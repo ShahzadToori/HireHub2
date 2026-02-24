@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login – HireHub</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/admin/css/admin.css">
+</head>
+<body class="admin-login-body">
+
+<div class="login-wrapper">
+  <div class="login-card">
+    <div class="login-header text-center mb-4">
+      <div class="login-logo mb-3">⚡</div>
+      <h1 class="login-title">Admin Login</h1>
+      <p class="login-sub">HireHub Control Panel</p>
+    </div>
+
+    <div id="loginAlert" class="alert d-none" role="alert"></div>
+
+    <form id="loginForm" novalidate>
+      <div class="mb-3">
+        <label class="form-label-custom">Username or Email</label>
+        <div class="input-icon-wrap">
+          <i class="bi bi-person"></i>
+          <input type="text" class="form-control-custom" id="username"
+                 placeholder="admin" autocomplete="username" required>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label-custom">Password</label>
+        <div class="input-icon-wrap">
+          <i class="bi bi-lock"></i>
+          <input type="password" class="form-control-custom" id="password"
+                 placeholder="••••••••" autocomplete="current-password" required>
+          <button type="button" class="btn-eye" id="togglePass" tabindex="-1">
+            <i class="bi bi-eye" id="eyeIcon"></i>
+          </button>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-login w-100" id="loginBtn">
+        <span id="loginText">Sign In</span>
+        <span id="loginSpinner" class="d-none">
+          <span class="spinner-border spinner-border-sm me-1"></span>Signing in…
+        </span>
+      </button>
+    </form>
+
+    <p class="text-center mt-3 first-time-link">
+      First time? <a href="#" id="setupLink">Create admin account</a>
+    </p>
+  </div>
+
+  <!-- Setup Form (hidden by default) -->
+  <div class="login-card mt-3 d-none" id="setupCard">
+    <h5 class="mb-3" style="font-family:'Syne',sans-serif">Create First Admin</h5>
+    <div id="setupAlert" class="alert d-none"></div>
+    <form id="setupForm">
+      <div class="mb-2">
+        <input type="text" class="form-control-custom" id="setupUsername" placeholder="Username" required>
+      </div>
+      <div class="mb-2">
+        <input type="email" class="form-control-custom" id="setupEmail" placeholder="Email" required>
+      </div>
+      <div class="mb-3">
+        <input type="password" class="form-control-custom" id="setupPassword" placeholder="Password (min 8 chars)" required minlength="8">
+      </div>
+      <button type="submit" class="btn-login w-100">Create Account</button>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Toggle password visibility
+  document.getElementById('togglePass').addEventListener('click', () => {
+    const inp  = document.getElementById('password');
+    const icon = document.getElementById('eyeIcon');
+    const isPass = inp.type === 'password';
+    inp.type = isPass ? 'text' : 'password';
+    icon.className = isPass ? 'bi bi-eye-slash' : 'bi bi-eye';
+  });
+
+  // Show alert helper
+  function showAlert(id, msg, type = 'danger') {
+    const el = document.getElementById(id);
+    el.className = `alert alert-${type}`;
+    el.textContent = msg;
+    el.classList.remove('d-none');
+    setTimeout(() => el.classList.add('d-none'), 4000);
+  }
+
+  // Login form
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn      = document.getElementById('loginBtn');
+    const loginTxt = document.getElementById('loginText');
+    const spinner  = document.getElementById('loginSpinner');
+
+    btn.disabled = true;
+    loginTxt.classList.add('d-none');
+    spinner.classList.remove('d-none');
+
+    try {
+      const res  = await fetch('/api/auth/login', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({
+          username: document.getElementById('username').value.trim(),
+          password: document.getElementById('password').value
+        })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        window.location.href = '/admin/dashboard.html';
+      } else {
+        showAlert('loginAlert', data.message || 'Login failed');
+        btn.disabled = false;
+        loginTxt.classList.remove('d-none');
+        spinner.classList.add('d-none');
+      }
+    } catch {
+      showAlert('loginAlert', 'Network error. Please try again.');
+      btn.disabled = false;
+      loginTxt.classList.remove('d-none');
+      spinner.classList.add('d-none');
+    }
+  });
+
+  // Setup toggle
+  document.getElementById('setupLink').addEventListener('click', (e) => {
+    e.preventDefault();
+    document.getElementById('setupCard').classList.toggle('d-none');
+  });
+
+  // Setup form
+  document.getElementById('setupForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    try {
+      const res  = await fetch('/api/auth/setup', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({
+          username: document.getElementById('setupUsername').value.trim(),
+          email:    document.getElementById('setupEmail').value.trim(),
+          password: document.getElementById('setupPassword').value
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        showAlert('setupAlert', 'Account created! Please login.', 'success');
+        document.getElementById('setupCard').classList.add('d-none');
+      } else {
+        showAlert('setupAlert', data.message);
+      }
+    } catch {
+      showAlert('setupAlert', 'Network error.');
+    }
+  });
+
+  // Auto-redirect if already logged in
+  fetch('/api/auth/me').then(r => r.json()).then(d => {
+    if (d.loggedIn) window.location.href = '/admin/dashboard.html';
+  });
+</script>
+</body>
+</html>

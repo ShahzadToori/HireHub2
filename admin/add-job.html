@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Job – HireHub Admin</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/admin/css/admin.css">
+</head>
+<body class="admin-body">
+
+<!-- Sidebar -->
+<aside class="admin-sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <span class="sidebar-brand">⚡ HireHub</span>
+    <button class="btn-sidebar-close d-lg-none" id="sidebarClose"><i class="bi bi-x-lg"></i></button>
+  </div>
+  <nav class="sidebar-nav">
+    <a href="dashboard.html"    class="sidebar-link"><i class="bi bi-speedometer2"></i><span>Dashboard</span></a>
+    <a href="jobs.html"         class="sidebar-link"><i class="bi bi-briefcase"></i><span>All Jobs</span></a>
+    <a href="add-job.html"      class="sidebar-link active"><i class="bi bi-plus-circle"></i><span>Add Job</span></a>
+    <a href="categories.html"   class="sidebar-link"><i class="bi bi-tag"></i><span>Categories</span></a>
+    <a href="messages.html" class="sidebar-link"><i class="bi bi-envelope"></i><span>Messages</span></a>
+    <a href="monetization.html" class="sidebar-link"><i class="bi bi-currency-dollar"></i><span>Monetization</span></a>
+    <a href="settings.html"     class="sidebar-link"><i class="bi bi-gear"></i><span>Settings</span></a>
+    <hr class="sidebar-divider">
+    <a href="/" class="sidebar-link" target="_blank"><i class="bi bi-box-arrow-up-right"></i><span>View Site</span></a>
+    <button class="sidebar-link sidebar-btn" id="logoutBtn"><i class="bi bi-box-arrow-right"></i><span>Logout</span></button>
+  </nav>
+</aside>
+<div class="sidebar-overlay d-lg-none d-none" id="sidebarOverlay"></div>
+
+<div class="admin-main">
+  <header class="admin-topbar">
+    <button class="btn-hamburger d-lg-none" id="sidebarToggle"><i class="bi bi-list fs-4"></i></button>
+    <h1 class="topbar-title" id="pageTitle">Add New Job</h1>
+    <div class="topbar-right">
+      <button class="btn-icon-admin" id="themeToggleAdmin" title="Toggle theme"><i class="bi bi-moon-fill" id="adminThemeIcon"></i></button>
+    </div>
+  </header>
+
+  <main class="admin-content">
+
+    <div id="formAlert" class="alert d-none mb-3"></div>
+
+    <form id="jobForm" novalidate>
+      <div class="row g-4">
+
+        <!-- Main Fields -->
+        <div class="col-lg-8">
+          <div class="admin-card">
+            <div class="admin-card-header"><h5 class="admin-card-title">Job Details</h5></div>
+            <div class="p-3">
+              <div class="row g-3">
+                <div class="col-12">
+                  <label class="form-label-custom">Job Title <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control-custom" name="title" placeholder="e.g. Senior Frontend Developer" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label-custom">Company Name <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control-custom" name="company" placeholder="e.g. Tech Corp" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label-custom">Location <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control-custom" name="location" placeholder="e.g. New York, NY or Remote" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label-custom">Category <span class="text-danger">*</span></label>
+                  <select class="form-control-custom" name="category_id" required>
+                    <option value="">Select category…</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label-custom">Job Type</label>
+                  <select class="form-control-custom" name="job_type">
+                    <option value="Full-time">Full-time</option>
+                    <option value="Part-time">Part-time</option>
+                    <option value="Contract">Contract</option>
+                    <option value="Freelance">Freelance</option>
+                    <option value="Remote">Remote</option>
+                  </select>
+                </div>
+                <div class="col-12">
+                  <label class="form-label-custom">Description <span class="text-danger">*</span></label>
+                  <textarea class="form-control-custom" name="description" rows="8"
+                    placeholder="Describe the role, responsibilities, requirements, and benefits…" required></textarea>
+                  <small class="text-muted">Be detailed – more info means better candidate matches.</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contact Info -->
+          <div class="admin-card mt-4">
+            <div class="admin-card-header"><h5 class="admin-card-title">Contact Information</h5></div>
+            <div class="p-3">
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label class="form-label-custom"><i class="bi bi-telephone me-1 text-success"></i>Phone</label>
+                  <input type="tel" class="form-control-custom" name="phone" placeholder="+1 555 000 0000">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label-custom"><i class="bi bi-whatsapp me-1" style="color:#25d366"></i>WhatsApp</label>
+                  <input type="tel" class="form-control-custom" name="whatsapp" placeholder="+1 555 000 0000">
+                  <small class="text-muted">With country code, no spaces or dashes</small>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label-custom"><i class="bi bi-envelope me-1 text-primary"></i>Email</label>
+                  <input type="email" class="form-control-custom" name="email" placeholder="jobs@company.com">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar Options -->
+        <div class="col-lg-4">
+          <div class="admin-card">
+            <div class="admin-card-header"><h5 class="admin-card-title">Publishing</h5></div>
+            <div class="p-3">
+              <div class="mb-3">
+                <label class="form-label-custom">Status</label>
+                <select class="form-control-custom" name="status">
+                  <option value="active">Active</option>
+                  <option value="expired">Expired</option>
+                </select>
+              </div>
+              <button type="submit" class="btn btn-admin-primary w-100 mb-2" id="submitBtn">
+                <i class="bi bi-check2-circle me-2"></i>
+                <span id="submitText">Publish Job</span>
+              </button>
+              <a href="jobs.html" class="btn btn-admin-outline w-100">Cancel</a>
+            </div>
+          </div>
+
+          <div class="admin-card mt-3">
+            <div class="admin-card-header"><h5 class="admin-card-title">Monetization</h5></div>
+            <div class="p-3">
+              <div class="form-check-custom mb-3">
+                <input type="checkbox" class="form-check-input" name="featured" id="featuredCheck">
+                <div>
+                  <label class="form-label-custom mb-0" for="featuredCheck">⭐ Featured Job</label>
+                  <small class="text-muted d-block">Highlighted in featured section</small>
+                </div>
+              </div>
+              <div id="featuredDateWrap" class="mb-3 d-none">
+                <label class="form-label-custom">Featured Until</label>
+                <input type="date" class="form-control-custom" name="featured_until">
+              </div>
+              <div class="form-check-custom">
+                <input type="checkbox" class="form-check-input" name="sponsored" id="sponsoredCheck">
+                <div>
+                  <label class="form-label-custom mb-0" for="sponsoredCheck">🔝 Sponsored</label>
+                  <small class="text-muted d-block">Pinned at top of all listings</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </form>
+
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/admin/js/admin.js"></script>
+<script>
+  // Determine if editing
+  const urlParams = new URLSearchParams(window.location.search);
+  const editId    = urlParams.get('id');
+  const isEdit    = !!editId;
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    await requireAuth();
+    await loadCategories();
+
+    if (isEdit) {
+      document.getElementById('pageTitle').textContent  = 'Edit Job';
+      document.getElementById('submitText').textContent = 'Update Job';
+      await loadJobData();
+    }
+
+    bindEvents();
+  });
+
+  async function loadCategories() {
+    try {
+      const data = await adminApi.get('/api/admin/categories');
+      const sel  = document.querySelector('select[name="category_id"]');
+      data.categories.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value       = c.id;
+        opt.textContent = c.name;
+        sel.appendChild(opt);
+      });
+    } catch {}
+  }
+
+  async function loadJobData() {
+    try {
+      const data = await adminApi.get(`/api/admin/jobs/${editId}`);
+      const job  = data.job;
+      const form = document.getElementById('jobForm');
+
+      ['title','company','location','job_type','description','phone','whatsapp','email','status','featured_until']
+        .forEach(field => {
+          const el = form.querySelector(`[name="${field}"]`);
+          if (el && job[field] != null) el.value = job[field];
+        });
+
+      form.querySelector('[name="category_id"]').value = job.category_id;
+
+      if (job.featured) {
+        form.querySelector('[name="featured"]').checked = true;
+        document.getElementById('featuredDateWrap').classList.remove('d-none');
+      }
+      if (job.sponsored) {
+        form.querySelector('[name="sponsored"]').checked = true;
+      }
+    } catch (e) {
+      showFormAlert('Failed to load job data', 'danger');
+    }
+  }
+
+  function bindEvents() {
+    document.getElementById('featuredCheck').addEventListener('change', (e) => {
+      document.getElementById('featuredDateWrap').classList.toggle('d-none', !e.target.checked);
+    });
+
+    document.getElementById('jobForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const btn  = document.getElementById('submitBtn');
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving…';
+
+      const body = {
+        title:          form.querySelector('[name="title"]').value.trim(),
+        company:        form.querySelector('[name="company"]').value.trim(),
+        category_id:    form.querySelector('[name="category_id"]').value,
+        location:       form.querySelector('[name="location"]').value.trim(),
+        job_type:       form.querySelector('[name="job_type"]').value,
+        description:    form.querySelector('[name="description"]').value.trim(),
+        phone:          form.querySelector('[name="phone"]').value.trim(),
+        whatsapp:       form.querySelector('[name="whatsapp"]').value.trim(),
+        email:          form.querySelector('[name="email"]').value.trim(),
+        status:         form.querySelector('[name="status"]').value,
+        featured:       form.querySelector('[name="featured"]').checked ? 1 : 0,
+        sponsored:      form.querySelector('[name="sponsored"]').checked ? 1 : 0,
+        featured_until: form.querySelector('[name="featured_until"]').value
+      };
+
+      if (!body.title || !body.company || !body.category_id || !body.location || !body.description) {
+        showFormAlert('Please fill all required fields', 'danger');
+        btn.disabled = false;
+        btn.innerHTML = `<i class="bi bi-check2-circle me-2"></i>${isEdit ? 'Update Job' : 'Publish Job'}`;
+        return;
+      }
+
+      try {
+        let data;
+        if (isEdit) {
+          data = await adminApi.put(`/api/admin/jobs/${editId}`, body);
+        } else {
+          data = await adminApi.post('/api/admin/jobs', body);
+        }
+
+        if (data.success) {
+          showFormAlert(isEdit ? 'Job updated successfully!' : 'Job published successfully!', 'success');
+          setTimeout(() => window.location.href = 'jobs.html', 1500);
+        } else {
+          throw new Error(data.message);
+        }
+      } catch (err) {
+        showFormAlert(err.message || 'Failed to save job', 'danger');
+        btn.disabled = false;
+        btn.innerHTML = `<i class="bi bi-check2-circle me-2"></i>${isEdit ? 'Update Job' : 'Publish Job'}`;
+      }
+    });
+  }
+
+  function showFormAlert(msg, type) {
+    const el = document.getElementById('formAlert');
+    el.className = `alert alert-${type}`;
+    el.textContent = msg;
+    el.classList.remove('d-none');
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+</script>
+</body>
+</html>

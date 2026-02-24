@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Messages – HireHub Admin</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/admin/css/admin.css">
+  <style>
+    /* ── Message status badges ──────────────────────────────────── */
+    .badge-unread  { background: #dbeafe; color: #1d4ed8; }
+    .badge-read    { background: var(--surface); color: var(--text-muted); border: 1px solid var(--border); }
+    .badge-replied { background: #d1fae5; color: #065f46; }
+
+    [data-theme="dark"] .badge-unread  { background: rgba(59,130,246,.2); color: #93c5fd; }
+    [data-theme="dark"] .badge-read    { background: var(--surface); color: var(--text-muted); }
+    [data-theme="dark"] .badge-replied { background: rgba(16,185,129,.15); color: #6ee7b7; }
+
+    .msg-badge {
+      display:       inline-block;
+      padding:       .18rem .6rem;
+      border-radius: 100px;
+      font-size:     .72rem;
+      font-weight:   700;
+      text-transform: capitalize;
+      white-space:   nowrap;
+    }
+
+    /* ── Unread counter pill in sidebar ─────────────────────────── */
+    .unread-pill {
+      background:    var(--primary);
+      color:         white;
+      border-radius: 100px;
+      padding:       .05rem .45rem;
+      font-size:     .7rem;
+      font-weight:   700;
+      margin-left:   .3rem;
+      vertical-align: middle;
+    }
+
+    /* ── Message inbox list ─────────────────────────────────────── */
+    .msg-inbox {
+      max-height:  600px;
+      overflow-y:  auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+    .msg-inbox::-webkit-scrollbar       { width: 4px; }
+    .msg-inbox::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    .msg-item {
+      padding:       .9rem 1rem;
+      border-bottom: 1px solid var(--border);
+      cursor:        pointer;
+      transition:    background .15s;
+    }
+    .msg-item:last-child { border-bottom: none; }
+    .msg-item:hover      { background: var(--surface); }
+    .msg-item.active     { background: var(--surface); border-left: 3px solid var(--primary); }
+
+    .msg-item-name {
+      font-weight: 600;
+      font-size:   .875rem;
+      color:       var(--text);
+      white-space: nowrap;
+      overflow:    hidden;
+      text-overflow: ellipsis;
+      max-width:   180px;
+    }
+    .msg-item-subject {
+      font-size:   .8rem;
+      color:       var(--text-muted);
+      white-space: nowrap;
+      overflow:    hidden;
+      text-overflow: ellipsis;
+    }
+    .msg-item-email {
+      font-size: .75rem;
+      color:     var(--text-muted);
+      white-space: nowrap;
+      overflow:    hidden;
+      text-overflow: ellipsis;
+    }
+    .msg-item-time {
+      font-size:  .72rem;
+      color:      var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .msg-unread-dot {
+      width:       8px;
+      height:      8px;
+      background:  var(--primary);
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top:  4px;
+    }
+
+    .msg-item.is-unread .msg-item-name    { font-weight: 700; }
+    .msg-item.is-unread .msg-item-subject { color: var(--text); font-weight: 500; }
+
+    /* ── Message detail ──────────────────────────────────────────── */
+    .msg-detail {
+      background:    var(--bg-card);
+      border:        1px solid var(--border);
+      border-radius: 12px;
+      overflow:      hidden;
+      display:       flex;
+      flex-direction: column;
+      min-height:    500px;
+    }
+
+    .msg-detail-header {
+      padding:       1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      background:    var(--surface);
+    }
+
+    .msg-detail-subject {
+      font-family:   var(--font);
+      font-size:     1.05rem;
+      font-weight:   700;
+      color:         var(--text);
+      margin-bottom: .6rem;
+    }
+
+    .msg-chip {
+      display:       inline-flex;
+      align-items:   center;
+      gap:           .3rem;
+      background:    var(--bg);
+      border:        1px solid var(--border);
+      border-radius: 100px;
+      padding:       .2rem .65rem;
+      font-size:     .78rem;
+      color:         var(--text-muted);
+    }
+
+    .msg-chip a {
+      color:           var(--primary);
+      text-decoration: none;
+    }
+    .msg-chip a:hover { text-decoration: underline; }
+
+    .msg-detail-body {
+      padding:     1.5rem;
+      flex:        1;
+      font-size:   .92rem;
+      line-height: 1.8;
+      color:       var(--text);
+      white-space: pre-wrap;
+      word-break:  break-word;
+    }
+
+    .msg-detail-footer {
+      padding:       1rem 1.5rem;
+      border-top:    1px solid var(--border);
+      background:    var(--surface);
+    }
+
+    /* ── Empty / placeholder states ─────────────────────────────── */
+    .msg-empty {
+      display:         flex;
+      flex-direction:  column;
+      align-items:     center;
+      justify-content: center;
+      flex:            1;
+      padding:         3rem 1rem;
+      text-align:      center;
+      color:           var(--text-muted);
+    }
+    .msg-empty i    { font-size: 3rem; margin-bottom: 1rem; opacity: .4; }
+    .msg-empty p    { font-size: .9rem; margin: 0; }
+
+    /* ── Action buttons ─────────────────────────────────────────── */
+    .btn-reply {
+      display:       inline-flex;
+      align-items:   center;
+      gap:           .4rem;
+      background:    var(--primary);
+      color:         white;
+      border:        none;
+      border-radius: 8px;
+      padding:       .45rem .9rem;
+      font-size:     .85rem;
+      font-weight:   600;
+      text-decoration: none;
+      cursor:        pointer;
+      transition:    background .18s;
+    }
+    .btn-reply:hover { background: var(--primary-hover, #0353e9); color: white; }
+
+    .btn-whatsapp-reply {
+      display:       inline-flex;
+      align-items:   center;
+      gap:           .4rem;
+      background:    #25d366;
+      color:         white;
+      border:        none;
+      border-radius: 8px;
+      padding:       .45rem .9rem;
+      font-size:     .85rem;
+      font-weight:   600;
+      text-decoration: none;
+      transition:    background .18s;
+    }
+    .btn-whatsapp-reply:hover { background: #1da851; color: white; }
+
+    /* ── Loading spinner ─────────────────────────────────────────── */
+    .msg-loading {
+      display:         flex;
+      align-items:     center;
+      justify-content: center;
+      padding:         3rem;
+    }
+  </style>
+</head>
+<body class="admin-body">
+
+<!-- ── Sidebar ──────────────────────────────────────────────── -->
+<aside class="admin-sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <span class="sidebar-brand">⚡ HireHub</span>
+    <button class="btn-sidebar-close d-lg-none" id="sidebarClose"><i class="bi bi-x-lg"></i></button>
+  </div>
+  <nav class="sidebar-nav">
+    <a href="dashboard.html"    class="sidebar-link"><i class="bi bi-speedometer2"></i><span>Dashboard</span></a>
+    <a href="jobs.html"         class="sidebar-link"><i class="bi bi-briefcase"></i><span>All Jobs</span></a>
+    <a href="add-job.html"      class="sidebar-link"><i class="bi bi-plus-circle"></i><span>Add Job</span></a>
+    <a href="categories.html"   class="sidebar-link"><i class="bi bi-tag"></i><span>Categories</span></a>
+    <a href="messages.html"     class="sidebar-link active"><i class="bi bi-envelope"></i><span>Messages <span class="unread-pill d-none" id="sidebarUnread">0</span></span></a>
+    <a href="monetization.html" class="sidebar-link"><i class="bi bi-currency-dollar"></i><span>Monetization</span></a>
+    <a href="settings.html"     class="sidebar-link"><i class="bi bi-gear"></i><span>Settings</span></a>
+    <hr class="sidebar-divider">
+    <a href="/" class="sidebar-link" target="_blank"><i class="bi bi-box-arrow-up-right"></i><span>View Site</span></a>
+    <button class="sidebar-link sidebar-btn" id="logoutBtn"><i class="bi bi-box-arrow-right"></i><span>Logout</span></button>
+  </nav>
+</aside>
+<div class="sidebar-overlay d-lg-none d-none" id="sidebarOverlay"></div>
+
+<!-- ── Main ─────────────────────────────────────────────────── -->
+<div class="admin-main">
+  <header class="admin-topbar">
+    <button class="btn-hamburger d-lg-none" id="sidebarToggle"><i class="bi bi-list fs-4"></i></button>
+    <h1 class="topbar-title">
+      Messages
+      <span class="unread-pill d-none" id="topbarUnread">0</span>
+    </h1>
+    <div class="topbar-right">
+      <select class="form-control-custom" id="statusFilter"
+              style="width:auto;padding:.35rem .85rem;font-size:.85rem">
+        <option value="">All Messages</option>
+        <option value="unread">Unread</option>
+        <option value="read">Read</option>
+        <option value="replied">Replied</option>
+      </select>
+      <button class="btn-icon-admin" id="themeToggleAdmin">
+        <i class="bi bi-moon-fill" id="adminThemeIcon"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="admin-content">
+    <div class="row g-4">
+
+      <!-- Inbox List -->
+      <div class="col-lg-5">
+        <div class="admin-card" style="overflow:hidden">
+          <div class="admin-card-header d-flex justify-content-between align-items-center">
+            <h5 class="admin-card-title mb-0">Inbox</h5>
+            <span id="totalCount" style="font-size:.82rem;color:var(--text-muted)">Loading…</span>
+          </div>
+
+          <div class="msg-inbox" id="msgInbox">
+            <div class="msg-loading">
+              <div class="spinner-border spinner-border-sm text-primary"></div>
+            </div>
+          </div>
+
+          <div class="admin-card-header" style="border-top:1px solid var(--border);border-bottom:none;padding:.6rem 1rem">
+            <ul class="pagination pagination-sm justify-content-center mb-0" id="msgPagination"></ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detail Panel -->
+      <div class="col-lg-7">
+        <div class="msg-detail" id="msgDetail">
+          <div class="msg-empty">
+            <i class="bi bi-envelope-open"></i>
+            <p>Select a message from the inbox to read it</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/admin/js/admin.js"></script>
+<script>
+'use strict';
+
+let currentPage = 1;
+let activeId    = null;
+
+document.addEventListener('DOMContentLoaded', async () => {
+  await requireAuth();
+  loadMessages();
+  document.getElementById('statusFilter').addEventListener('change', () => {
+    currentPage = 1;
+    loadMessages();
+  });
+});
+
+/* ── Load message list ─────────────────────────────────────── */
+async function loadMessages(page = 1) {
+  currentPage = page;
+  const status = document.getElementById('statusFilter').value;
+  const params = new URLSearchParams({ page, limit: 15 });
+  if (status) params.set('status', status);
+
+  const inbox = document.getElementById('msgInbox');
+  inbox.innerHTML = '<div class="msg-loading"><div class="spinner-border spinner-border-sm text-primary"></div></div>';
+
+  try {
+    const data = await adminApi.get(`/api/contact?${params}`);
+
+    // Unread badges
+    updateUnreadBadge(data.unread || 0);
+
+    // Total count
+    document.getElementById('totalCount').textContent =
+      `${data.total || 0} message${data.total !== 1 ? 's' : ''}`;
+
+    if (!data.messages || data.messages.length === 0) {
+      inbox.innerHTML = `
+        <div class="msg-empty">
+          <i class="bi bi-inbox"></i>
+          <p>${status ? 'No ' + status + ' messages' : 'No messages yet'}</p>
+        </div>`;
+      document.getElementById('msgPagination').innerHTML = '';
+      return;
+    }
+
+    inbox.innerHTML = data.messages.map(m => `
+      <div class="msg-item ${m.status === 'unread' ? 'is-unread' : ''} ${m.id === activeId ? 'active' : ''}"
+           id="msgItem_${m.id}"
+           onclick="openMessage(${m.id})">
+        <div class="d-flex justify-content-between align-items-start gap-2">
+          <div class="d-flex gap-2 flex-grow-1 overflow-hidden">
+            ${m.status === 'unread' ? '<div class="msg-unread-dot mt-1"></div>' : '<div style="width:8px;flex-shrink:0"></div>'}
+            <div class="overflow-hidden flex-grow-1">
+              <div class="msg-item-name">${escHtml(m.name)}</div>
+              <div class="msg-item-subject">${escHtml(m.subject)}</div>
+              <div class="msg-item-email">${escHtml(m.email)}</div>
+            </div>
+          </div>
+          <div class="text-end flex-shrink-0">
+            <span class="msg-badge badge-${m.status}">${m.status}</span>
+            <div class="msg-item-time mt-1">${timeAgo(m.created_at)}</div>
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    buildPagination(data.page, data.pages);
+
+  } catch (err) {
+    console.error('Messages load error:', err);
+    inbox.innerHTML = `
+      <div class="msg-empty">
+        <i class="bi bi-exclamation-triangle"></i>
+        <p>Failed to load messages.<br><small>Make sure you imported add_messages_table.sql</small></p>
+      </div>`;
+  }
+}
+
+/* ── Open single message ─────────────────────────────────────── */
+async function openMessage(id) {
+  activeId = id;
+
+  // Highlight active item
+  document.querySelectorAll('.msg-item').forEach(el => el.classList.remove('active'));
+  const item = document.getElementById(`msgItem_${id}`);
+  if (item) item.classList.add('active');
+
+  const detail = document.getElementById('msgDetail');
+  detail.innerHTML = '<div class="msg-loading"><div class="spinner-border text-primary"></div></div>';
+
+  try {
+    const data = await adminApi.get(`/api/contact/${id}`);
+    const m    = data.message;
+
+    detail.innerHTML = `
+      <div class="msg-detail-header">
+        <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+          <div class="msg-detail-subject">${escHtml(m.subject)}</div>
+          <span class="msg-badge badge-${m.status} flex-shrink-0">${m.status}</span>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+          <span class="msg-chip"><i class="bi bi-person"></i>${escHtml(m.name)}</span>
+          ${m.company ? `<span class="msg-chip"><i class="bi bi-building"></i>${escHtml(m.company)}</span>` : ''}
+          <span class="msg-chip"><i class="bi bi-envelope"></i><a href="mailto:${escHtml(m.email)}">${escHtml(m.email)}</a></span>
+          ${m.phone ? `<span class="msg-chip"><i class="bi bi-telephone"></i><a href="tel:${escHtml(m.phone)}">${escHtml(m.phone)}</a></span>` : ''}
+          <span class="msg-chip"><i class="bi bi-clock"></i>${timeAgo(m.created_at)}</span>
+        </div>
+      </div>
+
+      <div class="msg-detail-body">${escHtml(m.message)}</div>
+
+      <div class="msg-detail-footer">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+          <div class="d-flex flex-wrap gap-2">
+            <a href="mailto:${escHtml(m.email)}?subject=Re: ${encodeURIComponent(m.subject)}"
+               class="btn-reply" onclick="setTimeout(()=>markReplied(${m.id}),500)">
+              <i class="bi bi-reply-fill"></i>Reply via Email
+            </a>
+            ${m.phone ? `
+            <a href="https://wa.me/${m.phone.replace(/\D/g,'')}?text=${encodeURIComponent('Hi ' + m.name + ', thanks for contacting us regarding: ' + m.subject)}"
+               class="btn-whatsapp-reply" target="_blank" rel="noopener">
+              <i class="bi bi-whatsapp"></i>WhatsApp
+            </a>` : ''}
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <select class="form-control-custom" id="statusSel_${m.id}"
+                    onchange="changeStatus(${m.id}, this.value)"
+                    style="width:auto;padding:.35rem .75rem;font-size:.82rem">
+              <option value="unread"  ${m.status==='unread'  ? 'selected' : ''}>Mark Unread</option>
+              <option value="read"    ${m.status==='read'    ? 'selected' : ''}>Mark Read</option>
+              <option value="replied" ${m.status==='replied' ? 'selected' : ''}>Mark Replied</option>
+            </select>
+            <button class="btn-action btn-action-del" onclick="deleteMessage(${m.id})" title="Delete message">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Refresh inbox to update unread dot
+    loadMessages(currentPage);
+
+  } catch (err) {
+    console.error('Open message error:', err);
+    detail.innerHTML = `
+      <div class="msg-empty">
+        <i class="bi bi-exclamation-triangle"></i>
+        <p>Failed to load this message.</p>
+      </div>`;
+  }
+}
+
+/* ── Change status ───────────────────────────────────────────── */
+async function changeStatus(id, status) {
+  try {
+    await adminApi.put(`/api/contact/${id}/status`, { status });
+    loadMessages(currentPage);
+    // Update badge in detail if still open
+    const badge = document.querySelector(`#msgDetail .msg-badge`);
+    if (badge) { badge.className = `msg-badge badge-${status}`; badge.textContent = status; }
+  } catch { alert('Failed to update status'); }
+}
+
+/* ── Mark replied (called when reply button clicked) ─────────── */
+async function markReplied(id) {
+  try {
+    await adminApi.put(`/api/contact/${id}/status`, { status: 'replied' });
+    const sel = document.getElementById(`statusSel_${id}`);
+    if (sel) sel.value = 'replied';
+    loadMessages(currentPage);
+  } catch {}
+}
+
+/* ── Delete ──────────────────────────────────────────────────── */
+async function deleteMessage(id) {
+  if (!confirm('Delete this message permanently?')) return;
+  try {
+    await adminApi.del(`/api/contact/${id}`);
+    document.getElementById('msgDetail').innerHTML = `
+      <div class="msg-empty">
+        <i class="bi bi-trash"></i>
+        <p>Message deleted</p>
+      </div>`;
+    activeId = null;
+    loadMessages(currentPage);
+  } catch { alert('Delete failed'); }
+}
+
+/* ── Unread badge helper ─────────────────────────────────────── */
+function updateUnreadBadge(count) {
+  ['sidebarUnread', 'topbarUnread'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (count > 0) {
+      el.textContent = count;
+      el.classList.remove('d-none');
+    } else {
+      el.classList.add('d-none');
+    }
+  });
+}
+
+/* ── Pagination ──────────────────────────────────────────────── */
+function buildPagination(cur, total) {
+  const ul = document.getElementById('msgPagination');
+  ul.innerHTML = '';
+  if (total <= 1) return;
+  for (let i = 1; i <= total; i++) {
+    const li = document.createElement('li');
+    li.className = `page-item${i === cur ? ' active' : ''}`;
+    li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+    li.addEventListener('click', (e) => { e.preventDefault(); loadMessages(i); });
+    ul.appendChild(li);
+  }
+}
+</script>
+</body>
+</html>

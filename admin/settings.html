@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings – HireHub Admin</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/admin/css/admin.css">
+</head>
+<body class="admin-body">
+
+<aside class="admin-sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <span class="sidebar-brand">⚡ HireHub</span>
+    <button class="btn-sidebar-close d-lg-none" id="sidebarClose"><i class="bi bi-x-lg"></i></button>
+  </div>
+  <nav class="sidebar-nav">
+    <a href="dashboard.html"    class="sidebar-link"><i class="bi bi-speedometer2"></i><span>Dashboard</span></a>
+    <a href="jobs.html"         class="sidebar-link"><i class="bi bi-briefcase"></i><span>All Jobs</span></a>
+    <a href="add-job.html"      class="sidebar-link"><i class="bi bi-plus-circle"></i><span>Add Job</span></a>
+    <a href="categories.html"   class="sidebar-link"><i class="bi bi-tag"></i><span>Categories</span></a>
+    <a href="messages.html" class="sidebar-link"><i class="bi bi-envelope"></i><span>Messages</span></a>
+    <a href="monetization.html" class="sidebar-link"><i class="bi bi-currency-dollar"></i><span>Monetization</span></a>
+    <a href="settings.html"     class="sidebar-link active"><i class="bi bi-gear"></i><span>Settings</span></a>
+    <hr class="sidebar-divider">
+    <a href="/" class="sidebar-link" target="_blank"><i class="bi bi-box-arrow-up-right"></i><span>View Site</span></a>
+    <button class="sidebar-link sidebar-btn" id="logoutBtn"><i class="bi bi-box-arrow-right"></i><span>Logout</span></button>
+  </nav>
+</aside>
+<div class="sidebar-overlay d-lg-none d-none" id="sidebarOverlay"></div>
+
+<div class="admin-main">
+  <header class="admin-topbar">
+    <button class="btn-hamburger d-lg-none" id="sidebarToggle"><i class="bi bi-list fs-4"></i></button>
+    <h1 class="topbar-title">Site Settings</h1>
+    <div class="topbar-right">
+      <button class="btn-icon-admin" id="themeToggleAdmin"><i class="bi bi-moon-fill" id="adminThemeIcon"></i></button>
+    </div>
+  </header>
+
+  <main class="admin-content">
+
+    <div id="settingsAlert" class="alert d-none mb-3"></div>
+
+    <form id="settingsForm">
+      <div class="row g-4">
+
+        <div class="col-lg-8">
+
+          <!-- General -->
+          <div class="admin-card mb-4">
+            <div class="admin-card-header"><h5 class="admin-card-title"><i class="bi bi-globe me-2"></i>General</h5></div>
+            <div class="p-3">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label-custom">Site Name</label>
+                  <input type="text" class="form-control-custom" name="site_name">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label-custom">Site Tagline</label>
+                  <input type="text" class="form-control-custom" name="site_tagline">
+                </div>
+                <div class="col-12">
+                  <label class="form-label-custom">Hero Title</label>
+                  <input type="text" class="form-control-custom" name="hero_title">
+                </div>
+                <div class="col-12">
+                  <label class="form-label-custom">Hero Subtitle</label>
+                  <input type="text" class="form-control-custom" name="hero_subtitle">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label-custom">Jobs Per Page</label>
+                  <input type="number" class="form-control-custom" name="jobs_per_page" min="6" max="50">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Appearance -->
+          <div class="admin-card mb-4">
+            <div class="admin-card-header"><h5 class="admin-card-title"><i class="bi bi-palette me-2"></i>Appearance</h5></div>
+            <div class="p-3">
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label class="form-label-custom">Primary Color</label>
+                  <div class="color-input-wrap">
+                    <input type="color" class="color-swatch" name="primary_color" id="primaryColor" value="#0f62fe">
+                    <input type="text"  class="form-control-custom" id="primaryColorHex" value="#0f62fe" maxlength="7">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label-custom">Secondary Color</label>
+                  <div class="color-input-wrap">
+                    <input type="color" class="color-swatch" name="secondary_color" id="secondaryColor" value="#161616">
+                    <input type="text"  class="form-control-custom" id="secondaryColorHex" value="#161616" maxlength="7">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label-custom">Default Theme</label>
+                  <select class="form-control-custom" name="default_theme">
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sections toggle -->
+          <div class="admin-card mb-4">
+            <div class="admin-card-header"><h5 class="admin-card-title"><i class="bi bi-toggles me-2"></i>Section Visibility</h5></div>
+            <div class="p-3">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <div class="form-check-custom">
+                    <input type="checkbox" class="form-check-input" name="show_featured" id="showFeatured" value="1">
+                    <div>
+                      <label class="form-label-custom mb-0" for="showFeatured">Show Featured Jobs</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-check-custom">
+                    <input type="checkbox" class="form-check-input" name="show_sponsored" id="showSponsored" value="1">
+                    <div>
+                      <label class="form-label-custom mb-0" for="showSponsored">Show Sponsored Jobs</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-check-custom">
+                    <input type="checkbox" class="form-check-input" name="show_banner_top" id="showBannerTop" value="1">
+                    <div>
+                      <label class="form-label-custom mb-0" for="showBannerTop">Top Banner Ad</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-check-custom">
+                    <input type="checkbox" class="form-check-input" name="show_banner_side" id="showBannerSide" value="1">
+                    <div>
+                      <label class="form-label-custom mb-0" for="showBannerSide">Sidebar Banner Ad</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right column -->
+        <div class="col-lg-4">
+          <div class="admin-card mb-4">
+            <div class="admin-card-header"><h5 class="admin-card-title"><i class="bi bi-image me-2"></i>Logo</h5></div>
+            <div class="p-3">
+              <div id="logoPreviewWrap" class="mb-3 text-center d-none">
+                <img id="logoPreview" src="" style="max-height:60px;border-radius:8px">
+              </div>
+              <label class="form-label-custom">Upload Logo</label>
+              <input type="file" class="form-control-custom" id="logoFile" accept="image/*">
+              <small class="text-muted">PNG, SVG, JPG – max 2MB</small>
+              <button type="button" class="btn btn-admin-outline w-100 mt-2" id="uploadLogoBtn">
+                <i class="bi bi-upload me-2"></i>Upload
+              </button>
+            </div>
+          </div>
+
+          <div class="admin-card">
+            <div class="admin-card-header"><h5 class="admin-card-title">Save</h5></div>
+            <div class="p-3">
+              <button type="submit" class="btn btn-admin-primary w-100">
+                <i class="bi bi-check2-circle me-2"></i>Save Settings
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </form>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/admin/js/admin.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', async () => {
+    await requireAuth();
+    await loadCurrentSettings();
+    bindColorPickers();
+    bindLogoUpload();
+  });
+
+  async function loadCurrentSettings() {
+    try {
+      const data = await fetch('/api/settings').then(r => r.json());
+      const s    = data.settings;
+      const form = document.getElementById('settingsForm');
+
+      Object.entries(s).forEach(([key, val]) => {
+        const el = form.querySelector(`[name="${key}"]`);
+        if (!el) return;
+
+        if (el.type === 'checkbox') {
+          el.checked = val === '1';
+        } else {
+          el.value = val;
+        }
+      });
+
+      if (s.primary_color) {
+        document.getElementById('primaryColor').value    = s.primary_color;
+        document.getElementById('primaryColorHex').value = s.primary_color;
+      }
+      if (s.secondary_color) {
+        document.getElementById('secondaryColor').value    = s.secondary_color;
+        document.getElementById('secondaryColorHex').value = s.secondary_color;
+      }
+      if (s.logo_url) {
+        document.getElementById('logoPreview').src = s.logo_url;
+        document.getElementById('logoPreviewWrap').classList.remove('d-none');
+      }
+    } catch (e) {
+      console.warn('Settings load error', e);
+    }
+  }
+
+  function bindColorPickers() {
+    [['primaryColor','primaryColorHex','primary_color'],
+     ['secondaryColor','secondaryColorHex','secondary_color']].forEach(([pickerId, hexId]) => {
+      const picker = document.getElementById(pickerId);
+      const hex    = document.getElementById(hexId);
+
+      picker.addEventListener('input', () => { hex.value = picker.value; });
+      hex.addEventListener('input', () => {
+        if (/^#[0-9a-f]{6}$/i.test(hex.value)) picker.value = hex.value;
+      });
+    });
+  }
+
+  function bindLogoUpload() {
+    document.getElementById('uploadLogoBtn').addEventListener('click', async () => {
+      const file = document.getElementById('logoFile').files[0];
+      if (!file) { alert('Select a file first'); return; }
+
+      const formData = new FormData();
+      formData.append('logo', file);
+
+      try {
+        const res  = await fetch('/api/admin/upload-logo', { method: 'POST', body: formData });
+        const data = await res.json();
+        if (data.success) {
+          document.getElementById('logoPreview').src = data.logoUrl;
+          document.getElementById('logoPreviewWrap').classList.remove('d-none');
+          showSettingsAlert('Logo uploaded!', 'success');
+        } else {
+          showSettingsAlert(data.message, 'danger');
+        }
+      } catch {
+        showSettingsAlert('Upload failed', 'danger');
+      }
+    });
+  }
+
+  document.getElementById('settingsForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const body = {};
+
+    // Text/select fields
+    form.querySelectorAll('[name]').forEach(el => {
+      if (el.type === 'file') return;
+      if (el.type === 'checkbox') {
+        body[el.name] = el.checked ? '1' : '0';
+      } else if (el.name === 'primary_color') {
+        body[el.name] = document.getElementById('primaryColorHex').value;
+      } else if (el.name === 'secondary_color') {
+        body[el.name] = document.getElementById('secondaryColorHex').value;
+      } else {
+        body[el.name] = el.value;
+      }
+    });
+
+    try {
+      const data = await adminApi.put('/api/settings', body);
+      if (data.success) {
+        showSettingsAlert('Settings saved successfully!', 'success');
+      } else {
+        showSettingsAlert(data.message, 'danger');
+      }
+    } catch (err) {
+      showSettingsAlert('Failed to save settings', 'danger');
+    }
+  });
+
+  function showSettingsAlert(msg, type) {
+    const el = document.getElementById('settingsAlert');
+    el.className = `alert alert-${type}`;
+    el.textContent = msg;
+    el.classList.remove('d-none');
+    setTimeout(() => el.classList.add('d-none'), 4000);
+  }
+</script>
+</body>
+</html>

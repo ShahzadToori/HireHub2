@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard – HireHub Admin</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/admin/css/admin.css">
+</head>
+<body class="admin-body">
+
+<!-- ── Sidebar ────────────────────────────────────────────── -->
+<aside class="admin-sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <span class="sidebar-brand">⚡ HireHub</span>
+    <button class="btn-sidebar-close d-lg-none" id="sidebarClose"><i class="bi bi-x-lg"></i></button>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a href="dashboard.html"  class="sidebar-link active"><i class="bi bi-speedometer2"></i><span>Dashboard</span></a>
+    <a href="jobs.html"       class="sidebar-link"><i class="bi bi-briefcase"></i><span>All Jobs</span></a>
+    <a href="add-job.html"    class="sidebar-link"><i class="bi bi-plus-circle"></i><span>Add Job</span></a>
+    <a href="categories.html" class="sidebar-link"><i class="bi bi-tag"></i><span>Categories</span></a>
+    <a href="messages.html" class="sidebar-link"><i class="bi bi-envelope"></i><span>Messages</span></a>
+    <a href="monetization.html" class="sidebar-link"><i class="bi bi-currency-dollar"></i><span>Monetization</span></a>
+    <a href="settings.html"   class="sidebar-link"><i class="bi bi-gear"></i><span>Settings</span></a>
+    <hr class="sidebar-divider">
+    <a href="/"               class="sidebar-link" target="_blank"><i class="bi bi-box-arrow-up-right"></i><span>View Site</span></a>
+    <button class="sidebar-link sidebar-btn" id="logoutBtn"><i class="bi bi-box-arrow-right"></i><span>Logout</span></button>
+  </nav>
+</aside>
+
+<!-- ── Sidebar Overlay (mobile) ───────────────────────────── -->
+<div class="sidebar-overlay d-lg-none d-none" id="sidebarOverlay"></div>
+
+<!-- ── Main Content ──────────────────────────────────────── -->
+<div class="admin-main">
+
+  <!-- Top Bar -->
+  <header class="admin-topbar">
+    <button class="btn-hamburger d-lg-none" id="sidebarToggle"><i class="bi bi-list fs-4"></i></button>
+    <h1 class="topbar-title">Dashboard</h1>
+    <div class="topbar-right">
+      <button class="btn-icon-admin" id="themeToggleAdmin" title="Toggle theme"><i class="bi bi-moon-fill" id="adminThemeIcon"></i></button>
+      <div class="admin-avatar" id="adminName">A</div>
+    </div>
+  </header>
+
+  <main class="admin-content">
+
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-lg-3">
+        <div class="stat-card stat-primary">
+          <div class="stat-icon"><i class="bi bi-briefcase-fill"></i></div>
+          <div class="stat-value" id="statTotal">–</div>
+          <div class="stat-label">Total Jobs</div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="stat-card stat-success">
+          <div class="stat-icon"><i class="bi bi-check-circle-fill"></i></div>
+          <div class="stat-value" id="statActive">–</div>
+          <div class="stat-label">Active Jobs</div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="stat-card stat-warning">
+          <div class="stat-icon"><i class="bi bi-star-fill"></i></div>
+          <div class="stat-value" id="statFeatured">–</div>
+          <div class="stat-label">Featured</div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="stat-card stat-info">
+          <div class="stat-icon"><i class="bi bi-eye-fill"></i></div>
+          <div class="stat-value" id="statViews">–</div>
+          <div class="stat-label">Total Views</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row g-3 mb-4">
+      <div class="col-12">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h5 class="admin-card-title">Quick Actions</h5>
+          </div>
+          <div class="d-flex flex-wrap gap-2 p-3">
+            <a href="add-job.html" class="btn btn-admin-primary"><i class="bi bi-plus-lg me-2"></i>Post New Job</a>
+            <a href="jobs.html"    class="btn btn-admin-outline"><i class="bi bi-list-ul me-2"></i>Manage Jobs</a>
+            <a href="settings.html" class="btn btn-admin-outline"><i class="bi bi-gear me-2"></i>Site Settings</a>
+            <a href="monetization.html" class="btn btn-admin-outline"><i class="bi bi-currency-dollar me-2"></i>Monetization</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Jobs Table -->
+    <div class="admin-card">
+      <div class="admin-card-header d-flex justify-content-between align-items-center">
+        <h5 class="admin-card-title">Recent Jobs</h5>
+        <a href="jobs.html" class="btn btn-sm btn-admin-outline">View All</a>
+      </div>
+      <div class="table-responsive">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Job Title</th>
+              <th>Category</th>
+              <th>Status</th>
+              <th>Posted</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="recentJobsTable">
+            <tr><td colspan="5" class="text-center text-muted py-3">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/admin/js/admin.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', async () => {
+    await requireAuth();
+    loadDashboard();
+  });
+
+  async function loadDashboard() {
+    try {
+      const data = await adminApi.get('/api/admin/stats');
+      document.getElementById('statTotal').textContent   = data.stats.totalJobs;
+      document.getElementById('statActive').textContent  = data.stats.activeJobs;
+      document.getElementById('statFeatured').textContent = data.stats.featuredJobs;
+      document.getElementById('statViews').textContent   = data.stats.totalViews.toLocaleString();
+
+      const tbody = document.getElementById('recentJobsTable');
+      if (data.recentJobs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-3">No jobs yet</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.recentJobs.map(job => `
+        <tr>
+          <td><strong>${escHtml(job.title)}</strong><br><small class="text-muted">${escHtml(job.company)}</small></td>
+          <td>${escHtml(job.category)}</td>
+          <td><span class="status-badge status-${job.status}">${job.status}</span></td>
+          <td>${timeAgo(job.created_at)}</td>
+          <td>
+            <a href="edit-job.html?id=${job.id}" class="btn-action btn-action-edit"><i class="bi bi-pencil"></i></a>
+            <button class="btn-action btn-action-del" onclick="deleteJob(${job.id}, this)"><i class="bi bi-trash"></i></button>
+          </td>
+        </tr>
+      `).join('');
+    } catch (e) {
+      console.error('Dashboard load error:', e);
+    }
+  }
+
+  async function deleteJob(id, btn) {
+    if (!confirm('Delete this job?')) return;
+    try {
+      await adminApi.del(`/api/admin/jobs/${id}`);
+      btn.closest('tr').remove();
+    } catch (e) {
+      alert('Failed to delete job');
+    }
+  }
+</script>
+</body>
+</html>

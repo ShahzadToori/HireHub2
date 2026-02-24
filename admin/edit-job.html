@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="refresh" content="0;url=add-job.html">
+  <script>
+    // Preserve the ?id= parameter when redirecting
+    const id = new URLSearchParams(window.location.search).get('id');
+    if (id) window.location.href = `add-job.html?id=${id}`;
+    else     window.location.href = 'add-job.html';
+  </script>
+</head>
+<body></body>
+</html>

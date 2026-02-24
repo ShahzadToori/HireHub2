@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- SEO Meta -->
+  <title id="meta-title">HireHub – Find Your Next Career Opportunity</title>
+  <meta name="description" id="meta-desc" content="Browse thousands of job listings across tech, marketing, finance and more. Connect directly with recruiters via WhatsApp, phone, or email.">
+  <meta name="keywords" content="jobs, job listings, career, recruitment, hiring, employment">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" id="og-title" content="HireHub – Job Listings">
+  <meta property="og:description" content="Find your next career opportunity. Direct recruiter contact.">
+  <meta property="og:image" content="/images/og-image.jpg">
+
+  <!-- Schema.org – ItemList will be injected by JS -->
+  <script type="application/ld+json" id="schema-list"></script>
+
+  <!-- Bootstrap 5 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════
+     TOP BANNER AD
+════════════════════════════════════════════════ -->
+<div id="ad-top" class="ad-zone ad-top d-none">
+  <div class="container text-center py-1">
+    <span class="ad-label">Advertisement</span>
+    <div id="ad-top-code"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     NAVBAR
+════════════════════════════════════════════════ -->
+<nav class="navbar navbar-expand-lg sticky-top" id="mainNav">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+      <img id="site-logo" src="" alt="Logo" class="d-none" style="max-height:36px">
+      <span id="site-name" class="brand-name">HireHub</span>
+    </a>
+
+    <div class="d-flex align-items-center gap-2 ms-auto">
+      <button class="btn btn-icon theme-toggle" id="themeToggle" title="Toggle dark mode" aria-label="Toggle theme">
+        <i class="bi bi-moon-fill" id="themeIcon"></i>
+      </button>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <i class="bi bi-list fs-4"></i>
+      </button>
+    </div>
+
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+        <li class="nav-item"><a class="nav-link" href="#jobs">Browse Jobs</a></li>
+        <li class="nav-item"><a class="nav-link" href="#categories">Categories</a></li>
+        <li class="nav-item"><a class="nav-link" href="/contact.html">Post a Job</a></li>
+        <li class="nav-item"><a class="nav-link" href="/admin" target="_blank">Admin</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════
+     HERO
+════════════════════════════════════════════════ -->
+<header class="hero-section">
+  <div class="hero-bg"></div>
+  <div class="container position-relative">
+    <div class="row align-items-center min-vh-50">
+      <div class="col-lg-8 mx-auto text-center">
+        <div class="hero-badge mb-3">🚀 New jobs added daily</div>
+        <h1 class="hero-title" id="hero-title">Discover Jobs That Matter</h1>
+        <p class="hero-subtitle" id="hero-subtitle">Browse thousands of opportunities and connect directly with recruiters.</p>
+
+        <!-- Main Search Bar -->
+        <form class="hero-search-form" id="searchForm">
+          <div class="search-bar-wrap">
+            <div class="search-field search-field-keyword">
+              <i class="bi bi-search"></i>
+              <input type="text" id="searchInput" placeholder="Job title, skill, or company…" autocomplete="off">
+            </div>
+            <div class="search-field search-field-location">
+              <i class="bi bi-geo-alt"></i>
+              <input type="text" id="locationInput" placeholder="Location">
+            </div>
+            <button type="submit" class="btn btn-search">
+              <i class="bi bi-search me-1"></i>Search
+            </button>
+          </div>
+          <div class="search-filters-row mt-3">
+            <select id="categoryFilter" class="filter-pill">
+              <option value="">All Categories</option>
+            </select>
+            <select id="typeFilter" class="filter-pill">
+              <option value="">All Types</option>
+              <option value="Full-time">Full-time</option>
+              <option value="Part-time">Part-time</option>
+              <option value="Contract">Contract</option>
+              <option value="Freelance">Freelance</option>
+              <option value="Remote">Remote</option>
+            </select>
+            <select id="sortFilter" class="filter-pill">
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+              <option value="title">A–Z</option>
+            </select>
+            <button type="button" class="btn-clear-filters d-none" id="clearFilters">
+              <i class="bi bi-x-circle me-1"></i>Clear filters
+            </button>
+          </div>
+        </form>
+
+        <!-- Quick Stats -->
+        <div class="hero-stats d-flex justify-content-center gap-4 mt-4">
+          <div class="stat-pill"><span id="stat-total">…</span> Jobs</div>
+          <div class="stat-pill"><span id="stat-cats">…</span> Categories</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════
+     FEATURED JOBS
+════════════════════════════════════════════════ -->
+<section class="featured-section py-5" id="featured">
+  <div class="container">
+    <div class="section-header mb-4">
+      <span class="section-tag">✦ Featured</span>
+      <h2 class="section-title">Top Opportunities</h2>
+    </div>
+    <div class="row g-4" id="featuredList">
+      <!-- Injected by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     CATEGORIES
+════════════════════════════════════════════════ -->
+<section class="categories-section py-4" id="categories">
+  <div class="container">
+    <div class="section-header mb-4">
+      <span class="section-tag">Browse by</span>
+      <h2 class="section-title">Category</h2>
+    </div>
+    <div class="categories-scroll" id="categoryChips">
+      <!-- Injected by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     JOB LISTINGS + SIDEBAR
+════════════════════════════════════════════════ -->
+<section class="jobs-section py-5" id="jobs">
+  <div class="container">
+    <div class="row g-4">
+
+      <!-- Job Grid -->
+      <div class="col-lg-8">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <p class="results-info mb-0" id="resultsInfo">Loading jobs…</p>
+          <div class="d-flex align-items-center gap-2">
+            <button class="btn-grid-toggle active" id="viewGrid" title="Grid view"><i class="bi bi-grid-3x2-gap-fill"></i></button>
+            <button class="btn-grid-toggle" id="viewList" title="List view"><i class="bi bi-list-ul"></i></button>
+          </div>
+        </div>
+
+        <!-- Spinner -->
+        <div id="loadingSpinner" class="text-center py-5">
+          <div class="spinner-custom"></div>
+          <p class="mt-3 text-muted">Loading jobs…</p>
+        </div>
+
+        <div class="row g-3" id="jobsList">
+          <!-- Jobs injected here -->
+        </div>
+
+        <!-- Empty state -->
+        <div id="emptyState" class="empty-state d-none">
+          <i class="bi bi-search fs-1 mb-3"></i>
+          <h4>No jobs found</h4>
+          <p>Try adjusting your search filters</p>
+          <button class="btn btn-primary" onclick="resetFilters()">Clear All Filters</button>
+        </div>
+
+        <!-- Pagination -->
+        <nav id="paginationWrap" class="mt-5 d-none">
+          <ul class="pagination justify-content-center" id="pagination"></ul>
+        </nav>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="col-lg-4">
+        <!-- Sidebar Ad -->
+        <div id="ad-sidebar" class="ad-zone ad-sidebar d-none mb-4">
+          <span class="ad-label">Advertisement</span>
+          <div id="ad-sidebar-code"></div>
+        </div>
+
+        <!-- Category Stats Widget -->
+        <div class="sidebar-widget">
+          <h5 class="widget-title">Jobs by Category</h5>
+          <ul class="category-list" id="sidebarCats"></ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     JOB DETAIL MODAL
+════════════════════════════════════════════════ -->
+<div class="modal fade" id="jobModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content job-modal-content">
+
+      <!-- Sticky Header -->
+      <div class="job-modal-header">
+        <div class="d-flex justify-content-between align-items-start gap-3">
+          <div class="flex-grow-1">
+            <div id="modalBadges" class="d-flex flex-wrap gap-1 mb-2"></div>
+            <h3 class="modal-job-title" id="modalTitle">Loading…</h3>
+            <div class="modal-job-meta d-flex flex-wrap gap-2 mt-2">
+              <span class="meta-chip"><i class="bi bi-building me-1"></i><span id="modalCompany"></span></span>
+              <span class="meta-chip"><i class="bi bi-geo-alt me-1"></i><span id="modalLocation"></span></span>
+              <span class="meta-chip"><i class="bi bi-briefcase me-1"></i><span id="modalType"></span></span>
+              <span class="meta-chip"><i class="bi bi-tag me-1"></i><span id="modalCategory"></span></span>
+            </div>
+          </div>
+          <button type="button" class="btn-modal-close flex-shrink-0" data-bs-dismiss="modal" aria-label="Close">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Scrollable Body -->
+      <div class="modal-body job-modal-body">
+        <div class="modal-desc-label">
+          <i class="bi bi-file-text me-2"></i>Job Description
+        </div>
+        <div class="modal-job-desc" id="modalDescription"></div>
+      </div>
+
+      <!-- Sticky Footer – contact actions -->
+      <div class="job-modal-footer">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 w-100">
+          <small class="modal-posted-date" id="modalPosted">
+            <i class="bi bi-clock me-1"></i>
+          </small>
+          <div class="d-flex flex-wrap gap-2">
+            <a id="modalPhone" href="#" class="btn btn-contact btn-phone d-none" onclick="event.stopPropagation()">
+              <i class="bi bi-telephone-fill me-1"></i>Call
+            </a>
+            <a id="modalWhatsApp" href="#" class="btn btn-contact btn-whatsapp d-none"
+               target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">
+              <i class="bi bi-whatsapp me-1"></i>WhatsApp
+            </a>
+            <a id="modalEmail" href="#" class="btn btn-contact btn-email d-none" onclick="event.stopPropagation()">
+              <i class="bi bi-envelope-fill me-1"></i>Email
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════════ -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="row g-4 align-items-start">
+      <div class="col-md-4">
+        <div class="footer-brand mb-2">
+          <span class="brand-name" id="footer-site-name">HireHub</span>
+        </div>
+        <p class="footer-desc">Connecting talent with opportunity. Find your next career move today.</p>
+      </div>
+      <div class="col-md-4">
+        <h6 class="footer-heading">Quick Links</h6>
+        <ul class="footer-links">
+          <li><a href="#jobs">Browse Jobs</a></li>
+          <li><a href="#categories">Categories</a></li>
+          <li><a href="/admin" target="_blank">Admin Panel</a></li>
+        </ul>
+      </div>
+      <div class="col-md-4">
+        <h6 class="footer-heading">Contact</h6>
+        <p class="footer-desc">Looking to post a job? Reach out to our admin team.</p>
+      </div>
+    </div>
+    <hr class="footer-divider">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <p class="mb-0 footer-copy">© <span id="footerYear"></span> <span class="footer-brand-inline" id="footer-copy-name">HireHub</span>. All rights reserved.</p>
+      <p class="mb-0 footer-copy">Built with ❤️ for job seekers</p>
+    </div>
+  </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- App JS -->
+<script src="/js/main.js"></script>
+</body>
+</html>

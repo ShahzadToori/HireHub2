@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Categories – HireHub Admin</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/admin/css/admin.css">
+</head>
+<body class="admin-body">
+
+<aside class="admin-sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <span class="sidebar-brand">⚡ HireHub</span>
+    <button class="btn-sidebar-close d-lg-none" id="sidebarClose"><i class="bi bi-x-lg"></i></button>
+  </div>
+  <nav class="sidebar-nav">
+    <a href="dashboard.html"    class="sidebar-link"><i class="bi bi-speedometer2"></i><span>Dashboard</span></a>
+    <a href="jobs.html"         class="sidebar-link"><i class="bi bi-briefcase"></i><span>All Jobs</span></a>
+    <a href="add-job.html"      class="sidebar-link"><i class="bi bi-plus-circle"></i><span>Add Job</span></a>
+    <a href="categories.html"   class="sidebar-link active"><i class="bi bi-tag"></i><span>Categories</span></a>
+    <a href="messages.html" class="sidebar-link"><i class="bi bi-envelope"></i><span>Messages</span></a>
+    <a href="monetization.html" class="sidebar-link"><i class="bi bi-currency-dollar"></i><span>Monetization</span></a>
+    <a href="settings.html"     class="sidebar-link"><i class="bi bi-gear"></i><span>Settings</span></a>
+    <hr class="sidebar-divider">
+    <a href="/" class="sidebar-link" target="_blank"><i class="bi bi-box-arrow-up-right"></i><span>View Site</span></a>
+    <button class="sidebar-link sidebar-btn" id="logoutBtn"><i class="bi bi-box-arrow-right"></i><span>Logout</span></button>
+  </nav>
+</aside>
+<div class="sidebar-overlay d-lg-none d-none" id="sidebarOverlay"></div>
+
+<div class="admin-main">
+  <header class="admin-topbar">
+    <button class="btn-hamburger d-lg-none" id="sidebarToggle"><i class="bi bi-list fs-4"></i></button>
+    <h1 class="topbar-title">Categories</h1>
+    <div class="topbar-right">
+      <button class="btn-icon-admin" id="themeToggleAdmin"><i class="bi bi-moon-fill" id="adminThemeIcon"></i></button>
+    </div>
+  </header>
+
+  <main class="admin-content">
+    <div class="row g-4">
+      <div class="col-md-5">
+        <div class="admin-card">
+          <div class="admin-card-header"><h5 class="admin-card-title">Add Category</h5></div>
+          <div class="p-3">
+            <div id="catAlert" class="alert d-none mb-3"></div>
+            <label class="form-label-custom">Category Name</label>
+            <input type="text" class="form-control-custom mb-3" id="newCatName" placeholder="e.g. Healthcare">
+            <button class="btn btn-admin-primary w-100" id="addCatBtn">
+              <i class="bi bi-plus-lg me-2"></i>Add Category
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-7">
+        <div class="admin-card">
+          <div class="admin-card-header"><h5 class="admin-card-title">All Categories</h5></div>
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Slug</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="catsTable">
+                <tr><td colspan="3" class="text-center py-3">Loading…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/admin/js/admin.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', async () => {
+    await requireAuth();
+    loadCategories();
+
+    document.getElementById('addCatBtn').addEventListener('click', async () => {
+      const name = document.getElementById('newCatName').value.trim();
+      if (!name) { showCatAlert('Enter a category name', 'danger'); return; }
+      try {
+        await adminApi.post('/api/admin/categories', { name });
+        document.getElementById('newCatName').value = '';
+        showCatAlert('Category added!', 'success');
+        loadCategories();
+      } catch (e) { showCatAlert('Failed to add category', 'danger'); }
+    });
+  });
+
+  async function loadCategories() {
+    try {
+      const data = await adminApi.get('/api/admin/categories');
+      const tbody = document.getElementById('catsTable');
+      if (data.categories.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" class="text-center py-3 text-muted">No categories</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.categories.map(c => `
+        <tr>
+          <td><strong>${escHtml(c.name)}</strong></td>
+          <td><code>${c.slug}</code></td>
+          <td>
+            <button class="btn-action btn-action-del" onclick="deleteCat(${c.id}, this)">
+              <i class="bi bi-trash"></i>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    } catch { showCatAlert('Failed to load categories', 'danger'); }
+  }
+
+  async function deleteCat(id, btn) {
+    if (!confirm('Delete this category? Jobs in it won\'t be deleted, but will lose category assignment.')) return;
+    try {
+      await adminApi.del(`/api/admin/categories/${id}`);
+      btn.closest('tr').remove();
+    } catch { alert('Delete failed'); }
+  }
+
+  function showCatAlert(msg, type) {
+    const el = document.getElementById('catAlert');
+    el.className = `alert alert-${type}`;
+    el.textContent = msg;
+    el.classList.remove('d-none');
+    setTimeout(() => el.classList.add('d-none'), 3000);
+  }
+</script>
+</body>
+</html>
