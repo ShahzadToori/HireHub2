@@ -6,7 +6,7 @@ const router  = express.Router();
 // GET /api/settings  – public (website needs these)
 router.get('/', async (req, res) => {
   try {
-    const [rows] = await db.execute('SELECT `key`, `value` FROM settings');
+    const [rows] = await db.query('SELECT `key`, `value` FROM settings');
     const settings = {};
     rows.forEach(r => { settings[r.key] = r.value; });
     res.json({ success: true, settings });
@@ -27,7 +27,7 @@ router.put('/', requireAdmin, async (req, res) => {
 
     for (const [key, value] of entries) {
       // Only update known keys to prevent injection
-      await db.execute(
+      await db.query(
         'INSERT INTO settings (`key`, `value`) VALUES (?,?) ON DUPLICATE KEY UPDATE `value`=?',
         [key, value, value]
       );

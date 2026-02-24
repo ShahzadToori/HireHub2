@@ -12,7 +12,7 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Username and password required' });
     }
 
-    const [rows] = await db.execute(
+    const [rows] = await db.query(
       'SELECT * FROM admins WHERE username = ? OR email = ? LIMIT 1',
       [username, username]
     );
@@ -56,7 +56,7 @@ router.get('/me', (req, res) => {
 // POST /api/auth/setup  (run once to create first admin)
 router.post('/setup', async (req, res) => {
   try {
-    const [existing] = await db.execute('SELECT id FROM admins LIMIT 1');
+    const [existing] = await db.query('SELECT id FROM admins LIMIT 1');
     if (existing.length > 0) {
       return res.status(403).json({ success: false, message: 'Admin already exists' });
     }
@@ -67,7 +67,7 @@ router.post('/setup', async (req, res) => {
     }
 
     const hash = await bcrypt.hash(password, 12);
-    await db.execute(
+    await db.query(
       'INSERT INTO admins (username, email, password) VALUES (?, ?, ?)',
       [username, email, hash]
     );

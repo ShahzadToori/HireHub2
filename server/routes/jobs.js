@@ -58,7 +58,7 @@ router.get('/', async (req, res) => {
     };
     const orderSql = orderMap[sort] || 'j.created_at DESC';
 
-    const [[{ total }]] = await db.execute(
+    const [[{ total }]] = await db.query(
       `SELECT COUNT(*) AS total
          FROM jobs j
          JOIN categories c ON j.category_id = c.id
@@ -66,7 +66,7 @@ router.get('/', async (req, res) => {
       params
     );
 
-    const [jobs] = await db.execute(
+    const [jobs] = await db.query(
       `SELECT j.id, j.title, j.company, j.location, j.job_type,
               j.description, j.phone, j.whatsapp, j.email,
               j.featured, j.sponsored, j.slug, j.created_at, j.views,
@@ -96,7 +96,7 @@ router.get('/', async (req, res) => {
 // GET /api/jobs/featured  – sponsored + featured jobs
 router.get('/featured', async (req, res) => {
   try {
-    const [jobs] = await db.execute(
+    const [jobs] = await db.query(
       `SELECT j.id, j.title, j.company, j.location, j.job_type,
               j.description, j.phone, j.whatsapp, j.email,
               j.featured, j.sponsored, j.slug, j.created_at,
@@ -118,7 +118,7 @@ router.get('/featured', async (req, res) => {
 // GET /api/jobs/categories
 router.get('/categories', async (req, res) => {
   try {
-    const [cats] = await db.execute(
+    const [cats] = await db.query(
       `SELECT c.id, c.name, c.slug, COUNT(j.id) AS count
          FROM categories c
          LEFT JOIN jobs j ON j.category_id = c.id AND j.status = 'active'
@@ -134,7 +134,7 @@ router.get('/categories', async (req, res) => {
 // GET /api/jobs/:slug  – single job detail
 router.get('/:slug', async (req, res) => {
   try {
-    const [rows] = await db.execute(
+    const [rows] = await db.query(
       `SELECT j.*, c.name AS category, c.slug AS category_slug
          FROM jobs j
          JOIN categories c ON j.category_id = c.id
@@ -148,7 +148,7 @@ router.get('/:slug', async (req, res) => {
     }
 
     // Increment views
-    await db.execute('UPDATE jobs SET views = views + 1 WHERE id = ?', [rows[0].id]);
+    await db.query('UPDATE jobs SET views = views + 1 WHERE id = ?', [rows[0].id]);
 
     res.json({ success: true, job: rows[0] });
   } catch (err) {
