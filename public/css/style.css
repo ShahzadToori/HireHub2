@@ -919,3 +919,13 @@ img { max-width: 100%; }
 .pagination .page-link, .filter-pill {
   will-change: transform;
 }
+/* Mobile navbar fix – solid background for collapsed menu */
+@media (max-width: 991.98px) {
+  .navbar-collapse {
+    background: var(--bg-card);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: 0.5rem;
+    box-shadow: var(--shadow);
+  }
+}
