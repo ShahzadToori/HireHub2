@@ -919,13 +919,24 @@ img { max-width: 100%; }
 .pagination .page-link, .filter-pill {
   will-change: transform;
 }
-/* Mobile navbar fix – solid background for collapsed menu */
+/* Force solid background for mobile menu */
 @media (max-width: 991.98px) {
-  .navbar-collapse {
-    background: var(--bg-card);
+  #navMenu.navbar-collapse.show {
+    background: var(--bg-card) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
     padding: 1rem;
     border-radius: 8px;
     margin-top: 0.5rem;
     box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+  }
+}
+
+@media (max-width: 991.98px) {
+  #mainNav {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: var(--bg-nav) !important;
   }
 }
