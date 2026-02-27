@@ -25,8 +25,7 @@ router.get('/', async (req, res) => {
     const perPage = Math.min(intOr(limit, 12), 50);
     const offset  = (intOr(page, 1) - 1) * perPage;
 
-    // let where  = ['j.status = "active"'];
-    let where  = ["j.status = 'active'"];
+    let where  = ['j.status = "active"'];
     let params = [];
 
     if (q) {
@@ -58,7 +57,7 @@ router.get('/', async (req, res) => {
     };
     const orderSql = orderMap[sort] || 'j.created_at DESC';
 
-    const [[{ total }]] = await db.query(
+    const [[{ total }]] = await db.execute(
       `SELECT COUNT(*) AS total
          FROM jobs j
          JOIN categories c ON j.category_id = c.id
@@ -66,9 +65,9 @@ router.get('/', async (req, res) => {
       params
     );
 
-    const [jobs] = await db.query(
+    const [jobs] = await db.execute(
       `SELECT j.id, j.title, j.company, j.location, j.job_type,
-              j.description, j.phone, j.whatsapp, j.email,
+              j.description, j.phone, j.whatsapp, j.email, j.map_link, j.extra_fields,
               j.featured, j.sponsored, j.slug, j.created_at, j.views,
               c.name AS category, c.slug AS category_slug
          FROM jobs j
@@ -78,6 +77,11 @@ router.get('/', async (req, res) => {
        LIMIT ? OFFSET ?`,
       [...params, perPage, offset]
     );
+
+    // Parse extra_fields JSON
+    jobs.forEach(j => {
+      try { j.extra_fields = j.extra_fields ? JSON.parse(j.extra_fields) : null; } catch { j.extra_fields = null; }
+    });
 
     res.json({
       success: true,
@@ -96,9 +100,9 @@ router.get('/', async (req, res) => {
 // GET /api/jobs/featured  – sponsored + featured jobs
 router.get('/featured', async (req, res) => {
   try {
-    const [jobs] = await db.query(
+    const [jobs] = await db.execute(
       `SELECT j.id, j.title, j.company, j.location, j.job_type,
-              j.description, j.phone, j.whatsapp, j.email,
+              j.description, j.phone, j.whatsapp, j.email, j.map_link, j.extra_fields,
               j.featured, j.sponsored, j.slug, j.created_at,
               c.name AS category, c.slug AS category_slug
          FROM jobs j
@@ -118,7 +122,7 @@ router.get('/featured', async (req, res) => {
 // GET /api/jobs/categories
 router.get('/categories', async (req, res) => {
   try {
-    const [cats] = await db.query(
+    const [cats] = await db.execute(
       `SELECT c.id, c.name, c.slug, COUNT(j.id) AS count
          FROM categories c
          LEFT JOIN jobs j ON j.category_id = c.id AND j.status = 'active'
@@ -134,7 +138,7 @@ router.get('/categories', async (req, res) => {
 // GET /api/jobs/:slug  – single job detail
 router.get('/:slug', async (req, res) => {
   try {
-    const [rows] = await db.query(
+    const [rows] = await db.execute(
       `SELECT j.*, c.name AS category, c.slug AS category_slug
          FROM jobs j
          JOIN categories c ON j.category_id = c.id
@@ -147,8 +151,11 @@ router.get('/:slug', async (req, res) => {
       return res.status(404).json({ success: false, message: 'Job not found' });
     }
 
+    // Parse extra_fields JSON
+    try { rows[0].extra_fields = rows[0].extra_fields ? JSON.parse(rows[0].extra_fields) : null; } catch { rows[0].extra_fields = null; }
+
     // Increment views
-    await db.query('UPDATE jobs SET views = views + 1 WHERE id = ?', [rows[0].id]);
+    await db.execute('UPDATE jobs SET views = views + 1 WHERE id = ?', [rows[0].id]);
 
     res.json({ success: true, job: rows[0] });
   } catch (err) {

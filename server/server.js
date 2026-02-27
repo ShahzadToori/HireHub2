@@ -13,7 +13,6 @@ const settingsRoutes = require('./routes/settings');
 const contactRoutes  = require('./routes/contact');
 
 const app  = express();
-app.set('trust proxy', 1);
 const PORT = process.env.PORT || 3000;
 
 // ── Security ──────────────────────────────────────────────────
@@ -50,6 +49,26 @@ app.use(session({
 // ── Static files ──────────────────────────────────────────────
 app.use(express.static(path.join(__dirname, '../public')));
 app.use('/admin', express.static(path.join(__dirname, '../admin')));
+
+const db = require('./db/connection');
+
+// Serve job detail page
+app.get('/job/*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/job.html'));
+});
+
+// ── Public form schema (no auth – used by public modal) ────────
+app.get('/api/public/form-schema', async (req, res) => {
+  try {
+    const [[row]] = await db.execute(
+      "SELECT `value` FROM settings WHERE `key` = 'form_schema_v2' LIMIT 1"
+    );
+    const schema = row ? JSON.parse(row.value) : { sections: [] };
+    res.json({ success: true, schema });
+  } catch {
+    res.json({ success: true, schema: { sections: [] } });
+  }
+});
 
 // ── API Routes ────────────────────────────────────────────────
 app.use('/api/auth',     authRoutes);

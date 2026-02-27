@@ -316,7 +316,9 @@ function renderJobCard(job, isFeaturedSection = false) {
   const contacts = [
     job.phone    ? `<a href="tel:${job.phone}" class="btn-contact-icon phone" title="Call" onclick="event.stopPropagation()"><i class="bi bi-telephone-fill"></i></a>` : '',
     job.whatsapp ? `<a href="${waLink(job.whatsapp, job.title)}" class="btn-contact-icon whatsapp" title="WhatsApp" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i class="bi bi-whatsapp"></i></a>` : '',
-    job.email    ? `<a href="mailto:${job.email}" class="btn-contact-icon email" title="Email" onclick="event.stopPropagation()"><i class="bi bi-envelope-fill"></i></a>` : ''
+    job.map_link ? `<a href="${escHtml(job.map_link)}" class="btn-contact-icon map" title="View on Map" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i class="bi bi-geo-alt-fill"></i></a>` : '',
+    job.email    ? `<a href="mailto:${job.email}" class="btn-contact-icon email" title="Email" onclick="event.stopPropagation()"><i class="bi bi-envelope-fill"></i></a>` : '',
+    job.slug ? `<a href="/job/${job.slug}" class="btn-contact-icon details" title="View Details" onclick="event.stopPropagation()"><i class="bi bi-box-arrow-up-right"></i></a>` : ''
   ].filter(Boolean).join('');
 
   return `
@@ -389,8 +391,53 @@ function populateModal(job) {
     descEl.innerHTML = '<p>' + descEl.innerHTML + '</p>';
   }
 
+  // Render extra (custom) fields if present
+  const extraEl = $('#modalExtraFields');
+  if (job.extra_fields && typeof job.extra_fields === 'object' && Object.keys(job.extra_fields).length > 0) {
+    const schema = window.__formSchema || null;
+    // Build a label map from schema
+    const labelMap = {};
+    if (schema && schema.sections) {
+      schema.sections.forEach(sec => {
+        (sec.fields || []).forEach(f => {
+          if (!f.coreKey) {
+            labelMap[f.id]         = f.label || f.id;
+            labelMap[f.id+'_min']  = (f.label || f.id) + ' (Min)';
+            labelMap[f.id+'_max']  = (f.label || f.id) + ' (Max)';
+          }
+        });
+      });
+    }
+
+    let rows = '';
+    Object.entries(job.extra_fields).forEach(([key, val]) => {
+      if (!val && val !== 0) return;
+      const label = labelMap[key] || key.replace(/^fld_\w+_/, '').replace(/_/g,' ');
+      const displayVal = Array.isArray(val) ? val.join(', ') : String(val);
+      rows += `<div class="extra-field-row">
+        <span class="extra-field-label">${escHtml(label)}</span>
+        <span class="extra-field-value">${escHtml(displayVal)}</span>
+      </div>`;
+    });
+
+    if (rows) {
+      extraEl.innerHTML = `<div class="extra-fields-block">
+        <div class="modal-desc-label" style="margin-top:1.25rem"><i class="bi bi-list-check me-2"></i>Additional Details</div>
+        ${rows}
+      </div>`;
+      extraEl.classList.remove('d-none');
+    } else {
+      extraEl.innerHTML = '';
+      extraEl.classList.add('d-none');
+    }
+  } else {
+    extraEl.innerHTML = '';
+    extraEl.classList.add('d-none');
+  }
+
   const phone    = $('#modalPhone');
   const whatsapp = $('#modalWhatsApp');
+  const mapBtn   = $('#modalMap');
   const email    = $('#modalEmail');
 
   if (job.phone) {
@@ -408,6 +455,13 @@ function populateModal(job) {
     whatsapp.classList.remove('d-none');
   } else {
     whatsapp.classList.add('d-none');
+  }
+
+  if (job.map_link) {
+    mapBtn.href = job.map_link;
+    mapBtn.classList.remove('d-none');
+  } else {
+    mapBtn.classList.add('d-none');
   }
 
   if (job.email) {
@@ -628,6 +682,14 @@ function bindEvents() {
 // ── Init ───────────────────────────────────────────────────────
 async function init() {
   await loadSettings();
+  // Preload form schema so modal can resolve custom field labels
+  try {
+    const res = await fetch('/api/public/form-schema');
+    if (res.ok) {
+      const d = await res.json();
+      window.__formSchema = d.schema || null;
+    }
+  } catch {}
   bindEvents();
   await loadCategories();
   await loadFeaturedJobs();

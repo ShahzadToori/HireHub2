@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Add Job – HireHub Admin</title>
-  <meta name="robots" content="noindex, nofollow">
+  <meta name="robots" content="noindex">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -12,7 +12,6 @@
 </head>
 <body class="admin-body">
 
-<!-- Sidebar -->
 <aside class="admin-sidebar" id="sidebar">
   <div class="sidebar-header">
     <span class="sidebar-brand">⚡ HireHub</span>
@@ -23,9 +22,10 @@
     <a href="jobs.html"         class="sidebar-link"><i class="bi bi-briefcase"></i><span>All Jobs</span></a>
     <a href="add-job.html"      class="sidebar-link active"><i class="bi bi-plus-circle"></i><span>Add Job</span></a>
     <a href="categories.html"   class="sidebar-link"><i class="bi bi-tag"></i><span>Categories</span></a>
-    <a href="messages.html" class="sidebar-link"><i class="bi bi-envelope"></i><span>Messages</span></a>
+    <a href="messages.html"     class="sidebar-link"><i class="bi bi-envelope"></i><span>Messages</span></a>
     <a href="monetization.html" class="sidebar-link"><i class="bi bi-currency-dollar"></i><span>Monetization</span></a>
     <a href="settings.html"     class="sidebar-link"><i class="bi bi-gear"></i><span>Settings</span></a>
+    <a href="form-builder.html" class="sidebar-link"><i class="bi bi-ui-checks-grid"></i><span>Form Builder</span></a>
     <hr class="sidebar-divider">
     <a href="/" class="sidebar-link" target="_blank"><i class="bi bi-box-arrow-up-right"></i><span>View Site</span></a>
     <button class="sidebar-link sidebar-btn" id="logoutBtn"><i class="bi bi-box-arrow-right"></i><span>Logout</span></button>
@@ -38,85 +38,22 @@
     <button class="btn-hamburger d-lg-none" id="sidebarToggle"><i class="bi bi-list fs-4"></i></button>
     <h1 class="topbar-title" id="pageTitle">Add New Job</h1>
     <div class="topbar-right">
-      <button class="btn-icon-admin" id="themeToggleAdmin" title="Toggle theme"><i class="bi bi-moon-fill" id="adminThemeIcon"></i></button>
+      <a href="form-builder.html" class="btn btn-admin-outline btn-sm" style="font-size:.8rem">
+        <i class="bi bi-ui-checks-grid me-1"></i>Form Builder
+      </a>
+      <button class="btn-icon-admin" id="themeToggleAdmin"><i class="bi bi-moon-fill" id="adminThemeIcon"></i></button>
     </div>
   </header>
 
   <main class="admin-content">
-
     <div id="formAlert" class="alert d-none mb-3"></div>
 
     <form id="jobForm" novalidate>
       <div class="row g-4">
+        <!-- Dynamic form sections rendered here -->
+        <div class="col-lg-8" id="formMain"></div>
 
-        <!-- Main Fields -->
-        <div class="col-lg-8">
-          <div class="admin-card">
-            <div class="admin-card-header"><h5 class="admin-card-title">Job Details</h5></div>
-            <div class="p-3">
-              <div class="row g-3">
-                <div class="col-12">
-                  <label class="form-label-custom">Job Title <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control-custom" name="title" placeholder="e.g. Senior Frontend Developer" required>
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label-custom">Company Name <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control-custom" name="company" placeholder="e.g. Tech Corp" required>
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label-custom">Location <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control-custom" name="location" placeholder="e.g. New York, NY or Remote" required>
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label-custom">Category <span class="text-danger">*</span></label>
-                  <select class="form-control-custom" name="category_id" required>
-                    <option value="">Select category…</option>
-                  </select>
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label-custom">Job Type</label>
-                  <select class="form-control-custom" name="job_type">
-                    <option value="Full-time">Full-time</option>
-                    <option value="Part-time">Part-time</option>
-                    <option value="Contract">Contract</option>
-                    <option value="Freelance">Freelance</option>
-                    <option value="Remote">Remote</option>
-                  </select>
-                </div>
-                <div class="col-12">
-                  <label class="form-label-custom">Description <span class="text-danger">*</span></label>
-                  <textarea class="form-control-custom" name="description" rows="8"
-                    placeholder="Describe the role, responsibilities, requirements, and benefits…" required></textarea>
-                  <small class="text-muted">Be detailed – more info means better candidate matches.</small>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Contact Info -->
-          <div class="admin-card mt-4">
-            <div class="admin-card-header"><h5 class="admin-card-title">Contact Information</h5></div>
-            <div class="p-3">
-              <div class="row g-3">
-                <div class="col-md-4">
-                  <label class="form-label-custom"><i class="bi bi-telephone me-1 text-success"></i>Phone</label>
-                  <input type="tel" class="form-control-custom" name="phone" placeholder="+1 555 000 0000">
-                </div>
-                <div class="col-md-4">
-                  <label class="form-label-custom"><i class="bi bi-whatsapp me-1" style="color:#25d366"></i>WhatsApp</label>
-                  <input type="tel" class="form-control-custom" name="whatsapp" placeholder="+1 555 000 0000">
-                  <small class="text-muted">With country code, no spaces or dashes</small>
-                </div>
-                <div class="col-md-4">
-                  <label class="form-label-custom"><i class="bi bi-envelope me-1 text-primary"></i>Email</label>
-                  <input type="email" class="form-control-custom" name="email" placeholder="jobs@company.com">
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Sidebar Options -->
+        <!-- Sidebar (always shown) -->
         <div class="col-lg-4">
           <div class="admin-card">
             <div class="admin-card-header"><h5 class="admin-card-title">Publishing</h5></div>
@@ -129,8 +66,7 @@
                 </select>
               </div>
               <button type="submit" class="btn btn-admin-primary w-100 mb-2" id="submitBtn">
-                <i class="bi bi-check2-circle me-2"></i>
-                <span id="submitText">Publish Job</span>
+                <i class="bi bi-check2-circle me-2"></i><span id="submitText">Publish Job</span>
               </button>
               <a href="jobs.html" class="btn btn-admin-outline w-100">Cancel</a>
             </div>
@@ -159,139 +95,421 @@
               </div>
             </div>
           </div>
-        </div>
 
+          <div class="admin-card mt-3" style="background:rgba(15,98,254,.04);border-color:rgba(15,98,254,.15)">
+            <div class="p-3" style="font-size:.8rem;color:var(--text-muted)">
+              <i class="bi bi-ui-checks-grid me-1" style="color:var(--primary)"></i>
+              Customize this form in <a href="form-builder.html" style="color:var(--primary);font-weight:600">Form Builder</a>
+            </div>
+          </div>
+        </div>
       </div>
     </form>
-
   </main>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/admin/js/admin.js"></script>
 <script>
-  // Determine if editing
-  const urlParams = new URLSearchParams(window.location.search);
-  const editId    = urlParams.get('id');
-  const isEdit    = !!editId;
+'use strict';
 
-  document.addEventListener('DOMContentLoaded', async () => {
-    await requireAuth();
-    await loadCategories();
+const params   = new URLSearchParams(window.location.search);
+const editId   = params.get('id');
+const isEdit   = !!editId;
+let schema     = { sections: [] };
+let categories = [];
 
-    if (isEdit) {
-      document.getElementById('pageTitle').textContent  = 'Edit Job';
-      document.getElementById('submitText').textContent = 'Update Job';
-      await loadJobData();
-    }
+/* ══════════ INIT ══════════ */
+document.addEventListener('DOMContentLoaded', async () => {
+  await requireAuth();
+  await Promise.all([loadCategories(), loadSchema()]);
+  renderForm();
 
-    bindEvents();
+  if (isEdit) {
+    document.getElementById('pageTitle').textContent  = 'Edit Job';
+    document.getElementById('submitText').textContent = 'Update Job';
+    await loadJobData();
+  }
+
+  document.getElementById('featuredCheck').addEventListener('change', e =>
+    document.getElementById('featuredDateWrap').classList.toggle('d-none', !e.target.checked)
+  );
+
+  document.getElementById('jobForm').addEventListener('submit', handleSubmit);
+  console.log('Event listener attached');
+});
+
+/* ══════════ LOAD SCHEMA ══════════ */
+async function loadSchema() {
+  try {
+    const d = await adminApi.get('/api/admin/form-schema');
+    schema = d.schema || { sections: [] };
+    if (!schema.sections) schema.sections = [];
+  } catch {
+    schema = { sections: [] };
+  }
+}
+
+/* ══════════ LOAD CATEGORIES ══════════ */
+async function loadCategories() {
+  try {
+    const d = await adminApi.get('/api/admin/categories');
+    categories = d.categories || [];
+  } catch { categories = []; }
+}
+
+/* ══════════ RENDER FORM FROM SCHEMA ══════════ */
+function renderForm() {
+  const main = document.getElementById('formMain');
+  main.innerHTML = '';
+
+  if (!schema.sections.length) {
+    main.innerHTML = `<div class="admin-card"><div class="p-3 text-center" style="color:var(--text-muted)">
+      No form sections configured. <a href="form-builder.html" style="color:var(--primary)">Go to Form Builder</a> to set up your form.
+    </div></div>`;
+    return;
+  }
+
+  let first = true;
+  schema.sections.forEach(sec => {
+    if (sec.visible === false) return;
+    const visFields = (sec.fields || []).filter(f => f.visible !== false);
+    if (!visFields.length) return;
+
+    const card = document.createElement('div');
+    card.className = `admin-card${first ? '' : ' mt-4'}`;
+    first = false;
+
+    card.innerHTML = `
+      <div class="admin-card-header">
+        <h5 class="admin-card-title">
+          <i class="bi bi-${sec.icon||'briefcase'} me-2"></i>${esc(sec.title)}
+        </h5>
+      </div>
+      <div class="p-3">
+        <div class="row g-3" id="sec_fields_${sec.id}"></div>
+      </div>`;
+
+    main.appendChild(card);
+    const row = card.querySelector(`#sec_fields_${sec.id}`);
+
+    visFields.forEach(f => {
+      const colClass = f.width === 'full' ? 'col-12' : f.width === 'third' ? 'col-md-4' : 'col-md-6';
+      const col = document.createElement('div');
+      col.className = colClass;
+      col.appendChild(buildFieldInput(f));
+      row.appendChild(col);
+    });
   });
 
-  async function loadCategories() {
-    try {
-      const data = await adminApi.get('/api/admin/categories');
-      const sel  = document.querySelector('select[name="category_id"]');
-      data.categories.forEach(c => {
-        const opt = document.createElement('option');
-        opt.value       = c.id;
-        opt.textContent = c.name;
-        sel.appendChild(opt);
-      });
-    } catch {}
+  if (!main.children.length) {
+    main.innerHTML = `<div class="admin-card"><div class="p-3 text-center" style="color:var(--text-muted)">All sections are hidden. <a href="form-builder.html" style="color:var(--primary)">Form Builder</a></div></div>`;
   }
+}
 
-  async function loadJobData() {
-    try {
-      const data = await adminApi.get(`/api/admin/jobs/${editId}`);
-      const job  = data.job;
-      const form = document.getElementById('jobForm');
+/* ══════════ BUILD SINGLE FIELD ══════════ */
+function buildFieldInput(f) {
+  const wrap = document.createElement('div');
 
-      ['title','company','location','job_type','description','phone','whatsapp','email','status','featured_until']
-        .forEach(field => {
-          const el = form.querySelector(`[name="${field}"]`);
-          if (el && job[field] != null) el.value = job[field];
-        });
+  // Label style
+  const szMap = {xs:'11px',sm:'13px',md:'15px',lg:'18px',xl:'22px'};
+  const lStyles = [
+    `font-size:${szMap[f.labelSize]||'13px'}`,
+    f.labelBold   ? 'font-weight:700'   : '',
+    f.labelItalic ? 'font-style:italic' : '',
+    f.labelColor && f.labelColor !== '#000000' ? `color:${f.labelColor}` : ''
+  ].filter(Boolean).join(';');
 
-      form.querySelector('[name="category_id"]').value = job.category_id;
+  const labelHtml = `<label class="form-label-custom" style="${lStyles}" ${f.coreKey?`for="field_${f.coreKey}"`:`for="field_${f.id}"`}>
+    ${esc(f.label)}${f.required ? ' <span class="text-danger">*</span>' : ''}
+  </label>`;
 
-      if (job.featured) {
-        form.querySelector('[name="featured"]').checked = true;
-        document.getElementById('featuredDateWrap').classList.remove('d-none');
-      }
-      if (job.sponsored) {
-        form.querySelector('[name="sponsored"]').checked = true;
-      }
-    } catch (e) {
-      showFormAlert('Failed to load job data', 'danger');
+  const input    = buildInputEl(f);
+  const helpHtml = f.helpText ? `<small class="text-muted">${esc(f.helpText)}</small>` : '';
+
+  wrap.innerHTML = labelHtml + helpHtml;
+  if (input) {
+    if (Array.isArray(input)) {
+      input.forEach(el => wrap.appendChild(el));
+    } else {
+      wrap.appendChild(input);
     }
   }
 
-  function bindEvents() {
-    document.getElementById('featuredCheck').addEventListener('change', (e) => {
-      document.getElementById('featuredDateWrap').classList.toggle('d-none', !e.target.checked);
+  return wrap;
+}
+
+function buildInputEl(f) {
+  const id   = f.coreKey ? `field_${f.coreKey}` : `field_${f.id}`;
+  const name = f.coreKey || `extra_${f.id}`;
+  const req  = f.required ? 'required' : '';
+  const ph   = f.placeholder || '';
+  const attr = `id="${id}" name="${name}" ${req} placeholder="${esc(ph)}"`;
+  const cls  = 'form-control-custom';
+
+  switch (f.type) {
+    case 'textarea':
+      return el(`<textarea ${attr} class="${cls}" rows="7" data-fid="${f.id}" data-corekey="${f.coreKey||''}"></textarea>`);
+
+    case 'select': {
+      const opts = (f.options||[]).map(o=>`<option value="${esc(o)}">${esc(o)}</option>`).join('');
+      return el(`<select ${attr} class="${cls}" data-fid="${f.id}" data-corekey="${f.coreKey||''}"><option value="">Select…</option>${opts}</select>`);
+    }
+
+    case 'category': {
+      const opts = categories.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
+      return el(`<select id="field_category_id" name="category_id" ${req} class="${cls}" data-corekey="category_id"><option value="">Select category…</option>${opts}</select>`);
+    }
+
+    case 'jobtype':
+      return el(`<select id="field_job_type" name="job_type" class="${cls}" data-corekey="job_type">
+        <option value="Full-time">Full-time</option>
+        <option value="Part-time">Part-time</option>
+        <option value="Contract">Contract</option>
+        <option value="Freelance">Freelance</option>
+        <option value="Remote">Remote</option>
+      </select>`);
+
+    case 'radio': {
+      const wrap = document.createElement('div');
+      wrap.style.display='flex'; wrap.style.flexWrap='wrap'; wrap.style.gap='.6rem'; wrap.style.marginTop='.25rem';
+      (f.options||[]).forEach((o,i)=>{
+        const rid = `${id}_${i}`;
+        const div = el(`<div style="display:flex;align-items:center;gap:.35rem">
+          <input type="radio" id="${rid}" name="${name}" value="${esc(o)}" ${i===0&&f.required?'required':''} class="form-check-input" data-fid="${f.id}" data-corekey="${f.coreKey||''}">
+          <label for="${rid}" style="font-size:.85rem;cursor:pointer">${esc(o)}</label>
+        </div>`);
+        wrap.appendChild(div);
+      });
+      return wrap;
+    }
+
+    case 'checkbox': {
+      const wrap = document.createElement('div');
+      wrap.style.display='flex'; wrap.style.flexWrap='wrap'; wrap.style.gap='.6rem'; wrap.style.marginTop='.25rem';
+      (f.options||[]).forEach((o,i)=>{
+        const cid = `${id}_${i}`;
+        const div = el(`<div style="display:flex;align-items:center;gap:.35rem">
+          <input type="checkbox" id="${cid}" name="${name}[]" value="${esc(o)}" class="form-check-input" data-fid="${f.id}" data-corekey="${f.coreKey||''}">
+          <label for="${cid}" style="font-size:.85rem;cursor:pointer">${esc(o)}</label>
+        </div>`);
+        wrap.appendChild(div);
+      });
+      return wrap;
+    }
+
+    case 'salary': {
+      const wrap = document.createElement('div');
+      wrap.style.display='flex'; wrap.style.gap='.5rem';
+      const minEl = el(`<input type="number" name="extra_${f.id}_min" class="${cls}" placeholder="Min" data-fid="${f.id}_min" style="flex:1">`);
+      const sep   = el(`<span style="display:flex;align-items:center;color:var(--text-muted);flex-shrink:0">–</span>`);
+      const maxEl = el(`<input type="number" name="extra_${f.id}_max" class="${cls}" placeholder="Max" data-fid="${f.id}_max" style="flex:1">`);
+      wrap.appendChild(minEl); wrap.appendChild(sep); wrap.appendChild(maxEl);
+      return wrap;
+    }
+
+    case 'file':
+      return el(`<input type="file" ${attr} class="${cls}" data-fid="${f.id}" data-corekey="${f.coreKey||''}">`);
+
+    default: {
+      const inputType = ['text','email','tel','number','url','date'].includes(f.type) ? f.type : 'text';
+      return el(`<input type="${inputType}" ${attr} class="${cls}" data-fid="${f.id}" data-corekey="${f.coreKey||''}">`);
+    }
+  }
+}
+
+function el(html) {
+  const t = document.createElement('template');
+  t.innerHTML = html.trim();
+  return t.content.firstElementChild;
+}
+
+function esc(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ══════════ LOAD JOB DATA FOR EDIT ══════════ */
+async function loadJobData() {
+  try {
+    const d   = await adminApi.get(`/api/admin/jobs/${editId}`);
+    const job = d.job;
+    const form= document.getElementById('jobForm');
+
+    // Set core fields
+    const coreMap = {
+      title:'title',company:'company',location:'location',
+      category_id:'category_id',job_type:'job_type',description:'description',
+      phone:'phone',whatsapp:'whatsapp',email:'email',map_link:'map_link',
+      status:'status',featured_until:'featured_until'
+    };
+
+    Object.entries(coreMap).forEach(([coreKey, jobKey]) => {
+      const el = form.querySelector(`[name="${coreKey}"]`);
+      if (el && job[jobKey] != null) el.value = job[jobKey];
     });
 
-    document.getElementById('jobForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const form = e.target;
-      const btn  = document.getElementById('submitBtn');
+    if (job.featured) {
+      form.querySelector('[name="featured"]').checked = true;
+      document.getElementById('featuredDateWrap').classList.remove('d-none');
+    }
+    if (job.sponsored) form.querySelector('[name="sponsored"]').checked = true;
 
-      btn.disabled = true;
-      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving…';
-
-      const body = {
-        title:          form.querySelector('[name="title"]').value.trim(),
-        company:        form.querySelector('[name="company"]').value.trim(),
-        category_id:    form.querySelector('[name="category_id"]').value,
-        location:       form.querySelector('[name="location"]').value.trim(),
-        job_type:       form.querySelector('[name="job_type"]').value,
-        description:    form.querySelector('[name="description"]').value.trim(),
-        phone:          form.querySelector('[name="phone"]').value.trim(),
-        whatsapp:       form.querySelector('[name="whatsapp"]').value.trim(),
-        email:          form.querySelector('[name="email"]').value.trim(),
-        status:         form.querySelector('[name="status"]').value,
-        featured:       form.querySelector('[name="featured"]').checked ? 1 : 0,
-        sponsored:      form.querySelector('[name="sponsored"]').checked ? 1 : 0,
-        featured_until: form.querySelector('[name="featured_until"]').value
-      };
-
-      if (!body.title || !body.company || !body.category_id || !body.location || !body.description) {
-        showFormAlert('Please fill all required fields', 'danger');
-        btn.disabled = false;
-        btn.innerHTML = `<i class="bi bi-check2-circle me-2"></i>${isEdit ? 'Update Job' : 'Publish Job'}`;
-        return;
-      }
-
-      try {
-        let data;
-        if (isEdit) {
-          data = await adminApi.put(`/api/admin/jobs/${editId}`, body);
-        } else {
-          data = await adminApi.post('/api/admin/jobs', body);
+    // Extra fields
+    let extraFields = job.extra_fields;
+    if (typeof extraFields === 'string') {
+      try { extraFields = JSON.parse(extraFields); } catch { extraFields = null; }
+    }
+    if (extraFields && typeof extraFields === 'object') {
+      Object.entries(extraFields).forEach(([key, val]) => {
+        // Handle salary ranges
+        if (key.endsWith('_min') || key.endsWith('_max')) {
+          const el = form.querySelector(`[data-fid="${key}"]`);
+          if (el) el.value = val;
+          return;
         }
-
-        if (data.success) {
-          showFormAlert(isEdit ? 'Job updated successfully!' : 'Job published successfully!', 'success');
-          setTimeout(() => window.location.href = 'jobs.html', 1500);
-        } else {
-          throw new Error(data.message);
+        // Checkbox arrays
+        if (Array.isArray(val)) {
+          val.forEach(v => {
+            const cb = form.querySelector(`[name="extra_${key}[]"][value="${CSS.escape(v)}"]`);
+            if (cb) cb.checked = true;
+          });
+          return;
         }
-      } catch (err) {
-        showFormAlert(err.message || 'Failed to save job', 'danger');
-        btn.disabled = false;
-        btn.innerHTML = `<i class="bi bi-check2-circle me-2"></i>${isEdit ? 'Update Job' : 'Publish Job'}`;
+        const el = form.querySelector(`[data-fid="${key}"]`) ||
+                   form.querySelector(`[name="extra_${key}"]`);
+        if (el) el.value = val;
+      });
+    }
+  } catch(e) {
+    showAlert('Failed to load job data', 'danger');
+  }
+}
+
+/* ══════════ SUBMIT ══════════ */
+async function handleSubmit(e) {
+  
+  e.preventDefault();
+  console.log('handleSubmit running, schema:', schema);
+  const form = e.target;
+  const btn  = document.getElementById('submitBtn');
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving…';
+
+  // Collect core fields
+  const body = {
+    title:          getVal(form,'title'),
+    company:        getVal(form,'company'),
+    category_id:    getVal(form,'category_id'),
+    location:       getVal(form,'location'),
+    job_type:       getVal(form,'job_type'),
+    description:    getVal(form,'description'),
+    phone:          getVal(form,'phone'),
+    whatsapp:       getVal(form,'whatsapp'),
+    email:          getVal(form,'email'),
+    map_link:       getVal(form,'map_link'),
+    status:         getVal(form,'status'),
+    featured:       form.querySelector('[name="featured"]')?.checked ? 1 : 0,
+    sponsored:      form.querySelector('[name="sponsored"]')?.checked ? 1 : 0,
+    featured_until: getVal(form,'featured_until'),
+    extra_fields:   {}
+  };
+
+  // Required validation based on schema (core fields)
+  for (const sec of schema.sections) {
+    if (sec.visible === false) continue;
+    for (const f of sec.fields || []) {
+      console.log('Processing custom field:', f.id, 'type:', f.type);
+      if (f.visible === false) continue;
+      if (!f.coreKey) continue; // skip custom fields here
+
+       console.log('Checking core field:', f.coreKey, 'required:', f.required, 'value:', body[f.coreKey]);
+      if (f.required) {
+        const value = body[f.coreKey];
+        if (!value && value !== 0) {
+          showAlert(`"${f.label}" is required`, 'danger');
+          reset(btn); return;
+        }
       }
-    });
+    }
   }
 
-  function showFormAlert(msg, type) {
-    const el = document.getElementById('formAlert');
-    el.className = `alert alert-${type}`;
-    el.textContent = msg;
-    el.classList.remove('d-none');
-    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  // Collect extra (custom) fields and validate them
+  for (const sec of schema.sections) {
+    if (sec.visible === false) continue;
+    for (const f of sec.fields || []) {
+      if (f.coreKey) continue; // already handled
+      if (f.visible === false) continue;
+
+      if (f.type === 'salary') {
+        const mn = form.querySelector(`[data-fid="${f.id}_min"]`)?.value?.trim();
+        const mx = form.querySelector(`[data-fid="${f.id}_max"]`)?.value?.trim();
+        if (mn) body.extra_fields[f.id+'_min'] = mn;
+        if (mx) body.extra_fields[f.id+'_max'] = mx;
+        if (f.required && !mn && !mx) {
+          showAlert(`"${f.label}" is required (at least one field)`, 'danger');
+          reset(btn); return;
+        }
+      } else if (f.type === 'checkbox') {
+        const checked = [...form.querySelectorAll(`[name="extra_${f.id}[]"]:checked`)].map(cb=>cb.value);
+        if (checked.length) body.extra_fields[f.id] = checked;
+        if (f.required && checked.length === 0) {
+          showAlert(`"${f.label}" is required`, 'danger');
+          reset(btn); return;
+        }
+      } else if (f.type === 'radio') {
+        const selected = form.querySelector(`[name="extra_${f.id}"]:checked`)?.value;
+        if (selected) body.extra_fields[f.id] = selected;
+        if (f.required && !selected) {
+          showAlert(`"${f.label}" is required`, 'danger');
+          reset(btn); return;
+        }
+      } else {
+        const el = form.querySelector(`[data-fid="${f.id}"]`) || form.querySelector(`[name="extra_${f.id}"]`);
+        const v  = el?.value?.trim();
+        if (v) body.extra_fields[f.id] = v;
+        if (f.required && !v) {
+          showAlert(`"${f.label}" is required`, 'danger');
+          reset(btn); return;
+        }
+      }
+    }
   }
+
+  if (Object.keys(body.extra_fields).length === 0) body.extra_fields = null;
+
+  try {
+    const d = isEdit
+      ? await adminApi.put(`/api/admin/jobs/${editId}`, body)
+      : await adminApi.post('/api/admin/jobs', body);
+    if (d.success) {
+      showAlert(isEdit ? 'Job updated!' : 'Job published!', 'success');
+      setTimeout(() => window.location.href = 'jobs.html', 1400);
+    } else throw new Error(d.message);
+  } catch(err) {
+    console.error('API error:', err);
+    showAlert(err.message || 'Failed to save', 'danger');
+    reset(btn);
+  }
+}
+
+function getVal(form, name) {
+  return form.querySelector(`[name="${name}"]`)?.value?.trim() || '';
+}
+
+function reset(btn) {
+  btn.disabled = false;
+  btn.innerHTML = `<i class="bi bi-check2-circle me-2"></i>${isEdit ? 'Update Job' : 'Publish Job'}`;
+}
+
+function showAlert(msg, type) {
+  const el = document.getElementById('formAlert');
+  el.className = `alert alert-${type}`;
+  el.textContent = msg;
+  el.classList.remove('d-none');
+  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
 </script>
 </body>
 </html>

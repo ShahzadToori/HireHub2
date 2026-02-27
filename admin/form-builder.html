@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Form Builder – HireHub Admin</title>
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/admin/css/admin.css">
+  <style>
+    .fb-layout{display:flex;gap:1.5rem;align-items:flex-start}
+    .fb-left{flex:1;min-width:0}
+    .fb-right{width:300px;flex-shrink:0;position:sticky;top:76px}
+    @media(max-width:1100px){.fb-layout{flex-direction:column}.fb-right{width:100%;position:static}}
+
+    .fb-section{background:var(--bg-card);border:2px solid var(--border);border-radius:14px;margin-bottom:1rem;overflow:hidden;transition:border-color .18s}
+    .fb-section.sec-hidden{opacity:.5}
+    .fb-section-head{display:flex;align-items:center;gap:.6rem;padding:.8rem 1rem;background:var(--surface);border-bottom:1px solid var(--border)}
+    .fb-drag{cursor:grab;color:var(--text-muted);font-size:1rem;flex-shrink:0;padding:2px}
+    .fb-drag:active{cursor:grabbing}
+    .fb-sec-icon{width:28px;height:28px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.85rem;background:rgba(15,98,254,.1);color:var(--primary)}
+    .fb-sec-name{flex:1;background:transparent;border:none;outline:none;font-family:var(--font);font-size:.9rem;font-weight:700;color:var(--text);min-width:0;padding:2px 0}
+    .fb-sec-name:focus{border-bottom:2px solid var(--primary)}
+    .fb-pills{display:flex;gap:.3rem;flex-shrink:0}
+    .fpill{font-size:.67rem;font-weight:700;padding:.12rem .45rem;border-radius:100px;border:1px solid var(--border);background:var(--surface);color:var(--text-muted);white-space:nowrap}
+    .fpill.core{background:#d1fae5;color:#065f46;border-color:#a7f3d0}
+    [data-theme="dark"] .fpill.core{background:rgba(16,185,129,.15);color:#6ee7b7;border-color:rgba(16,185,129,.3)}
+    .fb-sec-btns{display:flex;gap:.25rem;flex-shrink:0}
+    .fbb{width:27px;height:27px;border-radius:6px;border:1px solid var(--border);background:transparent;display:flex;align-items:center;justify-content:center;font-size:.75rem;cursor:pointer;color:var(--text-muted);transition:all .15s}
+    .fbb:hover{background:var(--bg);color:var(--text)}
+    .fbb.del:hover{background:#fee2e2;color:#dc2626;border-color:#fca5a5}
+    [data-theme="dark"] .fbb.del:hover{background:rgba(220,38,38,.15);color:#f87171;border-color:rgba(220,38,38,.3)}
+
+    .fb-fields{padding:.5rem;display:flex;flex-direction:column;gap:.4rem;min-height:32px}
+    .fb-section.collapsed .fb-fields,.fb-section.collapsed .add-fld-wrap{display:none}
+    .sec-caret{transition:transform .2s;font-size:.72rem;color:var(--text-muted)}
+    .fb-section.collapsed .sec-caret{transform:rotate(-90deg)}
+
+    .fb-fld{background:var(--bg);border:1.5px solid var(--border);border-radius:9px;transition:border-color .15s}
+    .fb-fld:hover{border-color:rgba(15,98,254,.4)}
+    .fb-fld.fld-hidden{opacity:.4}
+    .fb-fld.fld-open{border-color:var(--primary);box-shadow:0 0 0 3px rgba(15,98,254,.08)}
+
+    .fld-head{display:flex;align-items:center;gap:.55rem;padding:.7rem .85rem;cursor:pointer}
+    .fld-drag{cursor:grab;color:var(--text-muted);font-size:.85rem;flex-shrink:0}
+    .fld-drag:active{cursor:grabbing}
+    .fld-info{flex:1;min-width:0}
+    .fld-name{font-weight:600;font-size:.84rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .fld-sub{font-size:.7rem;color:var(--text-muted);display:flex;gap:.4rem;flex-wrap:wrap;margin-top:1px}
+    .fld-badges{display:flex;gap:.25rem;flex-shrink:0}
+    .fbadge{font-size:.65rem;font-weight:700;padding:.1rem .4rem;border-radius:100px;border:1px solid var(--border);background:var(--surface);color:var(--text-muted)}
+    .fbadge.req{background:#fee2e2;color:#dc2626;border-color:#fca5a5}
+    .fbadge.typ{background:rgba(15,98,254,.1);color:var(--primary);border-color:rgba(15,98,254,.2)}
+    .fbadge.hid{opacity:.6}
+    [data-theme="dark"] .fbadge.req{background:rgba(220,38,38,.15);color:#f87171;border-color:rgba(220,38,38,.3)}
+    [data-theme="dark"] .fbadge.typ{background:rgba(15,98,254,.15);color:#93c5fd;border-color:rgba(15,98,254,.3)}
+    .fld-caret{font-size:.7rem;color:var(--text-muted);transition:transform .2s;flex-shrink:0}
+    .fb-fld.fld-open .fld-caret{transform:rotate(180deg)}
+
+    .fld-editor{display:none;padding:.85rem;border-top:1px solid var(--border);background:var(--surface)}
+    .fb-fld.fld-open .fld-editor{display:block}
+
+    .eg{display:grid;gap:.6rem}
+    .eg-2{grid-template-columns:1fr 1fr}
+    .eg-3{grid-template-columns:1fr 1fr 1fr}
+    .eg-1{grid-template-columns:1fr}
+    @media(max-width:640px){.eg-2,.eg-3{grid-template-columns:1fr}}
+
+    .elbl{display:block;font-size:.7rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:.3rem}
+    .einput{border:1.5px solid var(--border);border-radius:7px;padding:.42rem .65rem;background:var(--bg-card);color:var(--text);font-family:var(--font);font-size:.83rem;outline:none;width:100%;transition:border-color .15s}
+    .einput:focus{border-color:var(--primary)}
+    .einput:disabled{opacity:.5;cursor:not-allowed}
+
+    .etoggle-row{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.5rem}
+    .etog{display:flex;align-items:center;gap:.35rem;cursor:pointer;font-size:.78rem;color:var(--text-muted);background:var(--bg-card);border:1.5px solid var(--border);border-radius:7px;padding:.3rem .6rem;transition:all .15s;user-select:none}
+    .etog:has(input:checked){background:rgba(15,98,254,.08);border-color:rgba(15,98,254,.3);color:var(--primary)}
+    .etog input{accent-color:var(--primary);cursor:pointer;width:13px;height:13px}
+
+    .wbtns{display:flex;gap:.3rem}
+    .wbtn{flex:1;padding:.35rem;border:1.5px solid var(--border);border-radius:7px;background:transparent;font-size:.73rem;cursor:pointer;color:var(--text-muted);font-weight:600;text-align:center;transition:all .15s}
+    .wbtn.act{border-color:var(--primary);background:rgba(15,98,254,.08);color:var(--primary)}
+
+    .lsr{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap}
+    .lsr-sz{height:26px;border:1px solid var(--border);border-radius:6px;background:var(--bg-card);color:var(--text);font-size:.78rem;padding:0 .45rem;cursor:pointer;outline:none}
+    .lsr-sz:focus{border-color:var(--primary)}
+    .lbtn{width:28px;height:26px;border-radius:6px;border:1px solid var(--border);background:transparent;font-size:.8rem;cursor:pointer;color:var(--text-muted);display:flex;align-items:center;justify-content:center;transition:all .15s;font-weight:700}
+    .lbtn.act{background:var(--primary);color:white;border-color:var(--primary)}
+    .l-color{width:26px;height:26px;border-radius:6px;border:1px solid var(--border);cursor:pointer;padding:1px;background:transparent}
+    .lprev{font-size:.8rem;padding:.15rem .4rem;background:var(--bg-card);border-radius:5px;border:1px solid var(--border)}
+
+    .opts-list{display:flex;flex-direction:column;gap:.3rem;margin-top:.4rem}
+    .opt-row{display:flex;gap:.35rem;align-items:center}
+    .opt-row .einput{flex:1}
+    .opt-del{width:24px;height:24px;border-radius:5px;border:1px solid var(--border);background:transparent;cursor:pointer;color:var(--text-muted);display:flex;align-items:center;justify-content:center;font-size:.7rem;flex-shrink:0;transition:all .15s}
+    .opt-del:hover{background:#fee2e2;color:#dc2626;border-color:#fca5a5}
+    .opt-add{display:flex;align-items:center;gap:.3rem;padding:.3rem .55rem;border:1.5px dashed var(--border);border-radius:6px;background:transparent;color:var(--text-muted);font-size:.75rem;font-weight:600;cursor:pointer;width:100%;margin-top:.2rem;transition:all .15s}
+    .opt-add:hover{border-color:var(--primary);color:var(--primary)}
+
+    .add-fld-wrap{padding:.3rem .5rem .5rem}
+    .add-fld{display:flex;align-items:center;gap:.4rem;padding:.5rem .8rem;border:2px dashed var(--border);border-radius:8px;background:transparent;color:var(--text-muted);font-size:.8rem;font-weight:600;cursor:pointer;width:100%;transition:all .18s}
+    .add-fld:hover{border-color:var(--primary);color:var(--primary);background:rgba(15,98,254,.03)}
+    .add-sec-btn{display:flex;align-items:center;justify-content:center;gap:.5rem;padding:.85rem;border:2px dashed var(--border);border-radius:14px;background:transparent;color:var(--text-muted);font-size:.88rem;font-weight:700;cursor:pointer;width:100%;transition:all .18s}
+    .add-sec-btn:hover{border-color:var(--primary);color:var(--primary);background:rgba(15,98,254,.03)}
+
+    .fb-bar{position:sticky;bottom:0;background:var(--bg-card);border-top:1px solid var(--border);padding:.8rem 1.5rem;display:flex;justify-content:space-between;align-items:center;z-index:99;margin:1.5rem -1.5rem -1.5rem;box-shadow:0 -4px 20px rgba(0,0,0,.06)}
+    .fb-bar-info{font-size:.8rem;color:var(--text-muted)}
+
+    .pv-sec-title{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text-muted);margin-bottom:.5rem;padding-bottom:.35rem;border-bottom:1px solid var(--border)}
+    .pv-row{margin-bottom:.55rem}
+    .pv-mock{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:.45rem .7rem;font-size:.78rem;color:var(--text-muted);font-style:italic;margin-top:.25rem}
+    .req-star{color:#dc2626}
+  </style>
+</head>
+<body class="admin-body">
+
+<aside class="admin-sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <span class="sidebar-brand">⚡ HireHub</span>
+    <button class="btn-sidebar-close d-lg-none" id="sidebarClose"><i class="bi bi-x-lg"></i></button>
+  </div>
+  <nav class="sidebar-nav">
+    <a href="dashboard.html"    class="sidebar-link"><i class="bi bi-speedometer2"></i><span>Dashboard</span></a>
+    <a href="jobs.html"         class="sidebar-link"><i class="bi bi-briefcase"></i><span>All Jobs</span></a>
+    <a href="add-job.html"      class="sidebar-link"><i class="bi bi-plus-circle"></i><span>Add Job</span></a>
+    <a href="categories.html"   class="sidebar-link"><i class="bi bi-tag"></i><span>Categories</span></a>
+    <a href="messages.html"     class="sidebar-link"><i class="bi bi-envelope"></i><span>Messages</span></a>
+    <a href="monetization.html" class="sidebar-link"><i class="bi bi-currency-dollar"></i><span>Monetization</span></a>
+    <a href="settings.html"     class="sidebar-link"><i class="bi bi-gear"></i><span>Settings</span></a>
+    <a href="form-builder.html" class="sidebar-link active"><i class="bi bi-ui-checks-grid"></i><span>Form Builder</span></a>
+    <hr class="sidebar-divider">
+    <a href="/" class="sidebar-link" target="_blank"><i class="bi bi-box-arrow-up-right"></i><span>View Site</span></a>
+    <button class="sidebar-link sidebar-btn" id="logoutBtn"><i class="bi bi-box-arrow-right"></i><span>Logout</span></button>
+  </nav>
+</aside>
+<div class="sidebar-overlay d-lg-none d-none" id="sidebarOverlay"></div>
+
+<div class="admin-main">
+  <header class="admin-topbar">
+    <button class="btn-hamburger d-lg-none" id="sidebarToggle"><i class="bi bi-list fs-4"></i></button>
+    <h1 class="topbar-title">Form Builder</h1>
+    <div class="topbar-right">
+      <a href="add-job.html" class="btn btn-admin-outline btn-sm" style="font-size:.8rem" target="_blank">
+        <i class="bi bi-eye me-1"></i>Preview Form
+      </a>
+      <button class="btn-icon-admin" id="themeToggleAdmin"><i class="bi bi-moon-fill" id="adminThemeIcon"></i></button>
+    </div>
+  </header>
+
+  <main class="admin-content" style="padding-bottom:80px">
+    <div id="topAlert" class="alert d-none mb-3"></div>
+
+    <!-- Info banner -->
+    <div style="background:rgba(15,98,254,.06);border:1px solid rgba(15,98,254,.18);border-radius:10px;padding:.8rem 1rem;font-size:.83rem;color:var(--text);margin-bottom:1.25rem;display:flex;gap:.75rem;align-items:flex-start">
+      <i class="bi bi-info-circle-fill text-primary mt-1" style="flex-shrink:0"></i>
+      <span><strong>Full control:</strong> Every section and field — including core fields like Job Title, Description, Phone — can be customized. Change labels, types, widths, colors, required status, visibility, or delete. Add new sections anywhere with any fields you need. All changes live-apply to the Add Job form instantly after saving.</span>
+    </div>
+
+    <div class="fb-layout">
+      <!-- LEFT -->
+      <div class="fb-left">
+        <div id="sectionsList"></div>
+        <button class="add-sec-btn mt-2" id="addSecBtn">
+          <i class="bi bi-plus-circle-fill"></i> Add New Section
+        </button>
+      </div>
+
+      <!-- RIGHT -->
+      <div class="fb-right">
+        <div class="admin-card mb-3">
+          <div class="admin-card-header d-flex justify-content-between align-items-center">
+            <h5 class="admin-card-title mb-0" style="font-size:.88rem">Live Preview</h5>
+            <span style="font-size:.72rem;color:var(--text-muted)">Updates as you edit</span>
+          </div>
+          <div class="p-3" id="livePreview" style="font-size:.82rem">Loading…</div>
+        </div>
+
+        <div class="admin-card">
+          <div class="admin-card-header"><h5 class="admin-card-title mb-0" style="font-size:.88rem">Field Types</h5></div>
+          <div class="p-3">
+            <div style="display:flex;flex-direction:column;gap:.35rem;font-size:.78rem;color:var(--text-muted)">
+              <div><code style="background:rgba(15,98,254,.1);color:var(--primary);padding:.1rem .35rem;border-radius:4px;font-size:.7rem">text</code> &ensp;Single-line</div>
+              <div><code style="background:rgba(15,98,254,.1);color:var(--primary);padding:.1rem .35rem;border-radius:4px;font-size:.7rem">textarea</code> &ensp;Multi-line</div>
+              <div><code style="background:rgba(15,98,254,.1);color:var(--primary);padding:.1rem .35rem;border-radius:4px;font-size:.7rem">select</code> &ensp;Dropdown</div>
+              <div><code style="background:rgba(15,98,254,.1);color:var(--primary);padding:.1rem .35rem;border-radius:4px;font-size:.7rem">radio</code> &ensp;Single choice</div>
+              <div><code style="background:rgba(15,98,254,.1);color:var(--primary);padding:.1rem .35rem;border-radius:4px;font-size:.7rem">checkbox</code> &ensp;Multi choice</div>
+              <div><code style="background:rgba(15,98,254,.1);color:var(--primary);padding:.1rem .35rem;border-radius:4px;font-size:.7rem">number</code> &ensp;Numeric</div>
+              <div><code style="background:rgba(15,98,254,.1);color:var(--primary);padding:.1rem .35rem;border-radius:4px;font-size:.7rem">email / tel / url</code></div>
+              <div><code style="background:rgba(15,98,254,.1);color:var(--primary);padding:.1rem .35rem;border-radius:4px;font-size:.7rem">date</code> &ensp;Date picker</div>
+              <div><code style="background:rgba(15,98,254,.1);color:var(--primary);padding:.1rem .35rem;border-radius:4px;font-size:.7rem">salary</code> &ensp;Min–Max range</div>
+              <div><code style="background:rgba(15,98,254,.1);color:var(--primary);padding:.1rem .35rem;border-radius:4px;font-size:.7rem">file</code> &ensp;File upload</div>
+              <div><code style="background:rgba(15,98,254,.1);color:var(--primary);padding:.1rem .35rem;border-radius:4px;font-size:.7rem">category / jobtype</code> &ensp;Core selects</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Save bar -->
+    <div class="fb-bar">
+      <span class="fb-bar-info" id="barInfo">Loading…</span>
+      <div class="d-flex gap-2">
+        <button class="btn btn-admin-outline btn-sm" onclick="resetSchema()"><i class="bi bi-arrow-counterclockwise me-1"></i>Reset</button>
+        <button class="btn btn-admin-primary btn-sm" id="saveBtn" onclick="saveSchema()"><i class="bi bi-check2-circle me-2"></i>Save & Apply</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/admin/js/admin.js"></script>
+<script>
+'use strict';
+
+let schema = { sections: [] };
+let openFldId = null;
+const LOCKED_CORE_KEYS = ['title','company','location','category_id','description']; // cannot delete
+
+/* ══════════════ LOAD / SAVE ══════════════ */
+async function loadSchema() {
+  try {
+    const d = await adminApi.get('/api/admin/form-schema');
+    schema = d.schema || { sections: [] };
+    if (!schema.sections) schema.sections = [];
+    renderAll();
+    barInfo('Schema loaded');
+  } catch(e) { showAlert('Failed to load: '+e.message,'danger'); }
+}
+
+async function saveSchema() {
+  const btn = document.getElementById('saveBtn');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving…';
+  syncFromDOM();
+  try {
+    const d = await adminApi.put('/api/admin/form-schema', { schema });
+    if (d.success) { showAlert('Saved! Add Job form is now updated.','success'); barInfo('Saved '+new Date().toLocaleTimeString()); }
+    else throw new Error(d.message);
+  } catch(e) { showAlert('Save failed: '+e.message,'danger'); }
+  finally { btn.disabled=false; btn.innerHTML='<i class="bi bi-check2-circle me-2"></i>Save & Apply'; }
+}
+
+function resetSchema() {
+  if (confirm('Reset to last saved? Unsaved changes lost.')) loadSchema();
+}
+
+/* ══════════════ SYNC DOM → SCHEMA ══════════════ */
+function syncFromDOM() {
+  schema.sections = [];
+  document.querySelectorAll('[data-sid]').forEach(secEl => {
+    const sec = {
+      id:      secEl.dataset.sid,
+      title:   secEl.querySelector('.fb-sec-name')?.value || 'Untitled',
+      visible: !secEl.classList.contains('sec-hidden'),
+      icon:    secEl.dataset.icon || 'briefcase',
+      fields:  []
+    };
+    secEl.querySelectorAll('[data-fid]').forEach(fldEl => {
+      const field = {
+        id:          fldEl.dataset.fid,
+        coreKey:     fldEl.dataset.coreKey || null,
+        label:       val(fldEl,'label'),
+        labelSize:   val(fldEl,'labelSize') || 'sm',
+        labelBold:   chk(fldEl,'labelBold'),
+        labelItalic: chk(fldEl,'labelItalic'),
+        labelColor:  val(fldEl,'labelColor') || '',
+        type:        val(fldEl,'type') || 'text',
+        placeholder: val(fldEl,'placeholder') || '',
+        required:    chk(fldEl,'required'),
+        visible:     chk(fldEl,'visible'),
+        width:       fldEl.querySelector('[data-wsel]')?.dataset.selected || 'half',
+        helpText:    val(fldEl,'helpText') || '',
+        options:     []
+      };
+      fldEl.querySelectorAll('.opt-inp').forEach(o => { if(o.value.trim()) field.options.push(o.value.trim()); });
+      sec.fields.push(field);
+    });
+    schema.sections.push(sec);
+  });
+}
+
+function val(el, prop) { return el.querySelector(`[data-prop="${prop}"]`)?.value || ''; }
+function chk(el, prop) {
+  const el2 = el.querySelector(`[data-prop="${prop}"]`);
+  if (!el2) return prop === 'visible' ? true : false;
+  return el2.type === 'checkbox' ? el2.checked : el2.value;
+}
+
+/* ══════════════ RENDER ALL ══════════════ */
+function renderAll() {
+  const cont = document.getElementById('sectionsList');
+  cont.innerHTML = '';
+  schema.sections.forEach(sec => cont.appendChild(buildSec(sec)));
+  renderPreview();
+}
+
+/* ══════════════ BUILD SECTION ══════════════ */
+function buildSec(sec) {
+  const isCore = sec.id === 'sec_details' || sec.id === 'sec_contact';
+  const div = document.createElement('div');
+  div.className = 'fb-section' + (sec.visible===false?' sec-hidden':'');
+  div.dataset.sid  = sec.id;
+  div.dataset.icon = sec.icon || 'briefcase';
+
+  div.innerHTML = `
+    <div class="fb-section-head">
+      <i class="bi bi-grip-vertical fb-drag" title="Drag to reorder"></i>
+      <div class="fb-sec-icon"><i class="bi bi-${sec.icon||'briefcase'}"></i></div>
+      <input class="fb-sec-name" value="${esc(sec.title)}" placeholder="Section title…">
+      <div class="fb-pills">
+        ${isCore?'<span class="fpill core">Core</span>':''}
+        <span class="fpill fcount">${sec.fields.length} field${sec.fields.length!==1?'s':''}</span>
+      </div>
+      <div class="fb-sec-btns">
+        <button class="fbb" title="${sec.visible===false?'Show':'Hide'} section" onclick="toggleSecVis(this,'${sec.id}')">
+          <i class="bi bi-${sec.visible===false?'eye-slash':'eye'}"></i>
+        </button>
+        <button class="fbb del" title="Delete section" onclick="deleteSec('${sec.id}')"><i class="bi bi-trash"></i></button>
+        <button class="fbb" title="Collapse" onclick="toggleCollapse(this.closest('.fb-section'))">
+          <i class="bi bi-chevron-down sec-caret"></i>
+        </button>
+      </div>
+    </div>
+    <div class="fb-fields" id="fl_${sec.id}"></div>
+    <div class="add-fld-wrap">
+      <button class="add-fld" onclick="addField('${sec.id}')"><i class="bi bi-plus-circle"></i> Add Field</button>
+    </div>`;
+
+  const fc = div.querySelector(`#fl_${sec.id}`);
+  sec.fields.forEach(f => fc.appendChild(buildFld(f)));
+  div.querySelector('.fb-sec-name').addEventListener('input', dp);
+  return div;
+}
+
+/* ══════════════ BUILD FIELD ══════════════ */
+function buildFld(f) {
+  const isCoreField  = !!f.coreKey;
+  const isLocked     = LOCKED_CORE_KEYS.includes(f.coreKey);
+  const coreOnly     = ['category','jobtype'].includes(f.type);
+  const hasOpts      = ['select','radio','checkbox'].includes(f.type);
+  const widths       = ['full','half','third'];
+  const widthLabel   = {full:'Full',half:'Half',third:'Third'};
+  const wSel         = f.width || 'half';
+
+  const div = document.createElement('div');
+  div.className = 'fb-fld' + (f.visible===false?' fld-hidden':'') + (openFldId===f.id?' fld-open':'');
+  div.dataset.fid     = f.id;
+  if (f.coreKey) div.dataset.coreKey = f.coreKey;
+
+  div.innerHTML = `
+    <div class="fld-head" onclick="toggleFld(this.closest('[data-fid]'))">
+      <i class="bi bi-grip-vertical fld-drag" onclick="event.stopPropagation()" title="Drag to reorder"></i>
+      <div class="fld-info">
+        <div class="fld-name">${esc(f.label||'Untitled')}</div>
+        <div class="fld-sub">
+          <span>${f.type}</span>
+          <span>${widthLabel[wSel]||'Half'} width</span>
+          ${f.coreKey?`<span>core:${f.coreKey}</span>`:''}
+        </div>
+      </div>
+      <div class="fld-badges">
+        <span class="fbadge typ">${f.type}</span>
+        ${f.required?'<span class="fbadge req">Required</span>':''}
+        ${f.visible===false?'<span class="fbadge hid">Hidden</span>':''}
+      </div>
+      <i class="bi bi-chevron-down fld-caret"></i>
+    </div>
+    <div class="fld-editor">
+
+      <!-- Row 1: Label, Type, Width -->
+      <div class="eg eg-3 mb-2">
+        <div>
+          <label class="elbl">Label Text</label>
+          <input class="einput" data-prop="label" value="${esc(f.label||'')}" placeholder="Field label" oninput="syncFldHead(this)">
+        </div>
+        <div>
+          <label class="elbl">Field Type</label>
+          <select class="einput" data-prop="type" ${coreOnly?'disabled':''} onchange="onTypeChange(this)">
+            ${['text','textarea','email','tel','number','url','date','select','radio','checkbox','salary','file','category','jobtype'].map(t=>`<option value="${t}"${f.type===t?' selected':''}>${t}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label class="elbl">Width</label>
+          <div class="wbtns" data-wsel data-selected="${wSel}">
+            ${widths.map(w=>`<button type="button" class="wbtn${wSel===w?' act':''}" onclick="setWidth(this,'${w}')">${widthLabel[w]}</button>`).join('')}
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 2: Placeholder + Help -->
+      <div class="eg eg-2 mb-2">
+        <div>
+          <label class="elbl">Placeholder</label>
+          <input class="einput" data-prop="placeholder" value="${esc(f.placeholder||'')}" placeholder="Hint text…">
+        </div>
+        <div>
+          <label class="elbl">Help Text (below field)</label>
+          <input class="einput" data-prop="helpText" value="${esc(f.helpText||'')}" placeholder="e.g. With country code">
+        </div>
+      </div>
+
+      <!-- Row 3: Label Style -->
+      <div class="mb-2">
+        <label class="elbl">Label Style</label>
+        <div class="lsr">
+          <select class="lsr-sz" data-prop="labelSize" onchange="updLabelPrev(this.closest('[data-fid]'))">
+            ${['xs','sm','md','lg','xl'].map(s=>`<option value="${s}"${f.labelSize===s?' selected':''}>${s.toUpperCase()}</option>`).join('')}
+          </select>
+          <button type="button" class="lbtn${f.labelBold?' act':''}" title="Bold"
+            onclick="toggleLStyle(this.closest('[data-fid]'),'labelBold')"><b>B</b></button>
+          <button type="button" class="lbtn${f.labelItalic?' act':''}" title="Italic"
+            onclick="toggleLStyle(this.closest('[data-fid]'),'labelItalic')"><i>I</i></button>
+          <input type="color" class="l-color" data-prop="labelColor"
+                 value="${f.labelColor||'#000000'}" title="Label color"
+                 oninput="updLabelPrev(this.closest('[data-fid]'))">
+          <span style="font-size:.7rem;color:var(--text-muted)">Preview:</span>
+          <span class="lprev" style="${lStyle(f)}">${esc(f.label||'Label')}</span>
+          <input type="checkbox" data-prop="labelBold"   ${f.labelBold  ?'checked':''} style="display:none">
+          <input type="checkbox" data-prop="labelItalic" ${f.labelItalic?'checked':''} style="display:none">
+        </div>
+      </div>
+
+      <!-- Row 4: Toggles -->
+      <div class="etoggle-row mb-2">
+        <label class="etog">
+          <input type="checkbox" data-prop="required" ${f.required?'checked':''}
+                 onchange="syncBadges(this.closest('[data-fid]'))">
+          <i class="bi bi-asterisk" style="font-size:.65rem;color:#dc2626"></i> Required
+        </label>
+        <label class="etog">
+          <input type="checkbox" data-prop="visible" ${f.visible!==false?'checked':''}
+                 onchange="syncBadges(this.closest('[data-fid]'))">
+          <i class="bi bi-eye" style="font-size:.72rem"></i> Visible
+        </label>
+      </div>
+
+      <!-- Options (for select/radio/checkbox) -->
+      <div class="opts-wrap${hasOpts?'':' d-none'}" style="margin-bottom:.6rem">
+        <label class="elbl">Options</label>
+        <div class="opts-list">
+          ${(f.options||[]).map(o=>`<div class="opt-row"><input class="einput opt-inp" value="${esc(o)}" placeholder="Option…"><button type="button" class="opt-del" onclick="this.closest('.opt-row').remove()"><i class="bi bi-x"></i></button></div>`).join('')}
+        </div>
+        <button type="button" class="opt-add" onclick="addOpt(this)"><i class="bi bi-plus"></i> Add Option</button>
+      </div>
+
+      <!-- Delete -->
+      <div class="d-flex justify-content-end">
+        ${isLocked
+          ? '<span style="font-size:.75rem;color:var(--text-muted)"><i class="bi bi-lock-fill me-1"></i>Core field — cannot delete</span>'
+          : '<button type="button" class="fbb del" style="width:auto;padding:0 .65rem;height:26px;font-size:.75rem;gap:.3rem;display:flex;align-items:center" onclick="deleteFld(this.closest(\'[data-fid]\'))"><i class="bi bi-trash"></i> Delete Field</button>'
+        }
+      </div>
+    </div>`;
+
+  div.querySelectorAll('[data-prop="label"],[data-prop="labelSize"],[data-prop="labelColor"]').forEach(el=>el.addEventListener('input',dp));
+  div.querySelectorAll('[data-prop="required"],[data-prop="visible"],[data-prop="type"]').forEach(el=>el.addEventListener('change',dp));
+  return div;
+}
+
+function lStyle(f) {
+  const sz = {xs:'11px',sm:'13px',md:'15px',lg:'18px',xl:'22px'}[f.labelSize]||'13px';
+  return [
+    `font-size:${sz}`,
+    f.labelBold   ? 'font-weight:700'   : '',
+    f.labelItalic ? 'font-style:italic' : '',
+    f.labelColor && f.labelColor!=='#000000' ? `color:${f.labelColor}` : ''
+  ].filter(Boolean).join(';');
+}
+
+function updLabelPrev(fldEl) {
+  const f = {
+    labelSize:   fldEl.querySelector('[data-prop="labelSize"]')?.value||'sm',
+    labelBold:   fldEl.querySelector('[data-prop="labelBold"]')?.checked||false,
+    labelItalic: fldEl.querySelector('[data-prop="labelItalic"]')?.checked||false,
+    labelColor:  fldEl.querySelector('[data-prop="labelColor"]')?.value||''
+  };
+  const prev = fldEl.querySelector('.lprev');
+  if (prev) {
+    prev.style.cssText = lStyle(f);
+    prev.textContent   = fldEl.querySelector('[data-prop="label"]')?.value || 'Label';
+  }
+  dp();
+}
+
+function toggleLStyle(fldEl, prop) {
+  const cb  = fldEl.querySelector(`[data-prop="${prop}"]`);
+  cb.checked = !cb.checked;
+  const btn = fldEl.querySelector(`.lbtn[title="${prop==='labelBold'?'Bold':'Italic'}"]`);
+  if (btn) btn.classList.toggle('act', cb.checked);
+  updLabelPrev(fldEl);
+}
+
+/* ══════════════ INTERACTIONS ══════════════ */
+function toggleFld(fldEl) {
+  const wasOpen = fldEl.classList.contains('fld-open');
+  document.querySelectorAll('.fb-fld.fld-open').forEach(el=>el.classList.remove('fld-open'));
+  if (!wasOpen) { fldEl.classList.add('fld-open'); openFldId=fldEl.dataset.fid; }
+  else openFldId=null;
+}
+
+function syncFldHead(input) {
+  const fldEl = input.closest('[data-fid]');
+  const nm = fldEl.querySelector('.fld-name');
+  if (nm) nm.textContent = input.value||'Untitled';
+  updLabelPrev(fldEl);
+}
+
+function syncBadges(fldEl) {
+  const req = fldEl.querySelector('[data-prop="required"]')?.checked;
+  const vis = fldEl.querySelector('[data-prop="visible"]')?.checked??true;
+  const typ = fldEl.querySelector('[data-prop="type"]')?.value||'text';
+  const bd  = fldEl.querySelector('.fld-badges');
+  if (bd) {
+    bd.innerHTML = `<span class="fbadge typ">${typ}</span>${req?'<span class="fbadge req">Required</span>':''}${!vis?'<span class="fbadge hid">Hidden</span>':''}`;
+  }
+  fldEl.classList.toggle('fld-hidden',!vis);
+  dp();
+}
+
+function onTypeChange(sel) {
+  const fldEl  = sel.closest('[data-fid]');
+  const type   = sel.value;
+  const hasOpts= ['select','radio','checkbox'].includes(type);
+  fldEl.querySelector('.opts-wrap').classList.toggle('d-none',!hasOpts);
+  const metaSp = fldEl.querySelectorAll('.fld-sub span');
+  if (metaSp[0]) metaSp[0].textContent = type;
+  syncBadges(fldEl);
+}
+
+function setWidth(btn, w) {
+  const wrap = btn.closest('[data-wsel]');
+  wrap.dataset.selected = w;
+  const lbl = {full:'Full',half:'Half',third:'Third'};
+  wrap.querySelectorAll('.wbtn').forEach(b=>b.classList.toggle('act',b.textContent===lbl[w]));
+  const metaSp = btn.closest('[data-fid]').querySelectorAll('.fld-sub span');
+  if (metaSp[1]) metaSp[1].textContent = lbl[w]+' width';
+  dp();
+}
+
+function addOpt(btn) {
+  const list = btn.closest('.opts-wrap').querySelector('.opts-list');
+  list.insertAdjacentHTML('beforeend',`<div class="opt-row"><input class="einput opt-inp" placeholder="Option…"><button type="button" class="opt-del" onclick="this.closest('.opt-row').remove()"><i class="bi bi-x"></i></button></div>`);
+}
+
+function addField(secId) {
+  const fc = document.getElementById('fl_'+secId);
+  const f  = { id:'fld_'+Date.now()+'_'+Math.random().toString(36).slice(2,5), label:'New Field', type:'text', placeholder:'', required:false, visible:true, width:'half', labelSize:'sm', labelBold:false, labelItalic:false, labelColor:'', helpText:'', options:[] };
+  const el = buildFld(f);
+  fc.appendChild(el);
+  // auto open
+  document.querySelectorAll('.fb-fld.fld-open').forEach(x=>x.classList.remove('fld-open'));
+  el.classList.add('fld-open');
+  openFldId = f.id;
+  el.scrollIntoView({behavior:'smooth',block:'nearest'});
+  updCount(secId);
+  dp();
+}
+
+function deleteFld(fldEl) {
+  if (!confirm('Delete this field?')) return;
+  const secEl = fldEl.closest('[data-sid]');
+  fldEl.remove();
+  if (secEl) updCount(secEl.dataset.sid);
+  dp();
+}
+
+function deleteSec(sid) {
+  if (!confirm('Delete this entire section and all its fields?')) return;
+  document.querySelector(`[data-sid="${sid}"]`)?.remove();
+  dp();
+}
+
+function toggleSecVis(btn, sid) {
+  const sec = document.querySelector(`[data-sid="${sid}"]`);
+  const hide= sec.classList.toggle('sec-hidden');
+  btn.innerHTML = `<i class="bi bi-${hide?'eye-slash':'eye'}"></i>`;
+  btn.title     = (hide?'Show':'Hide')+' section';
+  dp();
+}
+
+function toggleCollapse(sec) { sec.classList.toggle('collapsed'); }
+
+function updCount(sid) {
+  const sec = document.querySelector(`[data-sid="${sid}"]`);
+  if (!sec) return;
+  const n = sec.querySelectorAll('[data-fid]').length;
+  const b = sec.querySelector('.fcount');
+  if (b) b.textContent = n+' field'+(n!==1?'s':'');
+}
+
+document.getElementById('addSecBtn').addEventListener('click',()=>{
+  const sec = { id:'sec_'+Date.now(), title:'New Section', visible:true, icon:'layout-text-window', fields:[] };
+  const el  = buildSec(sec);
+  document.getElementById('sectionsList').appendChild(el);
+  el.scrollIntoView({behavior:'smooth',block:'start'});
+  dp();
+});
+
+/* ══════════════ LIVE PREVIEW ══════════════ */
+let pvTimer;
+function dp() { clearTimeout(pvTimer); pvTimer=setTimeout(renderPreview,350); }
+
+function renderPreview() {
+  syncFromDOM();
+  const box = document.getElementById('livePreview');
+  let html  = '';
+  schema.sections.forEach(sec=>{
+    if (!sec.visible) return;
+    const vis = sec.fields.filter(f=>f.visible!==false);
+    if (!vis.length) return;
+    html += `<div class="pv-sec-title">${esc(sec.title)}</div>`;
+    vis.forEach(f=>{
+      const sz={xs:'10px',sm:'12px',md:'14px',lg:'16px',xl:'20px'}[f.labelSize]||'12px';
+      const st=[`font-size:${sz}`,f.labelBold?'font-weight:700':'',f.labelItalic?'font-style:italic':'',f.labelColor&&f.labelColor!=='#000000'?`color:${f.labelColor}`:''].filter(Boolean).join(';');
+      html += `<div class="pv-row"><div style="${st}">${esc(f.label)}${f.required?'<span class="req-star"> *</span>':''}</div><div class="pv-mock">${esc(f.placeholder||f.type)}</div></div>`;
+    });
+  });
+  box.innerHTML = html||'<span style="color:var(--text-muted)">Nothing visible yet</span>';
+}
+
+/* ══════════════ HELPERS ══════════════ */
+function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function barInfo(m){document.getElementById('barInfo').textContent=m;}
+function showAlert(m,t){const el=document.getElementById('topAlert');el.className=`alert alert-${t}`;el.textContent=m;el.classList.remove('d-none');setTimeout(()=>el.classList.add('d-none'),5000);}
+
+document.addEventListener('DOMContentLoaded',async()=>{await requireAuth();await loadSchema();});
+</script>
+</body>
+</html>
