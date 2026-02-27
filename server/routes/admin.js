@@ -44,7 +44,7 @@ async function uniqueSlug(title, excludeId = null) {
       ? 'SELECT id FROM jobs WHERE slug = ? AND id != ? LIMIT 1'
       : 'SELECT id FROM jobs WHERE slug = ? LIMIT 1';
     const args = excludeId ? [slug, excludeId] : [slug];
-    const [rows] = await db.execute(sql, args);
+    const [rows] = await db.query(sql, args);
     if (rows.length === 0) break;
     slug = `${base}-${i++}`;
   }
@@ -54,11 +54,11 @@ async function uniqueSlug(title, excludeId = null) {
 // ── Dashboard stats ────────────────────────────────────────────
 router.get('/stats', async (req, res) => {
   try {
-    const [[{ totalJobs }]]     = await db.execute('SELECT COUNT(*) AS totalJobs FROM jobs');
-    const [[{ activeJobs }]]    = await db.execute('SELECT COUNT(*) AS activeJobs FROM jobs WHERE status="active"');
-    const [[{ featuredJobs }]]  = await db.execute('SELECT COUNT(*) AS featuredJobs FROM jobs WHERE featured=1 AND status="active"');
-    const [[{ totalViews }]]    = await db.execute('SELECT COALESCE(SUM(views),0) AS totalViews FROM jobs');
-    const [recentJobs]          = await db.execute(
+    const [[{ totalJobs }]]     = await db.query('SELECT COUNT(*) AS totalJobs FROM jobs');
+    const [[{ activeJobs }]]    = await db.query('SELECT COUNT(*) AS activeJobs FROM jobs WHERE status="active"');
+    const [[{ featuredJobs }]]  = await db.query('SELECT COUNT(*) AS featuredJobs FROM jobs WHERE featured=1 AND status="active"');
+    const [[{ totalViews }]]    = await db.query('SELECT COALESCE(SUM(views),0) AS totalViews FROM jobs');
+    const [recentJobs]          = await db.query(
       `SELECT j.id, j.title, j.company, j.status, j.created_at, c.name AS category
          FROM jobs j JOIN categories c ON j.category_id = c.id
          ORDER BY j.created_at DESC LIMIT 5`
@@ -96,12 +96,12 @@ router.get('/jobs', async (req, res) => {
 
     const whereSql = where.length ? 'WHERE ' + where.join(' AND ') : '';
 
-    const [[{ total }]] = await db.execute(
+    const [[{ total }]] = await db.query(
       `SELECT COUNT(*) AS total FROM jobs j JOIN categories c ON j.category_id = c.id ${whereSql}`,
       params
     );
 
-    const [jobs] = await db.execute(
+    const [jobs] = await db.query(
       `SELECT j.id, j.title, j.company, j.location, j.status,
               j.featured, j.sponsored, j.views, j.created_at, j.slug,
               c.name AS category
@@ -122,7 +122,7 @@ router.get('/jobs', async (req, res) => {
 // ── Get single job (admin edit) ────────────────────────────────
 router.get('/jobs/:id', async (req, res) => {
   try {
-    const [rows] = await db.execute(
+    const [rows] = await db.query(
       `SELECT j.*, c.slug AS category_slug
          FROM jobs j JOIN categories c ON j.category_id = c.id
         WHERE j.id = ? LIMIT 1`,
@@ -145,7 +145,7 @@ router.post('/jobs', async (req, res) => {
     } = req.body;
 
     // Load form schema to determine required fields
-    const [[schemaRow]] = await db.execute(
+    const [[schemaRow]] = await db.query(
       "SELECT `value` FROM settings WHERE `key` = 'form_schema_v2' LIMIT 1"
     );
     const schema = schemaRow ? JSON.parse(schemaRow.value) : { sections: [] };
@@ -173,7 +173,7 @@ router.post('/jobs', async (req, res) => {
 
     const slug = await uniqueSlug(title);
 
-    await db.execute(
+    await db.query(
       `INSERT INTO jobs
          (title, company, category_id, location, job_type, description,
           phone, whatsapp, email, map_link, extra_fields, status, featured, sponsored, featured_until, slug)
@@ -202,7 +202,7 @@ router.put('/jobs/:id', async (req, res) => {
     } = req.body;
 
     // Load form schema to determine required fields
-    const [[schemaRow]] = await db.execute(
+    const [[schemaRow]] = await db.query(
       "SELECT `value` FROM settings WHERE `key` = 'form_schema_v2' LIMIT 1"
     );
     const schema = schemaRow ? JSON.parse(schemaRow.value) : { sections: [] };
@@ -228,12 +228,12 @@ router.put('/jobs/:id', async (req, res) => {
       });
     }
 
-    const [existing] = await db.execute('SELECT slug FROM jobs WHERE id = ? LIMIT 1', [req.params.id]);
+    const [existing] = await db.query('SELECT slug FROM jobs WHERE id = ? LIMIT 1', [req.params.id]);
     if (existing.length === 0) return res.status(404).json({ success: false, message: 'Job not found' });
 
     const slug = title ? await uniqueSlug(title, req.params.id) : existing[0].slug;
 
-    await db.execute(
+    await db.query(
       `UPDATE jobs SET
          title=?, company=?, category_id=?, location=?, job_type=?,
          description=?, phone=?, whatsapp=?, email=?, map_link=?, extra_fields=?,
@@ -255,7 +255,7 @@ router.put('/jobs/:id', async (req, res) => {
 // ── Delete single job ──────────────────────────────────────────
 router.delete('/jobs/:id', async (req, res) => {
   try {
-    const [result] = await db.execute('DELETE FROM jobs WHERE id = ?', [req.params.id]);
+    const [result] = await db.query('DELETE FROM jobs WHERE id = ?', [req.params.id]);
     if (result.affectedRows === 0) return res.status(404).json({ success: false, message: 'Job not found' });
     res.json({ success: true, message: 'Job deleted' });
   } catch (err) {
@@ -270,7 +270,7 @@ router.delete('/jobs', async (req, res) => {
 
     if (ids && Array.isArray(ids) && ids.length > 0) {
       const placeholders = ids.map(() => '?').join(',');
-      await db.execute(`DELETE FROM jobs WHERE id IN (${placeholders})`, ids);
+      await db.query(`DELETE FROM jobs WHERE id IN (${placeholders})`, ids);
       return res.json({ success: true, message: `${ids.length} jobs deleted` });
     }
 
@@ -284,7 +284,7 @@ router.delete('/jobs', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Specify ids or filters for bulk delete' });
     }
 
-    const [result] = await db.execute(
+    const [result] = await db.query(
       `DELETE FROM jobs WHERE ${where.join(' AND ')}`, params
     );
 
@@ -299,7 +299,7 @@ router.post('/upload-logo', upload.single('logo'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ success: false, message: 'No file uploaded' });
     const logoUrl = `/uploads/${req.file.filename}`;
-    await db.execute('UPDATE settings SET `value`=? WHERE `key`="logo_url"', [logoUrl]);
+    await db.query('UPDATE settings SET `value`=? WHERE `key`="logo_url"', [logoUrl]);
     res.json({ success: true, logoUrl });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -308,7 +308,7 @@ router.post('/upload-logo', upload.single('logo'), async (req, res) => {
 
 // ── Categories CRUD ────────────────────────────────────────────
 router.get('/categories', async (req, res) => {
-  const [cats] = await db.execute('SELECT * FROM categories ORDER BY name');
+  const [cats] = await db.query('SELECT * FROM categories ORDER BY name');
   res.json({ success: true, categories: cats });
 });
 
@@ -317,7 +317,7 @@ router.post('/categories', async (req, res) => {
     const { name } = req.body;
     if (!name) return res.status(400).json({ success: false, message: 'Name required' });
     const slug = slugify(name, { lower: true, strict: true });
-    await db.execute('INSERT INTO categories (name, slug) VALUES (?,?)', [name, slug]);
+    await db.query('INSERT INTO categories (name, slug) VALUES (?,?)', [name, slug]);
     res.json({ success: true, message: 'Category added' });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -326,7 +326,7 @@ router.post('/categories', async (req, res) => {
 
 router.delete('/categories/:id', async (req, res) => {
   try {
-    await db.execute('DELETE FROM categories WHERE id=?', [req.params.id]);
+    await db.query('DELETE FROM categories WHERE id=?', [req.params.id]);
     res.json({ success: true, message: 'Category deleted' });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -335,15 +335,15 @@ router.delete('/categories/:id', async (req, res) => {
 
 // ── Monetization ───────────────────────────────────────────────
 router.get('/monetization', async (req, res) => {
-  const [rows] = await db.execute('SELECT * FROM monetization');
-  const [ads]  = await db.execute('SELECT * FROM ad_placements');
+  const [rows] = await db.query('SELECT * FROM monetization');
+  const [ads]  = await db.query('SELECT * FROM ad_placements');
   res.json({ success: true, features: rows, adPlacements: ads });
 });
 
 router.put('/monetization/:id', async (req, res) => {
   try {
     const { enabled, price, duration_days } = req.body;
-    await db.execute(
+    await db.query(
       'UPDATE monetization SET enabled=?, price=?, duration_days=? WHERE id=?',
       [enabled ? 1 : 0, price, duration_days, req.params.id]
     );
@@ -356,7 +356,7 @@ router.put('/monetization/:id', async (req, res) => {
 router.put('/ad-placements/:id', async (req, res) => {
   try {
     const { ad_code, enabled } = req.body;
-    await db.execute(
+    await db.query(
       'UPDATE ad_placements SET ad_code=?, enabled=? WHERE id=?',
       [ad_code, enabled ? 1 : 0, req.params.id]
     );
@@ -371,7 +371,7 @@ const DEFAULT_SCHEMA_V2 = {"sections":[{"id":"sec_details","title":"Job Details"
 
 router.get('/form-schema', async (req, res) => {
   try {
-    const [[row]] = await db.execute(
+    const [[row]] = await db.query(
       "SELECT `value` FROM settings WHERE `key` = 'form_schema_v2' LIMIT 1"
     );
     const schema = row ? JSON.parse(row.value) : DEFAULT_SCHEMA_V2;
@@ -384,7 +384,7 @@ router.get('/form-schema', async (req, res) => {
 router.put('/form-schema', async (req, res) => {
   try {
     const schema = JSON.stringify(req.body.schema);
-    await db.execute(
+    await db.query(
       "INSERT INTO settings (`key`, `value`) VALUES ('form_schema_v2', ?) ON DUPLICATE KEY UPDATE `value` = ?",
       [schema, schema]
     );
