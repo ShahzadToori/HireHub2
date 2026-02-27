@@ -25,7 +25,7 @@ router.get('/', async (req, res) => {
     const perPage = Math.min(intOr(limit, 12), 50);
     const offset  = (intOr(page, 1) - 1) * perPage;
 
-    let where  = ['j.status = "active"'];
+    let where  = ["j.status = 'active'"];
     let params = [];
 
     if (q) {
