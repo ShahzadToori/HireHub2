@@ -55,8 +55,8 @@ async function uniqueSlug(title, excludeId = null) {
 router.get('/stats', async (req, res) => {
   try {
     const [[{ totalJobs }]]     = await db.query('SELECT COUNT(*) AS totalJobs FROM jobs');
-    const [[{ activeJobs }]]    = await db.query('SELECT COUNT(*) AS activeJobs FROM jobs WHERE status="active"');
-    const [[{ featuredJobs }]]  = await db.query('SELECT COUNT(*) AS featuredJobs FROM jobs WHERE featured=1 AND status="active"');
+    const [[{ activeJobs }]]    = await db.query("SELECT COUNT(*) AS activeJobs FROM jobs WHERE status='active'");
+    const [[{ featuredJobs }]]  = await db.query("SELECT COUNT(*) AS featuredJobs FROM jobs WHERE featured=1 AND status='active'");
     const [[{ totalViews }]]    = await db.query('SELECT COALESCE(SUM(views),0) AS totalViews FROM jobs');
     const [recentJobs]          = await db.query(
       `SELECT j.id, j.title, j.company, j.status, j.created_at, c.name AS category
