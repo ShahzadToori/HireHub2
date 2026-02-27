@@ -60,7 +60,7 @@ app.get('/job/*', (req, res) => {
 // ── Public form schema (no auth – used by public modal) ────────
 app.get('/api/public/form-schema', async (req, res) => {
   try {
-    const [[row]] = await db.execute(
+    const [[row]] = await db.query(
       "SELECT `value` FROM settings WHERE `key` = 'form_schema_v2' LIMIT 1"
     );
     const schema = row ? JSON.parse(row.value) : { sections: [] };
