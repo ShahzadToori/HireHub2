@@ -1,0 +1,28 @@
+<svg width="420" height="120" viewBox="0 0 420 120" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- Background (optional, remove if not needed) -->
+  <!-- <rect width="100%" height="100%" fill="#ffffff"/> -->
+
+  <!-- Orbit Circle -->
+  <circle cx="70" cy="60" r="38" stroke="#1E3A8A" stroke-width="4" fill="none"/>
+
+  <!-- Inner Solid Circle -->
+  <circle cx="70" cy="60" r="18" fill="#2563EB"/>
+
+  <!-- Orbit Accent Line -->
+  <ellipse cx="70" cy="60" rx="50" ry="20" 
+           stroke="#F59E0B" 
+           stroke-width="3" 
+           fill="none" 
+           transform="rotate(-20 70 60)"/>
+
+  <!-- Brand Text -->
+  <text x="140" y="70" 
+        font-family="Segoe UI, Arial, sans-serif" 
+        font-size="42" 
+        font-weight="700" 
+        fill="#111827">
+        Job<tspan fill="#2563EB">Orbit</tspan>
+  </text>
+
+</svg>
