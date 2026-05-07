@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Post a Job – JobOrbit</title>
+  <meta name="description" content="List your job opening on JobOrbit and connect with qualified candidates directly.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="/contact.html">
+  <meta property="og:type"        content="website">
+  <meta property="og:title"       content="Post a Job – JobOrbit">
+  <meta property="og:description" content="List your job opening and connect directly with qualified candidates.">
+  <meta property="og:image"       content="/images/icon-512x512.svg">
+  <meta property="og:site_name"   content="JobOrbit">
+  <meta name="twitter:card"       content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"ContactPage","name":"Post a Job","url":"/contact.html"}</script>
+  <link rel="icon" type="image/svg+xml" href="/JobOrbitFavicon.svg">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/contact.css">
+  <style>
+    /* ── Package picker ─────────────────────────────────────── */
+    .pkg-picker { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin-bottom: 1.75rem; }
+    @media(max-width:600px){ .pkg-picker { grid-template-columns: 1fr; } }
+
+    .pkg-card {
+      border: 2px solid var(--border-color, #e4e6ea);
+      border-radius: 14px;
+      padding: 1.25rem 1rem;
+      cursor: pointer;
+      text-align: center;
+      transition: all .2s;
+      background: var(--bg-card, #fff);
+      position: relative;
+      user-select: none;
+    }
+    .pkg-card:hover { border-color: var(--primary, #0f62fe); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(15,98,254,.12); }
+    .pkg-card.selected { border-color: var(--primary, #0f62fe); background: rgba(15,98,254,.05); box-shadow: 0 0 0 3px rgba(15,98,254,.12); }
+    .pkg-card.selected-featured  { border-color: #f59e0b; background: rgba(245,158,11,.05); box-shadow: 0 0 0 3px rgba(245,158,11,.15); }
+    .pkg-card.selected-sponsored { border-color: #10b981; background: rgba(16,185,129,.05); box-shadow: 0 0 0 3px rgba(16,185,129,.15); }
+
+    [data-theme="dark"] .pkg-card { background: var(--bg-card,#161b22); border-color: var(--border,#30363d); }
+    [data-theme="dark"] .pkg-card.selected { background: rgba(15,98,254,.1); }
+    [data-theme="dark"] .pkg-card.selected-featured  { background: rgba(245,158,11,.1); }
+    [data-theme="dark"] .pkg-card.selected-sponsored { background: rgba(16,185,129,.1); }
+
+    .pkg-check {
+      position: absolute; top: .6rem; right: .6rem;
+      width: 20px; height: 20px; border-radius: 50%;
+      background: var(--primary,#0f62fe); color: #fff;
+      display: none; align-items: center; justify-content: center;
+      font-size: .7rem;
+    }
+    .pkg-card.selected .pkg-check,
+    .pkg-card.selected-featured .pkg-check,
+    .pkg-card.selected-sponsored .pkg-check { display: flex; }
+    .pkg-card.selected-featured  .pkg-check { background: #f59e0b; }
+    .pkg-card.selected-sponsored .pkg-check { background: #10b981; }
+
+    .pkg-emoji { font-size: 1.75rem; margin-bottom: .35rem; }
+    .pkg-label { font-family: 'Syne',sans-serif; font-weight: 700; font-size: .95rem; color: var(--text,#1a1a2e); }
+    .pkg-price-tag { font-size: .78rem; font-weight: 700; margin-top: .2rem; }
+    .pkg-price-free { color: #10b981; }
+    .pkg-price-paid { color: var(--primary,#0f62fe); }
+    .pkg-desc-tag   { font-size: .72rem; color: var(--text-muted,#6b7280); margin-top: .25rem; line-height: 1.3; }
+
+    /* ── Form panels ────────────────────────────────────────── */
+    .form-panel { display: none; }
+    .form-panel.active { display: block; animation: fadeIn .22s ease; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+    /* ── Pending notice ─────────────────────────────────────── */
+    .pending-notice {
+      background: rgba(245,158,11,.08);
+      border: 1px solid rgba(245,158,11,.3);
+      border-radius: 9px;
+      padding: .65rem .9rem;
+      font-size: .8rem;
+      color: var(--text,#1a1a2e);
+      margin-bottom: 1rem;
+      display: flex; gap: .5rem; align-items: flex-start;
+    }
+    [data-theme="dark"] .pending-notice { background: rgba(245,158,11,.1); color: var(--text,#e6edf3); }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg sticky-top" id="mainNav">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+      <img id="site-logo" src="" alt="Logo" class="d-none" style="max-height:36px">
+      <!-- <span id="site-name" class="brand-name">JobOrbit</span> -->
+    </a>
+    <div class="d-flex align-items-center gap-2 ms-auto">
+      <button class="btn btn-icon theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <i class="bi bi-moon-fill" id="themeIcon"></i>
+      </button>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <i class="bi bi-list fs-4"></i>
+      </button>
+    </div>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+        <li class="nav-item"><a class="nav-link" href="/">Browse Jobs</a></li>
+        <li class="nav-item"><a class="nav-link" href="/#categories">Categories</a></li>
+        <li class="nav-item"><a class="nav-link nav-link-active" href="/contact.html">Post a Job</a></li>
+        <li class="nav-item"><a class="nav-link" href="/about.html">About</a></li>
+        <!-- <li class="nav-item"><a class="nav-link" href="/admin" target="_blank">Admin</a></li> -->
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="contact-hero">
+  <div class="contact-hero-bg"></div>
+  <div class="container position-relative text-center py-5">
+    <div class="contact-hero-icon"><i class="bi bi-megaphone-fill"></i></div>
+    <h1 class="contact-hero-title">Post Your Job Opening</h1>
+    <p class="contact-hero-sub">Reach thousands of qualified candidates. Choose a package below to get started.</p>
+    <div class="contact-hero-badges">
+      <span class="hero-badge-chip"><i class="bi bi-lightning-fill me-1"></i>Live in 24h</span>
+      <span class="hero-badge-chip"><i class="bi bi-people-fill me-1"></i>Thousands of job seekers</span>
+      <span class="hero-badge-chip"><i class="bi bi-whatsapp me-1"></i>Direct contact</span>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<section class="contact-section">
+  <div class="container">
+    <div class="row g-5 justify-content-center">
+
+      <!-- LEFT: forms -->
+      <div class="col-lg-7">
+        <div class="contact-card">
+          <div class="contact-card-header">
+            <h2 class="contact-card-title"><i class="bi bi-tags-fill me-2"></i>Choose Your Package</h2>
+            <p class="contact-card-sub">Select a plan — Standard lets you post directly, Featured & Sponsored go through our team.</p>
+          </div>
+
+          <!-- ── Package Picker ─────────────────────────────── -->
+          <div class="pkg-picker" id="pkgPicker">
+
+            <div class="pkg-card" id="pkgStandard" onclick="selectPkg('standard')">
+              <div class="pkg-check"><i class="bi bi-check"></i></div>
+              <div class="pkg-emoji">📋</div>
+              <div class="pkg-label">Standard</div>
+              <div class="pkg-price-tag pkg-price-free">Free</div>
+              <div class="pkg-desc-tag">Post directly, live after review</div>
+            </div>
+
+            <div class="pkg-card" id="pkgFeatured" onclick="selectPkg('featured')">
+              <div class="pkg-check"><i class="bi bi-check"></i></div>
+              <div class="pkg-emoji">⭐</div>
+              <div class="pkg-label">Featured</div>
+              <div class="pkg-price-tag pkg-price-paid">$9.99<small>/mo</small></div>
+              <div class="pkg-desc-tag">Highlighted in featured section</div>
+            </div>
+
+            <div class="pkg-card" id="pkgSponsored" onclick="selectPkg('sponsored')">
+              <div class="pkg-check"><i class="bi bi-check"></i></div>
+              <div class="pkg-emoji">🔝</div>
+              <div class="pkg-label">Sponsored</div>
+              <div class="pkg-price-tag pkg-price-paid">$19.99<small>/mo</small></div>
+              <div class="pkg-desc-tag">Pinned at top of all results</div>
+            </div>
+
+          </div>
+
+          <!-- ── Alert (shared) ────────────────────────────── -->
+          <div id="formAlert" class="contact-alert d-none" role="alert"></div>
+
+          <!-- ══════════════════════════════════════════════════
+               PANEL A: Standard – direct job post form
+          ══════════════════════════════════════════════════ -->
+          <div class="form-panel" id="panelStandard">
+
+            <div class="pending-notice">
+              <i class="bi bi-info-circle-fill text-warning mt-1" style="flex-shrink:0"></i>
+              <span>Your listing will be reviewed by our team before going live — usually within <strong>24 hours</strong>.</span>
+            </div>
+
+            <form id="jobForm" novalidate>
+
+              <div class="row g-3 mb-3">
+                <div class="col-sm-6">
+                  <label class="field-label" for="jTitle">Job Title <span class="req">*</span></label>
+                  <div class="field-wrap">
+                    <i class="bi bi-briefcase field-icon"></i>
+                    <input type="text" class="field-input" id="jTitle" placeholder="e.g. Senior Developer" required maxlength="200">
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <label class="field-label" for="jCompany">Company Name <span class="req">*</span></label>
+                  <div class="field-wrap">
+                    <i class="bi bi-building field-icon"></i>
+                    <input type="text" class="field-input" id="jCompany" placeholder="e.g. Tech Corp Ltd" required maxlength="200">
+                  </div>
+                </div>
+              </div>
+
+              <div class="row g-3 mb-3">
+                <div class="col-sm-6">
+                  <label class="field-label" for="jLocation">Location <span class="req">*</span></label>
+                  <div class="field-wrap">
+                    <i class="bi bi-geo-alt field-icon"></i>
+                    <input type="text" class="field-input" id="jLocation" placeholder="e.g. New York, NY" required maxlength="200">
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <label class="field-label" for="jType">Job Type</label>
+                  <div class="field-wrap">
+                    <i class="bi bi-clock field-icon"></i>
+                    <select class="field-input field-select" id="jType">
+                      <option value="Full-time">Full-time</option>
+                      <option value="Part-time">Part-time</option>
+                      <option value="Contract">Contract</option>
+                      <option value="Freelance">Freelance</option>
+                      <option value="Remote">Remote</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="field-label" for="jCategory">Category <span class="req">*</span></label>
+                <div class="field-wrap">
+                  <i class="bi bi-tag field-icon"></i>
+                  <select class="field-input field-select" id="jCategory" required>
+                    <option value="">Select category…</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="field-label" for="jDesc">Job Description <span class="req">*</span></label>
+                <textarea class="field-input field-textarea" id="jDesc"
+                  placeholder="Describe the role, responsibilities, requirements, salary range, and any other details…"
+                  required maxlength="8000" rows="8"></textarea>
+                <div class="field-hint"><span id="jDescCount">0</span> / 8000 characters</div>
+              </div>
+
+              <p class="field-label mb-2">Contact Methods <span class="req">*</span> <small class="text-muted fw-normal">(at least one)</small></p>
+              <div class="row g-3 mb-4">
+                <div class="col-sm-4">
+                  <label class="field-label" for="jPhone" style="font-weight:400">Phone</label>
+                  <div class="field-wrap">
+                    <i class="bi bi-telephone field-icon"></i>
+                    <input type="tel" class="field-input" id="jPhone" placeholder="+1 555 000 0000" maxlength="30">
+                  </div>
+                </div>
+                <div class="col-sm-4">
+                  <label class="field-label" for="jWhatsApp" style="font-weight:400">WhatsApp</label>
+                  <div class="field-wrap">
+                    <i class="bi bi-whatsapp field-icon"></i>
+                    <input type="tel" class="field-input" id="jWhatsApp" placeholder="+1 555 000 0000" maxlength="30">
+                  </div>
+                </div>
+                <div class="col-sm-4">
+                  <label class="field-label" for="jEmail" style="font-weight:400">Email</label>
+                  <div class="field-wrap">
+                    <i class="bi bi-envelope field-icon"></i>
+                    <input type="email" class="field-input" id="jEmail" placeholder="hr@company.com" maxlength="160">
+                  </div>
+                </div>
+              </div>
+
+              <button type="submit" class="btn-submit w-100" id="jobSubmitBtn">
+                <span id="jobBtnText"><i class="bi bi-send-fill me-2"></i>Submit Job for Review</span>
+                <span id="jobBtnSpinner" class="d-none">
+                  <span class="spinner-border spinner-border-sm me-2"></span>Submitting…
+                </span>
+              </button>
+
+            </form>
+          </div>
+
+          <!-- ══════════════════════════════════════════════════
+               PANEL B: Featured / Sponsored – message form
+          ══════════════════════════════════════════════════ -->
+          <div class="form-panel" id="panelContact">
+
+            <form id="contactForm" novalidate>
+
+              <div class="row g-3 mb-3">
+                <div class="col-sm-6">
+                  <label class="field-label" for="cName">Full Name <span class="req">*</span></label>
+                  <div class="field-wrap">
+                    <i class="bi bi-person field-icon"></i>
+                    <input type="text" class="field-input" id="cName" placeholder="John Smith" required maxlength="120">
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <label class="field-label" for="cCompany">Company Name</label>
+                  <div class="field-wrap">
+                    <i class="bi bi-building field-icon"></i>
+                    <input type="text" class="field-input" id="cCompany" placeholder="Tech Corp Ltd" maxlength="200">
+                  </div>
+                </div>
+              </div>
+
+              <div class="row g-3 mb-3">
+                <div class="col-sm-6">
+                  <label class="field-label" for="cEmail">Email Address <span class="req">*</span></label>
+                  <div class="field-wrap">
+                    <i class="bi bi-envelope field-icon"></i>
+                    <input type="email" class="field-input" id="cEmail" placeholder="you@company.com" required maxlength="160">
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <label class="field-label" for="cPhone">Phone / WhatsApp</label>
+                  <div class="field-wrap">
+                    <i class="bi bi-telephone field-icon"></i>
+                    <input type="tel" class="field-input" id="cPhone" placeholder="+1 555 000 0000" maxlength="30">
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="field-label" for="cSubject">Package <span class="req">*</span></label>
+                <div class="field-wrap">
+                  <i class="bi bi-tags field-icon"></i>
+                  <select class="field-input field-select" id="cSubject" required>
+                    <option value="">Select package…</option>
+                    <option value="Featured Job Inquiry">⭐ Featured Job – $9.99/mo</option>
+                    <option value="Sponsored Job Inquiry">🔝 Sponsored Job – $19.99/mo</option>
+                    <option value="Pricing and Packages">💰 Pricing and Packages</option>
+                    <option value="Partnership Inquiry">🤝 Partnership Inquiry</option>
+                    <option value="General Question">💬 General Question</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <label class="field-label" for="cMessage">Message <span class="req">*</span></label>
+                <textarea class="field-input field-textarea" id="cMessage"
+                  placeholder="Tell us about your company and the role. Include your preferred start date, any special requirements, and contact details for follow-up…"
+                  required maxlength="5000" rows="7"></textarea>
+                <div class="field-hint"><span id="charCount">0</span> / 5000 characters</div>
+              </div>
+
+              <button type="submit" class="btn-submit w-100" id="contactSubmitBtn">
+                <span id="contactBtnText"><i class="bi bi-send-fill me-2"></i>Send Message</span>
+                <span id="contactBtnSpinner" class="d-none">
+                  <span class="spinner-border spinner-border-sm me-2"></span>Sending…
+                </span>
+              </button>
+
+            </form>
+          </div>
+
+          <!-- ── No panel selected placeholder ─────────────── -->
+          <div id="panelNone" style="text-align:center;padding:2rem 1rem;color:var(--text-muted)">
+            <i class="bi bi-arrow-up" style="font-size:1.5rem;opacity:.4"></i>
+            <p class="mt-2" style="font-size:.9rem">Select a package above to continue</p>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- RIGHT: sidebar -->
+      <div class="col-lg-4 d-flex flex-column gap-4">
+
+        <div class="info-card">
+          <div class="info-icon-wrap info-primary"><i class="bi bi-clock-fill"></i></div>
+          <div>
+            <h5 class="info-title">Fast Response</h5>
+            <p class="info-text">Standard listings go live within <strong>24 hours</strong>. Featured &amp; Sponsored within <strong>12 hours</strong>.</p>
+          </div>
+        </div>
+
+        <div class="why-card">
+          <h5 class="why-title"><i class="bi bi-patch-check-fill me-2"></i>Why List With Us?</h5>
+          <ul class="why-list">
+            <li><span class="why-icon"><i class="bi bi-people-fill"></i></span><span>Reach thousands of active job seekers daily</span></li>
+            <li><span class="why-icon"><i class="bi bi-lightning-fill"></i></span><span>Go live in less than 24 hours</span></li>
+            <li><span class="why-icon"><i class="bi bi-whatsapp"></i></span><span>Direct WhatsApp, phone and email buttons</span></li>
+            <li><span class="why-icon"><i class="bi bi-star-fill"></i></span><span>Featured and sponsored placement options</span></li>
+            <li><span class="why-icon"><i class="bi bi-phone-fill"></i></span><span>Fully mobile-optimized listings</span></li>
+            <li><span class="why-icon"><i class="bi bi-graph-up-arrow"></i></span><span>SEO-optimized for maximum visibility</span></li>
+          </ul>
+        </div>
+
+        <div class="packages-card">
+          <h5 class="packages-title"><i class="bi bi-tags-fill me-2"></i>Package Comparison</h5>
+          <div class="pkg-item" style="cursor:pointer" onclick="selectPkg('standard')">
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="pkg-name">📋 Standard</span>
+              <span class="pkg-price free">Free</span>
+            </div>
+            <span class="pkg-desc">Direct listing · Pending review · All basics included</span>
+          </div>
+          <div class="pkg-item pkg-featured" style="cursor:pointer" onclick="selectPkg('featured')">
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="pkg-name">⭐ Featured</span>
+              <span class="pkg-price">$9.99<small>/mo</small></span>
+            </div>
+            <span class="pkg-desc">Highlighted card · Featured section · Priority placement</span>
+          </div>
+          <div class="pkg-item pkg-sponsored" style="cursor:pointer" onclick="selectPkg('sponsored')">
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="pkg-name">🔝 Sponsored</span>
+              <span class="pkg-price">$19.99<small>/mo</small></span>
+            </div>
+            <span class="pkg-desc">Pinned at top · Maximum visibility · All search results</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SUCCESS MODAL – job submitted -->
+<div class="modal fade" id="successJobModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width:400px">
+    <div class="modal-content success-modal">
+      <div class="text-center p-4">
+        <div class="success-icon"><i class="bi bi-check-circle-fill"></i></div>
+        <h4 class="success-title mt-3">Job Submitted!</h4>
+        <p class="success-text">Your listing is under review and will go live within <strong>24 hours</strong>. We'll notify you once it's published.</p>
+        <a href="/" class="btn-success-ok" style="text-decoration:none;display:inline-block">Back to Jobs</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS MODAL – message sent -->
+<div class="modal fade" id="successMsgModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width:400px">
+    <div class="modal-content success-modal">
+      <div class="text-center p-4">
+        <div class="success-icon"><i class="bi bi-check-circle-fill"></i></div>
+        <h4 class="success-title mt-3">Message Sent!</h4>
+        <p class="success-text">Our team will review your request and contact you within <strong>24 hours</strong>.</p>
+        <button class="btn-success-ok" data-bs-dismiss="modal">Got it!</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="footer-brand mb-2"><span class="brand-name" id="footer-site-name">JobOrbit</span></div>
+        <p class="footer-desc">Connecting talent with opportunity. Find your next career move today.</p>
+      </div>
+      <div class="col-md-4">
+        <h6 class="footer-heading">Quick Links</h6>
+        <ul class="footer-links">
+          <li><a href="/">Browse Jobs</a></li>
+          <li><a href="/contact.html">Post a Job</a></li>
+          <li><a href="/about.html">About Us</a></li>
+          <!-- <li><a href="/admin" target="_blank">Admin Panel</a></li> -->
+        </ul>
+      </div>
+      <div class="col-md-4">
+        <h6 class="footer-heading">Legal</h6>
+        <ul class="footer-links">
+          <li><a href="/privacy-policy.html">Privacy Policy</a></li>
+          <li><a href="/terms.html">Terms &amp; Conditions</a></li>
+          <li><a href="/disclaimer.html">Disclaimer</a></li>
+          <!-- <li><a href="/sitemap.xml" target="_blank">Sitemap</a></li> -->
+        </ul>
+      </div>
+    </div>
+    <hr class="footer-divider">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <p class="mb-0 footer-copy">© <span id="footerYear"></span> <span id="footer-copy-name">JobOrbit</span>. All rights reserved.</p>
+      <div class="d-flex flex-wrap gap-3">
+        <a href="/about.html" class="footer-copy" style="text-decoration:none">About</a>
+        <a href="/privacy-policy.html" class="footer-copy" style="text-decoration:none">Privacy</a>
+        <a href="/terms.html" class="footer-copy" style="text-decoration:none">Terms</a>
+        <a href="/disclaimer.html" class="footer-copy" style="text-decoration:none">Disclaimer</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+'use strict';
+
+/* ── Settings & theme ──────────────────────────────────────── */
+async function loadSettings() {
+  try {
+    const data = await fetch('/api/settings').then(r => r.json());
+    const s = data.settings;
+    if (s.primary_color)   document.documentElement.style.setProperty('--primary', s.primary_color);
+    if (s.secondary_color) document.documentElement.style.setProperty('--secondary', s.secondary_color);
+    if (s.site_name) {
+      document.querySelectorAll('.brand-name').forEach(el => el.textContent = s.site_name);
+      document.getElementById('footer-copy-name').textContent = s.site_name;
+      document.title = `Post a Job – ${s.site_name}`;
+    }
+    if (s.logo_url) {
+      const logo = document.getElementById('site-logo');
+      logo.src = s.logo_url; logo.classList.remove('d-none');
+    }
+    applyTheme(localStorage.getItem('theme') || s.default_theme || 'light', false);
+  } catch {}
+}
+
+function applyTheme(theme, save = true) {
+  document.documentElement.setAttribute('data-theme', theme);
+  document.documentElement.style.colorScheme = theme;
+  document.getElementById('themeIcon').className = theme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+  if (save) localStorage.setItem('theme', theme);
+}
+document.getElementById('themeToggle').addEventListener('click', () => {
+  applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+});
+
+/* ── Load categories into job form ─────────────────────────── */
+async function loadCategories() {
+  try {
+    const data = await fetch('/api/jobs/categories').then(r => r.json());
+    const sel  = document.getElementById('jCategory');
+    (data.categories || []).forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.id; opt.textContent = c.name;
+      sel.appendChild(opt);
+    });
+  } catch {}
+}
+
+/* ── Package picker ─────────────────────────────────────────── */
+let currentPkg = null;
+
+function selectPkg(pkg) {
+  currentPkg = pkg;
+
+  // Reset all cards
+  document.getElementById('pkgStandard').className  = 'pkg-card';
+  document.getElementById('pkgFeatured').className  = 'pkg-card';
+  document.getElementById('pkgSponsored').className = 'pkg-card';
+
+  // Activate selected card
+  const classMap = { standard: 'selected', featured: 'selected-featured', sponsored: 'selected-sponsored' };
+  document.getElementById('pkg' + pkg.charAt(0).toUpperCase() + pkg.slice(1)).className =
+    'pkg-card ' + classMap[pkg];
+
+  // Show correct panel
+  document.getElementById('panelNone').style.display    = 'none';
+  document.getElementById('panelStandard').classList.remove('active');
+  document.getElementById('panelContact').classList.remove('active');
+  document.getElementById('formAlert').classList.add('d-none');
+
+  if (pkg === 'standard') {
+    document.getElementById('panelStandard').classList.add('active');
+  } else {
+    // Pre-select the matching subject
+    const subjectMap = { featured: 'Featured Job Inquiry', sponsored: 'Sponsored Job Inquiry' };
+    document.getElementById('cSubject').value = subjectMap[pkg] || '';
+    document.getElementById('panelContact').classList.add('active');
+  }
+
+  // Scroll to form smoothly on mobile
+  if (window.innerWidth < 768) {
+    document.getElementById('panelNone').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+// Check URL param e.g. contact.html?pkg=featured
+const urlPkg = new URLSearchParams(window.location.search).get('pkg');
+if (['standard','featured','sponsored'].includes(urlPkg)) {
+  document.addEventListener('DOMContentLoaded', () => selectPkg(urlPkg));
+}
+
+/* ── Alert helper ───────────────────────────────────────────── */
+function showAlert(msg, type) {
+  const el = document.getElementById('formAlert');
+  el.className = `contact-alert contact-alert-${type}`;
+  el.innerHTML = `<i class="bi bi-${type === 'error' ? 'exclamation-triangle' : 'check-circle'}-fill me-2"></i>${msg}`;
+  el.classList.remove('d-none');
+  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+/* ── Job form (Standard) ────────────────────────────────────── */
+document.getElementById('jDesc').addEventListener('input', function() {
+  const n = this.value.length;
+  document.getElementById('jDescCount').textContent = n;
+  document.getElementById('jDescCount').style.color = n > 7500 ? '#dc3545' : '';
+});
+
+document.getElementById('jobForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('jobSubmitBtn');
+  const txt = document.getElementById('jobBtnText');
+  const spn = document.getElementById('jobBtnSpinner');
+
+  const title    = document.getElementById('jTitle').value.trim();
+  const company  = document.getElementById('jCompany').value.trim();
+  const location = document.getElementById('jLocation').value.trim();
+  const job_type = document.getElementById('jType').value;
+  const catId    = document.getElementById('jCategory').value;
+  const desc     = document.getElementById('jDesc').value.trim();
+  const phone    = document.getElementById('jPhone').value.trim();
+  const whatsapp = document.getElementById('jWhatsApp').value.trim();
+  const email    = document.getElementById('jEmail').value.trim();
+
+  if (!title || !company || !location || !desc) {
+    return showAlert('Please fill in all required fields.', 'error');
+  }
+  if (!phone && !whatsapp && !email) {
+    return showAlert('Please provide at least one contact method (phone, WhatsApp, or email).', 'error');
+  }
+
+  btn.disabled = true; txt.classList.add('d-none'); spn.classList.remove('d-none');
+
+  try {
+    const res  = await fetch('/api/jobs/submit', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ title, company, location, job_type, description: desc,
+                                phone, whatsapp, email, category_id: catId })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      new bootstrap.Modal(document.getElementById('successJobModal')).show();
+      document.getElementById('jobForm').reset();
+      document.getElementById('jDescCount').textContent = '0';
+    } else {
+      showAlert(data.message || 'Something went wrong. Please try again.', 'error');
+    }
+  } catch {
+    showAlert('Network error. Please check your connection.', 'error');
+  } finally {
+    btn.disabled = false; txt.classList.remove('d-none'); spn.classList.add('d-none');
+  }
+});
+
+/* ── Contact form (Featured / Sponsored) ────────────────────── */
+document.getElementById('cMessage').addEventListener('input', function() {
+  const n = this.value.length;
+  document.getElementById('charCount').textContent = n;
+  document.getElementById('charCount').style.color = n > 4500 ? '#dc3545' : '';
+});
+
+document.getElementById('contactForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('contactSubmitBtn');
+  const txt = document.getElementById('contactBtnText');
+  const spn = document.getElementById('contactBtnSpinner');
+
+  const name    = document.getElementById('cName').value.trim();
+  const company = document.getElementById('cCompany').value.trim();
+  const email   = document.getElementById('cEmail').value.trim();
+  const phone   = document.getElementById('cPhone').value.trim();
+  const subject = document.getElementById('cSubject').value;
+  const message = document.getElementById('cMessage').value.trim();
+
+  if (!name || !email || !subject || !message) {
+    return showAlert('Please fill in all required fields.', 'error');
+  }
+
+  btn.disabled = true; txt.classList.add('d-none'); spn.classList.remove('d-none');
+
+  try {
+    const res  = await fetch('/api/contact', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ name, company, email, phone, subject, message })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      new bootstrap.Modal(document.getElementById('successMsgModal')).show();
+      document.getElementById('contactForm').reset();
+      document.getElementById('charCount').textContent = '0';
+    } else {
+      showAlert(data.message || 'Something went wrong. Please try again.', 'error');
+    }
+  } catch {
+    showAlert('Network error. Please check your connection.', 'error');
+  } finally {
+    btn.disabled = false; txt.classList.remove('d-none'); spn.classList.add('d-none');
+  }
+});
+
+/* ── Init ───────────────────────────────────────────────────── */
+document.getElementById('footerYear').textContent = new Date().getFullYear();
+loadSettings();
+loadCategories();
+</script>
+</body>
+</html>

@@ -1,0 +1,3 @@
+title,company,location,description,category_id,job_type,phone,whatsapp,email,map_link,status,featured,sponsored,featured_until
+"Senior Software Engineer","Tech Solutions","Riyadh","We are looking for a Senior Software Engineer with 5+ years of experience in Node.js and React.",1,"Full-time","+966512345678","+966512345678","hr@techsolutions.com","https://maps.google.com/?q=Riyadh","active",1,0,"2025-12-31"
+"Digital Marketing Manager","Growth Agency","Jeddah","Lead our digital marketing team and manage SEO, social media, and PPC campaigns.",2,"Full-time","+966554433221","+966554433221","jobs@growthagency.com","","active",0,1,

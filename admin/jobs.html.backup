@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Jobs – HireHub Admin</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/svg+xml" href="/JobOrbitFavicon.svg">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/admin/css/admin.css">
+  <style>
+    .filter-chip{display:inline-flex;align-items:center;gap:.35rem;padding:.32rem .75rem;border-radius:100px;border:1.5px solid var(--border);background:transparent;font-size:.78rem;font-weight:600;color:var(--text-muted);cursor:pointer;transition:all .18s;white-space:nowrap}
+    .filter-chip:hover{border-color:var(--primary);color:var(--primary);background:rgba(15,98,254,.05)}
+    .filter-chip.active{border-color:var(--primary);background:rgba(15,98,254,.1);color:var(--primary)}
+    .filter-chip.chip-featured.active{border-color:#f59e0b;background:rgba(245,158,11,.1);color:#b45309}
+    .filter-chip.chip-sponsored.active{border-color:#10b981;background:rgba(16,185,129,.1);color:#065f46}
+    [data-theme="dark"] .filter-chip.chip-featured.active{color:#fcd34d;border-color:#f59e0b;background:rgba(245,158,11,.12)}
+    [data-theme="dark"] .filter-chip.chip-sponsored.active{color:#6ee7b7;border-color:#10b981;background:rgba(16,185,129,.12)}
+
+    .filter-row-1{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
+    .filter-row-2{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin-top:.6rem}
+    .filter-search{flex:1;min-width:150px}
+    .filter-select{min-width:130px;flex:0 1 auto}
+
+    .pag-wrap{display:flex;justify-content:space-between;align-items:center;padding:.75rem 1rem;border-top:1px solid var(--border);flex-wrap:wrap;gap:.5rem}
+    .pag-info{font-size:.8rem;color:var(--text-muted)}
+    .pagination{margin:0;flex-wrap:nowrap}
+    .page-link{color:var(--primary);background:var(--bg-card);border-color:var(--border);font-size:.82rem;padding:.3rem .6rem}
+    .page-item.active .page-link{background:var(--primary);border-color:var(--primary);color:#fff}
+    .page-item.disabled .page-link{color:var(--text-muted);background:var(--surface)}
+
+    .active-filters{display:flex;flex-wrap:wrap;gap:.35rem;padding:.5rem .75rem;border-top:1px solid var(--border);background:var(--surface)}
+    .af-tag{display:inline-flex;align-items:center;gap:.3rem;background:rgba(15,98,254,.1);color:var(--primary);border:1px solid rgba(15,98,254,.2);border-radius:100px;font-size:.72rem;font-weight:700;padding:.15rem .55rem;cursor:pointer}
+    .af-tag:hover{background:rgba(15,98,254,.18)}
+
+    .job-mob-card{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:.85rem;margin-bottom:.6rem}
+    .job-mob-title{font-weight:700;font-size:.9rem;color:var(--text)}
+    .job-mob-sub{font-size:.78rem;color:var(--text-muted);margin-top:.15rem}
+    .job-mob-badges{display:flex;flex-wrap:wrap;gap:.3rem;margin:.5rem 0}
+
+    @media(max-width:767px){.desktop-table{display:none}.mobile-cards{display:block}.pag-wrap{justify-content:center}}
+    @media(min-width:768px){.desktop-table{display:block}.mobile-cards{display:none}}
+
+    .date-range{display:flex;align-items:center;gap:.35rem;flex-wrap:wrap}
+    .date-range .form-control-custom{max-width:145px;font-size:.82rem;padding:.45rem .65rem}
+    .date-sep{font-size:.78rem;color:var(--text-muted)}
+  </style>
+</head>
+<body class="admin-body">
+
+<aside class="admin-sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <img src="/JobOrbitFavicon.svg" alt="JobOrbit" class="sidebar-brand" style="height:40px">
+    <span class="sidebar-brand">JobOrbit</span>
+    <button class="btn-sidebar-close d-lg-none" id="sidebarClose"><i class="bi bi-x-lg"></i></button>
+  </div>
+  <nav class="sidebar-nav">
+    <a href="dashboard.html"    class="sidebar-link"><i class="bi bi-speedometer2"></i><span>Dashboard</span></a>
+    <a href="jobs.html"         class="sidebar-link active"><i class="bi bi-briefcase"></i><span>All Jobs</span></a>
+    <a href="add-job.html"      class="sidebar-link"><i class="bi bi-plus-circle"></i><span>Add Job</span></a>
+    <a href="categories.html"   class="sidebar-link"><i class="bi bi-tag"></i><span>Categories</span></a>
+    <a href="messages.html"     class="sidebar-link"><i class="bi bi-envelope"></i><span>Messages</span></a>
+    <a href="monetization.html" class="sidebar-link"><i class="bi bi-currency-dollar"></i><span>Monetization</span></a>
+    <a href="settings.html"     class="sidebar-link"><i class="bi bi-gear"></i><span>Settings</span></a>
+    <a href="form-builder.html" class="sidebar-link"><i class="bi bi-ui-checks-grid"></i><span>Form Builder</span></a>
+    <hr class="sidebar-divider">
+    <a href="/" class="sidebar-link" target="_blank"><i class="bi bi-box-arrow-up-right"></i><span>View Site</span></a>
+    <button class="sidebar-link sidebar-btn" id="logoutBtn"><i class="bi bi-box-arrow-right"></i><span>Logout</span></button>
+  </nav>
+</aside>
+<div class="sidebar-overlay d-lg-none d-none" id="sidebarOverlay"></div>
+
+<div class="admin-main">
+  <header class="admin-topbar">
+    <button class="btn-hamburger d-lg-none" id="sidebarToggle"><i class="bi bi-list fs-4"></i></button>
+    <h1 class="topbar-title">Manage Jobs</h1>
+    <div class="topbar-right">
+      <a href="add-job.html" class="btn btn-admin-primary btn-sm"><i class="bi bi-plus-lg me-1"></i>Add Job</a>
+      <button class="btn-icon-admin" id="themeToggleAdmin" title="Toggle theme"><i class="bi bi-moon-fill" id="adminThemeIcon"></i></button>
+    </div>
+  </header>
+
+  <main class="admin-content">
+
+    <div class="admin-card mb-4">
+      <div class="p-3">
+        <!-- Row 1 -->
+        <div class="filter-row-1">
+          <input type="text" class="form-control-custom filter-search" id="filterQ" placeholder="Search title, company…">
+          <select class="form-control-custom filter-select" id="filterStatus">
+            <option value="">All Status</option>
+            <option value="active">Active</option>
+            <option value="expired">Expired</option>
+          </select>
+          <select class="form-control-custom filter-select" id="filterCat">
+            <option value="">All Categories</option>
+          </select>
+          <select class="form-control-custom filter-select" id="filterSort">
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="title">A → Z</option>
+          </select>
+        </div>
+
+        <!-- Row 2 -->
+        <div class="filter-row-2">
+          <button class="filter-chip chip-featured" id="chipFeatured" onclick="toggleChip('featured')">
+            <i class="bi bi-star-fill" style="font-size:.7rem"></i> Featured
+          </button>
+          <button class="filter-chip chip-sponsored" id="chipSponsored" onclick="toggleChip('sponsored')">
+            <i class="bi bi-megaphone-fill" style="font-size:.7rem"></i> Sponsored
+          </button>
+
+          <div class="date-range ms-auto">
+            <i class="bi bi-calendar3" style="color:var(--text-muted);font-size:.85rem"></i>
+            <input type="date" class="form-control-custom" id="filterDateFrom" title="From date">
+            <span class="date-sep">–</span>
+            <input type="date" class="form-control-custom" id="filterDateTo" title="To date">
+          </div>
+
+          <button class="btn btn-admin-primary btn-sm" id="applyFilters">
+            <i class="bi bi-search me-1"></i>Filter
+          </button>
+          <button class="btn btn-admin-outline btn-sm d-none" id="clearFilters">
+            <i class="bi bi-x-circle me-1"></i>Clear
+          </button>
+        </div>
+
+        <!-- Active tags -->
+        <div class="active-filters d-none mt-2 rounded" id="activeTags"></div>
+
+        <!-- Bulk bar -->
+        <div class="d-flex gap-2 mt-2 align-items-center d-none" id="bulkBar">
+          <span class="text-muted small"><span id="selectedCount">0</span> selected</span>
+          <button class="btn btn-sm btn-danger" id="bulkDelete"><i class="bi bi-trash me-1"></i>Delete Selected</button>
+          <button class="btn btn-sm btn-admin-outline" id="clearSelection"><i class="bi bi-x me-1"></i>Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="admin-card">
+      <!-- Desktop table -->
+      <div class="desktop-table">
+        <div class="table-responsive">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th style="width:36px"><input type="checkbox" id="selectAll" class="form-check-input"></th>
+                <th>Job</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Flags</th>
+                <th>Posted</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="jobsTable">
+              <tr><td colspan="7" class="text-center text-muted py-4">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Mobile cards -->
+      <div class="mobile-cards p-2" id="jobsMobile"></div>
+
+      <!-- Pagination -->
+      <div class="pag-wrap">
+        <span class="pag-info" id="tableInfo">–</span>
+        <nav aria-label="Jobs pagination">
+          <ul class="pagination pagination-sm mb-0" id="tablePagination"></ul>
+        </nav>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/admin/js/admin.js"></script>
+<script>
+'use strict';
+
+let currentPage = 1;
+let totalPages  = 1;
+const selectedIds = new Set();
+
+const filters = {
+  q: '', status: '', category: '', sort: 'newest',
+  featured: false, sponsored: false, dateFrom: '', dateTo: ''
+};
+
+document.addEventListener('DOMContentLoaded', async () => {
+  await requireAuth();
+  await loadCatFilter();
+  loadJobs();
+  bindEvents();
+});
+
+async function loadCatFilter() {
+  try {
+    const data = await adminApi.get('/api/admin/categories');
+    const sel  = document.getElementById('filterCat');
+    data.categories.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.slug; opt.textContent = c.name;
+      sel.appendChild(opt);
+    });
+  } catch {}
+}
+
+function toggleChip(type) {
+  filters[type] = !filters[type];
+  const id = 'chip' + type.charAt(0).toUpperCase() + type.slice(1);
+  document.getElementById(id).classList.toggle('active', filters[type]);
+  currentPage = 1;
+  loadJobs();
+  renderActiveTags();
+}
+
+function collectFilters() {
+  filters.q        = document.getElementById('filterQ').value.trim();
+  filters.status   = document.getElementById('filterStatus').value;
+  filters.category = document.getElementById('filterCat').value;
+  filters.sort     = document.getElementById('filterSort').value;
+  filters.dateFrom = document.getElementById('filterDateFrom').value;
+  filters.dateTo   = document.getElementById('filterDateTo').value;
+}
+
+function renderActiveTags() {
+  const bar  = document.getElementById('activeTags');
+  const clr  = document.getElementById('clearFilters');
+  const tags = [];
+  if (filters.q)         tags.push({ label: `"${filters.q}"`,       key: 'q' });
+  if (filters.status)    tags.push({ label: filters.status,          key: 'status' });
+  if (filters.category)  tags.push({ label: filters.category,        key: 'category' });
+  if (filters.featured)  tags.push({ label: '⭐ Featured',           key: 'featured' });
+  if (filters.sponsored) tags.push({ label: '🔝 Sponsored',          key: 'sponsored' });
+  if (filters.dateFrom)  tags.push({ label: 'From ' + filters.dateFrom, key: 'dateFrom' });
+  if (filters.dateTo)    tags.push({ label: 'To '   + filters.dateTo,   key: 'dateTo' });
+
+  if (tags.length) {
+    bar.classList.remove('d-none');
+    bar.innerHTML = '<span style="font-size:.72rem;color:var(--text-muted);font-weight:600">Active:</span> ' +
+      tags.map(t => `<span class="af-tag" onclick="removeFilter('${t.key}')">${escHtml(t.label)} <i class="bi bi-x"></i></span>`).join('');
+    clr.classList.remove('d-none');
+  } else {
+    bar.classList.add('d-none');
+    clr.classList.add('d-none');
+  }
+}
+
+function removeFilter(key) {
+  if (key === 'featured' || key === 'sponsored') {
+    filters[key] = false;
+    document.getElementById('chip' + key.charAt(0).toUpperCase() + key.slice(1))?.classList.remove('active');
+  } else {
+    filters[key] = '';
+    const map = { q:'filterQ', status:'filterStatus', category:'filterCat', dateFrom:'filterDateFrom', dateTo:'filterDateTo' };
+    if (map[key]) document.getElementById(map[key]).value = '';
+  }
+  currentPage = 1;
+  loadJobs();
+  renderActiveTags();
+}
+
+async function loadJobs(page = 1) {
+  currentPage = page;
+  const params = new URLSearchParams({ page, limit: 20 });
+  if (filters.q)         params.set('q',         filters.q);
+  if (filters.status)    params.set('status',     filters.status);
+  if (filters.category)  params.set('category',   filters.category);
+  if (filters.sort)      params.set('sort',       filters.sort);
+  if (filters.featured)  params.set('featured',   '1');
+  if (filters.sponsored) params.set('sponsored',  '1');
+  if (filters.dateFrom)  params.set('dateFrom',   filters.dateFrom);
+  if (filters.dateTo)    params.set('dateTo',     filters.dateTo);
+
+  const tbody  = document.getElementById('jobsTable');
+  const mobile = document.getElementById('jobsMobile');
+  const spinner = '<div class="spinner-border spinner-border-sm text-primary"></div>';
+  tbody.innerHTML  = `<tr><td colspan="7" class="text-center py-4">${spinner}</td></tr>`;
+  mobile.innerHTML = `<div class="text-center py-4">${spinner}</div>`;
+
+  try {
+    const data = await adminApi.get('/api/admin/jobs?' + params);
+    if (!data.success) throw new Error(data.message || 'API error');
+    totalPages = data.pages || 1;
+
+    document.getElementById('tableInfo').textContent =
+      data.total + ' job' + (data.total !== 1 ? 's' : '') + '  ·  Page ' + data.page + ' of ' + totalPages;
+
+    if (!data.jobs || data.jobs.length === 0) {
+      tbody.innerHTML  = '<tr><td colspan="7" class="text-center text-muted py-5">No jobs found</td></tr>';
+      mobile.innerHTML = '<p class="text-center text-muted py-4">No jobs found</p>';
+      buildPagination(1, 1);
+      return;
+    }
+
+    tbody.innerHTML = data.jobs.map(job => `
+      <tr>
+        <td><input type="checkbox" class="form-check-input job-check" value="${job.id}"></td>
+        <td>
+          <strong class="d-block" style="font-size:.875rem">${escHtml(job.title)}</strong>
+          <small class="text-muted">${escHtml(job.company)} · ${escHtml(job.location)}</small>
+        </td>
+        <td style="font-size:.82rem">${escHtml(job.category)}</td>
+        <td><span class="status-badge status-${job.status}">${job.status}</span></td>
+        <td>
+          ${job.featured  ? '<span class="status-badge status-featured">⭐ Featured</span> ' : ''}
+          ${job.sponsored ? '<span class="status-badge" style="background:#d1fae5;color:#065f46">🔝 Sponsored</span>' : ''}
+          ${!job.featured && !job.sponsored ? '<span class="text-muted small">–</span>' : ''}
+        </td>
+        <td style="font-size:.8rem;color:var(--text-muted);white-space:nowrap">${timeAgo(job.created_at)}</td>
+        <td>
+          <div class="d-flex gap-1">
+            <a href="edit-job.html?id=${job.id}" class="btn-action btn-action-edit" title="Edit"><i class="bi bi-pencil"></i></a>
+            <button class="btn-action btn-action-del" onclick="deleteJob(${job.id},this)" title="Delete"><i class="bi bi-trash"></i></button>
+          </div>
+        </td>
+      </tr>`).join('');
+
+    mobile.innerHTML = data.jobs.map(job => `
+      <div class="job-mob-card">
+        <div class="d-flex justify-content-between align-items-start gap-2">
+          <div class="flex-grow-1">
+            <div class="job-mob-title">${escHtml(job.title)}</div>
+            <div class="job-mob-sub">${escHtml(job.company)} · ${escHtml(job.location)}</div>
+          </div>
+          <input type="checkbox" class="form-check-input job-check flex-shrink-0 mt-1" value="${job.id}">
+        </div>
+        <div class="job-mob-badges">
+          <span class="status-badge status-${job.status}">${job.status}</span>
+          <span style="font-size:.72rem;color:var(--text-muted)">${escHtml(job.category)}</span>
+          ${job.featured  ? '<span class="status-badge status-featured">⭐ Featured</span>' : ''}
+          ${job.sponsored ? '<span class="status-badge" style="background:#d1fae5;color:#065f46;font-size:.72rem;padding:.15rem .5rem">🔝 Sponsored</span>' : ''}
+        </div>
+        <div class="d-flex justify-content-between align-items-center">
+          <small class="text-muted"><i class="bi bi-clock me-1"></i>${timeAgo(job.created_at)}</small>
+          <div class="d-flex gap-1">
+            <a href="edit-job.html?id=${job.id}" class="btn-action btn-action-edit" title="Edit"><i class="bi bi-pencil"></i></a>
+            <button class="btn-action btn-action-del" onclick="deleteJob(${job.id},this)" title="Delete"><i class="bi bi-trash"></i></button>
+          </div>
+        </div>
+      </div>`).join('');
+
+    buildPagination(data.page, totalPages);
+    bindCheckboxes();
+  } catch (e) {
+    const msg = e.message || 'Failed to load jobs';
+    tbody.innerHTML  = `<tr><td colspan="7" class="text-center text-danger py-4"><i class="bi bi-exclamation-triangle me-2"></i>${msg}</td></tr>`;
+    mobile.innerHTML = `<p class="text-center text-danger py-4">${msg}</p>`;
+  }
+}
+
+/* ── Smart pagination: max ~9 buttons, never full list ───────── */
+function buildPagination(cur, total) {
+  const ul = document.getElementById('tablePagination');
+  ul.innerHTML = '';
+  if (total <= 1) return;
+
+  function smartRange(cur, total) {
+    const delta = 2, range = [];
+    for (let i = Math.max(2, cur - delta); i <= Math.min(total - 1, cur + delta); i++) range.push(i);
+    if (cur - delta > 2)         range.unshift('…');
+    if (cur + delta < total - 1) range.push('…');
+    range.unshift(1);
+    if (total > 1) range.push(total);
+    return range;
+  }
+
+  const btn = (label, page, disabled, active) => {
+    const li = document.createElement('li');
+    li.className = 'page-item' + (disabled ? ' disabled' : '') + (active ? ' active' : '');
+    const a = document.createElement('a');
+    a.className = 'page-link'; a.href = '#'; a.innerHTML = label;
+    if (!disabled && !active) a.addEventListener('click', e => { e.preventDefault(); loadJobs(page); });
+    li.appendChild(a); ul.appendChild(li);
+  };
+
+  btn('<i class="bi bi-chevron-left"></i>', cur - 1, cur === 1, false);
+  smartRange(cur, total).forEach(p => {
+    if (p === '…') {
+      const li = document.createElement('li');
+      li.className = 'page-item disabled';
+      li.innerHTML = '<span class="page-link" style="pointer-events:none">…</span>';
+      ul.appendChild(li);
+    } else {
+      btn(p, p, false, p === cur);
+    }
+  });
+  btn('<i class="bi bi-chevron-right"></i>', cur + 1, cur === total, false);
+}
+
+function bindCheckboxes() {
+  document.querySelectorAll('.job-check').forEach(cb => {
+    if (selectedIds.has(Number(cb.value))) cb.checked = true;
+    cb.addEventListener('change', () => {
+      if (cb.checked) selectedIds.add(Number(cb.value));
+      else             selectedIds.delete(Number(cb.value));
+      updateBulkBar();
+    });
+  });
+}
+
+function updateBulkBar() {
+  document.getElementById('selectedCount').textContent = selectedIds.size;
+  document.getElementById('bulkBar').classList.toggle('d-none', selectedIds.size === 0);
+}
+
+function bindEvents() {
+  document.getElementById('selectAll').addEventListener('change', e => {
+    document.querySelectorAll('.job-check').forEach(cb => {
+      cb.checked = e.target.checked;
+      if (e.target.checked) selectedIds.add(Number(cb.value));
+      else                   selectedIds.delete(Number(cb.value));
+    });
+    updateBulkBar();
+  });
+
+  document.getElementById('applyFilters').addEventListener('click', () => {
+    collectFilters(); currentPage = 1; loadJobs(1); renderActiveTags();
+  });
+
+  document.getElementById('filterQ').addEventListener('keypress', e => {
+    if (e.key === 'Enter') { collectFilters(); currentPage = 1; loadJobs(1); renderActiveTags(); }
+  });
+
+  document.getElementById('clearFilters').addEventListener('click', () => {
+    Object.assign(filters, { q:'', status:'', category:'', sort:'newest', featured:false, sponsored:false, dateFrom:'', dateTo:'' });
+    ['filterQ','filterStatus','filterCat','filterSort','filterDateFrom','filterDateTo'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el.tagName === 'SELECT') el.selectedIndex = 0; else el.value = '';
+    });
+    document.getElementById('chipFeatured').classList.remove('active');
+    document.getElementById('chipSponsored').classList.remove('active');
+    currentPage = 1; loadJobs(1); renderActiveTags();
+  });
+
+  document.getElementById('clearSelection').addEventListener('click', () => {
+    selectedIds.clear();
+    document.querySelectorAll('.job-check').forEach(cb => cb.checked = false);
+    document.getElementById('selectAll').checked = false;
+    updateBulkBar();
+  });
+
+  document.getElementById('bulkDelete').addEventListener('click', async () => {
+    if (!selectedIds.size) return;
+    if (!confirm('Permanently delete ' + selectedIds.size + ' job' + (selectedIds.size > 1 ? 's' : '') + '?')) return;
+    try {
+      await adminApi.del('/api/admin/jobs', { ids: [...selectedIds] });
+      selectedIds.clear(); updateBulkBar(); loadJobs(currentPage);
+    } catch { alert('Bulk delete failed'); }
+  });
+}
+
+async function deleteJob(id, btn) {
+  if (!confirm('Delete this job permanently?')) return;
+  try {
+    await adminApi.del('/api/admin/jobs/' + id);
+    btn.closest('tr')?.remove();
+    btn.closest('.job-mob-card')?.remove();
+    selectedIds.delete(id); updateBulkBar();
+  } catch { alert('Delete failed'); }
+}
+</script>
+</body>
+</html>

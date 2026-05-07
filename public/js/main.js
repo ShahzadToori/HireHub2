@@ -1,0 +1,1015 @@
+/* ════════════════════════════════════════════════════════════
+   HIREHUB – MAIN.JS
+   Handles: settings, theme, jobs, filters, modal, pagination,
+            SEO meta + schema.org injection, shareable URLs
+════════════════════════════════════════════════════════════ */
+
+'use strict';
+
+// ── State ──────────────────────────────────────────────────────
+const state = {
+  jobs:         [],
+  categories:   [],
+  settings:     {},
+  page:         1,
+  totalPages:   1,
+  totalJobs:    0,
+  viewMode:     'grid',
+  filters: {
+    q:        '',
+    location: '',
+    category: '',
+    type:     '',
+    sort:     'newest'
+  }
+};
+
+// ── API helpers ────────────────────────────────────────────────
+const api = {
+  get: async (url) => {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+  }
+};
+
+// ── DOM helpers ────────────────────────────────────────────────
+const $ = (sel, ctx = document) => ctx.querySelector(sel);
+const $$ = (sel, ctx = document) => ctx.querySelectorAll(sel);
+
+// ── Date formatting ────────────────────────────────────────────
+function timeAgo(dateStr) {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const days = Math.floor(diff / 86400000);
+  if (days === 0) return 'Today';
+  if (days === 1) return 'Yesterday';
+  if (days < 7)  return `${days}d ago`;
+  if (days < 30) return `${Math.floor(days/7)}w ago`;
+  if (days < 365) return `${Math.floor(days/30)}mo ago`;
+  return `${Math.floor(days/365)}y ago`;
+}
+
+// ── WhatsApp link builder ──────────────────────────────────────
+//function waLink(number, jobTitle) {
+ // const clean = number.replace(/\D/g, '');
+ // const msg   = encodeURIComponent(`Hi, I'm interested in the "${jobTitle}" position.`);
+  //return `https://wa.me/${clean}?text=${msg}`;
+//}
+function waLink(job) {
+  // Use WhatsApp number if available, otherwise fallback to phone
+  const number = job.whatsapp || job.phone;
+  if (!number) return '#';
+
+  const clean = number.replace(/\D/g, '');
+  const siteUrl = (window.state?.settings?.site_url || window.location.origin).replace(/\/$/, '');
+  const jobUrl = `${siteUrl}/job/${job.slug}`;
+
+  const postedDate = new Date(job.created_at).toLocaleDateString('en-GB'); // DD/MM/YYYY
+
+  const msg = `*Job Inquiry: ${job.title}*\n\n` +
+    `🏢 *Company:* ${job.company}\n` +
+    `📍 *Location:* ${job.location}\n` +
+    `💼 *Job Type:* ${job.job_type || 'Full-time'}\n` +
+   // `📅 *Posted:* ${postedDate}\n\n` +
+    `🔗 *View full job:* ${jobUrl}\n\n` +
+    `Hello, I am very interested in this position. Please find my details attached. Thank you.`;
+
+  return `https://wa.me/${clean}?text=${encodeURIComponent(msg)}`;
+}
+// ── Security: HTML escape ──────────────────────────────────────
+function escHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SEO HELPERS
+══════════════════════════════════════════════════════════════ */
+
+/** Set or create a <meta> tag */
+function setMeta(attr, name, content) {
+  if (!content) return;
+  let el = document.querySelector(`meta[${attr}="${name}"]`);
+  if (!el) {
+    el = document.createElement('meta');
+    el.setAttribute(attr, name);
+    document.head.appendChild(el);
+  }
+  el.setAttribute('content', content);
+}
+
+/** Inject / update a JSON-LD <script> block */
+function setJsonLd(id, obj) {
+  let el = document.getElementById(id);
+  if (!el) {
+    el = document.createElement('script');
+    el.type = 'application/ld+json';
+    el.id   = id;
+    document.head.appendChild(el);
+  }
+  el.textContent = JSON.stringify(obj);
+}
+
+/** Update the canonical <link> */
+function setCanonical(url) {
+  let el = document.querySelector('link[rel="canonical"]');
+  if (!el) { el = document.createElement('link'); el.rel = 'canonical'; document.head.appendChild(el); }
+  el.href = url;
+}
+
+// ── Inject site-level schema (called once after settings load) ─
+function injectSiteSchema() {
+  const s       = state.settings;
+  const siteUrl = (s.site_url || window.location.origin).replace(/\/$/, '');
+  const name    = s.site_name || 'HireHub';
+  const desc    = s.site_description || 'Find your next career opportunity';
+
+  setJsonLd('schema-website', {
+    '@context': 'https://schema.org',
+    '@type':    'WebSite',
+    name,
+    url:         siteUrl,
+    description: desc,
+    potentialAction: {
+      '@type':      'SearchAction',
+      target:       { '@type': 'EntryPoint', urlTemplate: `${siteUrl}/?q={search_term_string}` },
+      'query-input': 'required name=search_term_string'
+    }
+  });
+
+  setJsonLd('schema-org', {
+    '@context': 'https://schema.org',
+    '@type':    'Organization',
+    name,
+    url:         siteUrl,
+    description: desc,
+    contactPoint: {
+      '@type':      'ContactPoint',
+      contactType:  'customer service',
+      url:          `${siteUrl}/contact.html`
+    }
+  });
+
+  // Google Search Console verification
+  if (s.google_verify) setMeta('name', 'google-site-verification', s.google_verify);
+
+  // OG image
+  const ogImg = s.og_image || s.logo_url || `${siteUrl}/images/icon-512x512.svg`;
+  setMeta('property', 'og:image', ogImg);
+  setMeta('name', 'twitter:image', ogImg);
+
+  // Twitter handle
+  if (s.twitter_handle) setMeta('name', 'twitter:site', s.twitter_handle);
+}
+
+// ── Update meta tags dynamically as filters change ─────────────
+function updateMetaTags() {
+  const s       = state.settings;
+  const siteUrl = (s.site_url || window.location.origin).replace(/\/$/, '');
+  const name    = s.site_name || 'HireHub';
+  const f       = state.filters;
+
+  let title, desc, canonical;
+
+  // Build contextual title/description from active filters
+  const parts = [];
+  if (f.q)    parts.push(`"${f.q}"`);
+  if (f.type) parts.push(f.type);
+
+  // Try to resolve category slug → name
+  if (f.category) {
+    const cat = state.categories.find(c =>
+      c.slug === f.category || String(c.id) === String(f.category)
+    );
+    if (cat) parts.push(cat.name);
+  }
+  if (f.location) parts.push(`in ${f.location}`);
+
+  if (parts.length) {
+    const label = parts.join(' ');
+    title    = `${label} Jobs – ${name}`;
+    desc     = `Find ${label} jobs on ${name}. ${state.totalJobs ? state.totalJobs + ' listings' : 'Multiple listings'} with direct recruiter contact via WhatsApp, phone, or email.`;
+    const qp = new URLSearchParams();
+    if (f.q)        qp.set('q', f.q);
+    if (f.category) qp.set('category', f.category);
+    if (f.location) qp.set('location', f.location);
+    if (f.type)     qp.set('type', f.type);
+    canonical = `${siteUrl}/?${qp.toString()}`;
+  } else {
+    title    = `${name} – Find Your Next Career Opportunity`;
+    desc     = s.site_description || `Browse ${state.totalJobs ? state.totalJobs + ' job listings' : 'thousands of jobs'} across tech, marketing, finance and more. Connect directly with recruiters.`;
+    canonical = `${siteUrl}/`;
+  }
+
+  // Apply to document
+  document.title = title;
+  setCanonical(canonical);
+  setMeta('name',     'description',      desc);
+  setMeta('property', 'og:title',         title);
+  setMeta('property', 'og:description',   desc);
+  setMeta('property', 'og:url',           canonical);
+  setMeta('property', 'og:site_name',     name);
+  setMeta('name',     'twitter:title',    title);
+  setMeta('name',     'twitter:description', desc);
+
+  // Update URL bar without page reload (shareable filtered pages)
+  const qp = new URLSearchParams();
+  if (f.q)               qp.set('q',        f.q);
+  if (f.category)        qp.set('category', f.category);
+  if (f.location)        qp.set('location', f.location);
+  if (f.type)            qp.set('type',     f.type);
+  if (f.sort !== 'newest') qp.set('sort',   f.sort);
+  if (state.page > 1)    qp.set('page',     state.page);
+  const qs = qp.toString();
+  history.replaceState(null, '', qs ? `/?${qs}` : '/');
+}
+
+// ── JobPosting + ItemList schema (updated after each job load) ─
+function updateSchema(jobs) {
+  const s       = state.settings;
+  const siteUrl = (s.site_url || window.location.origin).replace(/\/$/, '');
+  const name    = s.site_name || 'HireHub';
+  const country = s.country_code || 'US';
+
+  const empTypeMap = {
+    'Full-time': 'FULL_TIME', 'Part-time': 'PART_TIME',
+    'Contract':  'CONTRACTOR', 'Freelance': 'CONTRACTOR', 'Remote': 'FULL_TIME'
+  };
+
+  setJsonLd('schema-list', {
+    '@context':      'https://schema.org',
+    '@type':         'ItemList',
+    name:            `${name} Job Listings`,
+    url:             `${siteUrl}/`,
+    numberOfItems:   state.totalJobs,
+    itemListElement: jobs.slice(0, 20).map((job, i) => ({
+      '@type':   'ListItem',
+      position:  i + 1,
+      url:       `${siteUrl}/job/${job.slug}`,
+      item: {
+        '@type':         'JobPosting',
+        title:            job.title,
+        description:      job.description.substring(0, 500),
+        datePosted:       new Date(job.created_at).toISOString().split('T')[0],
+        validThrough:     new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0],
+        employmentType:   empTypeMap[job.job_type] || 'FULL_TIME',
+        url:              `${siteUrl}/job/${job.slug}`,
+        directApply:      !!(job.phone || job.whatsapp || job.email),
+        identifier:       { '@type': 'PropertyValue', name, value: String(job.id) },
+        hiringOrganization: { '@type': 'Organization', name: job.company, sameAs: siteUrl },
+        jobLocation: {
+          '@type': 'Place',
+          address: { '@type': 'PostalAddress', addressLocality: job.location, addressCountry: country }
+        }
+      }
+    }))
+  });
+
+  // BreadcrumbList
+  const items = [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: `${siteUrl}/` },
+    { '@type': 'ListItem', position: 2, name: 'Jobs',  item: `${siteUrl}/` }
+  ];
+  if (state.filters.category) {
+    const cat = state.categories.find(c =>
+      c.slug === state.filters.category || String(c.id) === String(state.filters.category)
+    );
+    if (cat) items.push({ '@type': 'ListItem', position: 3, name: cat.name, item: `${siteUrl}/?category=${cat.slug}` });
+  }
+  setJsonLd('schema-breadcrumb', { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: items });
+
+  // Sync meta tags too
+  updateMetaTags();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SETTINGS
+══════════════════════════════════════════════════════════════ */
+async function loadSettings() {
+  try {
+    const data = await api.get('/api/settings');
+    state.settings = data.settings;
+    const s = state.settings;
+
+    if (s.primary_color) {
+      document.documentElement.style.setProperty('--primary', s.primary_color);
+      document.documentElement.style.setProperty('--primary-hover', s.primary_color + 'cc');
+    }
+    if (s.secondary_color) {
+      document.documentElement.style.setProperty('--secondary', s.secondary_color);
+    }
+
+    if (s.site_name) {
+      $$('.brand-name').forEach(el => { el.textContent = s.site_name; });
+      $('#footer-site-name').textContent = s.site_name;
+      $('#footer-copy-name').textContent = s.site_name;
+      setMeta('property', 'og:site_name', s.site_name);
+    }
+
+    if (s.hero_title)    $('#hero-title').textContent    = s.hero_title;
+    if (s.hero_subtitle) $('#hero-subtitle').textContent = s.hero_subtitle;
+
+    if (s.logo_url) {
+      const logo = $('#site-logo');
+      logo.src = s.logo_url;
+      logo.classList.remove('d-none');
+    }
+
+    const savedTheme = localStorage.getItem('theme') || s.default_theme || 'light';
+    applyTheme(savedTheme, false);
+
+    if (s.show_banner_top  === '1') $('#ad-top').classList.remove('d-none');
+    if (s.show_banner_side === '1') $('#ad-sidebar').classList.remove('d-none');
+
+    // Inject site-level SEO schema now that settings are loaded
+    injectSiteSchema();
+
+  } catch (e) {
+    console.warn('Settings load failed:', e);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   THEME
+══════════════════════════════════════════════════════════════ */
+function applyTheme(theme, save = true) {
+  document.documentElement.setAttribute('data-theme', theme);
+  const icon = $('#themeIcon');
+  icon.className = theme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+  if (save) localStorage.setItem('theme', theme);
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme');
+  applyTheme(current === 'dark' ? 'light' : 'dark');
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CATEGORIES
+══════════════════════════════════════════════════════════════ */
+async function loadCategories() {
+  try {
+    const data = await api.get('/api/jobs/categories');
+    state.categories = data.categories;
+
+    const catFilter = $('#categoryFilter');
+    state.categories.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.slug;
+      opt.textContent = `${c.name} (${c.count})`;
+      catFilter.appendChild(opt);
+    });
+
+    $('#stat-cats').textContent = state.categories.length;
+
+    const chipsContainer = $('#categoryChips');
+    chipsContainer.innerHTML = '';
+
+    const allChip = document.createElement('button');
+    allChip.className = 'category-chip active';
+    allChip.setAttribute('role', 'listitem');
+    allChip.innerHTML = `<i class="bi bi-grid" aria-hidden="true"></i> All <span class="cat-count">${state.categories.reduce((a,c)=>a+c.count,0)}</span>`;
+    allChip.addEventListener('click', () => filterByCategory(''));
+    chipsContainer.appendChild(allChip);
+
+    state.categories.forEach(c => {
+      const chip = document.createElement('button');
+      chip.className    = 'category-chip';
+      chip.dataset.slug = c.slug;
+      chip.setAttribute('role', 'listitem');
+      chip.innerHTML    = `${c.name} <span class="cat-count">${c.count}</span>`;
+      chip.addEventListener('click', () => filterByCategory(c.slug));
+      chipsContainer.appendChild(chip);
+    });
+
+    const sidebarCats = $('#sidebarCats');
+    state.categories.forEach(c => {
+      const li = document.createElement('li');
+      li.innerHTML = `<span>${c.name}</span><span class="cat-badge">${c.count}</span>`;
+      li.addEventListener('click', () => filterByCategory(c.slug));
+      sidebarCats.appendChild(li);
+    });
+
+    // Sync with URL param if set
+    if (state.filters.category) {
+      catFilter.value = state.filters.category;
+      $$('.category-chip').forEach(chip => {
+        chip.classList.toggle('active',
+          state.filters.category === ''
+            ? !chip.dataset.slug
+            : chip.dataset.slug === state.filters.category
+        );
+      });
+    }
+  } catch (e) {
+    console.warn('Categories load failed:', e);
+  }
+}
+
+function filterByCategory(slug) {
+  state.filters.category = slug;
+  state.page = 1;
+  $$('.category-chip').forEach(chip => {
+    chip.classList.toggle('active', slug === '' ? !chip.dataset.slug : chip.dataset.slug === slug);
+  });
+  $('#categoryFilter').value = slug;
+  loadJobs();
+  toggleClearBtn();
+  document.getElementById('jobs').scrollIntoView({ behavior: 'smooth' });
+}
+
+/* ══════════════════════════════════════════════════════════════
+   FEATURED JOBS
+══════════════════════════════════════════════════════════════ */
+async function loadFeaturedJobs() {
+  try {
+    const data = await api.get('/api/jobs/featured');
+    const container = $('#featuredList');
+
+    if (!data.jobs || data.jobs.length === 0) {
+      $('#featured').classList.add('d-none');
+      return;
+    }
+
+    container.innerHTML = data.jobs.map(job => `
+      <div class="col-md-6 col-lg-4">${renderJobCard(job, true)}</div>
+    `).join('');
+
+    data.jobs.forEach(job => {
+      if (!state.jobs.find(j => j.id === job.id)) state.jobs.push(job);
+    });
+
+    container.querySelectorAll('.job-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        if (!e.target.closest('a')) openJobModal(card.dataset.id);
+      });
+    });
+  } catch (e) {
+    $('#featured').classList.add('d-none');
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   LOAD JOBS
+══════════════════════════════════════════════════════════════ */
+async function loadJobs() {
+  const spinner     = $('#loadingSpinner');
+  const list        = $('#jobsList');
+  const emptyState  = $('#emptyState');
+  const pagination  = $('#paginationWrap');
+  const resultsInfo = $('#resultsInfo');
+
+  spinner.classList.remove('d-none');
+  list.innerHTML = '';
+  emptyState.classList.add('d-none');
+  pagination.classList.add('d-none');
+
+  try {
+    const params = new URLSearchParams({
+      q:        state.filters.q,
+      location: state.filters.location,
+      category: state.filters.category,
+      type:     state.filters.type,
+      sort:     state.filters.sort,
+      page:     state.page,
+      limit:    state.settings.jobs_per_page || 12
+    });
+    [...params.keys()].forEach(k => { if (!params.get(k)) params.delete(k); });
+
+    const data = await api.get(`/api/jobs?${params}`);
+
+    spinner.classList.add('d-none');
+    state.totalJobs  = data.total;
+    state.totalPages = data.pages;
+    $('#stat-total').textContent = data.total;
+
+    if (data.jobs.length === 0) {
+      emptyState.classList.remove('d-none');
+      resultsInfo.textContent = 'No jobs found';
+      updateMetaTags();
+      return;
+    }
+
+    resultsInfo.textContent = `Showing ${data.jobs.length} of ${data.total} jobs`;
+    state.jobs = data.jobs;
+
+    list.className = state.viewMode === 'list' ? 'row g-3 list-view' : 'row g-3';
+    list.innerHTML = data.jobs.map((job, idx) => {
+      const adInsert = (idx === 5 && state.page === 1)
+        ? '<div class="col-12" id="ad-between"><span class="ad-label text-muted small d-block text-center">Advertisement</span></div>'
+        : '';
+      return `${adInsert}<div class="col-md-6 col-lg-${state.viewMode === 'list' ? '12' : '6'}">${renderJobCard(job)}</div>`;
+    }).join('');
+
+    list.querySelectorAll('.job-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        if (!e.target.closest('a')) openJobModal(card.dataset.id);
+      });
+    });
+
+    updateSchema(data.jobs); // updates schema + meta + URL bar
+
+    if (data.pages > 1) {
+      buildPagination(data.page, data.pages);
+      pagination.classList.remove('d-none');
+    }
+  } catch (e) {
+    spinner.classList.add('d-none');
+    list.innerHTML = `<div class="col-12 text-center text-danger py-4"><i class="bi bi-exclamation-triangle me-2"></i>Failed to load jobs. Please refresh.</div>`;
+    console.error('Jobs load error:', e);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   RENDER JOB CARD
+══════════════════════════════════════════════════════════════ */
+function renderJobCard(job, isFeaturedSection = false) {
+  const isFeatured  = job.featured == 1;
+  const isSponsored = job.sponsored == 1;
+
+  let cardClass = 'job-card';
+  if (isFeatured)  cardClass += ' featured-card';
+  if (isSponsored) cardClass += ' sponsored-card';
+
+  const badges = [
+    isSponsored ? '<span class="badge-sponsored">Sponsored</span>' : '',
+    isFeatured  ? '<span class="badge-featured">⭐ Featured</span>' : '',
+    `<span class="badge-category">${job.category}</span>`,
+    `<span class="badge-type">${job.job_type || 'Full-time'}</span>`
+  ].filter(Boolean).join('');
+
+  const contacts = [
+    job.phone    ? `<a href="tel:${job.phone}" class="btn-contact-icon phone" title="Call" onclick="event.stopPropagation()"><i class="bi bi-telephone-fill"></i></a>` : '',
+    job.whatsapp ? `<a href="${waLink(job)}" class="btn-contact-icon whatsapp" title="WhatsApp" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i class="bi bi-whatsapp"></i></a>` : '',
+    job.map_link ? `<a href="${escHtml(job.map_link)}" class="btn-contact-icon map" title="View on Map" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i class="bi bi-geo-alt-fill"></i></a>` : '',
+    job.email    ? `<a href="mailto:${job.email}" class="btn-contact-icon email" title="Email" onclick="event.stopPropagation()"><i class="bi bi-envelope-fill"></i></a>` : '',
+    job.slug     ? `<a href="/job/${job.slug}" class="btn-contact-icon details" title="View Details" onclick="event.stopPropagation()"><i class="bi bi-box-arrow-up-right"></i></a>` : ''
+  ].filter(Boolean).join('');
+
+  return `
+    <div class="${cardClass}" data-id="${job.id}" data-slug="${job.slug || ''}" role="button" tabindex="0"
+         aria-label="View ${escHtml(job.title)} at ${escHtml(job.company)}">
+      <div class="card-badges">${badges}</div>
+      <div class="card-title">${escHtml(job.title)}</div>
+      <div class="card-company"><i class="bi bi-building me-1"></i>${escHtml(job.company)}</div>
+      <div class="card-meta">
+        <span class="meta-item"><i class="bi bi-geo-alt"></i>${escHtml(job.location)}</span>
+      </div>
+      <p class="card-desc">${escHtml(job.description)}</p>
+      <div class="card-footer-row">
+        <span class="card-date"><i class="bi bi-clock me-1"></i>${timeAgo(job.created_at)}</span>
+        <div class="card-contacts">${contacts}</div>
+      </div>
+    </div>`;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   JOB MODAL
+══════════════════════════════════════════════════════════════ */
+// async function openJobModal(jobId) {
+//   const cached = state.jobs.find(j => j.id == jobId);
+//   if (cached) {
+//     populateModal(cached);
+//     new bootstrap.Modal($('#jobModal')).show();
+//     return;
+//   }
+
+//   try {
+//     const card = document.querySelector(`.job-card[data-id="${jobId}"]`);
+//     const slug = card ? card.dataset.slug : null;
+//     if (!slug) return;
+//     const data = await api.get(`/api/jobs/${slug}`);
+//     if (!data.success) return;
+//     state.jobs.push(data.job);
+//     populateModal(data.job);
+//     new bootstrap.Modal($('#jobModal')).show();
+//   } catch (e) {
+//     console.warn('Could not load job details:', e);
+//   }
+// }
+
+
+async function openJobModal(jobId) {
+  try {
+    const card = document.querySelector(`.job-card[data-id="${jobId}"]`);
+    const slug = card ? card.dataset.slug : null;
+    if (!slug) return;
+    const data = await api.get(`/api/jobs/${slug}`);
+    if (!data.success) return;
+    // Optional: update the cached version in state.jobs
+    const existingIndex = state.jobs.findIndex(j => j.id == data.job.id);
+    if (existingIndex !== -1) {
+      state.jobs[existingIndex] = data.job;
+    } else {
+      state.jobs.push(data.job);
+    }
+    populateModal(data.job);
+    new bootstrap.Modal($('#jobModal')).show();
+  } catch (e) {
+    console.warn('Could not load job details:', e);
+  }
+}
+
+function populateModal(job) {
+  const badges = [
+    job.sponsored == 1 ? '<span class="badge-sponsored">Sponsored</span>' : '',
+    job.featured  == 1 ? '<span class="badge-featured">⭐ Featured</span>' : ''
+  ].filter(Boolean).join('');
+
+  $('#modalBadges').innerHTML     = badges;
+  $('#modalTitle').textContent    = job.title;
+  $('#modalCompany').textContent  = job.company;
+  $('#modalLocation').textContent = job.location;
+  $('#modalType').textContent     = job.job_type || 'Full-time';
+  $('#modalCategory').textContent = job.category;
+  $('#modalPosted').textContent   = `Posted ${timeAgo(job.created_at)}`;
+
+  const descEl = $('#modalDescription');
+  descEl.innerHTML = escHtml(job.description)
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/\n/g, '<br>');
+  if (!descEl.innerHTML.startsWith('<p>')) {
+    descEl.innerHTML = '<p>' + descEl.innerHTML + '</p>';
+  }
+
+  // Extra fields
+  const extraEl = $('#modalExtraFields');
+  if (job.extra_fields && typeof job.extra_fields === 'object' && Object.keys(job.extra_fields).length > 0) {
+    const schema   = window.__formSchema || null;
+    const labelMap = {};
+    if (schema && schema.sections) {
+      schema.sections.forEach(sec => {
+        (sec.fields || []).forEach(f => {
+          if (!f.coreKey) {
+            labelMap[f.id]        = f.label || f.id;
+            labelMap[f.id+'_min'] = (f.label || f.id) + ' (Min)';
+            labelMap[f.id+'_max'] = (f.label || f.id) + ' (Max)';
+          }
+        });
+      });
+    }
+    let rows = '';
+    Object.entries(job.extra_fields).forEach(([key, val]) => {
+      if (!val && val !== 0) return;
+      const label      = labelMap[key] || key.replace(/^fld_\w+_/, '').replace(/_/g, ' ');
+      const displayVal = Array.isArray(val) ? val.join(', ') : String(val);
+      rows += `<div class="extra-field-row">
+        <span class="extra-field-label">${escHtml(label)}</span>
+        <span class="extra-field-value">${escHtml(displayVal)}</span>
+      </div>`;
+    });
+    if (rows) {
+      extraEl.innerHTML = `<div class="extra-fields-block">
+        <div class="modal-desc-label" style="margin-top:1.25rem"><i class="bi bi-list-check me-2"></i>Additional Details</div>
+        ${rows}
+      </div>`;
+      extraEl.classList.remove('d-none');
+    } else {
+      extraEl.innerHTML = ''; extraEl.classList.add('d-none');
+    }
+  } else {
+    extraEl.innerHTML = ''; extraEl.classList.add('d-none');
+  }
+
+  const phone    = $('#modalPhone');
+  const whatsapp = $('#modalWhatsApp');
+  const mapBtn   = $('#modalMap');
+  const email    = $('#modalEmail');
+
+  if (job.phone) {
+    phone.href = `tel:${job.phone}`;
+    phone.innerHTML = `<i class="bi bi-telephone-fill me-1"></i>${job.phone}`;
+    phone.classList.remove('d-none');
+  } else { phone.classList.add('d-none'); }
+
+  if (job.whatsapp) {
+    whatsapp.href = waLink(job.whatsapp, job.title);
+    whatsapp.innerHTML = `<i class="bi bi-whatsapp me-1"></i>WhatsApp`;
+    whatsapp.classList.remove('d-none');
+  } else { whatsapp.classList.add('d-none'); }
+
+  if (job.map_link) {
+    mapBtn.href = job.map_link;
+    mapBtn.classList.remove('d-none');
+  } else { mapBtn.classList.add('d-none'); }
+
+  if (job.email) {
+    email.href = `mailto:${job.email}`;
+    email.innerHTML = `<i class="bi bi-envelope-fill me-1"></i>${job.email}`;
+    email.classList.remove('d-none');
+  } else { email.classList.add('d-none'); }
+
+  // Update title for context (won't change canonical)
+  document.title = `${job.title} at ${job.company} | ${state.settings.site_name || 'HireHub'}`;
+
+  // ── Wire share button ──────────────────────────────────────
+  const siteUrl  = (state.settings.site_url || window.location.origin).replace(/\/$/, '');
+  const jobUrl   = `${siteUrl}/job/${job.slug}`;
+  const siteName = state.settings.site_name || 'HireHub';
+
+  const shareText = buildShareText(job, jobUrl, siteName);
+  const waShareUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+  const tgShareUrl = `https://t.me/share/url?url=${encodeURIComponent(jobUrl)}&text=${encodeURIComponent(`${job.title} at ${job.company}\n${job.location} · ${job.job_type || 'Full-time'}`)}`;
+  const twShareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(`${job.title} at ${job.company} – ${job.location}`)}&url=${encodeURIComponent(jobUrl)}`;
+  const fbShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(jobUrl)}`;
+
+  const shareWA   = document.getElementById('shareWA');
+  const shareTG   = document.getElementById('shareTG');
+  const shareTW   = document.getElementById('shareTW');
+  const shareFB   = document.getElementById('shareFB');
+  const shareCopy = document.getElementById('shareCopy');
+  const shareBtn  = document.getElementById('modalShareBtn');
+  const shareDrop = document.getElementById('modalShareDropdown');
+
+  if (shareWA)   shareWA.href   = waShareUrl;
+  if (shareTG)   shareTG.href   = tgShareUrl;
+  if (shareTW)   shareTW.href   = twShareUrl;
+  if (shareFB)   shareFB.href   = fbShareUrl;
+
+  // Copy link
+  if (shareCopy) {
+    shareCopy.onclick = async () => {
+      try { await navigator.clipboard.writeText(jobUrl); } catch { fallbackCopy(jobUrl); }
+      shareCopy.innerHTML = '<i class="bi bi-check-lg"></i> Copied!';
+      shareCopy.classList.add('copied');
+      showShareToast('Link copied to clipboard');
+      setTimeout(() => {
+        shareCopy.innerHTML = '<i class="bi bi-link-45deg"></i> Copy job link';
+        shareCopy.classList.remove('copied');
+        shareDrop.classList.remove('open');
+      }, 1800);
+    };
+  }
+
+  // Toggle dropdown or use native share
+  if (shareBtn) {
+    shareBtn.onclick = async (e) => {
+  e.stopPropagation();
+  if (navigator.share) {
+    try {
+      const fullShareText = buildShareText(job, jobUrl, siteName);
+      await navigator.share({ title: `${job.title} at ${job.company}`, text: fullShareText, url: jobUrl });
+      return;
+    } catch (err) { if (err.name === 'AbortError') return; }
+  }
+  shareDrop.classList.toggle('open');
+};
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SHARE HELPERS
+══════════════════════════════════════════════════════════════ */
+function buildShareText(job, jobUrl, siteName) {
+  // Helper: remove phone numbers and replace with call‑to‑action
+  function stripPhoneNumbers(text) {
+    let cleaned = text.replace(/(\+?9665|05)\d{8}/g, '')
+                      .replace(/(\+\d{1,3}[-.\s]?\d{6,})/g, '')
+                      .replace(/\d{4,}[-.\s]?\d{4,}/g, '');
+    // If any phone-like pattern was removed, add a placeholder
+    if (cleaned !== text) {
+      // Avoid adding multiple placeholders
+      if (!cleaned.includes('📞 Contact details on website')) {
+        cleaned += ' 📞 Contact details on website.';
+      }
+    }
+    return cleaned;
+  }
+
+  // Helper: remove email addresses and replace with call‑to‑action
+  function stripEmails(text) {
+    let cleaned = text.replace(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g, '');
+    if (cleaned !== text) {
+      if (!cleaned.includes('✉️ Email on website')) {
+        cleaned += ' ✉️ Email on website.';
+      }
+    }
+    return cleaned;
+  }
+
+  let desc = (job.description || '').replace(/\n/g, ' ');
+  desc = stripPhoneNumbers(desc);
+  desc = stripEmails(desc);
+  // Also remove common labels like "Contact:" but leave the call‑to‑action
+  desc = desc.replace(/Contact:\s*/gi, '')
+             .replace(/Phone:\s*/gi, '')
+             .replace(/WhatsApp:\s*/gi, '');
+  
+  const truncatedDesc = desc.substring(0, 200) + (desc.length >= 200 ? '…' : '');
+  const notice = `⚠️ *Important Notice:* 
+▪ Verify job details before joining
+▪ Do NOT pay anyone for job placement
+▪ Only deal with verified sources`;
+
+  return `🔥 *Job Opportunity on ${siteName}*\n\n` +
+    `📋 *${job.title}*\n` +
+    `🏢 ${job.company || 'Not specified'}\n` +
+    `📍 ${job.location}\n` +
+    `💼 ${job.job_type || 'Full-time'}\n\n` +
+    `${truncatedDesc}\n\n` +
+    `🔗 View & apply: ${jobUrl}\n\n` +
+    `${notice}`;
+}
+
+function showShareToast(msg) {
+  let t = document.getElementById('shareToastEl');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'shareToastEl';
+    t.className = 'share-toast';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;opacity:0';
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand('copy');
+  document.body.removeChild(ta);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PAGINATION
+══════════════════════════════════════════════════════════════ */
+function buildPagination(currentPage, totalPages) {
+  const ul = $('#pagination');
+  ul.innerHTML = '';
+
+  const addItem = (label, page, disabled = false, active = false) => {
+    const li = document.createElement('li');
+    li.className = `page-item${disabled ? ' disabled' : ''}${active ? ' active' : ''}`;
+    const a  = document.createElement('a');
+    a.className = 'page-link';
+    a.href      = '#jobs';
+    a.innerHTML = label;
+    if (!disabled && !active) {
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        state.page = page;
+        loadJobs();
+        document.getElementById('jobs').scrollIntoView({ behavior: 'smooth' });
+      });
+    }
+    li.appendChild(a);
+    ul.appendChild(li);
+  };
+
+  addItem('<i class="bi bi-chevron-left"></i>', currentPage - 1, currentPage === 1);
+  pagRange(currentPage, totalPages).forEach(p => {
+    if (p === '…') addItem('…', null, true);
+    else            addItem(p, p, false, p === currentPage);
+  });
+  addItem('<i class="bi bi-chevron-right"></i>', currentPage + 1, currentPage === totalPages);
+}
+
+function pagRange(cur, total) {
+  const delta = 2, range = [];
+  for (let i = Math.max(2, cur - delta); i <= Math.min(total - 1, cur + delta); i++) range.push(i);
+  if (cur - delta > 2)         range.unshift('…');
+  if (cur + delta < total - 1) range.push('…');
+  range.unshift(1);
+  if (total > 1) range.push(total);
+  return range;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   FILTER HELPERS
+══════════════════════════════════════════════════════════════ */
+function toggleClearBtn() {
+  const hasFilter = state.filters.q || state.filters.location ||
+                    state.filters.category || state.filters.type ||
+                    state.filters.sort !== 'newest';
+  $('#clearFilters').classList.toggle('d-none', !hasFilter);
+}
+
+window.resetFilters = function() {
+  state.filters = { q: '', location: '', category: '', type: '', sort: 'newest' };
+  state.page    = 1;
+  $('#searchInput').value    = '';
+  $('#locationInput').value  = '';
+  $('#categoryFilter').value = '';
+  $('#typeFilter').value     = '';
+  $('#sortFilter').value     = 'newest';
+  $$('.category-chip').forEach(c => c.classList.remove('active'));
+  $$('.category-chip')[0]?.classList.add('active');
+  toggleClearBtn();
+  loadJobs();
+};
+
+function setViewMode(mode) {
+  state.viewMode = mode;
+  if (mode === 'list') {
+    $('#jobsList').classList.add('list-view');
+    $('#viewList').classList.add('active');
+    $('#viewGrid').classList.remove('active');
+  } else {
+    $('#jobsList').classList.remove('list-view');
+    $('#viewGrid').classList.add('active');
+    $('#viewList').classList.remove('active');
+  }
+  loadJobs();
+}
+
+let debTimer;
+function debounce(fn, ms = 350) {
+  clearTimeout(debTimer);
+  debTimer = setTimeout(fn, ms);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   EVENT LISTENERS
+══════════════════════════════════════════════════════════════ */
+function bindEvents() {
+  $('#themeToggle').addEventListener('click', toggleTheme);
+
+  // Close share dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    const drop = document.getElementById('modalShareDropdown');
+    const wrap = document.getElementById('modalShareWrap');
+    if (drop && drop.classList.contains('open') && wrap && !wrap.contains(e.target)) {
+      drop.classList.remove('open');
+    }
+  });
+
+  $('#searchForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    state.filters.q        = $('#searchInput').value.trim();
+    state.filters.location = $('#locationInput').value.trim();
+    state.page = 1;
+    loadJobs();
+    toggleClearBtn();
+  });
+
+  $('#searchInput').addEventListener('input', () => {
+    debounce(() => { state.filters.q = $('#searchInput').value.trim(); state.page = 1; loadJobs(); toggleClearBtn(); });
+  });
+
+  $('#locationInput').addEventListener('input', () => {
+    debounce(() => { state.filters.location = $('#locationInput').value.trim(); state.page = 1; loadJobs(); toggleClearBtn(); }, 400);
+  });
+
+  $('#categoryFilter').addEventListener('change', (e) => { filterByCategory(e.target.value); });
+  $('#typeFilter').addEventListener('change', (e) => { state.filters.type = e.target.value; state.page = 1; loadJobs(); toggleClearBtn(); });
+  $('#sortFilter').addEventListener('change', (e) => { state.filters.sort = e.target.value; state.page = 1; loadJobs(); toggleClearBtn(); });
+  $('#clearFilters').addEventListener('click', resetFilters);
+  $('#viewGrid').addEventListener('click', () => setViewMode('grid'));
+  $('#viewList').addEventListener('click', () => setViewMode('list'));
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && document.activeElement.classList.contains('job-card')) {
+      openJobModal(document.activeElement.dataset.id);
+    }
+  });
+
+  $('#footerYear').textContent = new Date().getFullYear();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   INIT  –  reads URL params so filtered pages work on load
+══════════════════════════════════════════════════════════════ */
+async function init() {
+  // ── Read URL search params for shareable/SEO links ──────────
+  const up = new URLSearchParams(window.location.search);
+  if (up.get('q'))        state.filters.q        = up.get('q');
+  if (up.get('category')) state.filters.category = up.get('category');
+  if (up.get('location')) state.filters.location = up.get('location');
+  if (up.get('type'))     state.filters.type     = up.get('type');
+  if (up.get('sort'))     state.filters.sort     = up.get('sort');
+  if (up.get('page'))     state.page             = parseInt(up.get('page')) || 1;
+
+  // Pre-fill visible filter inputs from URL
+  if (state.filters.q)        { const el = $('#searchInput');   if (el) el.value = state.filters.q; }
+  if (state.filters.location) { const el = $('#locationInput'); if (el) el.value = state.filters.location; }
+  if (state.filters.type)     { const el = $('#typeFilter');    if (el) el.value = state.filters.type; }
+  if (state.filters.sort)     { const el = $('#sortFilter');    if (el) el.value = state.filters.sort; }
+
+  await loadSettings();
+
+  // Preload form schema for modal extra-field labels
+  try {
+    const res = await fetch('/api/public/form-schema');
+    if (res.ok) { const d = await res.json(); window.__formSchema = d.schema || null; }
+  } catch {}
+
+  bindEvents();
+  await loadCategories();  // also syncs category chip/select from URL param
+  await loadFeaturedJobs();
+  await loadJobs();
+
+}
+
+
+
+document.addEventListener('DOMContentLoaded', init);

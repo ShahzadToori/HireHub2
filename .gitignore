@@ -1,0 +1,13 @@
+node_modules/
+.env
+*.log
+session/
+.wwebjs_auth/
+cron-session/
+poster-session/
+channel-forwarder/*session/
+venv/
+temp_message.txt
+qr.png
+*.tmp
+.DS_Store
