@@ -548,6 +548,7 @@ function renderJobCard(job, isFeaturedSection = false) {
     job.whatsapp ? `<a href="${waLink(job)}" class="btn-contact-icon whatsapp" title="WhatsApp" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i class="bi bi-whatsapp"></i></a>` : '',
     job.map_link ? `<a href="${escHtml(job.map_link)}" class="btn-contact-icon map" title="View on Map" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i class="bi bi-geo-alt-fill"></i></a>` : '',
     job.email    ? `<a href="mailto:${job.email}" class="btn-contact-icon email" title="Email" onclick="event.stopPropagation()"><i class="bi bi-envelope-fill"></i></a>` : '',
+    job.apply_link ? `<a href="${escHtml(job.apply_link)}" class="btn-contact-icon applylink" title="Apply Link" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i class="bi bi-box-arrow-up-right"></i></a>` : '',
     job.slug     ? `<a href="/job/${job.slug}" class="btn-contact-icon details" title="View Details" onclick="event.stopPropagation()"><i class="bi bi-box-arrow-up-right"></i></a>` : ''
   ].filter(Boolean).join('');
 
@@ -601,17 +602,10 @@ async function openJobModal(jobId) {
     if (!slug) return;
     const data = await api.get(`/api/jobs/${slug}`);
     if (!data.success) return;
-    // Optional: update the cached version in state.jobs
-    const existingIndex = state.jobs.findIndex(j => j.id == data.job.id);
-    if (existingIndex !== -1) {
-      state.jobs[existingIndex] = data.job;
-    } else {
-      state.jobs.push(data.job);
-    }
     populateModal(data.job);
     new bootstrap.Modal($('#jobModal')).show();
   } catch (e) {
-    console.warn('Could not load job details:', e);
+    console.warn(e);
   }
 }
 
@@ -680,7 +674,7 @@ function populateModal(job) {
   const whatsapp = $('#modalWhatsApp');
   const mapBtn   = $('#modalMap');
   const email    = $('#modalEmail');
-
+const applyBtn = $('#modalApplyLink');
   if (job.phone) {
     phone.href = `tel:${job.phone}`;
     phone.innerHTML = `<i class="bi bi-telephone-fill me-1"></i>${job.phone}`;
@@ -704,6 +698,14 @@ function populateModal(job) {
     email.classList.remove('d-none');
   } else { email.classList.add('d-none'); }
 
+
+// Check that apply_link exists and is not an empty string
+if (job.apply_link && job.apply_link.trim() !== '') {
+    applyBtn.href = job.apply_link;
+    applyBtn.classList.remove('d-none');
+} else {
+    applyBtn.classList.add('d-none');
+}
   // Update title for context (won't change canonical)
   document.title = `${job.title} at ${job.company} | ${state.settings.site_name || 'HireHub'}`;
 

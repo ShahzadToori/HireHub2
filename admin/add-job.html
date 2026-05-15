@@ -125,7 +125,17 @@
               </div>
             </div>
           </div>
-
+<!-- Apply Link Card -->
+<div class="admin-card mt-3">
+  <div class="admin-card-header">
+    <h5 class="admin-card-title"><i class="bi bi-link-45deg me-2"></i>Apply Link</h5>
+  </div>
+  <div class="p-3">
+    <label class="form-label-custom">External Application URL</label>
+    <input type="url" class="form-control-custom" name="apply_link" placeholder="https://company.com/apply">
+    <small class="text-muted">If provided, an "Apply Link" button will appear on the job page.</small>
+  </div>
+</div>
           <div class="admin-card mt-3" style="background:rgba(15,98,254,.04);border-color:rgba(15,98,254,.15)">
             <div class="p-3" style="font-size:.8rem;color:var(--text-muted)">
               <i class="bi bi-ui-checks-grid me-1" style="color:var(--primary)"></i>
@@ -371,6 +381,7 @@ async function loadJobData() {
       title:'title',company:'company',location:'location',
       category_id:'category_id',job_type:'job_type',description:'description',
       phone:'phone',whatsapp:'whatsapp',email:'email',map_link:'map_link',
+      apply_link: 'apply_link',
       status:'status',featured_until:'featured_until'
     };
 
@@ -439,6 +450,7 @@ async function handleSubmit(e) {
     whatsapp:       getVal(form,'whatsapp'),
     email:          getVal(form,'email'),
     map_link:       getVal(form,'map_link'),
+    apply_link:      getVal(form,'apply_link'),
     status:         getVal(form,'status'),
     featured:       form.querySelector('[name="featured"]')?.checked ? 1 : 0,
     sponsored:      form.querySelector('[name="sponsored"]')?.checked ? 1 : 0,

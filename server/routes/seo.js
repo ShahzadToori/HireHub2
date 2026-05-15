@@ -275,12 +275,13 @@ if (job.whatsapp) {
     `Hello, I am very interested in this position. Please find my details attached. Thank you.`;
   whatsappUrl = `https://wa.me/${clean}?text=${encodeURIComponent(msg)}`;
 }
-
+const applyLinkBtn = job.apply_link ? `<a href="${he(job.apply_link)}" class="cbtn cbtn-applylink" target="_blank"><i>🔗</i> Apply Link</a>` : '';
 const contactBtns = [
   job.phone    ? `<a href="tel:${he(job.phone)}"    class="cbtn cbtn-phone"><i>📞</i> ${he(job.phone)}</a>` : '',
   job.whatsapp ? `<a href="${whatsappUrl}" class="cbtn cbtn-wa" target="_blank"><i>💬</i> WhatsApp</a>` : '',
   job.email    ? `<a href="mailto:${he(job.email)}" class="cbtn cbtn-email"><i>✉️</i> ${he(job.email)}</a>` : '',
-  job.map_link ? `<a href="${he(job.map_link)}"     class="cbtn cbtn-map" target="_blank"><i>📍</i> View Location</a>` : ''
+  job.map_link ? `<a href="${he(job.map_link)}"     class="cbtn cbtn-map" target="_blank"><i>📍</i> View Location</a>` : '',
+  applyLinkBtn
 ].filter(Boolean).join('\n          ');
 
     // ── Full SSR HTML ──────────────────────────────────────────
@@ -354,6 +355,8 @@ const contactBtns = [
     .cbtn-wa{background:#dcfce7;color:#15803d;border:1px solid #bbf7d0}
     .cbtn-email{background:#e8f0fe;color:#1a56db;border:1px solid #c7d7fb}
     .cbtn-map{background:#fff3e0;color:#c84b00;border:1px solid #ffcc80}
+    .cbtn-applylink{background:#e8f0fe;color:#1a56db;border:1px solid #c7d7fb}
+.cbtn-applylink:hover{background:#1a56db;color:#fff}
     .back{display:inline-flex;align-items:center;gap:.3rem;color:#0f62fe;font-size:.88rem;margin-bottom:1.5rem}
     .back:hover{text-decoration:underline}
     footer{margin-top:3rem;padding:1.5rem 1.25rem;text-align:center;font-size:.8rem;color:#9ca3af;border-top:1px solid #e5e7eb}

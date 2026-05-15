@@ -164,7 +164,7 @@ router.post('/jobs', async (req, res) => {
   try {
     const {
       title, company, category_id, location, job_type = 'Full-time',
-      description, phone, whatsapp, email, map_link, extra_fields,
+      description, phone, whatsapp, email, map_link, apply_link, extra_fields,
       status = 'active', featured = 0, sponsored = 0, featured_until
     } = req.body;
 
@@ -177,10 +177,10 @@ router.post('/jobs', async (req, res) => {
     await db.execute(
       `INSERT INTO jobs
          (title, company, category_id, location, job_type, description,
-          phone, whatsapp, email, map_link, extra_fields, status, featured, sponsored, featured_until, slug)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          phone, whatsapp, email, map_link, apply_link, extra_fields, status, featured, sponsored, featured_until, slug)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [title, company, category_id, location, job_type, description,
-       phone || null, whatsapp || null, email || null, map_link || null,
+       phone || null, whatsapp || null, email || null, map_link || null, apply_link || null,
        extra_fields ? JSON.stringify(extra_fields) : null,
        status, featured ? 1 : 0, sponsored ? 1 : 0,
        featured_until || null, slug]
@@ -198,7 +198,7 @@ router.put('/jobs/:id', async (req, res) => {
   try {
     const {
       title, company, category_id, location, job_type,
-      description, phone, whatsapp, email, map_link, extra_fields,
+      description, phone, whatsapp, email, map_link, apply_link, extra_fields,
       status, featured, sponsored, featured_until
     } = req.body;
 
@@ -210,11 +210,11 @@ router.put('/jobs/:id', async (req, res) => {
     await db.execute(
       `UPDATE jobs SET
          title=?, company=?, category_id=?, location=?, job_type=?,
-         description=?, phone=?, whatsapp=?, email=?, map_link=?, extra_fields=?,
+         description=?, phone=?, whatsapp=?, email=?, map_link=?, apply_link=?, extra_fields=?,
          status=?, featured=?, sponsored=?, featured_until=?, slug=?
        WHERE id=?`,
       [title, company, category_id, location, job_type,
-       description, phone || null, whatsapp || null, email || null, map_link || null,
+       description, phone || null, whatsapp || null, email || null, map_link || null, apply_link || null,
        extra_fields ? JSON.stringify(extra_fields) : null,
        status, featured ? 1 : 0, sponsored ? 1 : 0,
        featured_until || null, slug, req.params.id]
@@ -526,6 +526,7 @@ const parseValue = (value, type = 'string', allowNull = true) => {
   whatsapp: parseValue(row.whatsapp),
   email: parseValue(row.email),
   map_link: parseValue(row.map_link),
+  apply_link: parseValue(row.apply_link),
   status: parseValue(row.status) || 'active',
   featured: parseValue(row.featured, 'int') || 0,
   sponsored: parseValue(row.sponsored, 'int') || 0,
@@ -534,7 +535,7 @@ const parseValue = (value, type = 'string', allowNull = true) => {
 };
 
         // Handle extra fields: any column not in the main list goes into extra_fields JSON
-        const mainFields = ['title','company','location','description','category_id','job_type','phone','whatsapp','email','map_link','status','featured','sponsored','featured_until','views','slug','id'];
+        const mainFields = ['title','company','location','description','category_id','job_type','phone','whatsapp','email','map_link','apply_link','status','featured','sponsored','featured_until','views','slug','id'];
         const extraFields = {};
         for (const [key, val] of Object.entries(row)) {
           if (!mainFields.includes(key) && val !== undefined && val !== '') {
@@ -590,13 +591,13 @@ if (!slug) {
           await db.execute(
             `UPDATE jobs SET
               title = ?, company = ?, category_id = ?, location = ?, job_type = ?,
-              description = ?, phone = ?, whatsapp = ?, email = ?, map_link = ?,
+              description = ?, phone = ?, whatsapp = ?, email = ?, map_link = ?, apply_link = ?,
               extra_fields = ?, status = ?, featured = ?, sponsored = ?, featured_until = ?,
               views = ?, slug = ?
              WHERE id = ?`,
             [
               jobData.title, jobData.company, jobData.category_id, jobData.location, jobData.job_type,
-              jobData.description, jobData.phone, jobData.whatsapp, jobData.email, jobData.map_link,
+              jobData.description, jobData.phone, jobData.whatsapp, jobData.email, jobData.map_link, jobData.apply_link,
               jobData.extra_fields, jobData.status, jobData.featured, jobData.sponsored, jobData.featured_until,
               jobData.views, slug,
               existingId
@@ -608,11 +609,11 @@ if (!slug) {
           await db.execute(
             `INSERT INTO jobs
               (title, company, category_id, location, job_type, description,
-               phone, whatsapp, email, map_link, extra_fields, status, featured, sponsored, featured_until, views, slug)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+               phone, whatsapp, email, map_link, apply_link, extra_fields, status, featured, sponsored, featured_until, views, slug)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
               jobData.title, jobData.company, jobData.category_id, jobData.location, jobData.job_type,
-              jobData.description, jobData.phone, jobData.whatsapp, jobData.email, jobData.map_link,
+              jobData.description, jobData.phone, jobData.whatsapp, jobData.email, jobData.map_link,  jobData.apply_link,
               jobData.extra_fields, jobData.status, jobData.featured, jobData.sponsored, jobData.featured_until,
               jobData.views, slug
             ]

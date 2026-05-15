@@ -811,6 +811,33 @@ img { max-width: 100%; }
   border-color: #e65100;
 }
 
+
+
+.btn-applylink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1.25rem;
+  border-radius: 9px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-decoration: none;
+  background: #e8f0fe;
+  color: #1a56db;
+  border: 1px solid #c7d7fb;
+}
+.btn-applylink:hover {
+  background: #1a56db;
+  color: #fff;
+}
+.btn-contact-icon.applylink {
+    color: #1a56db;
+}
+.btn-contact-icon.applylink:hover {
+    background: #1a56db;
+    color: white;
+}
+
 [data-theme="dark"] .btn-phone    { background: rgba(22,163,74,.15);  color: #86efac; border-color: rgba(22,163,74,.3); }
 [data-theme="dark"] .btn-whatsapp { background: rgba(37,211,102,.12); color: #86efac; border-color: rgba(37,211,102,.25); }
 [data-theme="dark"] .btn-email    { background: rgba(15,98,254,.15);  color: #93c5fd; border-color: rgba(15,98,254,.3); }
