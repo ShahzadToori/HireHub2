@@ -1,24 +1,15 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
-  <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-S3HNGSBYPQ"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-S3HNGSBYPQ');
-</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Top Interview Questions for Engineers in the Gulf (With Answers) - JobOrbit</title>
-  <meta name="description" content="Prepare for your engineering interview in Saudi Arabia or the Gulf. Civil, software, mechanical, and electrical questions with detailed example answers.">
+  <title>Networking in the Gulf: How Wasta Works and How to Build Real Connections - JobOrbit</title>
+  <meta name="description" content="How professional networking really works in Saudi Arabia and the Gulf — understanding wasta, where to network, and the cultural rules that matter.">
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
-  <link rel="canonical" href="/blog/interview-questions-engineers.html">
+  <link rel="canonical" href="/blog/networking-tips-gulf.html">
   <meta property="og:type" content="article">
-  <meta property="og:title" content="Top Interview Questions for Engineers in the Gulf (With Answers)">
-  <meta property="og:description" content="Prepare for your engineering interview in Saudi Arabia or the Gulf. Civil, software, mechanical, and electrical questions with detailed example answers.">
+  <meta property="og:title" content="Networking in the Gulf: How Wasta Works and How to Build Real Connections">
+  <meta property="og:description" content="How professional networking really works in Saudi Arabia and the Gulf — understanding wasta, where to network, and the cultural rules that matter.">
   <meta property="og:site_name" content="JobOrbit">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" type="image/svg+xml" href="/JobOrbitFavicon.svg">
@@ -28,8 +19,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
-<style>
-  /* ── Blog shared ─── */
+  <style>
   .blog-hero{background:linear-gradient(135deg,#0d1117 0%,#161b22 55%,#0f2744 100%);padding:4rem 0 3rem;position:relative;overflow:hidden}
   .blog-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(15,98,254,.2),transparent 70%)}
   .blog-hero-inner{position:relative;text-align:center}
@@ -38,41 +28,20 @@
   .blog-hero-sub{color:rgba(255,255,255,.6);font-size:.95rem;max-width:580px;margin:0 auto}
   .blog-hero-meta{display:flex;justify-content:center;align-items:center;gap:1rem;margin-top:1.25rem;flex-wrap:wrap}
   .blog-hero-meta span{font-size:.78rem;color:rgba(255,255,255,.45);display:flex;align-items:center;gap:.3rem}
-  /* Cards */
-  .blog-card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:transform .2s,box-shadow .2s;height:100%;display:flex;flex-direction:column}
-  .blog-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.12)}
-  .blog-card-thumb{aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;font-size:3rem}
-  .blog-card-body{padding:1.5rem;flex:1;display:flex;flex-direction:column}
-  .blog-card-cat{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--primary);margin-bottom:.5rem}
-  .blog-card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;color:var(--text-primary);line-height:1.3;margin-bottom:.6rem}
-  .blog-card-title a{color:inherit;text-decoration:none}
-  .blog-card-title a:hover{color:var(--primary)}
-  .blog-card-excerpt{color:var(--text-secondary);font-size:.875rem;line-height:1.65;flex:1;margin-bottom:1rem}
-  .blog-card-footer{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);padding-top:.75rem;margin-top:auto}
-  .blog-card-meta{font-size:.75rem;color:var(--text-muted);display:flex;align-items:center;gap:.35rem}
-  .blog-card-read{font-size:.78rem;font-weight:600;color:var(--primary);text-decoration:none;display:flex;align-items:center;gap:.25rem}
-  .blog-card-read:hover{text-decoration:underline}
-  /* Featured */
-  .blog-featured{background:var(--bg-card);border:1px solid var(--border);border-radius:20px;overflow:hidden;display:flex;flex-direction:column;margin-bottom:2.5rem}
-  @media(min-width:768px){.blog-featured{flex-direction:row}}
-  .blog-featured-thumb{min-height:200px;flex:0 0 42%;display:flex;align-items:center;justify-content:center;font-size:4rem}
-  .blog-featured-body{padding:2rem;display:flex;flex-direction:column;justify-content:center}
-  /* Article */
   .article-body h2{font-family:'Syne',sans-serif;font-weight:700;font-size:1.35rem;color:var(--text-primary);margin:2rem 0 .75rem;padding-bottom:.4rem;border-bottom:2px solid var(--border)}
   .article-body h3{font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;color:var(--text-primary);margin:1.5rem 0 .5rem}
   .article-body p{color:var(--text-secondary);font-size:.95rem;line-height:1.8;margin-bottom:1rem}
   .article-body ul,.article-body ol{color:var(--text-secondary);font-size:.95rem;line-height:1.8;padding-left:1.5rem;margin-bottom:1rem}
-  .article-body li{margin-bottom:.35rem}
+  .article-body li{margin-bottom:.4rem}
   .article-body strong{color:var(--text-primary);font-weight:600}
   .article-body a{color:var(--primary)}
   .article-highlight{background:rgba(15,98,254,.06);border-left:3px solid var(--primary);border-radius:0 10px 10px 0;padding:1rem 1.25rem;margin:1.5rem 0}
   [data-theme="dark"] .article-highlight{background:rgba(15,98,254,.1)}
   .article-highlight p{margin:0;font-size:.9rem;color:var(--text-secondary)}
-  /* Sidebar */
   .sidebar-widget{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:1.25rem;margin-bottom:1.25rem}
   .sidebar-widget-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:1rem}
   .rel-link{display:flex;align-items:flex-start;gap:.6rem;padding:.5rem 0;border-bottom:1px solid var(--border);text-decoration:none}
-  .rel-link:last-child{border-bottom:none;padding-bottom:0}
+  .rel-link:last-child{border-bottom:none}
   .rel-link:hover .rel-title{color:var(--primary)}
   .rel-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
   .rel-title{font-size:.83rem;font-weight:600;color:var(--text-primary);line-height:1.3;transition:color .15s}
@@ -81,10 +50,27 @@
   .cta-widget h5{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;color:#fff;margin-bottom:.5rem}
   .cta-widget p{font-size:.82rem;color:rgba(255,255,255,.85);margin-bottom:1rem}
   .cta-widget a{background:#fff;color:#0f62fe;border-radius:8px;padding:.5rem 1.25rem;font-size:.85rem;font-weight:700;text-decoration:none;display:inline-block}
-  /* Breadcrumb */
   .breadcrumb-bar{display:flex;align-items:center;gap:.4rem;font-size:.82rem;color:var(--text-muted);margin-bottom:1.5rem;flex-wrap:wrap}
   .breadcrumb-bar a{color:var(--text-muted);text-decoration:none}
   .breadcrumb-bar a:hover{color:var(--primary)}
+  /* Salary table */
+  .salary-table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem}
+  .salary-table th{background:var(--primary);color:#fff;padding:.65rem 1rem;font-family:'Syne',sans-serif;font-size:.8rem;text-align:left}
+  .salary-table td{padding:.6rem 1rem;border-bottom:1px solid var(--border);font-size:.875rem;color:var(--text-secondary)}
+  .salary-table tr:last-child td{border-bottom:none}
+  .salary-table tr:nth-child(even) td{background:var(--surface)}
+  .salary-table .salary-high{color:#059669;font-weight:700}
+  /* Tip box */
+  .tip-box{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.3);border-radius:10px;padding:.9rem 1.1rem;margin:1.25rem 0;display:flex;gap:.75rem}
+  .tip-box i{color:#d97706;font-size:1.1rem;flex-shrink:0;margin-top:.1rem}
+  .tip-box p{margin:0;font-size:.88rem;color:var(--text-secondary)}
+  /* Step list */
+  .step-list{counter-reset:steps;list-style:none;padding:0;margin:1rem 0 1.5rem}
+  .step-list li{counter-increment:steps;display:flex;gap:.85rem;padding:.75rem 0;border-bottom:1px solid var(--border)}
+  .step-list li:last-child{border-bottom:none}
+  .step-list li::before{content:counter(steps);width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;flex-shrink:0;font-family:'Syne',sans-serif}
+  .step-list li > div{font-size:.92rem;color:var(--text-secondary);line-height:1.65}
+  .step-list li strong{color:var(--text-primary);display:block;margin-bottom:.2rem}
 </style>
 </head>
 <body>
@@ -92,7 +78,7 @@
   <div class="container">
     <a class="navbar-brand d-flex align-items-center gap-2" href="/">
       <img id="site-logo" src="" alt="Logo" class="d-none" style="max-height:36px">
-      <!-- <span id="site-name" class="brand-name">JobOrbit</span> -->
+      
     </a>
     <div class="d-flex align-items-center gap-2 ms-auto">
       <button class="btn btn-icon theme-toggle" id="themeToggle" aria-label="Toggle theme">
@@ -105,10 +91,8 @@
     <div class="collapse navbar-collapse" id="navMenu">
       <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
         <li class="nav-item"><a class="nav-link" href="/">Browse Jobs</a></li>
-        <li class="nav-item"><a class="nav-link" href="/#categories">Categories</a></li>
         <li class="nav-item"><a class="nav-link nav-link-active" href="/blog/">Blog</a></li>
         <li class="nav-item"><a class="nav-link" href="/contact.html">Post a Job</a></li>
-        <li class="nav-item"><a class="nav-link" href="/feedback.html">Feedback</a></li>
         <li class="nav-item"><a class="nav-link" href="/about.html">About</a></li>
       </ul>
     </div>
@@ -120,11 +104,11 @@
     <div class="breadcrumb-bar" style="justify-content:center;margin-bottom:.75rem">
       <a href="/">Home</a><i class="bi bi-chevron-right" style="font-size:.65rem"></i>
       <a href="/blog/">Blog</a><i class="bi bi-chevron-right" style="font-size:.65rem"></i>
-      <span style="color:rgba(255,255,255,.45)">Interview Prep</span>
+      <span style="color:rgba(255,255,255,.45)">Career Growth</span>
     </div>
-    <div class="blog-hero-badge"><i class="bi bi-person-workspace me-1"></i>Interview Prep</div>
-    <h1 class="blog-hero-title">Top Interview Questions for Engineers in the Gulf (With Answers)</h1>
-    <p class="blog-hero-sub">Civil, software, mechanical, and electrical — common Gulf engineering interview questions with how to answer them.</p>
+    <div class="blog-hero-badge"><i class="bi bi-people-fill me-1"></i>Career Growth</div>
+    <h1 class="blog-hero-title">Networking in the Gulf: How Wasta Works and How to Build Real Connections</h1>
+    <p class="blog-hero-sub">Understanding wasta, where to network in Riyadh, LinkedIn strategies, and the cultural rules that determine whether Gulf networking actually works for you.</p>
     <div class="blog-hero-meta">
       <span><i class="bi bi-clock"></i>8 min read</span>
       <span><i class="bi bi-calendar3"></i>June 2025</span>
@@ -141,70 +125,67 @@
       </div>
       <article class="article-body">
 
-<p>Engineering interviews in the Gulf are rigorous by design. Whether you are applying for a civil role on a NEOM megaproject, a software engineering position at a Riyadh tech startup, or a mechanical engineering job with Saudi Aramco, the interview process is built to separate candidates who truly know their field from those who have simply memorised buzzwords. This guide covers the most common interview questions across engineering disciplines — and how to answer each one effectively.</p>
+<p>Anyone who has spent time working in Saudi Arabia, the UAE, or Kuwait will tell you the same thing: <em>who you know matters enormously</em>. The Arabic concept of wasta — roughly translated as social capital, connections, or influence — is a real and significant factor in Gulf hiring. But that does not mean networking is impossible for outsiders, or that it is about corruption. It means that relationships, trust, and personal introductions are deeply valued in Gulf business culture, and building genuine professional relationships will accelerate your career faster than applications alone ever could.</p>
 
-<h2>General Engineering Questions (All Disciplines)</h2>
-<p>These questions appear regardless of your engineering specialism:</p>
+<h2>Understanding Wasta Without Misunderstanding It</h2>
+<p>Wasta is frequently mischaracterised in Western media as simply bribery or nepotism. That misses the point. At its core, wasta is about trust and vouching. When someone with good wasta recommends you for a role, they are staking their own reputation on your performance. It is a system built on mutual accountability — and that is why it works.</p>
+<p>For professionals building careers in the Gulf, the implication is clear: people hire those they know, trust, and have been vouched for. Building authentic relationships — not transactional networking — is the path to accessing the best opportunities, many of which are never advertised publicly.</p>
 
-<h3>"Walk me through your most challenging engineering project."</h3>
-<p>Use the STAR method: Situation, Task, Action, Result. Describe the project context, your specific role, the challenge you faced, and the measurable outcome. Numbers matter enormously here: "We reduced construction time by 18%" is far more compelling than "we finished ahead of schedule."</p>
+<h2>Building a Professional Network in Saudi Arabia: Where to Start</h2>
 
-<h3>"How do you ensure quality and safety on a project?"</h3>
-<p>Gulf employers — particularly in oil and gas, construction, and manufacturing — place enormous emphasis on HSE (Health, Safety, and Environment). Describe your specific processes: design reviews, inspection checklists, safety audits, and relevant certifications such as NEBOSH, ISO 9001, or equivalent frameworks.</p>
+<h3>LinkedIn: Still the Most Important Platform</h3>
+<p>LinkedIn penetration among professionals in Saudi Arabia is exceptionally high. Riyadh has one of the highest LinkedIn user densities of any global city. A complete, professional LinkedIn profile is non-negotiable. But Saudi professionals use LinkedIn differently from many Western users — direct, personalised outreach is more effective than generic connection requests.</p>
+<p>When connecting with Saudi professionals, always include a brief personal note explaining why you want to connect. Reference a shared industry, a specific piece of their work, or a mutual connection. Generic "I'd like to add you to my network" messages are ignored.</p>
 
-<h3>"How do you handle project delays or budget overruns?"</h3>
-<p>This tests both your problem-solving and your communication skills. Walk through a real example where you identified an issue early, communicated it proactively to stakeholders, and implemented a credible recovery plan. Employers want to see that you surface problems rather than hiding them.</p>
-
-<h2>Civil Engineering Interview Questions</h2>
-<p>Civil engineers in Saudi Arabia work across roads, bridges, buildings, water infrastructure, and the Kingdom's landmark giga-projects.</p>
+<h3>In-Person Networking Events</h3>
+<p>Saudi Arabia hosts a significant number of professional events, particularly in Riyadh and Jeddah. Key venues for networking include:</p>
 <ul>
-<li><strong>"What foundation types have you designed for, and what factors influence your selection?"</strong> Be prepared to discuss soil conditions, bearing capacity, groundwater table, structural loads, and cost-efficiency. Demonstrate familiarity with both shallow and deep foundation systems.</li>
-<li><strong>"Explain the difference between working load and ultimate load in structural design."</strong> Working loads represent service conditions; ultimate loads include safety factors and represent theoretical collapse conditions. Be specific about the codes you apply (BS, ASCE, or Saudi Building Code).</li>
-<li><strong>"What experience do you have with Primavera P6 or MS Project?"</strong> Both are widely used on Gulf construction projects. Be specific about the scale and complexity of schedules you have built and maintained.</li>
-<li><strong>"How do you manage stakeholder expectations on a large infrastructure project?"</strong> Describe your communication cadence, reporting templates, change management process, and how you handle scope creep professionally.</li>
+<li><strong>Cityscape Saudi Arabia</strong> — Real estate and development professionals</li>
+<li><strong>LEAP Tech Conference</strong> — One of the world's largest tech events, held in Riyadh every February</li>
+<li><strong>Saudi HR Summit</strong> — HR, talent, and organisational development professionals</li>
+<li><strong>ADIPEC / Saudi Aramco events</strong> — Oil, gas, and energy sector professionals</li>
+<li><strong>Chamber of Commerce events</strong> — General business and cross-sector networking through SCCI and regional chambers</li>
+<li><strong>University alumni networks</strong> — KAUST, KFUPM, and King Saud University all have active alumni communities</li>
 </ul>
 
-<h2>Software Engineering Interview Questions</h2>
-<p>Saudi Arabia's tech sector is growing fast, and technical interviews are genuinely demanding.</p>
+<h3>Majlis Culture: The Original Networking Event</h3>
+<p>The majlis is a traditional gathering — usually hosted by a senior figure — where community members come to discuss, connect, and seek counsel. In a business context, senior Saudi executives sometimes hold professional majlis gatherings. If you receive an invitation, attend. Come prepared to listen more than you speak, show genuine curiosity, and never rush the conversation toward business topics. The relationship comes first; business follows naturally.</p>
+
+<h2>Cultural Nuances That Will Make or Break Your Networking</h2>
+
+<h3>Invest in the Relationship First</h3>
+<p>Gulf networking operates on a long-term relationship model. Do not ask for a favour, referral, or introduction at a first meeting. The sequence is: meet, build rapport over multiple interactions, and then — when there is genuine mutual trust — ask for help. Rushing this sequence is culturally tone-deaf and counterproductive.</p>
+
+<h3>Hospitality is a Language</h3>
+<p>If a Saudi professional invites you for coffee, a meal, or a visit to their office, this is meaningful. Accept whenever possible. The social time over Arabic coffee (qahwa) and dates is where relationships are actually built — not during formal meetings. Reciprocate by hosting when you can.</p>
+
+<h3>Respect for Hierarchy</h3>
+<p>Saudi business culture is hierarchical. When networking, understand where people sit in their organisations and communicate accordingly. Addressing senior figures with appropriate deference and titles is noticed and appreciated. First names are generally acceptable once a relationship is established, but follow the lead of your Saudi contact.</p>
+
+<h3>Gender Dynamics</h3>
+<p>The professional landscape in Saudi Arabia has changed significantly since 2017's social reforms. Women now work across virtually all sectors, attend events, and are present at the highest levels of business. Mixed-gender professional networking is now normal in major Saudi cities. However, some traditional Saudi professionals may still prefer gender-segregated professional contexts. Be attentive and responsive to social cues.</p>
+
+<h2>Digital Networking Strategies That Work in the Gulf</h2>
 <ul>
-<li><strong>"Explain the difference between REST and GraphQL."</strong> REST is resource-based with multiple endpoints; GraphQL uses a single endpoint and lets the client specify exactly what data it needs, reducing over-fetching and under-fetching.</li>
-<li><strong>"How do you approach system design for a high-traffic application?"</strong> Discuss load balancing, caching strategies (Redis), database sharding, CDN usage, and the trade-offs between horizontal and vertical scaling.</li>
-<li><strong>"What is your experience with cloud platforms?"</strong> Gulf companies increasingly use Azure (Microsoft has Saudi data centres) and AWS. Be specific about services used: EC2, RDS, Lambda, S3, Azure Functions, and so on.</li>
-<li><strong>"Describe a time you refactored legacy code."</strong> Focus on your decision-making process: why refactor, the approach you chose, how you ensured no regressions, and the measurable outcome in terms of performance or maintainability.</li>
+<li><strong>Publish original content on LinkedIn</strong> — Professionals who share genuine insights about their field — market analysis, career advice, project case studies — consistently report more inbound outreach from Gulf employers and decision-makers.</li>
+<li><strong>WhatsApp professional groups</strong> — Industry-specific WhatsApp groups are extremely active in the Gulf. Getting added to relevant groups (usually through a mutual contact) gives you regular visibility with dozens of industry professionals.</li>
+<li><strong>Comment thoughtfully, not just like</strong> — Adding substantive comments to posts from senior Gulf professionals creates visibility and starts conversations that connection requests alone never would.</li>
+<li><strong>Arabic content</strong> — If you speak Arabic, publishing some content in Arabic dramatically expands your reach with Saudi professionals who are less active on English-language content.</li>
 </ul>
 
-<h2>Mechanical Engineering Interview Questions</h2>
-<ul>
-<li><strong>"What experience do you have with rotating equipment maintenance?"</strong> Pumps, compressors, turbines, and motors are critical in Saudi Arabia's oil and gas sector. Be specific about equipment types, failure modes, and your maintenance strategy (preventive, predictive, or corrective).</li>
-<li><strong>"How do you select materials for a high-temperature, high-pressure application?"</strong> Discuss yield strength at elevated temperatures, thermal expansion coefficients, corrosion resistance, and compliance with ASME or API standards.</li>
-<li><strong>"What CAD tools have you used, and to what level of proficiency?"</strong> AutoCAD, SolidWorks, CATIA, and Inventor are all used across Gulf industry. Be specific about deliverables — 2D drawings, 3D models, assembly files — and any FEA simulation experience.</li>
-</ul>
-
-<h2>Electrical Engineering Interview Questions</h2>
-<ul>
-<li><strong>"Explain the difference between earthing and bonding."</strong> Earthing provides a safe path for fault current to flow to ground. Bonding connects metallic components to equalise potential and prevent sparking from potential differences.</li>
-<li><strong>"What experience do you have with SCADA systems?"</strong> Common in utility and oil and gas roles. Describe specific systems (Wonderware, Ignition, Siemens WinCC), what you monitored or controlled, and any incidents or improvements you managed.</li>
-<li><strong>"How do you conduct a load flow analysis?"</strong> Explain the purpose (verifying the system handles load demand within acceptable voltage and current limits), the software used (ETAP or PowerWorld), and how you interpret and act on the results.</li>
-</ul>
-
-<h2>Strong Questions to Ask Your Interviewer</h2>
-<p>When asked "do you have any questions for us?" — always have questions ready. Strong options include:</p>
-<ul>
-<li>"What does success look like in this role after the first 90 days?"</li>
-<li>"What are the biggest technical challenges the team is currently navigating?"</li>
-<li>"How does the company support continuing professional development and certifications?"</li>
-<li>"What is the typical career progression path from this position?"</li>
-</ul>
+<h2>Maintaining Your Network Long-Term</h2>
+<p>Gulf professional networks reward consistency. The contacts you built in your first year in Riyadh may be your most valuable career asset five years later — but only if you have maintained the relationship through occasional check-ins, congratulatory messages on promotions, and genuine engagement with their work.</p>
+<p>A practical approach: keep a simple list of your 20 most important professional relationships in the Gulf. Schedule a brief check-in with each person every 3–4 months, whether that is a LinkedIn message, a coffee meeting, or a WhatsApp note. It takes very little time and keeps relationships warm.</p>
 
 <div class="article-highlight">
-<p><strong>Final tip:</strong> Research the company thoroughly before your interview. Know their major projects, recent news, key clients, and Vision 2030 contracts they hold. Gulf employers genuinely value candidates who understand the business context, not just the technical role on offer.</p>
+  <p><strong>The long game:</strong> The most successful international professionals in Saudi Arabia consistently report that their best opportunities came through relationships built over 2–5 years, not through job applications. Invest in your Gulf network consistently, authentically, and patiently — the returns compound over time in ways that are difficult to quantify but impossible to miss.</p>
 </div>
       </article>
       <div class="article-highlight mt-4">
-        <p><strong>Ready to put this advice into action?</strong> Browse current job openings on <a href="/">JobOrbit</a> and connect directly with employers via WhatsApp, phone, or email.</p>
+        <p><strong>Ready to take action?</strong> Browse current job openings across Saudi Arabia and the Gulf on <a href="/">JobOrbit</a> — and apply directly to employers via WhatsApp, phone, or email.</p>
       </div>
     </div>
-    <div class="col-lg-4 pt-lg-0" style="padding-top:0">
+    <div class="col-lg-4">
       <div style="position:sticky;top:80px;padding-top:1rem">
         <div class="sidebar-widget">
   <div class="sidebar-widget-title">More Articles</div>
@@ -258,6 +239,7 @@
     </div>
   </div>
 </div>
+
 <footer class="site-footer">
   <div class="container">
     <div class="row g-4 align-items-start">
@@ -303,30 +285,10 @@
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-async function loadSettings() {
-  try {
-    const data = await fetch('/api/settings').then(r=>r.json());
-    const s = data.settings;
-    if (s.primary_color) document.documentElement.style.setProperty('--primary', s.primary_color);
-    if (s.secondary_color) document.documentElement.style.setProperty('--secondary', s.secondary_color);
-    if (s.site_name) {
-      document.querySelectorAll('.brand-name').forEach(el => el.textContent = s.site_name);
-      document.getElementById('footer-copy-name').textContent = s.site_name;
-    }
-    if (s.logo_url) { const l=document.getElementById('site-logo'); l.src=s.logo_url; l.classList.remove('d-none'); }
-    applyTheme(localStorage.getItem('theme') || s.default_theme || 'light', false);
-  } catch(e) {}
-}
-function applyTheme(t, save=true) {
-  document.documentElement.setAttribute('data-theme', t);
-  document.documentElement.style.colorScheme = t;
-  document.getElementById('themeIcon').className = t==='dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
-  if (save) localStorage.setItem('theme', t);
-}
-document.getElementById('themeToggle').addEventListener('click', ()=>{
-  applyTheme(document.documentElement.getAttribute('data-theme')==='dark' ? 'light' : 'dark');
-});
-document.getElementById('footerYear').textContent = new Date().getFullYear();
+async function loadSettings(){try{const d=await fetch('/api/settings').then(r=>r.json());const s=d.settings;if(s.primary_color)document.documentElement.style.setProperty('--primary',s.primary_color);if(s.site_name){document.querySelectorAll('.brand-name').forEach(e=>e.textContent=s.site_name);document.getElementById('footer-copy-name').textContent=s.site_name;}if(s.logo_url){const l=document.getElementById('site-logo');l.src=s.logo_url;l.classList.remove('d-none');}applyTheme(localStorage.getItem('theme')||s.default_theme||'light',false);}catch(e){}}
+function applyTheme(t,save=true){document.documentElement.setAttribute('data-theme',t);document.documentElement.style.colorScheme=t;document.getElementById('themeIcon').className=t==='dark'?'bi bi-sun-fill':'bi bi-moon-fill';if(save)localStorage.setItem('theme',t);}
+document.getElementById('themeToggle').addEventListener('click',()=>{applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');});
+document.getElementById('footerYear').textContent=new Date().getFullYear();
 loadSettings();
 </script>
 </body>
