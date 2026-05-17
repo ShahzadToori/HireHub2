@@ -13,6 +13,8 @@ const settingsRoutes = require('./routes/settings');
 const contactRoutes  = require('./routes/contact');
 const seoRoutes      = require('./routes/seo');
 const { router: alertsRouter, scheduleAutoDigest } = require('./routes/alerts');
+const reviewsRouter  = require('./routes/reviews');
+const blacklistRouter = require('./routes/blacklist');
 
 const app  = express();
 app.set('trust proxy', 1);
@@ -71,12 +73,14 @@ app.get('/api/public/form-schema', async (req, res) => {
 });
 
 // ── API Routes ────────────────────────────────────────────────
-app.use('/api/auth',     authRoutes);
-app.use('/api/jobs',     jobsRoutes);
-app.use('/api/admin',    adminRoutes);
-app.use('/api/settings', settingsRoutes);
-app.use('/api/contact',  contactRoutes);
-app.use('/api/alerts',   alertsRouter);
+app.use('/api/auth',      authRoutes);
+app.use('/api/jobs',      jobsRoutes);
+app.use('/api/admin',     adminRoutes);
+app.use('/api/settings',  settingsRoutes);
+app.use('/api/contact',   contactRoutes);
+app.use('/api/alerts',    alertsRouter);
+app.use('/api/reviews',   reviewsRouter);
+app.use('/api/blacklist', blacklistRouter);
 
 // ── SPA Fallback ──────────────────────────────────────────────
 app.get('/admin/*', (req, res) => {

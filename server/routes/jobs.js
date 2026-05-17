@@ -169,6 +169,62 @@ router.get('/cities', async (req, res) => {
   }
 });
 
+// GET /api/jobs/job-of-day  – Phase 6: featured job of the day
+router.get('/job-of-day', async (req, res) => {
+  try {
+    // Prefer featured/sponsored jobs, ordered by views
+    let [rows] = await db.query(
+      `SELECT j.id, j.title, j.company, j.location, j.job_type,
+              j.slug, j.created_at, j.salary, j.visa_sponsored,
+              j.whatsapp, j.phone, j.email, c.name AS category
+         FROM jobs j JOIN categories c ON j.category_id = c.id
+        WHERE j.status = 'active' AND (j.featured = 1 OR j.sponsored = 1)
+        ORDER BY j.views DESC, j.created_at DESC LIMIT 1`
+    );
+    // Fallback to most-viewed active job
+    if (rows.length === 0) {
+      [rows] = await db.query(
+        `SELECT j.id, j.title, j.company, j.location, j.job_type,
+                j.slug, j.created_at, j.salary, j.visa_sponsored,
+                j.whatsapp, j.phone, j.email, c.name AS category
+           FROM jobs j JOIN categories c ON j.category_id = c.id
+          WHERE j.status = 'active'
+          ORDER BY j.views DESC, j.created_at DESC LIMIT 1`
+      );
+    }
+    if (rows.length === 0) return res.json({ success: false });
+    res.json({ success: true, job: rows[0] });
+  } catch (err) {
+    console.error('[job-of-day]', err.message);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+// GET /api/jobs/trends  – Phase 6: hiring trends for chart + top categories
+router.get('/trends', async (req, res) => {
+  try {
+    const [monthly] = await db.query(
+      `SELECT DATE_FORMAT(created_at, '%b %Y') AS label,
+              DATE_FORMAT(created_at, '%Y-%m') AS month,
+              COUNT(*) AS count
+         FROM jobs
+        WHERE created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
+        GROUP BY month, label ORDER BY month ASC`
+    );
+    const [topCategories] = await db.query(
+      `SELECT c.name, COUNT(*) AS count
+         FROM jobs j JOIN categories c ON j.category_id = c.id
+        WHERE j.status = 'active'
+          AND j.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+        GROUP BY c.id, c.name ORDER BY count DESC LIMIT 6`
+    );
+    res.json({ success: true, months: monthly, topCategories });
+  } catch (err) {
+    console.error('[trends]', err.message);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
 // POST /api/jobs/submit  – public job submission (status = pending, admin reviews)
 router.post('/submit', async (req, res) => {
   try {

@@ -183,8 +183,37 @@
     .share-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
     /* ═══════════════════════════════════════════
-      
+       PHASE 6 — JOB OF THE DAY
+    ═══════════════════════════════════════════ */
+    .jotd-card{background:linear-gradient(135deg,var(--bg-card) 0%,var(--surface) 100%);border:1.5px solid var(--primary);border-radius:18px;padding:1.5rem 2rem;display:flex;align-items:center;gap:1.5rem;box-shadow:0 4px 24px rgba(15,98,254,.1);cursor:pointer;transition:transform .18s,box-shadow .18s;position:relative;overflow:hidden}
+    .jotd-card::before{content:"🌟";position:absolute;right:1.5rem;top:1rem;font-size:1.5rem;opacity:.15}
+    .jotd-card:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(15,98,254,.18)}
+    @media(max-width:576px){.jotd-card{flex-direction:column;align-items:flex-start;padding:1.25rem}}
+    .jotd-badge{display:inline-flex;align-items:center;gap:.3rem;background:var(--primary);color:#fff;font-size:.65rem;font-weight:700;padding:.2rem .65rem;border-radius:100px;letter-spacing:.05em;text-transform:uppercase;margin-bottom:.5rem}
+    .jotd-title{font-family:"Syne",sans-serif;font-weight:800;font-size:1.2rem;color:var(--text-primary);margin-bottom:.35rem}
+    .jotd-meta{display:flex;flex-wrap:wrap;gap:.6rem;font-size:.82rem;color:var(--text-muted)}
+    .jotd-meta span{display:flex;align-items:center;gap:.25rem}
+    .jotd-cta{margin-left:auto;flex-shrink:0;background:var(--primary);color:#fff;padding:.6rem 1.5rem;border-radius:10px;font-family:"Syne",sans-serif;font-weight:700;font-size:.88rem;border:none;cursor:pointer;white-space:nowrap;transition:background .15s}
+    .jotd-cta:hover{background:#0353e9}
+    @media(max-width:576px){.jotd-cta{width:100%;margin-left:0}}
+    /* ═══════════════════════════════════════════
+       PHASE 6 — TRUST SCORE BADGE
+    ═══════════════════════════════════════════ */
+    .trust-score{display:inline-flex;align-items:center;gap:.2rem;font-size:.68rem;font-weight:700;border-radius:100px;padding:.18rem .6rem}
+    .trust-high{background:rgba(16,185,129,.1);color:#059669;border:1px solid rgba(16,185,129,.25)}
+    .trust-medium{background:rgba(245,158,11,.1);color:#d97706;border:1px solid rgba(245,158,11,.25)}
+    .trust-low{background:rgba(107,114,128,.1);color:#6b7280;border:1px solid rgba(107,114,128,.2)}
+    /* ═══════════════════════════════════════════
+       PHASE 6 — TOP CATEGORIES WIDGET
+    ═══════════════════════════════════════════ */
+    .top-cat-item{display:flex;align-items:center;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid var(--border);font-size:.84rem}
+    .top-cat-item:last-child{border-bottom:none}
+    .top-cat-name{color:var(--text-secondary)}
+    .top-cat-bar-wrap{flex:1;margin:0 .75rem;height:6px;background:var(--border);border-radius:3px}
+    .top-cat-bar{height:100%;background:var(--primary);border-radius:3px;transition:width .6s ease}
+    .top-cat-count{font-weight:700;color:var(--text-primary);font-size:.78rem}
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
 
@@ -328,6 +357,19 @@
 </section>
 
 <!-- ══════════════════════════════════════════════
+     JOB OF THE DAY
+════════════════════════════════════════════════ -->
+<section class="py-4 d-none" id="jobOfDaySection" aria-label="Job of the Day">
+  <div class="container">
+    <div class="section-header mb-3">
+      <span class="section-tag">🌟 Daily Pick</span>
+      <h2 class="section-title">Job of the Day</h2>
+    </div>
+    <div id="jobOfDayCard"><!-- injected by JS --></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
      CATEGORIES
 ════════════════════════════════════════════════ -->
 <section class="categories-section py-4" id="categories" aria-label="Job Categories">
@@ -353,6 +395,52 @@
     </div>
     <div class="cities-grid" id="citiesGrid">
       <!-- Injected by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     HIRING TRENDS
+════════════════════════════════════════════════ -->
+<section class="py-4 d-none" id="hiringTrendsSection" aria-label="Hiring Trends">
+  <div class="container">
+    <div class="section-header mb-3">
+      <span class="section-tag">📈 Market Data</span>
+      <h2 class="section-title">Hiring Trends</h2>
+    </div>
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <div class="sidebar-widget">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="widget-title mb-0">Monthly Job Postings</h5>
+            <span style="font-size:.75rem;color:var(--text-muted)">Last 6 months</span>
+          </div>
+          <canvas id="hiringTrendsChart" height="200"></canvas>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="sidebar-widget">
+          <h5 class="widget-title">Top Categories This Month</h5>
+          <div id="topCatsWidget"><!-- injected by JS --></div>
+        </div>
+        <div class="sidebar-widget mt-3">
+          <h5 class="widget-title">Community Tools</h5>
+          <a href="/employers/reviews.html" style="display:flex;align-items:center;gap:.75rem;padding:.65rem .75rem;background:var(--surface);border:1px solid var(--border);border-radius:10px;text-decoration:none;margin-bottom:.5rem;transition:border-color .15s" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor=''">
+            <i class="bi bi-star-fill" style="color:#f59e0b;font-size:1.1rem"></i>
+            <div>
+              <div style="font-size:.85rem;font-weight:700;color:var(--text-primary)">Employer Reviews</div>
+              <div style="font-size:.72rem;color:var(--text-muted)">Rate your employer anonymously</div>
+            </div>
+          </a>
+          <a href="/employers/blacklist.html" style="display:flex;align-items:center;gap:.75rem;padding:.65rem .75rem;background:var(--surface);border:1px solid var(--border);border-radius:10px;text-decoration:none;transition:border-color .15s" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor=''">
+            <i class="bi bi-shield-exclamation" style="color:#dc2626;font-size:1.1rem"></i>
+            <div>
+              <div style="font-size:.85rem;font-weight:700;color:var(--text-primary)">Blacklisted Companies</div>
+              <div style="font-size:.72rem;color:var(--text-muted)">Check before you accept an offer</div>
+            </div>
+          </a>
+        </div>
+      </div>
     </div>
   </div>
 </section>

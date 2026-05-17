@@ -611,10 +611,17 @@ function renderJobCard(job, isFeaturedSection = false) {
   // ── WhatsApp Quick Apply ──────────────────────────────────
   
 
+  // ── Trust Score badge ─────────────────────────────────────
+  const trustScore = calcTrustScore(job);
+  const trustHtml  = trustScore
+    ? `<span class="trust-score trust-${trustScore.level}" title="Employer transparency score">
+         <i class="bi bi-shield-check me-1"></i>${trustScore.label}
+       </span>` : '';
+
   return `
     <div class="${cardClass}" data-id="${job.id}" data-slug="${job.slug || ''}" role="button" tabindex="0"
          aria-label="View ${escHtml(job.title)} at ${escHtml(job.company)}">
-      <div class="card-badges">${badges}</div>
+      <div class="card-badges">${badges}${trustHtml ? ' ' + trustHtml : ''}</div>
       <button class="btn-report-job" onclick="reportJob('${job.id}','${escHtml(job.title).replace(/'/g,"\\'")}',event)" title="Report this listing" aria-label="Report job"><i class="bi bi-flag"></i></button>
       <div class="card-title">${escHtml(job.title)}</div>
       <div class="card-company"><i class="bi bi-building me-1"></i>${escHtml(job.company)}</div>
@@ -643,6 +650,25 @@ function getCityFlag(location) {
   if (/bahrain|manama/i.test(loc))                                            return '🇧🇭 ';
   if (/muscat|oman/i.test(loc))                                               return '🇴🇲 ';
   return '';
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PHASE 6 — TRUST SCORE
+   Scores each job by how much info the employer provided
+══════════════════════════════════════════════════════════════ */
+function calcTrustScore(job) {
+  let score = 0;
+  if (job.salary)         score += 25;  // salary disclosed
+  if (job.visa_sponsored) score += 20;  // visa status clear
+  if (job.phone)          score += 10;  // direct phone
+  if (job.whatsapp)       score += 10;  // WhatsApp contact
+  if (job.email)          score += 10;  // email contact
+  if (job.map_link)       score += 10;  // location verified
+  if (job.description && job.description.length > 200) score += 15; // detailed JD
+  if (score === 0) return null;
+  if (score >= 70) return { level: 'high',   label: 'Transparent' };
+  if (score >= 40) return { level: 'medium', label: 'Partial Info' };
+  return               { level: 'low',    label: 'Low Info' };
 }
 
 async function loadCitiesSection() {
@@ -722,13 +748,24 @@ async function openJobModal(jobId) {
     const card = document.querySelector(`.job-card[data-id="${jobId}"]`);
     const slug = card ? card.dataset.slug : null;
     if (!slug) return;
-    const data = await api.get(`/api/jobs/${slug}`);
-    if (!data.success) return;
-    trackRecentlyViewed(data.job); // Phase 2
-    populateModal(data.job);
-    new bootstrap.Modal($('#jobModal')).show();
+    await openJobBySlug(slug);
   } catch (e) {
     console.warn(e);
+  }
+}
+
+// Opens modal directly from a slug — used by Job of the Day,
+// Recently Viewed, Similar Jobs, and any card without a .job-card wrapper
+async function openJobBySlug(slug) {
+  try {
+    if (!slug) return;
+    const data = await api.get(`/api/jobs/${slug}`);
+    if (!data.success) return;
+    trackRecentlyViewed(data.job);
+    populateModal(data.job);
+    bootstrap.Modal.getOrCreateInstance($('#jobModal')).show();
+  } catch (e) {
+    console.warn('[openJobBySlug]', e);
   }
 }
 
@@ -1160,6 +1197,117 @@ function showSkeletons(count = 6) {
 }
 
 /* ══════════════════════════════════════════════════════════════
+   PHASE 6 — JOB OF THE DAY
+══════════════════════════════════════════════════════════════ */
+async function loadJobOfDay() {
+  try {
+    const data = await cachedGet('/api/jobs/job-of-day', 3600000); // cache 1 hour
+    if (!data.success || !data.job) return;
+    const job = data.job;
+    const section = document.getElementById('jobOfDaySection');
+    const card    = document.getElementById('jobOfDayCard');
+    if (!section || !card) return;
+
+    const flag = getCityFlag(job.location);
+    const salaryHtml = job.salary
+      ? `<span><i class="bi bi-cash-stack"></i>${escHtml(job.salary)}</span>` : '';
+
+    card.innerHTML = `
+      <div class="jotd-card" onclick="openJobBySlug('${job.slug}')">
+        <div style="flex:1;min-width:0">
+          <div class="jotd-badge"><i class="bi bi-star-fill me-1"></i>Job of the Day</div>
+          <div class="jotd-title">${escHtml(job.title)}</div>
+          <div class="jotd-meta">
+            <span><i class="bi bi-building"></i>${escHtml(job.company)}</span>
+            <span><i class="bi bi-geo-alt"></i>${flag}${escHtml(job.location)}</span>
+            <span><i class="bi bi-briefcase"></i>${escHtml(job.job_type || 'Full-time')}</span>
+            ${salaryHtml}
+            <span><i class="bi bi-clock"></i>${timeAgo(job.created_at)}</span>
+          </div>
+        </div>
+        <button class="jotd-cta" onclick="event.stopPropagation();openJobBySlug('${job.slug}')">
+          View Job <i class="bi bi-arrow-right ms-1"></i>
+        </button>
+      </div>`;
+    section.classList.remove('d-none');
+  } catch (e) { /* silent — non-critical */ }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PHASE 6 — HIRING TRENDS GRAPH
+══════════════════════════════════════════════════════════════ */
+let trendsChart = null;
+
+async function loadHiringTrends() {
+  try {
+    const data = await cachedGet('/api/jobs/trends', 3600000); // cache 1 hour
+    if (!data.success || !data.months) return;
+
+    const section = document.getElementById('hiringTrendsSection');
+    if (!section) return;
+    section.classList.remove('d-none');
+
+    // ── Monthly chart ────────────────────────────────────────
+    const canvas = document.getElementById('hiringTrendsChart');
+    if (canvas && typeof Chart !== 'undefined') {
+      const isDark  = document.documentElement.getAttribute('data-theme') === 'dark';
+      const gridCol = isDark ? 'rgba(255,255,255,.08)' : 'rgba(0,0,0,.06)';
+      const textCol = isDark ? '#94a3b8' : '#64748b';
+
+      if (trendsChart) trendsChart.destroy();
+      trendsChart = new Chart(canvas, {
+        type: 'bar',
+        data: {
+          labels: data.months.map(m => m.label),
+          datasets: [{
+            label: 'Jobs Posted',
+            data:  data.months.map(m => m.count),
+            backgroundColor: 'rgba(15,98,254,.75)',
+            borderRadius: 6,
+            borderSkipped: false
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: ctx => ` ${ctx.parsed.y} jobs posted`
+              }
+            }
+          },
+          scales: {
+            x: { grid: { color: gridCol }, ticks: { color: textCol } },
+            y: { grid: { color: gridCol }, ticks: { color: textCol, precision: 0 }, beginAtZero: true }
+          }
+        }
+      });
+    }
+
+    // ── Top categories bar widget ─────────────────────────────
+    const topCats = document.getElementById('topCatsWidget');
+    if (topCats && data.topCategories?.length) {
+      const max = data.topCategories[0].count;
+      topCats.innerHTML = data.topCategories.slice(0, 6).map(c => `
+        <div class="top-cat-item">
+          <span class="top-cat-name">${escHtml(c.name)}</span>
+          <div class="top-cat-bar-wrap">
+            <div class="top-cat-bar" style="width:${Math.round((c.count/max)*100)}%"></div>
+          </div>
+          <span class="top-cat-count">${c.count}</span>
+        </div>`).join('');
+    }
+
+    // Re-render chart on theme toggle
+    document.getElementById('themeToggle')?.addEventListener('click', () => {
+      setTimeout(() => loadHiringTrends(), 100);
+    });
+
+  } catch (e) { /* silent — non-critical */ }
+}
+
+/* ══════════════════════════════════════════════════════════════
    PAGINATION
 ══════════════════════════════════════════════════════════════ */
 function buildPagination(currentPage, totalPages) {
@@ -1370,6 +1518,8 @@ async function init() {
   // Non-critical — run after without blocking
   loadCitiesSection();
   renderRecentlyViewed();
+  loadJobOfDay();       // Phase 6
+  loadHiringTrends();   // Phase 6
 
   // Populate alerts category dropdown
   const alertCat = document.getElementById('alertCategorySelect');
