@@ -160,7 +160,8 @@
     .mbn-item i{font-size:1.25rem;transition:transform .15s}
     .mbn-item.active,.mbn-item:hover{color:var(--primary)}
     .mbn-item.active i,.mbn-item:hover i{transform:translateY(-2px)}
-    .mbn-wa{color:#25d366!important}
+    .mbn-alert{color:var(--primary)!important}
+    .mbn-alert:hover i,.mbn-alert:hover{color:var(--primary)!important}
     /* ── Share ─────────────────────────────────────────────── */
     .share-wrap{position:relative;display:inline-block}
     .btn-share{display:inline-flex;align-items:center;gap:.35rem;padding:.45rem .9rem;border-radius:9px;font-size:.82rem;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text-primary);transition:background .15s,color .15s;white-space:nowrap}
@@ -180,6 +181,9 @@
     .share-hr{margin:.4rem 0;border-color:var(--border)}
     .share-toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(20px);background:#161616;color:#fff;padding:.55rem 1.25rem;border-radius:100px;font-size:.82rem;font-weight:600;opacity:0;transition:all .25s;z-index:99999;pointer-events:none;white-space:nowrap}
     .share-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+    /* ═══════════════════════════════════════════
+      
   </style>
 </head>
 <body>
@@ -218,6 +222,7 @@
         <li class="nav-item"><a class="nav-link nav-link-active" href="#jobs">Browse Jobs</a></li>
         <li class="nav-item"><a class="nav-link" href="#categories">Categories</a></li>
         <li class="nav-item"><a class="nav-link" href="/blog/">Blog</a></li>
+        <li class="nav-item"><a class="nav-link" href="/tools/">Tools</a></li>
         <li class="nav-item"><a class="nav-link" href="/contact.html">Post a Job</a></li>
         <li class="nav-item"><a class="nav-link" href="/feedback.html">Feedback</a></li>
         <li class="nav-item"><a class="nav-link" href="/about.html">About</a></li>
@@ -541,6 +546,7 @@
           <li><a href="#jobs">Browse Jobs</a></li>
           <li><a href="#categories">Categories</a></li>
           <li><a href="/blog/">Blog</a></li>
+          <li><a href="/tools/">Career Tools</a></li>
           <li><a href="/contact.html">Post a Job</a></li>
           <!-- <li><a href="/admin" target="_blank">Admin Panel</a></li> -->
         </ul>
@@ -620,7 +626,7 @@
      PHASE 2 — MOBILE BOTTOM NAV
 ════════════════════════════════════════════════ -->
 <nav class="mobile-bottom-nav" aria-label="Mobile navigation">
-  <a href="#jobs" class="mbn-item active" onclick="document.getElementById('jobs').scrollIntoView({behavior:'smooth'});return false">
+  <a href="#jobs" class="mbn-item" onclick="document.getElementById('jobs').scrollIntoView({behavior:'smooth'});return false">
     <i class="bi bi-briefcase-fill"></i>
     <span>Jobs</span>
   </a>
@@ -628,7 +634,7 @@
     <i class="bi bi-grid-fill"></i>
     <span>Browse</span>
   </a>
-  <button class="mbn-item mbn-wa" onclick="openAlertsModal()" aria-label="Get email job alerts" style="color:var(--primary)!important">
+  <button class="mbn-item mbn-alert" onclick="openAlertsModal()" aria-label="Get email job alerts">
     <i class="bi bi-envelope-fill"></i>
     <span>Alerts</span>
   </button>

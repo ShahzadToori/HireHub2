@@ -1049,7 +1049,13 @@ window.clearSearchHistory = function() {
    PHASE 2 — WHATSAPP JOB ALERTS
 ══════════════════════════════════════════════════════════════ */
 window.openAlertsModal = function() {
-  const modal = new bootstrap.Modal(document.getElementById('alertsModal'));
+  const el = document.getElementById('alertsModal');
+  if (!el) {
+    console.warn('[alerts] Modal element #alertsModal not found in page');
+    return;
+  }
+  // getOrCreateInstance prevents duplicate modal instances on repeat clicks
+  const modal = bootstrap.Modal.getOrCreateInstance(el);
   // Pre-fill category if one is active
   const catSel = document.getElementById('alertCategorySelect');
   if (catSel && state.filters.category) catSel.value = state.filters.category;
@@ -1376,8 +1382,66 @@ async function init() {
     });
   }
 
+  // Fix: Mobile bottom nav active tab
+  initMobileNavActive();
+
 }
 
+/* ══════════════════════════════════════════════════════════════
+   MOBILE BOTTOM NAV — ACTIVE TAB
+   Uses IntersectionObserver to highlight the correct tab
+   as user scrolls through sections
+══════════════════════════════════════════════════════════════ */
+function initMobileNavActive() {
+  const mbnItems = document.querySelectorAll('.mobile-bottom-nav .mbn-item');
+  if (!mbnItems.length) return;
 
+  // Map section IDs to nav item index
+  const sectionMap = {
+    'jobs':       0,  // Jobs tab
+    'featured':   0,  // also Jobs
+    'categories': 1,  // Browse tab
+    'cities':     1,  // also Browse
+  };
+
+  // Set active tab by index
+  function setActive(idx) {
+    mbnItems.forEach((item, i) => {
+      item.classList.toggle('active', i === idx);
+    });
+  }
+
+  // Click handlers — set active immediately on tap
+  mbnItems.forEach((item, idx) => {
+    item.addEventListener('click', () => {
+      // Don't set active on Alerts button (index 2) or Theme (index 4)
+      // Those are actions, not navigation
+      if (idx !== 2 && idx !== 4) {
+        setActive(idx);
+      }
+    });
+  });
+
+  // IntersectionObserver — auto-update active as user scrolls
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const idx = sectionMap[entry.target.id];
+        if (idx !== undefined) setActive(idx);
+      }
+    });
+  }, {
+    threshold: 0.3  // section must be 30% visible to trigger
+  });
+
+  // Observe the key sections
+  ['jobs', 'categories', 'cities', 'featured'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) observer.observe(el);
+  });
+
+  // Set Jobs as default active on load
+  setActive(0);
+}
 
 document.addEventListener('DOMContentLoaded', init);

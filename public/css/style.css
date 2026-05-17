@@ -1040,24 +1040,48 @@ img { max-width: 100%; }
   border-top: 1px solid var(--border);
 }
 
-/* Force solid background for mobile menu */
-@media (max-width: 991.98px) {
-  #navMenu.navbar-collapse.show {
-    background: var(--bg-card) !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    padding: 1rem;
-    border-radius: 8px;
-    margin-top: 0.5rem;
-    box-shadow: var(--shadow);
-    border: 1px solid var(--border);
-  }
-}
+
 
 @media (max-width: 991.98px) {
   #mainNav {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     background: var(--bg-nav) !important;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   MOBILE NAVBAR — DROPDOWN BACKGROUND FIX
+   Applies to ALL pages sitewide
+═══════════════════════════════════════════ */
+@media (max-width: 991.98px) {
+  #navMenu {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: .75rem 1rem 1rem;
+    margin-top: .5rem;
+    box-shadow: 0 8px 28px rgba(0,0,0,.14);
+  }
+  [data-theme="dark"] #navMenu {
+    box-shadow: 0 8px 28px rgba(0,0,0,.45);
+  }
+  #navMenu .nav-link {
+    padding: .6rem .85rem;
+    border-radius: 9px;
+    font-size: .92rem;
+  }
+  #navMenu .nav-link:hover {
+    background: var(--surface);
+    color: var(--primary);
+  }
+  #navMenu .nav-link-active {
+    background: var(--surface);
+    color: var(--primary) !important;
+  }
+  #navMenu .nav-item + .nav-item {
+    border-top: 1px solid var(--border);
+    margin-top: .15rem;
+    padding-top: .15rem;
   }
 }

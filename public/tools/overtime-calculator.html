@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Overtime Pay Calculator Saudi Arabia — Saudi Labour Law 2026 - JobOrbit</title>
+  <meta name="description" content="Calculate your legal overtime pay in Saudi Arabia. Based on Saudi Labour Law — 150% regular, 200% for public holidays. Free and instant.">
+  <meta name="robots" content="index, follow, max-snippet:-1">
+  <link rel="canonical" href="/tools/overtime-calculator.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Overtime Pay Calculator Saudi Arabia — Saudi Labour Law 2026">
+  <meta property="og:description" content="Calculate your legal overtime pay in Saudi Arabia. Based on Saudi Labour Law — 150% regular, 200% for public holidays. Free and instant.">
+  <meta property="og:site_name" content="JobOrbit">
+  <meta name="twitter:card" content="summary">
+  <link rel="icon" type="image/svg+xml" href="/JobOrbitFavicon.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0f62fe">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+  /* Tool hero */
+  .tool-hero{background:linear-gradient(135deg,#0d1117 0%,#161b22 55%,#0f2744 100%);padding:3.5rem 0 2.75rem;position:relative;overflow:hidden;text-align:center}
+  .tool-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(15,98,254,.2),transparent 70%)}
+  .tool-hero-inner{position:relative}
+  .tool-badge{display:inline-flex;align-items:center;gap:.4rem;background:rgba(15,98,254,.18);border:1px solid rgba(15,98,254,.3);border-radius:100px;padding:.28rem .85rem;font-size:.72rem;font-weight:700;color:#60a5fa;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.9rem}
+  .tool-hero h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.7rem,4vw,2.8rem);color:#fff;line-height:1.12;margin-bottom:.6rem}
+  .tool-hero p{color:rgba(255,255,255,.6);font-size:.95rem;max-width:540px;margin:0 auto}
+  /* Calculator card */
+  .calc-card{background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:2.25rem;box-shadow:var(--shadow)}
+  @media(max-width:576px){.calc-card{padding:1.5rem 1.25rem;border-radius:14px}}
+  /* Form fields */
+  .calc-label{font-size:.82rem;font-weight:700;color:var(--text-secondary);margin-bottom:.4rem;display:block;letter-spacing:.02em}
+  .calc-input,.calc-select{width:100%;padding:.7rem .95rem;border:1.5px solid var(--border);border-radius:11px;background:var(--bg-card);color:var(--text-primary);font-family:'DM Sans',sans-serif;font-size:.93rem;outline:none;transition:border-color .18s,box-shadow .18s;appearance:none}
+  .calc-input:focus,.calc-select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(15,98,254,.12)}
+  /* Result box */
+  .result-box{background:linear-gradient(135deg,rgba(15,98,254,.08),rgba(15,98,254,.04));border:1.5px solid rgba(15,98,254,.2);border-radius:14px;padding:1.5rem;margin-top:1.5rem;display:none}
+  .result-box.show{display:block;animation:fadeUp .25s ease}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  .result-main{font-family:'Syne',sans-serif;font-weight:800;font-size:2rem;color:var(--primary);margin-bottom:.25rem}
+  .result-label{font-size:.82rem;color:var(--text-muted);margin-bottom:1rem}
+  .result-row{display:flex;justify-content:space-between;align-items:center;padding:.45rem 0;border-bottom:1px solid var(--border);font-size:.875rem}
+  .result-row:last-child{border-bottom:none}
+  .result-row-label{color:var(--text-secondary)}
+  .result-row-val{font-weight:700;color:var(--text-primary)}
+  .result-row-val.green{color:#059669}
+  .result-row-val.blue{color:var(--primary)}
+  /* Calc button */
+  .btn-calc{width:100%;padding:.85rem;background:var(--primary);color:#fff;border:none;border-radius:11px;font-family:'Syne',sans-serif;font-weight:700;font-size:.97rem;cursor:pointer;transition:background .15s,transform .12s,box-shadow .15s;margin-top:.25rem}
+  .btn-calc:hover{background:#0353e9;transform:translateY(-1px);box-shadow:0 6px 20px rgba(15,98,254,.28)}
+  /* Info box */
+  .info-box{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.25);border-radius:10px;padding:.85rem 1rem;font-size:.82rem;color:var(--text-secondary);margin-top:1.25rem;display:flex;gap:.65rem}
+  .info-box i{color:#d97706;flex-shrink:0;margin-top:.1rem}
+  /* Related tools */
+  .related-tool{display:flex;align-items:center;gap:.85rem;padding:.85rem 1rem;background:var(--surface);border:1px solid var(--border);border-radius:12px;text-decoration:none;transition:border-color .15s,transform .15s;margin-bottom:.6rem}
+  .related-tool:hover{border-color:var(--primary);transform:translateX(3px);text-decoration:none}
+  .related-tool-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.05rem;flex-shrink:0}
+  .related-tool-title{font-weight:700;font-size:.88rem;color:var(--text-primary);display:block}
+  .related-tool-desc{font-size:.75rem;color:var(--text-muted)}
+  /* Sidebar widget */
+  .sidebar-widget{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:1.25rem;margin-bottom:1.25rem}
+  .sidebar-widget-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:.85rem}
+</style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg sticky-top" id="mainNav">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+      <img id="site-logo" src="" alt="Logo" class="d-none" style="max-height:36px">
+    </a>
+    <div class="d-flex align-items-center gap-2 ms-auto">
+      <button class="btn btn-icon theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <i class="bi bi-moon-fill" id="themeIcon"></i>
+      </button>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <i class="bi bi-list fs-4"></i>
+      </button>
+    </div>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+        <li class="nav-item"><a class="nav-link" href="/">Browse Jobs</a></li>
+        <li class="nav-item"><a class="nav-link" href="/blog/">Blog</a></li>
+        <li class="nav-item"><a class="nav-link nav-link-active" href="/tools/">Tools</a></li>
+        <li class="nav-item"><a class="nav-link" href="/contact.html">Post a Job</a></li>
+        <li class="nav-item"><a class="nav-link" href="/about.html">About</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<section class="tool-hero">
+  <div class="container tool-hero-inner">
+    <div class="tool-badge"><i class="bi bi-clock-history me-1"></i>Overtime Calculator</div>
+    <h1>Overtime Pay Calculator — Saudi Arabia</h1>
+    <p>Calculate your legal overtime pay based on Saudi Labour Law. Regular overtime is 150%, public holidays are 200%.</p>
+  </div>
+</section>
+
+<div class="container py-5">
+  <div class="row g-4 g-lg-5">
+    <div class="col-lg-8">
+      <div class="calc-card">
+        <h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;color:var(--text-primary);margin-bottom:.4rem">Overtime Pay Calculator</h2>
+        <p style="font-size:.88rem;color:var(--text-muted);margin-bottom:1.5rem">Based on Saudi Labour Law — 150% for regular overtime, 200% for holidays</p>
+
+        <div class="row g-3">
+          <div class="col-sm-6">
+            <label class="calc-label" for="otBasic">Basic Monthly Salary (SAR)</label>
+            <input type="number" class="calc-input" id="otBasic" placeholder="e.g. 8000" min="0">
+          </div>
+          <div class="col-sm-6">
+            <label class="calc-label" for="otHours">Overtime Hours</label>
+            <input type="number" class="calc-input" id="otHours" placeholder="e.g. 20" min="0" step="0.5">
+          </div>
+          <div class="col-12">
+            <label class="calc-label" for="otType">Overtime Type</label>
+            <select class="calc-select" id="otType">
+              <option value="regular">Regular Overtime (weekdays) — 150%</option>
+              <option value="friday">Friday Overtime — 150%</option>
+              <option value="holiday">Public Holiday — 200%</option>
+              <option value="ramadan">Ramadan (reduced hours) — 150%</option>
+            </select>
+          </div>
+          <div class="col-sm-6">
+            <label class="calc-label" for="otWorkDays">Working Days per Month</label>
+            <select class="calc-select" id="otWorkDays">
+              <option value="26">26 days (standard)</option>
+              <option value="25">25 days</option>
+              <option value="22">22 days (5-day week)</option>
+              <option value="30">30 days</option>
+            </select>
+          </div>
+          <div class="col-sm-6">
+            <label class="calc-label" for="otWorkHours">Working Hours per Day</label>
+            <select class="calc-select" id="otWorkHours">
+              <option value="8">8 hours (standard)</option>
+              <option value="9">9 hours</option>
+              <option value="6">6 hours (Ramadan)</option>
+            </select>
+          </div>
+          <div class="col-12">
+            <button class="btn-calc" onclick="calcOT()"><i class="bi bi-clock-history me-2"></i>Calculate Overtime Pay</button>
+          </div>
+        </div>
+
+        <div class="result-box" id="otResult">
+          <div class="result-main" id="otTotal">SAR 0</div>
+          <div class="result-label">Total Overtime Pay Owed</div>
+          <div id="otBreakdown"></div>
+        </div>
+
+        <div class="info-box mt-3">
+          <i class="bi bi-info-circle-fill"></i>
+          <div>Saudi Labour Law caps work at <strong>12 hours per day maximum</strong> including overtime. Employees cannot be compelled to work more than this limit.</div>
+        </div>
+      </div>
+
+      <div class="calc-card mt-4">
+        <h2 style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;color:var(--text-primary);margin-bottom:1rem">Overtime Rules in Saudi Arabia</h2>
+        <div style="font-size:.88rem;color:var(--text-secondary);line-height:1.75">
+          <ul style="padding-left:1.25rem">
+            <li>Standard working day is <strong>8 hours</strong>, maximum 48 hours per week.</li>
+            <li>During Ramadan, Muslim employees work <strong>6 hours per day maximum</strong>.</li>
+            <li>Regular overtime is paid at <strong>150%</strong> of the hourly rate.</li>
+            <li>Work on public holidays is paid at <strong>200%</strong> of the hourly rate.</li>
+            <li>Maximum working day including overtime is <strong>12 hours</strong>.</li>
+            <li>Overtime must be mutually agreed — employers cannot compel unlimited overtime.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="sidebar-widget">
+        <div class="sidebar-widget-title">Other Tools</div>
+        <a href="/tools/eosb-calculator.html" class="related-tool">
+          <div class="related-tool-icon" style="background:rgba(16,185,129,.1);color:#059669"><i class="bi bi-cash-stack"></i></div>
+          <div><span class="related-tool-title">EOSB Calculator</span><span class="related-tool-desc">End of service gratuity</span></div>
+        </a>
+        <a href="/tools/salary-calculator.html" class="related-tool">
+          <div class="related-tool-icon" style="background:rgba(15,98,254,.1);color:var(--primary)"><i class="bi bi-currency-dollar"></i></div>
+          <div><span class="related-tool-title">Salary Calculator</span><span class="related-tool-desc">Gulf salary benchmarks</span></div>
+        </a>
+        <a href="/tools/net-salary-calculator.html" class="related-tool">
+          <div class="related-tool-icon" style="background:rgba(139,92,246,.1);color:#7c3aed"><i class="bi bi-wallet2"></i></div>
+          <div><span class="related-tool-title">Net Salary Calculator</span><span class="related-tool-desc">Take-home after GOSI</span></div>
+        </a>
+        <a href="/tools/overtime-calculator.html" class="related-tool">
+          <div class="related-tool-icon" style="background:rgba(245,158,11,.1);color:#d97706"><i class="bi bi-clock-history"></i></div>
+          <div><span class="related-tool-title">Overtime Calculator</span><span class="related-tool-desc">Legal overtime pay</span></div>
+        </a>
+        <a href="/tools/notice-period-calculator.html" class="related-tool">
+          <div class="related-tool-icon" style="background:rgba(239,68,68,.1);color:#dc2626"><i class="bi bi-calendar-check"></i></div>
+          <div><span class="related-tool-title">Notice Period Calculator</span><span class="related-tool-desc">Last working day</span></div>
+        </a>
+      </div>
+      <div class="sidebar-widget">
+        <div class="sidebar-widget-title">Find a Job</div>
+        <p style="font-size:.85rem;color:var(--text-secondary);margin-bottom:1rem">Browse thousands of verified jobs in Saudi Arabia and the Gulf.</p>
+        <a href="/" style="display:flex;align-items:center;justify-content:center;gap:.5rem;padding:.75rem;background:var(--primary);color:#fff;border-radius:11px;font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;text-decoration:none">
+          <i class="bi bi-briefcase-fill"></i> Browse Jobs
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="row g-4 align-items-start">
+      <div class="col-md-4">
+        <div class="footer-brand mb-2"><span class="brand-name" id="footer-site-name">JobOrbit</span></div>
+        <p class="footer-desc">Connecting talent with opportunity across the Gulf region.</p>
+      </div>
+      <div class="col-md-4">
+        <h6 class="footer-heading">Quick Links</h6>
+        <ul class="footer-links">
+          <li><a href="/">Browse Jobs</a></li>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/tools/">Career Tools</a></li>
+          <li><a href="/contact.html">Post a Job</a></li>
+        </ul>
+      </div>
+      <div class="col-md-4">
+        <h6 class="footer-heading">Legal &amp; Info</h6>
+        <ul class="footer-links">
+          <li><a href="/about.html">About Us</a></li>
+          <li><a href="/feedback.html">Contact Us</a></li>
+          <li><a href="/privacy-policy.html">Privacy Policy</a></li>
+          <li><a href="/terms.html">Terms &amp; Conditions</a></li>
+          <li><a href="/disclaimer.html">Disclaimer</a></li>
+        </ul>
+      </div>
+    </div>
+    <hr class="footer-divider">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <p class="mb-0 footer-copy">&copy; <span id="footerYear"></span> <span id="footer-copy-name">JobOrbit</span>. All rights reserved.</p>
+      <div class="d-flex flex-wrap gap-3">
+        <a href="/tools/" class="footer-copy" style="text-decoration:none">Tools</a>
+        <a href="/privacy-policy.html" class="footer-copy" style="text-decoration:none">Privacy</a>
+        <a href="/terms.html" class="footer-copy" style="text-decoration:none">Terms</a>
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+(function(){
+  async function loadSettings(){
+    try{
+      const d=await fetch('/api/settings').then(r=>r.json());
+      const s=d.settings;
+      if(s.primary_color)document.documentElement.style.setProperty('--primary',s.primary_color);
+      if(s.secondary_color)document.documentElement.style.setProperty('--secondary',s.secondary_color);
+      if(s.site_name){
+        document.querySelectorAll('.brand-name').forEach(e=>e.textContent=s.site_name);
+        const fc=document.getElementById('footer-copy-name');if(fc)fc.textContent=s.site_name;
+      }
+      if(s.logo_url){const l=document.getElementById('site-logo');l.src=s.logo_url;l.classList.remove('d-none');}
+      applyTheme(localStorage.getItem('theme')||s.default_theme||'light',false);
+    }catch(e){}
+  }
+  function applyTheme(t,save=true){
+    document.documentElement.setAttribute('data-theme',t);
+    document.documentElement.style.colorScheme=t;
+    const i=document.getElementById('themeIcon');
+    if(i)i.className=t==='dark'?'bi bi-sun-fill':'bi bi-moon-fill';
+    if(save)localStorage.setItem('theme',t);
+  }
+  const tb=document.getElementById('themeToggle');
+  if(tb)tb.addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+  const fy=document.getElementById('footerYear');if(fy)fy.textContent=new Date().getFullYear();
+  loadSettings();
+})();
+</script>
+<script>
+function calcOT(){
+  const basic=parseFloat(document.getElementById('otBasic').value)||0;
+  const hours=parseFloat(document.getElementById('otHours').value)||0;
+  const type=document.getElementById('otType').value;
+  const days=parseInt(document.getElementById('otWorkDays').value)||26;
+  const hrs=parseInt(document.getElementById('otWorkHours').value)||8;
+  if(basic<=0||hours<=0){alert('Please enter salary and overtime hours.');return;}
+
+  const monthlyHours=days*hrs;
+  const hourlyRate=basic/monthlyHours;
+  const multiplier=type==='holiday'?2:1.5;
+  const otHourly=hourlyRate*multiplier;
+  const total=otHourly*hours;
+
+  function fmt(n){return'SAR '+n.toLocaleString('en-SA',{minimumFractionDigits:2,maximumFractionDigits:2});}
+
+  const typeLabel={regular:'Weekday (150%)',friday:'Friday (150%)',holiday:'Public Holiday (200%)',ramadan:'Ramadan (150%)'}[type];
+
+  const rows=`
+    <div class="result-row"><span class="result-row-label">Basic Hourly Rate</span><span class="result-row-val">${fmt(hourlyRate)}</span></div>
+    <div class="result-row"><span class="result-row-label">Overtime Type</span><span class="result-row-val">${typeLabel}</span></div>
+    <div class="result-row"><span class="result-row-label">Overtime Hourly Rate (×${multiplier})</span><span class="result-row-val blue">${fmt(otHourly)}</span></div>
+    <div class="result-row"><span class="result-row-label">Total Hours Claimed</span><span class="result-row-val">${hours} hours</span></div>
+    <div class="result-row"><span class="result-row-label" style="font-weight:700">Total Overtime Pay</span><span class="result-row-val blue" style="font-size:1.05rem">${fmt(total)}</span></div>
+    <div class="result-row"><span class="result-row-label">Monthly base used</span><span class="result-row-val" style="color:var(--text-muted)">${days} days × ${hrs} hrs = ${monthlyHours} hrs</span></div>`;
+
+  document.getElementById('otBreakdown').innerHTML=rows;
+  document.getElementById('otTotal').textContent=fmt(total);
+  document.getElementById('otResult').classList.add('show');
+}</script>
+</body>
+</html>
