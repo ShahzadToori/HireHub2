@@ -217,6 +217,7 @@ async function loadJob() {
     injectJobSEO(job, siteUrl, siteName);
 
     renderJob(job);
+    loadSimilarJobs(job); // Phase 2: non-blocking
   } catch (err) {
     console.error(err);
     showError('Job not found or could not be loaded.');
@@ -440,18 +441,76 @@ function fallbackCopy(text) {
   ta.select();
   document.execCommand('copy');
   document.body.removeChild(ta);
-  $('#jobDetailContainer').innerHTML = `
-    <div class="text-center py-5">
-      <i class="bi bi-exclamation-triangle fs-1 text-muted"></i>
-      <h4 class="mt-3">${msg}</h4>
-      <a href="/" class="btn btn-primary mt-3">Back to Home</a>
-    </div>`;
 }
 
 // ── Init ──────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
+  // Inject Phase 2 Similar Jobs CSS
+  const simCss = document.createElement('style');
+  simCss.textContent = `
+    .similar-jobs-section{margin-top:2.5rem}
+    .sim-heading{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;color:var(--text-primary);margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid var(--border)}
+    .sim-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:.85rem}
+    @media(max-width:480px){.sim-grid{grid-template-columns:1fr}}
+    .sim-card{display:block;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:1rem;text-decoration:none;transition:transform .18s,border-color .18s,box-shadow .18s}
+    .sim-card:hover{transform:translateY(-2px);border-color:var(--primary);box-shadow:0 6px 20px rgba(0,0,0,.08);text-decoration:none}
+    .sim-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;color:var(--text-primary);margin-bottom:.25rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .sim-company{font-size:.78rem;color:var(--text-muted);margin-bottom:.35rem}
+    .sim-meta{display:flex;justify-content:space-between;align-items:center;font-size:.73rem;color:var(--text-muted);margin-bottom:.5rem}
+    .sim-time{font-size:.7rem}
+    .sim-actions{display:flex;gap:.4rem}
+    .sim-btn{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:7px;font-size:.85rem;text-decoration:none;transition:background .15s}
+    .sim-wa{background:rgba(37,211,102,.1);color:#25d366}.sim-wa:hover{background:#25d366;color:#fff}
+    .sim-ph{background:rgba(15,98,254,.1);color:var(--primary)}.sim-ph:hover{background:var(--primary);color:#fff}
+  `;
+  document.head.appendChild(simCss);
+
   await loadSettings();
   $('#themeToggle')?.addEventListener('click', toggleTheme);
   const fy = $('#footerYear'); if (fy) fy.textContent = new Date().getFullYear();
   await loadJob();
 });
+
+/* ══════════════════════════════════════════════════════════════
+   PHASE 2 — SIMILAR JOBS
+══════════════════════════════════════════════════════════════ */
+async function loadSimilarJobs(job) {
+  try {
+    const params = new URLSearchParams({ category: job.category_slug || job.category, limit: 4, sort: 'newest' });
+    const res  = await fetch(`/api/jobs?${params}`);
+    const data = await res.json();
+    if (!data.jobs || data.jobs.length === 0) return;
+
+    // Filter out the current job
+    const similar = data.jobs.filter(j => j.id !== job.id).slice(0, 4);
+    if (similar.length === 0) return;
+
+    const siteUrl = (_siteSettings.site_url || window.location.origin).replace(/\/$/, '');
+
+    const cards = similar.map(j => {
+      const wa = j.whatsapp ? `<a href="${waLink(j)}" class="sim-btn sim-wa" target="_blank" rel="noopener"><i class="bi bi-whatsapp"></i></a>` : '';
+      const ph = j.phone    ? `<a href="tel:${j.phone}" class="sim-btn sim-ph"><i class="bi bi-telephone-fill"></i></a>` : '';
+      return `
+        <a href="${siteUrl}/job/${j.slug}" class="sim-card">
+          <div class="sim-title">${escHtml(j.title)}</div>
+          <div class="sim-company"><i class="bi bi-building me-1"></i>${escHtml(j.company)}</div>
+          <div class="sim-meta">
+            <span><i class="bi bi-geo-alt me-1"></i>${escHtml(j.location)}</span>
+            <span class="sim-time">${timeAgo(j.created_at)}</span>
+          </div>
+          <div class="sim-actions">${wa}${ph}</div>
+        </a>`;
+    }).join('');
+
+    const section = document.createElement('div');
+    section.className = 'similar-jobs-section';
+    section.innerHTML = `
+      <div class="sim-heading"><i class="bi bi-briefcase me-2"></i>Similar Jobs</div>
+      <div class="sim-grid">${cards}</div>`;
+
+    const container = $('#jobDetailContainer');
+    if (container) container.appendChild(section);
+  } catch (e) {
+    // Silent fail — similar jobs are non-critical
+  }
+}

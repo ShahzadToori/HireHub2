@@ -20,9 +20,24 @@ const state = {
     location: '',
     category: '',
     type:     '',
-    sort:     'newest'
+    sort:     'newest',
+    salary:   '',   // Phase 1: salary range
+    visa:     '',   // Phase 1: visa sponsorship
+    date:     ''    // Phase 1: days since posted
   }
 };
+
+// ── Simple in-memory cache ─────────────────────────────────────
+const _cache = {};
+async function cachedGet(url, ttlMs = 60000) {
+  const now = Date.now();
+  if (_cache[url] && now - _cache[url].ts < ttlMs) return _cache[url].data;
+  const res  = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const data = await res.json();
+  _cache[url] = { data, ts: now };
+  return data;
+}
 
 // ── API helpers ────────────────────────────────────────────────
 const api = {
@@ -292,7 +307,7 @@ function updateSchema(jobs) {
 ══════════════════════════════════════════════════════════════ */
 async function loadSettings() {
   try {
-    const data = await api.get('/api/settings');
+    const data = await cachedGet('/api/settings', 300000); // cache 5 min
     state.settings = data.settings;
     const s = state.settings;
 
@@ -341,6 +356,9 @@ function applyTheme(theme, save = true) {
   document.documentElement.setAttribute('data-theme', theme);
   const icon = $('#themeIcon');
   icon.className = theme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+  // Sync mobile bottom nav icon
+  const mbnIcon = document.getElementById('mbnThemeIcon');
+  if (mbnIcon) mbnIcon.className = theme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
   if (save) localStorage.setItem('theme', theme);
 }
 
@@ -354,7 +372,7 @@ function toggleTheme() {
 ══════════════════════════════════════════════════════════════ */
 async function loadCategories() {
   try {
-    const data = await api.get('/api/jobs/categories');
+    const data = await cachedGet('/api/jobs/categories', 120000); // cache 2 min
     state.categories = data.categories;
 
     const catFilter = $('#categoryFilter');
@@ -464,10 +482,14 @@ async function loadJobs() {
   const pagination  = $('#paginationWrap');
   const resultsInfo = $('#resultsInfo');
 
-  spinner.classList.remove('d-none');
-  list.innerHTML = '';
+  // Phase 2: use skeleton screens instead of spinner
+  spinner.classList.add('d-none');
+  showSkeletons(6);
   emptyState.classList.add('d-none');
   pagination.classList.add('d-none');
+
+  // Phase 2: track search history
+  if (state.filters.q) addToSearchHistory(state.filters.q);
 
   try {
     const params = new URLSearchParams({
@@ -476,6 +498,9 @@ async function loadJobs() {
       category: state.filters.category,
       type:     state.filters.type,
       sort:     state.filters.sort,
+      salary:   state.filters.salary,
+      visa:     state.filters.visa,
+      date:     state.filters.date,
       page:     state.page,
       limit:    state.settings.jobs_per_page || 12
     });
@@ -532,42 +557,139 @@ function renderJobCard(job, isFeaturedSection = false) {
   const isFeatured  = job.featured == 1;
   const isSponsored = job.sponsored == 1;
 
+  // ── Urgency logic ─────────────────────────────────────────
+  const daysOld        = Math.floor((Date.now() - new Date(job.created_at).getTime()) / 86400000);
+  const isNew          = daysOld <= 1;
+  const isUrgent       = job.urgent == 1 || /urgent|immediately|asap/i.test(job.title || '');
+  const isExpiring     = daysOld >= 25 && daysOld < 30;
+  const isMaybeExpired = daysOld >= 30;
+
   let cardClass = 'job-card';
-  if (isFeatured)  cardClass += ' featured-card';
-  if (isSponsored) cardClass += ' sponsored-card';
+  if (isFeatured)     cardClass += ' featured-card';
+  if (isSponsored)    cardClass += ' sponsored-card';
+  if (isMaybeExpired) cardClass += ' card-expired';
+
+  // ── Urgency badge ─────────────────────────────────────────
+  const urgencyBadge = isUrgent       ? '<span class="badge-urgency badge-urgent">🔥 Urgent</span>'
+                     : isNew          ? '<span class="badge-urgency badge-new">⚡ New Today</span>'
+                     : isExpiring     ? '<span class="badge-urgency badge-expiring">⏰ Closing Soon</span>'
+                     : isMaybeExpired ? '<span class="badge-urgency badge-expired">⚠ May Be Expired</span>'
+                     : '';
 
   const badges = [
-    isSponsored ? '<span class="badge-sponsored">Sponsored</span>' : '',
-    isFeatured  ? '<span class="badge-featured">⭐ Featured</span>' : '',
-    `<span class="badge-category">${job.category}</span>`,
-    `<span class="badge-type">${job.job_type || 'Full-time'}</span>`
+    isSponsored  ? '<span class="badge-sponsored">📌 Sponsored</span>' : '',
+    isFeatured   ? '<span class="badge-featured">⭐ Featured</span>'   : '',
+    urgencyBadge,
+    `<span class="badge-category">${escHtml(job.category || '')}</span>`,
+    `<span class="badge-type">${escHtml(job.job_type || 'Full-time')}</span>`
   ].filter(Boolean).join('');
 
+  // ── Salary badge ──────────────────────────────────────────
+  const salaryHtml = job.salary
+    ? `<span class="card-salary"><i class="bi bi-cash-stack me-1"></i>${escHtml(job.salary)}</span>`
+    : '';
+
+  // ── Visa sponsored badge ──────────────────────────────────
+  const visaHtml = job.visa_sponsored
+    ? `<span class="card-visa-badge"><i class="bi bi-passport me-1"></i>Visa Sponsored</span>`
+    : '';
+
+  // ── City flag ─────────────────────────────────────────────
+  const cityFlag   = getCityFlag(job.location);
+  const locationHtml = `<span class="meta-item"><i class="bi bi-geo-alt"></i>${cityFlag}${escHtml(job.location)}</span>`;
+
+  // ── Contact icons ─────────────────────────────────────────
   const contacts = [
-    job.phone    ? `<a href="tel:${job.phone}" class="btn-contact-icon phone" title="Call" onclick="event.stopPropagation()"><i class="bi bi-telephone-fill"></i></a>` : '',
-    job.whatsapp ? `<a href="${waLink(job)}" class="btn-contact-icon whatsapp" title="WhatsApp" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i class="bi bi-whatsapp"></i></a>` : '',
-    job.map_link ? `<a href="${escHtml(job.map_link)}" class="btn-contact-icon map" title="View on Map" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i class="bi bi-geo-alt-fill"></i></a>` : '',
-    job.email    ? `<a href="mailto:${job.email}" class="btn-contact-icon email" title="Email" onclick="event.stopPropagation()"><i class="bi bi-envelope-fill"></i></a>` : '',
+    job.phone     ? `<a href="tel:${job.phone}" class="btn-contact-icon phone" title="Call" onclick="event.stopPropagation()"><i class="bi bi-telephone-fill"></i></a>` : '',
+    job.whatsapp  ? `<a href="${waLink(job)}" class="btn-contact-icon whatsapp" title="WhatsApp" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i class="bi bi-whatsapp"></i></a>` : '',
+    job.map_link  ? `<a href="${escHtml(job.map_link)}" class="btn-contact-icon map" title="View on Map" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i class="bi bi-geo-alt-fill"></i></a>` : '',
+    job.email     ? `<a href="mailto:${job.email}" class="btn-contact-icon email" title="Email" onclick="event.stopPropagation()"><i class="bi bi-envelope-fill"></i></a>` : '',
     job.apply_link ? `<a href="${escHtml(job.apply_link)}" class="btn-contact-icon applylink" title="Apply Link" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i class="bi bi-box-arrow-up-right"></i></a>` : '',
-    job.slug     ? `<a href="/job/${job.slug}" class="btn-contact-icon details" title="View Details" onclick="event.stopPropagation()"><i class="bi bi-box-arrow-up-right"></i></a>` : ''
+    job.slug      ? `<a href="/job/${job.slug}" class="btn-contact-icon details" title="View Full Details" onclick="event.stopPropagation()"><i class="bi bi-arrows-angle-expand"></i></a>` : ''
   ].filter(Boolean).join('');
+
+  // ── WhatsApp Quick Apply ──────────────────────────────────
+  
 
   return `
     <div class="${cardClass}" data-id="${job.id}" data-slug="${job.slug || ''}" role="button" tabindex="0"
          aria-label="View ${escHtml(job.title)} at ${escHtml(job.company)}">
       <div class="card-badges">${badges}</div>
+      <button class="btn-report-job" onclick="reportJob('${job.id}','${escHtml(job.title).replace(/'/g,"\\'")}',event)" title="Report this listing" aria-label="Report job"><i class="bi bi-flag"></i></button>
       <div class="card-title">${escHtml(job.title)}</div>
       <div class="card-company"><i class="bi bi-building me-1"></i>${escHtml(job.company)}</div>
-      <div class="card-meta">
-        <span class="meta-item"><i class="bi bi-geo-alt"></i>${escHtml(job.location)}</span>
-      </div>
+      ${salaryHtml || visaHtml ? `<div class="card-highlights">${salaryHtml}${visaHtml}</div>` : ''}
+      <div class="card-meta">${locationHtml}</div>
       <p class="card-desc">${escHtml(job.description)}</p>
       <div class="card-footer-row">
         <span class="card-date"><i class="bi bi-clock me-1"></i>${timeAgo(job.created_at)}</span>
-        <div class="card-contacts">${contacts}</div>
+        <div class="d-flex align-items-center gap-1">
+          <div class="card-contacts">${contacts}</div>
+        </div>
       </div>
     </div>`;
 }
+
+/* ══════════════════════════════════════════════════════════════
+   CITY FLAG + CITIES SECTION
+══════════════════════════════════════════════════════════════ */
+function getCityFlag(location) {
+  if (!location) return '';
+  const loc = location.toLowerCase();
+  if (/riyadh|jeddah|dammam|mecca|medina|khobar|tabuk|ksa|saudi/i.test(loc)) return '🇸🇦 ';
+  if (/dubai|abu dhabi|sharjah|ajman|uae|emirates/i.test(loc))               return '🇦🇪 ';
+  if (/doha|qatar/i.test(loc))                                                return '🇶🇦 ';
+  if (/kuwait/i.test(loc))                                                    return '🇰🇼 ';
+  if (/bahrain|manama/i.test(loc))                                            return '🇧🇭 ';
+  if (/muscat|oman/i.test(loc))                                               return '🇴🇲 ';
+  return '';
+}
+
+async function loadCitiesSection() {
+  const grid = document.getElementById('citiesGrid');
+  if (!grid) return;
+
+  // Gulf cities with flags — counts pulled from your own job data
+  const GULF_CITIES = [
+    { name: 'Riyadh',    flag: '🇸🇦', param: 'Riyadh' },
+    { name: 'Jeddah',    flag: '🇸🇦', param: 'Jeddah' },
+    { name: 'Dammam',    flag: '🇸🇦', param: 'Dammam' },
+    { name: 'Dubai',     flag: '🇦🇪', param: 'Dubai'  },
+    { name: 'Abu Dhabi', flag: '🇦🇪', param: 'Abu Dhabi' },
+    { name: 'Doha',      flag: '🇶🇦', param: 'Doha'   },
+    { name: 'Kuwait',    flag: '🇰🇼', param: 'Kuwait' },
+    { name: 'Muscat',    flag: '🇴🇲', param: 'Muscat' },
+  ];
+
+  // Try to get live counts from your jobs data
+  let countMap = {};
+  try {
+    const data = await api.get('/api/jobs/cities');
+    if (data.cities) data.cities.forEach(c => { countMap[c.city] = c.count; });
+  } catch { /* silently use static data */ }
+
+  grid.innerHTML = GULF_CITIES.map(city => {
+    const count = countMap[city.name] || countMap[city.param] || '';
+    const countHtml = count ? `<div class="city-count">${count} jobs</div>` : '';
+    return `
+      <a class="city-card" href="/?location=${encodeURIComponent(city.param)}"
+         onclick="event.preventDefault(); filterByCity('${city.param}')">
+        <span class="city-flag">${city.flag}</span>
+        <div class="city-name">${city.name}</div>
+        ${countHtml}
+      </a>`;
+  }).join('');
+}
+
+window.filterByCity = function(cityName) {
+  state.filters.location = cityName;
+  state.page = 1;
+  const locInput = document.getElementById('locationInput');
+  if (locInput) locInput.value = cityName;
+  loadJobs();
+  toggleClearBtn();
+  document.getElementById('jobs')?.scrollIntoView({ behavior: 'smooth' });
+};
 
 /* ══════════════════════════════════════════════════════════════
    JOB MODAL
@@ -602,6 +724,7 @@ async function openJobModal(jobId) {
     if (!slug) return;
     const data = await api.get(`/api/jobs/${slug}`);
     if (!data.success) return;
+    trackRecentlyViewed(data.job); // Phase 2
     populateModal(data.job);
     new bootstrap.Modal($('#jobModal')).show();
   } catch (e) {
@@ -682,7 +805,7 @@ const applyBtn = $('#modalApplyLink');
   } else { phone.classList.add('d-none'); }
 
   if (job.whatsapp) {
-    whatsapp.href = waLink(job.whatsapp, job.title);
+    whatsapp.href = waLink(job);
     whatsapp.innerHTML = `<i class="bi bi-whatsapp me-1"></i>WhatsApp`;
     whatsapp.classList.remove('d-none');
   } else { whatsapp.classList.add('d-none'); }
@@ -843,6 +966,194 @@ function fallbackCopy(text) {
 }
 
 /* ══════════════════════════════════════════════════════════════
+   PHASE 2 — RECENTLY VIEWED JOBS (localStorage)
+══════════════════════════════════════════════════════════════ */
+const RV_KEY = 'jb_recentlyViewed';
+const MAX_RV = 5;
+
+function trackRecentlyViewed(job) {
+  try {
+    let rv = JSON.parse(localStorage.getItem(RV_KEY) || '[]');
+    rv = rv.filter(j => j.id !== job.id); // remove duplicate
+    rv.unshift({ id: job.id, slug: job.slug, title: job.title, company: job.company, location: job.location, created_at: job.created_at });
+    if (rv.length > MAX_RV) rv = rv.slice(0, MAX_RV);
+    localStorage.setItem(RV_KEY, JSON.stringify(rv));
+    renderRecentlyViewed();
+  } catch {}
+}
+
+function renderRecentlyViewed() {
+  const wrap = document.getElementById('recentlyViewedWrap');
+  const list = document.getElementById('recentlyViewedList');
+  if (!wrap || !list) return;
+  try {
+    const rv = JSON.parse(localStorage.getItem(RV_KEY) || '[]');
+    if (rv.length === 0) { wrap.classList.add('d-none'); return; }
+    wrap.classList.remove('d-none');
+    list.innerHTML = rv.map(j => `
+      <li class="rv-item" onclick="openJobModal('${j.id}')" title="${escHtml(j.title)}">
+        <div class="rv-title">${escHtml(j.title)}</div>
+        <div class="rv-meta">${escHtml(j.company)} · ${escHtml(j.location)}</div>
+      </li>`).join('');
+  } catch {}
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PHASE 2 — SEARCH HISTORY (localStorage)
+══════════════════════════════════════════════════════════════ */
+const SH_KEY = 'jb_searchHistory';
+const MAX_SH = 5;
+
+function addToSearchHistory(query) {
+  if (!query || query.trim().length < 2) return;
+  try {
+    let hist = JSON.parse(localStorage.getItem(SH_KEY) || '[]');
+    hist = hist.filter(q => q !== query.trim());
+    hist.unshift(query.trim());
+    if (hist.length > MAX_SH) hist = hist.slice(0, MAX_SH);
+    localStorage.setItem(SH_KEY, JSON.stringify(hist));
+  } catch {}
+}
+
+function showSearchHistory() {
+  const drop = document.getElementById('searchHistoryDrop');
+  if (!drop) return;
+  try {
+    const hist = JSON.parse(localStorage.getItem(SH_KEY) || '[]');
+    if (hist.length === 0) { drop.classList.remove('show'); return; }
+    drop.innerHTML = `<div class="sh-label">Recent searches</div>` +
+      hist.map(q => `<button class="sh-item" onclick="applyHistorySearch('${escHtml(q)}')">${escHtml(q)}</button>`).join('') +
+      `<button class="sh-clear" onclick="clearSearchHistory()"><i class="bi bi-trash me-1"></i>Clear history</button>`;
+    drop.classList.add('show');
+  } catch {}
+}
+
+window.applyHistorySearch = function(q) {
+  const inp = document.getElementById('searchInput');
+  if (inp) inp.value = q;
+  state.filters.q = q;
+  state.page = 1;
+  loadJobs();
+  toggleClearBtn();
+  const drop = document.getElementById('searchHistoryDrop');
+  if (drop) drop.classList.remove('show');
+};
+
+window.clearSearchHistory = function() {
+  localStorage.removeItem(SH_KEY);
+  const drop = document.getElementById('searchHistoryDrop');
+  if (drop) drop.classList.remove('show');
+};
+
+/* ══════════════════════════════════════════════════════════════
+   PHASE 2 — WHATSAPP JOB ALERTS
+══════════════════════════════════════════════════════════════ */
+window.openAlertsModal = function() {
+  const modal = new bootstrap.Modal(document.getElementById('alertsModal'));
+  // Pre-fill category if one is active
+  const catSel = document.getElementById('alertCategorySelect');
+  if (catSel && state.filters.category) catSel.value = state.filters.category;
+  modal.show();
+};
+
+window.submitAlerts = async function() {
+  const emailEl   = document.getElementById('alertEmail');
+  const category  = document.getElementById('alertCategorySelect')?.value || '';
+  const city      = document.getElementById('alertCity')?.value.trim() || '';
+  const btn       = document.getElementById('alertSubmitBtn');
+  const msgEl     = document.getElementById('alertMsg');
+
+  const email = emailEl?.value.trim().toLowerCase();
+
+  // Validate
+  const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!email || !emailRe.test(email)) {
+    msgEl.textContent = 'Please enter a valid email address.';
+    msgEl.className = 'alert-msg error';
+    emailEl?.focus();
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Subscribing…';
+  msgEl.textContent = '';
+
+  try {
+    const res  = await fetch('/api/alerts/subscribe', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ email, category, city, channel: 'email' })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      msgEl.textContent = data.message;
+      msgEl.className   = 'alert-msg success';
+      btn.innerHTML     = '<i class="bi bi-check-lg me-1"></i>Done!';
+      // Store locally so we can show "already subscribed" state later
+      localStorage.setItem('jb_alertSub', JSON.stringify({ email, category, city, ts: Date.now() }));
+      setTimeout(() => {
+        bootstrap.Modal.getInstance(document.getElementById('alertsModal'))?.hide();
+        btn.disabled  = false;
+        btn.innerHTML = '<i class="bi bi-envelope-fill me-1"></i>Subscribe';
+        msgEl.textContent = '';
+        if (emailEl) emailEl.value = '';
+      }, 3000);
+    } else {
+      throw new Error(data.message || 'Failed to subscribe');
+    }
+  } catch (e) {
+    msgEl.textContent = e.message || 'Network error. Please try again.';
+    msgEl.className   = 'alert-msg error';
+    btn.disabled      = false;
+    btn.innerHTML     = '<i class="bi bi-envelope-fill me-1"></i>Subscribe';
+  }
+};
+
+/* ══════════════════════════════════════════════════════════════
+   PHASE 2 — REPORT A JOB
+══════════════════════════════════════════════════════════════ */
+window.reportJob = async function(jobId, jobTitle, e) {
+  if (e) e.stopPropagation();
+  const reason = prompt(`Report "${jobTitle}"\n\nSelect reason:\n1. Expired / Filled\n2. Fake or Scam\n3. Inappropriate content\n4. Duplicate listing\n\nEnter number (1-4):`);
+  if (!reason) return;
+  const reasons = { '1': 'Expired/Filled', '2': 'Fake/Scam', '3': 'Inappropriate', '4': 'Duplicate' };
+  const reasonText = reasons[reason.trim()] || 'Other';
+  try {
+    await fetch('/api/report-job', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jobId, reason: reasonText })
+    });
+  } catch {}
+  showShareToast('⚑ Report submitted — thank you!');
+};
+
+/* ══════════════════════════════════════════════════════════════
+   PHASE 2 — SKELETON LOADING
+══════════════════════════════════════════════════════════════ */
+function showSkeletons(count = 6) {
+  const list = $('#jobsList');
+  if (!list) return;
+  list.className = 'row g-3';
+  list.innerHTML = Array(count).fill(0).map(() => `
+    <div class="col-md-6 col-lg-6">
+      <div class="skeleton-card">
+        <div class="skel-line skel-badge"></div>
+        <div class="skel-line skel-title"></div>
+        <div class="skel-line skel-company"></div>
+        <div class="skel-line skel-meta"></div>
+        <div class="skel-line skel-desc"></div>
+        <div class="skel-line skel-desc short"></div>
+        <div class="skel-footer">
+          <div class="skel-line skel-date"></div>
+          <div class="skel-line skel-btn"></div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+/* ══════════════════════════════════════════════════════════════
    PAGINATION
 ══════════════════════════════════════════════════════════════ */
 function buildPagination(currentPage, totalPages) {
@@ -892,18 +1203,32 @@ function pagRange(cur, total) {
 function toggleClearBtn() {
   const hasFilter = state.filters.q || state.filters.location ||
                     state.filters.category || state.filters.type ||
+                    state.filters.salary || state.filters.visa || state.filters.date ||
                     state.filters.sort !== 'newest';
-  $('#clearFilters').classList.toggle('d-none', !hasFilter);
+  const btn = $('#clearFilters');
+  btn.classList.toggle('d-none', !hasFilter);
+  // Show active filter count
+  const count = [state.filters.q, state.filters.location, state.filters.category,
+    state.filters.type, state.filters.salary, state.filters.visa, state.filters.date]
+    .filter(Boolean).length;
+  const countEl = document.getElementById('filterCount');
+  if (countEl) countEl.textContent = count > 0 ? `(${count})` : '';
 }
 
 window.resetFilters = function() {
-  state.filters = { q: '', location: '', category: '', type: '', sort: 'newest' };
+  state.filters = { q: '', location: '', category: '', type: '', sort: 'newest', salary: '', visa: '', date: '' };
   state.page    = 1;
   $('#searchInput').value    = '';
   $('#locationInput').value  = '';
   $('#categoryFilter').value = '';
   $('#typeFilter').value     = '';
   $('#sortFilter').value     = 'newest';
+  const sf = document.getElementById('salaryFilter');
+  const vf = document.getElementById('visaFilter');
+  const df = document.getElementById('dateFilter');
+  if (sf) sf.value = '';
+  if (vf) vf.value = '';
+  if (df) df.value = '';
   $$('.category-chip').forEach(c => c.classList.remove('active'));
   $$('.category-chip')[0]?.classList.add('active');
   toggleClearBtn();
@@ -943,7 +1268,19 @@ function bindEvents() {
     if (drop && drop.classList.contains('open') && wrap && !wrap.contains(e.target)) {
       drop.classList.remove('open');
     }
+    // Close search history dropdown
+    const shDrop = document.getElementById('searchHistoryDrop');
+    const shInp  = document.getElementById('searchInput');
+    if (shDrop && shDrop.classList.contains('show') && !shInp?.contains(e.target) && !shDrop.contains(e.target)) {
+      shDrop.classList.remove('show');
+    }
   });
+
+  // Phase 2: Show search history on input focus
+  const searchInput = document.getElementById('searchInput');
+  if (searchInput) {
+    searchInput.addEventListener('focus', () => showSearchHistory());
+  }
 
   $('#searchForm').addEventListener('submit', (e) => {
     e.preventDefault();
@@ -966,6 +1303,14 @@ function bindEvents() {
   $('#typeFilter').addEventListener('change', (e) => { state.filters.type = e.target.value; state.page = 1; loadJobs(); toggleClearBtn(); });
   $('#sortFilter').addEventListener('change', (e) => { state.filters.sort = e.target.value; state.page = 1; loadJobs(); toggleClearBtn(); });
   $('#clearFilters').addEventListener('click', resetFilters);
+
+  // Phase 1 new filters
+  const salaryFilter = document.getElementById('salaryFilter');
+  const visaFilter   = document.getElementById('visaFilter');
+  const dateFilter   = document.getElementById('dateFilter');
+  if (salaryFilter) salaryFilter.addEventListener('change', (e) => { state.filters.salary = e.target.value; state.page = 1; loadJobs(); toggleClearBtn(); });
+  if (visaFilter)   visaFilter.addEventListener('change',   (e) => { state.filters.visa   = e.target.value; state.page = 1; loadJobs(); toggleClearBtn(); });
+  if (dateFilter)   dateFilter.addEventListener('change',   (e) => { state.filters.date   = e.target.value; state.page = 1; loadJobs(); toggleClearBtn(); });
   $('#viewGrid').addEventListener('click', () => setViewMode('grid'));
   $('#viewList').addEventListener('click', () => setViewMode('list'));
 
@@ -1006,9 +1351,30 @@ async function init() {
   } catch {}
 
   bindEvents();
-  await loadCategories();  // also syncs category chip/select from URL param
-  await loadFeaturedJobs();
+
+  // Run categories + featured in PARALLEL (not sequential)
+  await Promise.all([
+    loadCategories(),
+    loadFeaturedJobs()
+  ]);
+
+  // Now load jobs (needs categories ready for filter sync)
   await loadJobs();
+
+  // Non-critical — run after without blocking
+  loadCitiesSection();
+  renderRecentlyViewed();
+
+  // Populate alerts category dropdown
+  const alertCat = document.getElementById('alertCategorySelect');
+  if (alertCat && state.categories.length) {
+    state.categories.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.slug;
+      opt.textContent = c.name;
+      alertCat.appendChild(opt);
+    });
+  }
 
 }
 

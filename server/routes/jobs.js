@@ -12,14 +12,17 @@ const intOr = (v, def) => {
 router.get('/', async (req, res) => {
   try {
     const {
-      q,             // keyword
-      category,      // category slug or id
-      location,      // location text
-      type,          // job_type
-      sort = 'newest',
-      page = 1,
-      limit = 12,
-      featured       // '1' to show only featured
+      q,
+      category,
+      location,
+      type,
+      sort     = 'newest',
+      page     = 1,
+      limit    = 12,
+      featured,
+      salary,   // Phase 1: e.g. "5000-10000" or "35000+"
+      visa,     // Phase 1: "1" = visa sponsored only
+      date      // Phase 1: days since posted e.g. "7" = last 7 days
     } = req.query;
 
     const perPage = Math.min(intOr(limit, 12), 50);
@@ -47,28 +50,44 @@ router.get('/', async (req, res) => {
     if (featured === '1') {
       where.push('j.featured = 1 AND (j.featured_until IS NULL OR j.featured_until >= CURDATE())');
     }
+    if (visa === '1') {
+      where.push('j.visa_sponsored = 1');
+    }
+    if (date && !isNaN(parseInt(date))) {
+      where.push('j.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)');
+      params.push(parseInt(date));
+    }
+    if (salary) {
+      if (salary.endsWith('+')) {
+        const min = parseInt(salary);
+        if (!isNaN(min)) { where.push('j.salary_min >= ?'); params.push(min); }
+      } else if (salary.includes('-')) {
+        const [mn, mx] = salary.split('-').map(Number);
+        if (!isNaN(mn) && !isNaN(mx)) {
+          where.push('(j.salary_min >= ? AND j.salary_min <= ?)');
+          params.push(mn, mx);
+        }
+      }
+    }
 
     const whereSql = where.length ? 'WHERE ' + where.join(' AND ') : '';
 
     const orderMap = {
-      newest: 'j.created_at DESC',
-      oldest: 'j.created_at ASC',
-      title:  'j.title ASC'
+      newest:      'j.created_at DESC',
+      oldest:      'j.created_at ASC',
+      title:       'j.title ASC',
+      salary_high: 'j.salary_min DESC'
     };
     const orderSql = orderMap[sort] || 'j.created_at DESC';
 
-    const [[{ total }]] = await db.query(
-      `SELECT COUNT(*) AS total
-         FROM jobs j
-         JOIN categories c ON j.category_id = c.id
-       ${whereSql}`,
-      params
-    );
-
+    // ── Single query with SQL_CALC_FOUND_ROWS — avoids second COUNT query ──
     const [jobs] = await db.query(
-      `SELECT j.id, j.title, j.company, j.location, j.job_type,
-              j.description, j.phone, j.whatsapp, j.email, j.map_link, j.extra_fields,
+      `SELECT SQL_CALC_FOUND_ROWS
+              j.id, j.title, j.company, j.location, j.job_type,
+              LEFT(j.description, 220) AS description,
+              j.phone, j.whatsapp, j.email, j.map_link, j.apply_link,
               j.featured, j.sponsored, j.slug, j.created_at, j.views,
+              j.salary, j.visa_sponsored,
               c.name AS category, c.slug AS category_slug
          FROM jobs j
          JOIN categories c ON j.category_id = c.id
@@ -78,17 +97,15 @@ router.get('/', async (req, res) => {
       [...params, perPage, offset]
     );
 
-    // Parse extra_fields JSON
-    jobs.forEach(j => {
-      try { j.extra_fields = j.extra_fields ? JSON.parse(j.extra_fields) : null; } catch { j.extra_fields = null; }
-    });
+    // Get total from FOUND_ROWS() — no extra table scan
+    const [[{ total }]] = await db.query('SELECT FOUND_ROWS() AS total');
 
     res.json({
       success: true,
       total,
-      page:     intOr(page, 1),
+      page:    intOr(page, 1),
       perPage,
-      pages:    Math.ceil(total / perPage),
+      pages:   Math.ceil(total / perPage),
       jobs
     });
   } catch (err) {
@@ -130,6 +147,23 @@ router.get('/categories', async (req, res) => {
          ORDER BY c.name`
     );
     res.json({ success: true, categories: cats });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+// GET /api/jobs/cities  – job counts per city for the cities grid
+router.get('/cities', async (req, res) => {
+  try {
+    const [cities] = await db.query(
+      `SELECT location AS city, COUNT(*) AS count
+         FROM jobs
+        WHERE status = 'active'
+        GROUP BY location
+        ORDER BY count DESC
+        LIMIT 20`
+    );
+    res.json({ success: true, cities });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Server error' });
   }

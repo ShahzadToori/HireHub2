@@ -12,6 +12,7 @@ const adminRoutes    = require('./routes/admin');
 const settingsRoutes = require('./routes/settings');
 const contactRoutes  = require('./routes/contact');
 const seoRoutes      = require('./routes/seo');
+const { router: alertsRouter, scheduleAutoDigest } = require('./routes/alerts');
 
 const app  = express();
 app.set('trust proxy', 1);
@@ -75,6 +76,7 @@ app.use('/api/jobs',     jobsRoutes);
 app.use('/api/admin',    adminRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/contact',  contactRoutes);
+app.use('/api/alerts',   alertsRouter);
 
 // ── SPA Fallback ──────────────────────────────────────────────
 app.get('/admin/*', (req, res) => {
@@ -101,4 +103,7 @@ app.listen(PORT, () => {
   console.log(`🔧  Admin panel     → http://localhost:${PORT}/admin`);
   console.log(`🗺   Sitemap         → http://localhost:${PORT}/sitemap.xml`);
   console.log(`📡  RSS Feed         → http://localhost:${PORT}/feed.rss`);
+
+  // Start email alert auto-digest (runs every 24h)
+  scheduleAutoDigest();
 });

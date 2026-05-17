@@ -198,6 +198,17 @@ router.get('/job/:slug', async (req, res, next) => {
     if (rows.length === 0) return next(); // 404 → SPA handles it
 
     const job      = rows[0];
+
+    // Phase 2: fetch similar jobs (same category, exclude current)
+    const [simRows] = await db.query(
+      `SELECT j.title, j.company, j.location, j.slug, j.job_type, j.created_at
+         FROM jobs j
+         JOIN categories c ON j.category_id = c.id
+        WHERE j.category_id = ? AND j.slug != ? AND j.status = 'active'
+        ORDER BY j.created_at DESC
+        LIMIT 4`,
+      [job.category_id, job.slug]
+    );
     const siteUrl  = await getSiteUrl();
     const siteName = await getSiteName();
 
@@ -313,10 +324,12 @@ const contactBtns = [
   <script type="application/ld+json">${JSON.stringify(jobSchema)}</script>
   <script type="application/ld+json">${JSON.stringify(breadcrumb)}</script>
 
-  <!-- Redirect real users to SPA -->
+  <!-- Redirect real users to SPA (only once, prevents loop) -->
   <script>
-    if (!/googlebot|bingbot|yandex|baidu|duckduck|twitterbot|facebookexternalhit|linkedinbot|slackbot|whatsapp|crawler|spider|bot/i.test(navigator.userAgent)) {
-      window.location.replace('/job/${job.slug}#ssr');
+    var ua = navigator.userAgent;
+    var isBot = /googlebot|bingbot|yandex|baidu|duckduck|twitterbot|facebookexternalhit|linkedinbot|slackbot|whatsapp|crawler|spider|bot/i.test(ua);
+    if (!isBot && window.location.hash !== '#ssr') {
+      window.location.replace('/job/${job.slug}');
     }
   </script>
 
@@ -416,6 +429,27 @@ const contactBtns = [
       </p>
     </div>
   </div>
+
+  <!-- Phase 2: Similar Jobs -->
+  ${simRows.length > 0 ? `
+  <div style="margin-top:2rem">
+    <h2 style="font-size:1.05rem;font-weight:700;color:#0f172a;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid #e5e7eb">
+      Similar Jobs in ${he(job.category)}
+    </h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.85rem">
+      ${simRows.map(j => `
+      <a href="${siteUrl}/job/${xe(j.slug)}" style="display:block;background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:1rem;text-decoration:none;transition:border-color .15s">
+        <div style="font-family:-apple-system,sans-serif;font-weight:700;font-size:.9rem;color:#0f172a;margin-bottom:.3rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${he(j.title)}</div>
+        <div style="font-size:.78rem;color:#64748b;margin-bottom:.3rem">🏢 ${he(j.company)}</div>
+        <div style="font-size:.75rem;color:#94a3b8">📍 ${he(j.location)} · ${he(j.job_type || 'Full-time')}</div>
+      </a>`).join('')}
+    </div>
+  </div>` : ''}
+
+  <!-- Phase 2: Report a Job link -->
+  <p style="margin-top:2rem;text-align:center;font-size:.78rem;color:#9ca3af">
+    ⚑ <a href="/feedback.html" style="color:#9ca3af">Report this listing</a> if it appears fake, expired, or inappropriate.
+  </p>
 </div>
 
 <footer>© ${new Date().getFullYear()} ${he(siteName)}. All rights reserved.</footer>
