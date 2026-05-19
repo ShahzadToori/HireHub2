@@ -832,8 +832,11 @@ function updatePreview() {
     RB.data.settings.accentColor
   );
 
-  // Run scaling after a short delay so the browser has painted the content
-  setTimeout(function() { scalePreview(); }, 50);
+  // Run scaling + page overflow check after browser paints content
+  setTimeout(function() {
+    scalePreview();
+    checkPageOverflow();
+  }, 80);
 }
 
 function scalePreview() {
@@ -1032,6 +1035,8 @@ function buildResumeHTML(tpl, ac) {
               ${p.noticePeriod?`<div class="tpl-info-row"><span class="tpl-info-label">Notice</span>${escHtml(p.noticePeriod)}</div>`:''}`:'' }
           </div>
         </div>
+        ${D.achievements?`<div class="tpl-section-title" style="color:${color};border-color:${color}">Achievements</div><div class="tpl-summary">${escHtml(D.achievements).replace(/\n/g,'<br>')}</div>`:''}
+        ${buildCustomSectionsHTML(color)}
       </div>
       ${BRANDING}
     </div>`;
@@ -1057,6 +1062,8 @@ function buildResumeHTML(tpl, ac) {
         ${D.summary.text?`<div class="tpl-summary" style="border-color:${color}">${escHtml(D.summary.text)}</div>`:''}
         ${D.experience.length?`<div class="tpl-section-title" style="border-color:${color}">Work Experience</div>${D.experience.map(e=>`<div class="tpl-exp-item" style="border-color:${color}"><div class="tpl-exp-title">${escHtml(e.title)}</div><div class="tpl-exp-company">${escHtml(e.company)}${e.country?', '+escHtml(e.country):''}</div><div class="tpl-exp-dates">${formatDate(e.startDate)} – ${e.current?'Present':formatDate(e.endDate)}</div><div class="tpl-exp-desc">${escHtml(e.description).replace(/\n/g,'<br>')}</div></div>`).join('')}`:''}
         ${D.education.length||D.certifications.length?`<div class="tpl-section-title" style="border-color:${color}">Education & Certifications</div>${eduHtml}${certHtml}`:''}
+        ${D.achievements?`<div class="tpl-section-title" style="border-color:${color}">Achievements</div><div class="tpl-summary" style="color:#475569">${escHtml(D.achievements).replace(/\n/g,'<br>')}</div>`:''}
+        ${buildCustomSectionsHTML(color)}
         ${p.nationality||p.visaStatus||p.noticePeriod?`<div class="tpl-section-title" style="border-color:${color}">Personal Details</div>
           <div style="display:flex;flex-wrap:wrap;gap:.25rem .75rem;font-size:8.5pt;color:#475569">
             ${p.nationality?`<span><strong>Nationality:</strong> ${escHtml(p.nationality)}</span>`:''}
@@ -1150,11 +1157,17 @@ async function downloadPDF() {
       // Font size control
       '.rb-resume { font-size:' + fontSize + 'pt !important; }',
       '.rb-resume * { font-size:inherit; }',
+      // Keep sections together — no mid-section page breaks
+      '.tpl-exp-item, .rb-section-wrap { break-inside:avoid; page-break-inside:avoid; }',
+      '.tpl-section-title { break-after:avoid; page-break-after:avoid; }',
+      '.tpl-two-col { break-inside:avoid; page-break-inside:avoid; }',
       // Print settings
       '@media print {',
       '  @page { margin:0; size:A4 portrait; }',
       '  body  { margin:0; padding:0; }',
       '  *     { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }',
+      '  .tpl-exp-item, .rb-section-wrap { break-inside:avoid !important; page-break-inside:avoid !important; }',
+      '  .tpl-section-title { break-after:avoid !important; page-break-after:avoid !important; }',
       '}',
     ].join('\n');
 
@@ -1489,6 +1502,7 @@ function renderCustomSections() {
   }
 
   wrap.innerHTML = RB.data.customSections.map(function(sec, idx) {
+    var pbActive = sec.pageBreak ? ' active' : '';
     return '<div class="rb-dynamic-item" id="cs-' + sec.id + '" style="margin-bottom:1rem">' +
       '<div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.75rem">' +
         '<input class="rb-input" style="flex:1;font-weight:700" value="' + escHtml(sec.title) + '" ' +
@@ -1500,6 +1514,10 @@ function renderCustomSections() {
         '<span style="font-size:.72rem;font-weight:700;color:var(--text-muted)">Layout:</span>' +
         '<button class="cs-layout-btn' + (sec.layout==='full'?' active':'') + '" onclick="csSetLayout(' + sec.id + ',\'full\',this)"><i class="bi bi-layout-text-window-reverse"></i> Full Width</button>' +
         '<button class="cs-layout-btn' + (sec.layout==='half'?' active':'') + '" onclick="csSetLayout(' + sec.id + ',\'half\',this)"><i class="bi bi-layout-split"></i> Half Width</button>' +
+        '<span style="font-size:.72rem;font-weight:700;color:var(--text-muted);margin-left:.25rem">Page:</span>' +
+        '<button class="cs-layout-btn' + pbActive + '" onclick="csTogglePageBreak(' + sec.id + ',this)" title="Start this section on a new page in the PDF">' +
+          '<i class="bi bi-file-earmark-break"></i> New Page' +
+        '</button>' +
       '</div>' +
       '<div class="cs-toolbar">' +
         '<button class="cs-tb-btn" onclick="csFmt(' + sec.id + ',\'bold\')" title="Bold"><b>B</b></button>' +
@@ -1522,15 +1540,18 @@ function renderCustomSections() {
         'oninput="csUpdateContent(' + sec.id + ',this)" ' +
         'onkeydown="csKeydown(event,' + sec.id + ')" ' +
         'placeholder="Type your content here...&#10;• Use bullet list for responsibilities&#10;• Tab to indent, Shift+Tab to outdent"></div>' +
-      '<p style="font-size:.7rem;color:var(--text-muted);margin:.3rem 0 0"><i class="bi bi-info-circle me-1"></i>Two consecutive Half sections appear side-by-side on the resume.</p>' +
+      '<p style="font-size:.7rem;color:var(--text-muted);margin:.3rem 0 0"><i class="bi bi-info-circle me-1"></i>Two consecutive Half sections appear side-by-side. Use "New Page" if PDF content overflows to next page.</p>' +
     '</div>';
   }).join('');
 
-  // Restore HTML content into editors (innerHTML, not value)
+  // Restore HTML content into editors
   RB.data.customSections.forEach(function(sec) {
     var ed = document.getElementById('cs-ed-' + sec.id);
     if (ed && sec.content) ed.innerHTML = sec.content;
   });
+
+  // Show page overflow warning in live preview
+  checkPageOverflow();
 }
 
 window.csUpdateTitle = function(id, val) {
@@ -1578,9 +1599,11 @@ function buildCustomSectionsHTML(color) {
   while (i < secs.length) {
     var s = secs[i];
     if (!s.title && !s.content) { i++; continue; }
+    // Manual page break before this section
+    var breakStyle = s.pageBreak ? 'break-before:page;page-break-before:always;' : '';
     if (s.layout === 'half' && secs[i+1] && secs[i+1].layout === 'half') {
       var s2 = secs[i+1];
-      html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:.5rem">' +
+      html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:.5rem;' + breakStyle + '">' +
         '<div><div class="tpl-section-title" style="color:' + color + ';border-color:' + color + '">' + escHtml(s.title) + '</div>' +
         '<div style="font-size:9pt;color:#475569;line-height:1.6">' + (s.content || '') + '</div></div>' +
         '<div><div class="tpl-section-title" style="color:' + color + ';border-color:' + color + '">' + escHtml(s2.title) + '</div>' +
@@ -1588,8 +1611,10 @@ function buildCustomSectionsHTML(color) {
         '</div>';
       i += 2;
     } else {
-      html += '<div class="tpl-section-title" style="color:' + color + ';border-color:' + color + '">' + escHtml(s.title) + '</div>' +
-        '<div style="font-size:9pt;color:#475569;line-height:1.6;margin-bottom:.6rem">' + (s.content || '') + '</div>';
+      html += '<div class="rb-section-wrap" style="' + breakStyle + '">' +
+        '<div class="tpl-section-title" style="color:' + color + ';border-color:' + color + '">' + escHtml(s.title) + '</div>' +
+        '<div style="font-size:9pt;color:#475569;line-height:1.6;margin-bottom:.6rem">' + (s.content || '') + '</div>' +
+        '</div>';
       i++;
     }
   }
@@ -1599,3 +1624,50 @@ function buildCustomSectionsHTML(color) {
 window.addCustomSection    = addCustomSection;
 window.removeCustomSection = removeCustomSection;
 window.renderCustomSections = renderCustomSections;
+
+window.csTogglePageBreak = function(id, btn) {
+  var sec = RB.data.customSections.find(function(s){ return s.id === id; });
+  if (!sec) return;
+  sec.pageBreak = !sec.pageBreak;
+  btn.classList.toggle('active', sec.pageBreak);
+  updatePreview();
+  scheduleAutosave();
+};
+
+// Show a dashed "Page 1 ends here" line in the live preview when content exceeds A4 height
+function checkPageOverflow() {
+  var preview = document.getElementById('rbPreviewWrap') || document.querySelector('.rb-preview-inner');
+  if (!preview) return;
+  var resume  = preview.querySelector('.rb-resume');
+  if (!resume) return;
+
+  // Remove old indicator
+  var old = preview.querySelector('.rb-page-overflow-line');
+  if (old) old.remove();
+
+  var A4_PX = 1123; // A4 height at 96dpi
+  var h     = resume.scrollHeight;
+  if (h <= A4_PX) return; // fits on one page — no warning needed
+
+  // Insert a dashed page-break line at the 1123px mark
+  var line = document.createElement('div');
+  line.className = 'rb-page-overflow-line';
+  line.style.cssText = [
+    'position:absolute',
+    'left:0',
+    'right:0',
+    'top:' + A4_PX + 'px',
+    'border-top:2px dashed #f59e0b',
+    'z-index:10',
+    'pointer-events:none',
+  ].join(';');
+
+  var badge = document.createElement('span');
+  badge.style.cssText = 'position:absolute;right:4px;top:-11px;background:#f59e0b;color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;white-space:nowrap';
+  badge.textContent = '⚠ Page 1 ends here — use "New Page" on next section';
+  line.appendChild(badge);
+
+  // Make preview container relative so line positions correctly
+  preview.style.position = 'relative';
+  preview.appendChild(line);
+}
