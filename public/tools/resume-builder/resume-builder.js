@@ -1168,7 +1168,6 @@ async function downloadPDF() {
       '  *     { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }',
       '  .tpl-exp-item, .rb-section-wrap { break-inside:avoid !important; page-break-inside:avoid !important; }',
       '  .tpl-section-title { break-after:avoid !important; page-break-after:avoid !important; }',
-      '  [style*="break-before:page"] { padding-top:1.5rem !important; }',
       '}',
     ].join('\n');
 
@@ -1601,7 +1600,8 @@ function buildCustomSectionsHTML(color) {
     var s = secs[i];
     if (!s.title && !s.content) { i++; continue; }
     // Manual page break before this section
-    var breakStyle = s.pageBreak ? 'break-before:page;page-break-before:always;padding-top:1.5rem;' : '';
+    var breakStyle  = s.pageBreak ? 'break-before:page;page-break-before:always;' : '';
+    var breakSpacer = s.pageBreak ? '<div style="height:1.5cm;display:block;"></div>' : '';
     if (s.layout === 'half' && secs[i+1] && secs[i+1].layout === 'half') {
       var s2 = secs[i+1];
       html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:.5rem;' + breakStyle + '">' +
@@ -1613,6 +1613,7 @@ function buildCustomSectionsHTML(color) {
       i += 2;
     } else {
       html += '<div class="rb-section-wrap" style="' + breakStyle + '">' +
+        breakSpacer +
         '<div class="tpl-section-title" style="color:' + color + ';border-color:' + color + '">' + escHtml(s.title) + '</div>' +
         '<div style="font-size:9pt;color:#475569;line-height:1.6;margin-bottom:.6rem">' + (s.content || '') + '</div>' +
         '</div>';
