@@ -156,7 +156,7 @@
     </div>
   </div>
 </footer>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
 <script>
 (function(){
   async function ls(){try{const d=await fetch('/api/settings').then(r=>r.json());const s=d.settings;if(s.primary_color)document.documentElement.style.setProperty('--primary',s.primary_color);if(s.site_name){document.querySelectorAll('.brand-name').forEach(e=>e.textContent=s.site_name);const fc=document.getElementById('footer-copy-name');if(fc)fc.textContent=s.site_name;}if(s.logo_url){const l=document.getElementById('site-logo');if(l){l.src=s.logo_url;l.classList.remove('d-none');}}at(localStorage.getItem('theme')||s.default_theme||'light',false);}catch(e){}}

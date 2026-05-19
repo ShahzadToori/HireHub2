@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free Gulf Resume Builder — JobOrbit</title>
+  <meta name="description" content="Build a professional Gulf CV for free. Gulf-specific fields: photo, nationality, iqama status, visa, expected salary. 5 templates. Download PDF instantly.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="/tools/resume-builder/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Free Gulf Resume Builder — JobOrbit">
+  <meta property="og:description" content="Build a Gulf-ready CV in minutes. Photo, iqama status, visa fields. 5 professional templates. Free PDF download.">
+  <meta property="og:site_name" content="JobOrbit">
+  <link rel="icon" type="image/svg+xml" href="/JobOrbitFavicon.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0f62fe">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/tools/resume-builder/resume-builder.css">
+  <!-- html2pdf.js for PDF export — no server needed -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════
+     NAVBAR
+════════════════════════════════════════════════ -->
+<nav class="navbar navbar-expand-lg sticky-top" id="mainNav">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+      <img id="site-logo" src="" alt="Logo" class="d-none" style="max-height:36px">
+    </a>
+    <div class="d-flex align-items-center gap-2 ms-auto">
+      <button class="btn btn-icon theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <i class="bi bi-moon-fill" id="themeIcon"></i>
+      </button>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <i class="bi bi-list fs-4"></i>
+      </button>
+    </div>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+        <li class="nav-item"><a class="nav-link" href="/">Browse Jobs</a></li>
+        <li class="nav-item"><a class="nav-link" href="/blog/">Blog</a></li>
+        <li class="nav-item"><a class="nav-link nav-link-active" href="/tools/">Tools</a></li>
+        <li class="nav-item"><a class="nav-link" href="/contact.html">Post a Job</a></li>
+        <li class="nav-item"><a class="nav-link" href="/feedback.html">Feedback</a></li>
+        <li class="nav-item"><a class="nav-link" href="/about.html">About</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════
+     RESTORE BANNER
+════════════════════════════════════════════════ -->
+<div id="rbRestoreBanner" class="rb-restore-banner" style="display:none">
+  <span><i class="bi bi-clock-history me-2"></i>Welcome back! Your resume was saved — continue where you left off.</span>
+  <div style="display:flex;gap:.5rem;flex-shrink:0">
+    <button onclick="autosave();document.getElementById('rbRestoreBanner').style.display='none'">Continue ✓</button>
+    <button style="background:var(--surface);color:var(--text-secondary);border:1px solid var(--border)" onclick="localStorage.removeItem('rb_joborbit_data');location.reload()">Start Fresh</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     HERO
+════════════════════════════════════════════════ -->
+<section class="rb-hero">
+  <div class="container rb-hero-inner">
+    <div class="rb-badge"><i class="bi bi-file-earmark-person-fill me-1"></i>Gulf Resume Builder</div>
+    <h1>Build Your Gulf-Ready CV — Free</h1>
+    <p>Gulf-specific fields (iqama, visa, nationality, photo), 5 professional templates, instant PDF download. No account needed.</p>
+    <div style="display:flex;justify-content:center;flex-wrap:wrap;gap:.6rem;margin-top:1rem">
+      <span style="background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);border-radius:100px;padding:.25rem .8rem;font-size:.75rem"><i class="bi bi-check-circle-fill me-1" style="color:#34d399"></i>100% Free</span>
+      <span style="background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);border-radius:100px;padding:.25rem .8rem;font-size:.75rem"><i class="bi bi-check-circle-fill me-1" style="color:#34d399"></i>No Registration</span>
+      <span style="background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);border-radius:100px;padding:.25rem .8rem;font-size:.75rem"><i class="bi bi-check-circle-fill me-1" style="color:#34d399"></i>Gulf-Specific Fields</span>
+      <span style="background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);border-radius:100px;padding:.25rem .8rem;font-size:.75rem"><i class="bi bi-check-circle-fill me-1" style="color:#34d399"></i>5 Templates</span>
+      <span style="background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);border-radius:100px;padding:.25rem .8rem;font-size:.75rem"><i class="bi bi-check-circle-fill me-1" style="color:#34d399"></i>PDF Download</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     PROGRESS STEPS
+════════════════════════════════════════════════ -->
+<div class="rb-progress-wrap">
+  <div class="container">
+    <div class="rb-steps">
+      <div class="rb-step active" onclick="goToStep(1)">
+        <div class="rb-step-dot">1</div>
+        <div class="rb-step-label">Personal</div>
+      </div>
+      <div class="rb-step" onclick="goToStep(2)">
+        <div class="rb-step-dot">2</div>
+        <div class="rb-step-label">Experience</div>
+      </div>
+      <div class="rb-step" onclick="goToStep(3)">
+        <div class="rb-step-dot">3</div>
+        <div class="rb-step-label">Education</div>
+      </div>
+      <div class="rb-step" onclick="goToStep(4)">
+        <div class="rb-step-dot">4</div>
+        <div class="rb-step-label">Skills</div>
+      </div>
+      <div class="rb-step" onclick="goToStep(5)">
+        <div class="rb-step-dot">5</div>
+        <div class="rb-step-label">Extras</div>
+      </div>
+      <div class="rb-step" onclick="goToStep(6)">
+        <div class="rb-step-dot">6</div>
+        <div class="rb-step-label">Download</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     MAIN: FORM + PREVIEW
+════════════════════════════════════════════════ -->
+<div class="rb-main">
+
+  <!-- ════════════════════ FORM PANEL ════════════════════ -->
+  <div class="rb-form-panel">
+
+    <!-- Gulf Tip Box -->
+    <div class="rb-tip-box mb-3" id="rbTipBox">
+      <i class="bi bi-lightbulb-fill"></i>
+      <div id="rbGulfTip">Loading tips...</div>
+    </div>
+
+    <!-- ATS Score Widget (visible on all steps) -->
+    <div class="rb-ats-widget">
+      <div class="rb-ats-header">
+        <div class="rb-ats-ring" id="rbAtsRing"></div>
+        <div>
+          <div class="rb-ats-title">ATS Compatibility Score</div>
+          <div class="rb-ats-sub">Fill more fields to improve your score</div>
+        </div>
+      </div>
+      <div id="rbAtsList"></div>
+    </div>
+
+    <!-- ─── STEP 1: Personal Info ─────────────────────── -->
+    <div class="rb-section active" id="rb-step-1">
+      <div class="rb-section-title">Personal Information</div>
+      <div class="rb-section-sub">Gulf employers require more personal details than Western CVs. Fill all Gulf-marked fields.</div>
+
+      <!-- Photo Upload -->
+      <div class="rb-field-group">
+        <label class="rb-label"><i class="bi bi-camera-fill me-1"></i>Professional Photo <span class="rb-gulf-badge">Gulf Required</span></label>
+        <div class="rb-photo-wrap">
+          <div class="rb-photo-preview" id="rbPhotoPrev" title="Click to upload photo">
+            <div class="rb-photo-placeholder">
+              <i class="bi bi-person-bounding-box"></i>
+              Tap to upload
+            </div>
+          </div>
+          <ul class="rb-photo-tips">
+            <li>✓ Plain white or light background</li>
+            <li>✓ Formal attire, facing camera</li>
+            <li>✓ Clear face, no sunglasses</li>
+            <li>✗ No selfies or casual photos</li>
+            <li>✗ No group photos</li>
+          </ul>
+        </div>
+        <input type="file" id="rbPhotoInput" accept="image/*" style="display:none">
+      </div>
+
+      <div class="row g-2">
+        <div class="col-sm-6">
+          <div class="rb-field-group">
+            <label class="rb-label" for="rbFullNameEn">Full Name (English) <span class="rb-required">*</span></label>
+            <input class="rb-input" id="rbFullNameEn" placeholder="e.g. Mohammed Al-Rashidi" autocomplete="name">
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="rb-field-group">
+            <label class="rb-label" for="rbFullNameAr">Full Name (Arabic) <span class="rb-gulf-badge">Optional</span></label>
+            <input class="rb-input" id="rbFullNameAr" placeholder="محمد الراشدي" dir="rtl">
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="rb-field-group">
+            <label class="rb-label" for="rbJobTitle">Professional Title <span class="rb-required">*</span></label>
+            <input class="rb-input" id="rbJobTitle" placeholder="e.g. Senior Civil Engineer, Registered Nurse, IT Manager">
+            <div id="rbSalaryWidget" class="rb-salary-widget">
+              <i class="bi bi-graph-up-arrow me-1" style="color:#059669"></i>
+              <strong>Gulf Salary Benchmark:</strong> <span id="rbSalaryRange" class="rb-salary-range"></span>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="rb-field-group">
+            <label class="rb-label" for="rbNationality">Nationality <span class="rb-gulf-badge">Gulf Required</span></label>
+            <input class="rb-input" id="rbNationality" placeholder="e.g. Pakistani, Indian, Egyptian">
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="rb-field-group">
+            <label class="rb-label" for="rbDob">Date of Birth <span class="rb-gulf-badge">Gulf Required</span></label>
+            <input type="date" class="rb-input" id="rbDob">
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="rb-field-group">
+            <label class="rb-label" for="rbGender">Gender <span class="rb-gulf-badge">Gulf Required</span></label>
+            <select class="rb-select" id="rbGender">
+              <option value="">Select...</option>
+              <option>Male</option>
+              <option>Female</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="rb-field-group">
+            <label class="rb-label" for="rbMaritalStatus">Marital Status <span class="rb-gulf-badge">Common in Gulf</span></label>
+            <select class="rb-select" id="rbMaritalStatus">
+              <option value="">Select...</option>
+              <option>Single</option>
+              <option>Married</option>
+              <option>Divorced</option>
+              <option>Widowed</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="rb-field-group">
+            <label class="rb-label" for="rbReligion">Religion <span class="rb-gulf-badge">Optional</span></label>
+            <input class="rb-input" id="rbReligion" placeholder="e.g. Muslim, Christian">
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="rb-field-group">
+            <label class="rb-label" for="rbCurrentCity">Current City</label>
+            <input class="rb-input" id="rbCurrentCity" placeholder="e.g. Riyadh">
+          </div>
+        </div>
+      </div>
+
+      <hr style="border-color:var(--border);margin:1.1rem 0">
+      <p style="font-size:.78rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.85rem">Gulf Visa & Work Status</p>
+      <div class="row g-2">
+        <div class="col-sm-6">
+          <div class="rb-field-group">
+            <label class="rb-label" for="rbVisaStatus">Current Visa / Status <span class="rb-gulf-badge">Gulf Required</span></label>
+            <select class="rb-select" id="rbVisaStatus">
+              <option value="">Select...</option>
+              <option>Work Visa / Iqama</option>
+              <option>Visit Visa</option>
+              <option>Tourist Visa</option>
+              <option>Family Residence</option>
+              <option>Own Iqama</option>
+              <option>Premium Residency</option>
+              <option>Not in Saudi / Abroad</option>
+              <option>UAE Residence Visa</option>
+              <option>Qatar Residence Permit</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="rb-field-group">
+            <label class="rb-label" for="rbNoticePeriod">Notice Period <span class="rb-gulf-badge">Gulf Required</span></label>
+            <select class="rb-select" id="rbNoticePeriod">
+              <option value="">Select...</option>
+              <option>Immediately Available</option>
+              <option>2 Weeks</option>
+              <option>1 Month</option>
+              <option>2 Months</option>
+              <option>3 Months</option>
+              <option>Negotiable</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="rb-field-group">
+            <label class="rb-label" for="rbIqamaNo">Iqama / Residence ID</label>
+            <input class="rb-input" id="rbIqamaNo" placeholder="Optional">
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="rb-field-group">
+            <label class="rb-label">Transferable Iqama? <span class="rb-gulf-badge">Saudi Key Field</span></label>
+            <div style="display:flex;gap:1.25rem;padding:.5rem 0">
+              <label style="display:flex;align-items:center;gap:.4rem;cursor:pointer;font-size:.85rem;color:var(--text-secondary)">
+                <input type="checkbox" id="rbTransferable"> Yes, my iqama is transferable
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="rb-field-group">
+            <label class="rb-label" for="rbPassportExpiry">Passport Expiry Date</label>
+            <input type="date" class="rb-input" id="rbPassportExpiry">
+            <div id="rbPassportExpiryWarn" class="rb-expiry-warn"></div>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="rb-field-group">
+            <label class="rb-label">Driving Licence</label>
+            <div style="display:flex;gap:1rem;padding:.5rem 0;flex-wrap:wrap">
+              <label style="display:flex;align-items:center;gap:.4rem;cursor:pointer;font-size:.85rem;color:var(--text-secondary)">
+                <input type="checkbox" id="rbDrivingLic"> Has driving licence
+              </label>
+              <label style="display:flex;align-items:center;gap:.4rem;cursor:pointer;font-size:.85rem;color:var(--text-secondary)">
+                <input type="checkbox" id="rbSaudiLic"> Saudi driving licence
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <hr style="border-color:var(--border);margin:1.1rem 0">
+      <p style="font-size:.78rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.85rem">Expected Salary</p>
+      <div class="row g-2">
+        <div class="col-4">
+          <div class="rb-field-group">
+            <label class="rb-label" for="rbSalaryCurrency">Currency</label>
+            <select class="rb-select" id="rbSalaryCurrency">
+              <option value="SAR">SAR</option>
+              <option value="AED">AED</option>
+              <option value="QAR">QAR</option>
+              <option value="KWD">KWD</option>
+              <option value="BHD">BHD</option>
+              <option value="OMR">OMR</option>
+              <option value="USD">USD</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-8">
+          <div class="rb-field-group">
+            <label class="rb-label" for="rbExpSalary">Expected Salary (monthly)</label>
+            <input type="number" class="rb-input" id="rbExpSalary" placeholder="e.g. 12000">
+          </div>
+        </div>
+      </div>
+
+      <hr style="border-color:var(--border);margin:1.1rem 0">
+      <p style="font-size:.78rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.85rem">Contact Details</p>
+      <div class="row g-2">
+        <div class="col-4">
+          <div class="rb-field-group">
+            <label class="rb-label">Code</label>
+            <select class="rb-select" id="rbPhoneCode">
+              <option value="+966">+966 🇸🇦</option>
+              <option value="+971">+971 🇦🇪</option>
+              <option value="+974">+974 🇶🇦</option>
+              <option value="+965">+965 🇰🇼</option>
+              <option value="+92">+92 🇵🇰</option>
+              <option value="+91">+91 🇮🇳</option>
+              <option value="+880">+880 🇧🇩</option>
+              <option value="+63">+63 🇵🇭</option>
+              <option value="+20">+20 🇪🇬</option>
+              <option value="+977">+977 🇳🇵</option>
+              <option value="+94">+94 🇱🇰</option>
+              <option value="+44">+44 🇬🇧</option>
+              <option value="+1">+1 🇺🇸</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-8">
+          <div class="rb-field-group">
+            <label class="rb-label" for="rbPhone">Phone Number <span class="rb-required">*</span></label>
+            <input type="tel" class="rb-input" id="rbPhone" placeholder="5XXXXXXXX" autocomplete="tel">
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="rb-field-group">
+            <label class="rb-label">WhatsApp Code</label>
+            <select class="rb-select" id="rbWaCode">
+              <option value="+966">+966 🇸🇦</option>
+              <option value="+971">+971 🇦🇪</option>
+              <option value="+92">+92 🇵🇰</option>
+              <option value="+91">+91 🇮🇳</option>
+              <option value="+880">+880 🇧🇩</option>
+              <option value="+63">+63 🇵🇭</option>
+              <option value="+20">+20 🇪🇬</option>
+              <option value="+977">+977 🇳🇵</option>
+              <option value="+44">+44 🇬🇧</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-8">
+          <div class="rb-field-group">
+            <label class="rb-label" for="rbWhatsapp">WhatsApp Number <span class="rb-gulf-badge">Gulf Priority</span></label>
+            <input type="tel" class="rb-input" id="rbWhatsapp" placeholder="Same as phone or different">
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="rb-field-group">
+            <label class="rb-label" for="rbEmail">Email Address <span class="rb-required">*</span></label>
+            <input type="email" class="rb-input" id="rbEmail" placeholder="your@email.com" autocomplete="email">
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="rb-field-group">
+            <label class="rb-label" for="rbLinkedin">LinkedIn Profile URL</label>
+            <input type="url" class="rb-input" id="rbLinkedin" placeholder="https://linkedin.com/in/yourname">
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="rb-field-group">
+            <label class="rb-label" for="rbCurrentEmployer">Current / Last Employer</label>
+            <input class="rb-input" id="rbCurrentEmployer" placeholder="Company name">
+          </div>
+        </div>
+      </div>
+
+      <div class="rb-nav-btns">
+        <button class="rb-btn-next" onclick="nextStep()">Continue to Experience <i class="bi bi-arrow-right ms-1"></i></button>
+      </div>
+    </div>
+
+    <!-- ─── STEP 2: Summary + Experience ──────────────── -->
+    <div class="rb-section" id="rb-step-2">
+      <div class="rb-section-title">Summary & Work Experience</div>
+      <div class="rb-section-sub">Your professional summary is the first thing employers read. Keep it 3–5 lines max.</div>
+
+      <div class="rb-field-group">
+        <label class="rb-label" for="rbSummary">Professional Summary</label>
+        <textarea class="rb-textarea" id="rbSummary" rows="4"
+          data-maxlen="600"
+          placeholder="Write a compelling 3–5 line summary. Example:&#10;Results-driven Civil Engineer with 7 years of Gulf experience on major infrastructure projects in Saudi Arabia and UAE. Specialised in structural design and project delivery under FIDIC contracts. Currently holding transferable iqama, available with 1 month notice."></textarea>
+        <div class="d-flex justify-content-between">
+          <div class="rb-hint">Gulf tip: mention your years of experience, specialisation, and Gulf-specific details like iqama status.</div>
+          <div id="rbSummaryCount" class="rb-char-count">0 / 600</div>
+        </div>
+      </div>
+
+      <hr style="border-color:var(--border);margin:1.1rem 0">
+      <p style="font-size:.82rem;font-weight:700;color:var(--text-primary);margin-bottom:.75rem">Work Experience</p>
+
+      <div id="rbExperienceList"></div>
+      <button class="rb-add-btn" onclick="addExperience()">
+        <i class="bi bi-plus-circle-fill"></i> Add Work Experience
+      </button>
+
+      <div class="rb-nav-btns">
+        <button class="rb-btn-prev" onclick="prevStep()"><i class="bi bi-arrow-left me-1"></i> Back</button>
+        <button class="rb-btn-next" onclick="nextStep()">Continue to Education <i class="bi bi-arrow-right ms-1"></i></button>
+      </div>
+    </div>
+
+    <!-- ─── STEP 3: Education + Certifications ────────── -->
+    <div class="rb-section" id="rb-step-3">
+      <div class="rb-section-title">Education & Certifications</div>
+      <div class="rb-section-sub">List your highest qualification first. Include all relevant Gulf licences.</div>
+
+      <p style="font-size:.82rem;font-weight:700;color:var(--text-primary);margin-bottom:.75rem">Education</p>
+      <div id="rbEducationList"></div>
+      <button class="rb-add-btn" onclick="addEducation()">
+        <i class="bi bi-plus-circle-fill"></i> Add Education
+      </button>
+
+      <hr style="border-color:var(--border);margin:1.1rem 0">
+      <p style="font-size:.82rem;font-weight:700;color:var(--text-primary);margin-bottom:.5rem">Certifications & Licences</p>
+      <p class="rb-hint mb-2">Include PMP, ACCA, CPA, HAAD, DHA, SCHS, SAP, AWS, or any Gulf-specific professional licence.</p>
+      <div id="rbCertList"></div>
+      <button class="rb-add-btn" onclick="addCertification()">
+        <i class="bi bi-plus-circle-fill"></i> Add Certification
+      </button>
+
+      <div class="rb-nav-btns">
+        <button class="rb-btn-prev" onclick="prevStep()"><i class="bi bi-arrow-left me-1"></i> Back</button>
+        <button class="rb-btn-next" onclick="nextStep()">Continue to Skills <i class="bi bi-arrow-right ms-1"></i></button>
+      </div>
+    </div>
+
+    <!-- ─── STEP 4: Skills + Languages ────────────────── -->
+    <div class="rb-section" id="rb-step-4">
+      <div class="rb-section-title">Skills & Languages</div>
+      <div class="rb-section-sub">Add at least 5 skills. Use keywords from job descriptions to pass ATS screening.</div>
+
+      <div class="rb-field-group">
+        <label class="rb-label">Skills <span class="rb-gulf-badge">ATS Critical</span></label>
+        <div class="rb-tags-wrap" id="rbSkillsWrap">
+          <input class="rb-tags-input" id="rbSkillInput" placeholder="Type skill + Enter">
+        </div>
+        <div class="rb-hint">Type a skill and press Enter. Suggestions based on your job title:</div>
+        <div id="rbSkillSuggestions" class="rb-suggestions mt-2"></div>
+      </div>
+
+      <hr style="border-color:var(--border);margin:1.1rem 0">
+      <p style="font-size:.82rem;font-weight:700;color:var(--text-primary);margin-bottom:.75rem">Languages</p>
+      <div id="rbLanguageList"></div>
+      <button class="rb-add-btn" onclick="addLanguage()">
+        <i class="bi bi-plus-circle-fill"></i> Add Language
+      </button>
+      <div class="rb-hint mt-2">Gulf tip: Arabic proficiency — even Basic — significantly increases your chances with Saudi employers.</div>
+
+      <div class="rb-nav-btns">
+        <button class="rb-btn-prev" onclick="prevStep()"><i class="bi bi-arrow-left me-1"></i> Back</button>
+        <button class="rb-btn-next" onclick="nextStep()">Continue to Extras <i class="bi bi-arrow-right ms-1"></i></button>
+      </div>
+    </div>
+
+    <!-- ─── STEP 5: References + Achievements + Custom Sections ── -->
+    <div class="rb-section" id="rb-step-5">
+      <div class="rb-section-title">References, Achievements & Custom Sections</div>
+      <div class="rb-section-sub">Add references, achievements, and any custom sections with your own title and rich text content.</div>
+
+      <p style="font-size:.82rem;font-weight:700;color:var(--text-primary);margin-bottom:.75rem">References</p>
+      <div id="rbReferenceList"></div>
+      <button class="rb-add-btn" onclick="addReference()">
+        <i class="bi bi-plus-circle-fill"></i> Add Reference
+      </button>
+
+      <hr style="border-color:var(--border);margin:1.1rem 0">
+      <div class="rb-field-group">
+        <label class="rb-label" for="rbAchievements">Achievements & Awards <span class="rb-gulf-badge">Optional</span></label>
+        <textarea class="rb-textarea" id="rbAchievements" rows="4"
+          placeholder="• Employee of the Year 2023 — Al-Rajhi Bank&#10;• Completed Aramco Safety Excellence Programme&#10;• Published paper on structural engineering in Saudi Engineering Journal"></textarea>
+        <div class="rb-hint">Gulf tip: any company awards, vision 2030 project involvement, or Saudi council recognitions strengthen your application significantly.</div>
+      </div>
+
+      <hr style="border-color:var(--border);margin:1.1rem 0">
+
+      <!-- Custom Sections -->
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.65rem;gap:.75rem;flex-wrap:wrap">
+        <div>
+          <p style="font-size:.88rem;font-weight:700;color:var(--text-primary);margin:0">Custom Sections</p>
+          <p style="font-size:.76rem;color:var(--text-muted);margin:.2rem 0 0">Add any section with your own title — Roles &amp; Responsibilities, Projects, Publications, Volunteer Work, etc. Full or half-width layout.</p>
+        </div>
+        <button class="rb-add-btn" style="width:auto;flex-shrink:0;padding:.5rem 1.1rem;margin:0" onclick="addCustomSection()">
+          <i class="bi bi-plus-circle-fill"></i> Add Section
+        </button>
+      </div>
+      <div id="rbCustomSectionsList">
+        <p style="font-size:.82rem;color:var(--text-muted);text-align:center;padding:.85rem 0">No custom sections yet. Click "Add Section" to create one.</p>
+      </div>
+
+      <div class="rb-nav-btns">
+        <button class="rb-btn-prev" onclick="prevStep()"><i class="bi bi-arrow-left me-1"></i> Back</button>
+        <button class="rb-btn-next" onclick="nextStep()">Choose Template & Download <i class="bi bi-arrow-right ms-1"></i></button>
+      </div>
+    </div>
+
+    <!-- ─── STEP 6: Template + Download ───────────────── -->
+    <div class="rb-section" id="rb-step-6">
+      <div class="rb-section-title">Choose Template & Download</div>
+      <div class="rb-section-sub">Select the template that best fits your industry, then download your PDF.</div>
+
+      <!-- Template grid -->
+      <p style="font-size:.78rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem">Template</p>
+      <div class="rb-template-grid" id="rbTemplateGrid">
+        <!-- Injected by JS -->
+      </div>
+
+      <!-- Color -->
+      <p style="font-size:.78rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.6rem">Accent Colour</p>
+      <div id="rbColorPicker" class="rb-colors"></div>
+
+      <!-- Font -->
+      <p style="font-size:.78rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.6rem">Font Style</p>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.25rem">
+        <button onclick="selectFont('dm-sans')"    id="font-dm-sans"    style="padding:.35rem .85rem;border-radius:8px;border:1.5px solid var(--primary);background:rgba(15,98,254,.08);color:var(--primary);font-size:.8rem;font-weight:600;cursor:pointer">Professional</button>
+        <button onclick="selectFont('syne')"       id="font-syne"       style="padding:.35rem .85rem;border-radius:8px;border:1.5px solid var(--border);background:var(--surface);color:var(--text-secondary);font-size:.8rem;cursor:pointer;font-family:'Syne',sans-serif">Modern</button>
+        <button onclick="selectFont('georgia')"    id="font-georgia"    style="padding:.35rem .85rem;border-radius:8px;border:1.5px solid var(--border);background:var(--surface);color:var(--text-secondary);font-size:.8rem;cursor:pointer;font-family:Georgia,serif">Classic</button>
+      </div>
+
+      <!-- Download actions -->
+      <div style="display:flex;gap:.65rem;flex-direction:column">
+        <button class="rb-btn-download" onclick="downloadPDF()">
+          <i class="bi bi-file-earmark-pdf-fill"></i> Download PDF
+        </button>
+        <div style="display:flex;gap:.65rem">
+          <button class="rb-preview-action-btn flex-fill" onclick="printResume()">
+            <i class="bi bi-printer"></i> Print / Save
+          </button>
+          <button class="rb-wa-share flex-fill" onclick="shareViaWhatsApp()">
+            <i class="bi bi-whatsapp"></i> Share Summary
+          </button>
+          <button class="rb-preview-action-btn flex-fill" id="rbCopyBtn" onclick="copyCVText()">
+            <i class="bi bi-clipboard"></i> Copy Text
+          </button>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <div class="rb-cta">
+        <h3>✅ Your Gulf Resume is Ready!</h3>
+        <p>Now find the jobs that match your profile. Browse thousands of verified Gulf listings.</p>
+        <div class="cta-btns">
+          <a href="/" class="cta-btn"><i class="bi bi-briefcase-fill me-1"></i>Browse All Jobs</a>
+          <a href="/?location=Riyadh" class="cta-btn">Jobs in Riyadh</a>
+          <a href="/?location=Dubai" class="cta-btn">Jobs in Dubai</a>
+          <a href="/?location=Doha" class="cta-btn">Jobs in Doha</a>
+        </div>
+      </div>
+
+      <div class="rb-nav-btns">
+        <button class="rb-btn-prev" onclick="prevStep()"><i class="bi bi-arrow-left me-1"></i> Back</button>
+      </div>
+    </div>
+
+  </div><!-- /.rb-form-panel -->
+
+  <!-- ════════════════════ PREVIEW PANEL ════════════════════ -->
+  <div class="rb-preview-panel" id="rbPreviewPanel">
+    <button class="rb-preview-close" id="rbPreviewClose" aria-label="Close preview">
+      <i class="bi bi-x-lg"></i>
+    </button>
+    <div class="rb-preview-label"><i class="bi bi-eye me-1"></i>Live Preview — updates as you type</div>
+    <div class="rb-preview-actions">
+      <button class="rb-preview-action-btn" onclick="downloadPDF()"><i class="bi bi-download"></i> PDF</button>
+      <button class="rb-preview-action-btn" onclick="printResume()"><i class="bi bi-printer"></i> Print</button>
+      <button class="rb-preview-action-btn" onclick="shareViaWhatsApp()"><i class="bi bi-whatsapp" style="color:#25d366"></i> Share</button>
+      <button class="rb-preview-action-btn" id="rbCopyBtn2" onclick="copyCVText()"><i class="bi bi-clipboard"></i> Copy</button>
+    </div>
+    <div id="rbPreviewWrap" class="rb-preview-wrap">
+      <div style="padding:3rem;text-align:center;color:#94a3b8">
+        <i class="bi bi-file-earmark-person" style="font-size:2.5rem;display:block;margin-bottom:1rem;opacity:.4"></i>
+        Start filling in your details to see the live preview
+      </div>
+    </div>
+  </div>
+
+</div><!-- /.rb-main -->
+
+<!-- ══════════════════════════════════════════════
+     MOBILE PREVIEW TOGGLE
+════════════════════════════════════════════════ -->
+<div class="rb-mobile-toggle">
+  <button class="rb-toggle-btn" id="rbMobileToggle" aria-label="Toggle preview">
+    <i class="bi bi-eye-fill"></i>
+  </button>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     PDF GENERATING OVERLAY
+════════════════════════════════════════════════ -->
+<div class="rb-generating" id="rbGenerating">
+  <div class="rb-generating-card">
+    <div class="spinner-border" role="status"></div>
+    <h5>Building Your Gulf CV…</h5>
+    <p>Generating your professional PDF. This takes a few seconds.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════════ -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="row g-4 align-items-start">
+      <div class="col-md-4">
+        <div class="footer-brand mb-2"><span class="brand-name" id="footer-site-name">JobOrbit</span></div>
+        <p class="footer-desc">Connecting talent with opportunity across the Gulf region.</p>
+      </div>
+      <div class="col-md-4">
+        <h6 class="footer-heading">Career Tools</h6>
+        <ul class="footer-links">
+          <li><a href="/tools/resume-builder/">Gulf Resume Builder</a></li>
+          <li><a href="/tools/eosb-calculator.html">EOSB Calculator</a></li>
+          <li><a href="/tools/salary-calculator.html">Salary Calculator</a></li>
+          <li><a href="/tools/iqama-transfer-checker.html">Iqama Transfer Checker</a></li>
+          <li><a href="/tools/">All Tools</a></li>
+        </ul>
+      </div>
+      <div class="col-md-4">
+        <h6 class="footer-heading">Legal</h6>
+        <ul class="footer-links">
+          <li><a href="/about.html">About Us</a></li>
+          <li><a href="/privacy-policy.html">Privacy Policy</a></li>
+          <li><a href="/terms.html">Terms & Conditions</a></li>
+          <li><a href="/disclaimer.html">Disclaimer</a></li>
+        </ul>
+      </div>
+    </div>
+    <hr class="footer-divider">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <p class="mb-0 footer-copy">© <span id="footerYear"></span> <span id="footer-copy-name">JobOrbit</span>. All rights reserved.</p>
+      <a href="/" class="footer-copy" style="text-decoration:none">Browse Jobs →</a>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
+<script src="/tools/resume-builder/resume-builder.js"></script>
+<script>
+// Font selector
+window.selectFont = function(font) {
+  RB.data.settings.font = font;
+  ['dm-sans','syne','georgia'].forEach(f => {
+    const btn = document.getElementById('font-' + f);
+    if (btn) {
+      btn.style.borderColor  = f === font ? 'var(--primary)' : 'var(--border)';
+      btn.style.background   = f === font ? 'rgba(15,98,254,.08)' : 'var(--surface)';
+      btn.style.color        = f === font ? 'var(--primary)' : 'var(--text-secondary)';
+      btn.style.fontWeight   = f === font ? '700' : '400';
+    }
+  });
+  document.getElementById('rbPreviewWrap').style.fontFamily = font === 'syne' ? "'Syne',sans-serif" : font === 'georgia' ? "Georgia,serif" : "'DM Sans',sans-serif";
+};
+// Footer year
+document.getElementById('footerYear').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>

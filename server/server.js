@@ -15,6 +15,7 @@ const seoRoutes      = require('./routes/seo');
 const { router: alertsRouter, scheduleAutoDigest } = require('./routes/alerts');
 const reviewsRouter  = require('./routes/reviews');
 const blacklistRouter = require('./routes/blacklist');
+const pdfRoute       = require('./routes/pdf');
 
 const app  = express();
 app.set('trust proxy', 1);
@@ -81,6 +82,7 @@ app.use('/api/contact',   contactRoutes);
 app.use('/api/alerts',    alertsRouter);
 app.use('/api/reviews',   reviewsRouter);
 app.use('/api/blacklist', blacklistRouter);
+app.use(pdfRoute);   // ← PDF generation (POST /api/resume/pdf)
 
 // ── SPA Fallback ──────────────────────────────────────────────
 app.get('/admin/*', (req, res) => {
