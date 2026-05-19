@@ -1,6 +1,9 @@
 /* ══════════════════════════════════════════════════════════════
    routes/pdf.js — Production-ready PDF generation
    
+   On VPS  : uses puppeteer's OWN bundled Chromium (no snap needed)
+   On Termux: uses puppeteer-core + system Chromium
+   
    Architecture:
    • Singleton browser — Chromium launches once, stays alive
    • Concurrency queue — max 3 PDFs generate simultaneously
@@ -8,34 +11,32 @@
    • Overflow guard   — 503 if queue is full (not a crash)
    • Auto-recovery    — browser restarts if it crashes
    • Timeout          — requests don't hang forever (25s max)
-   
-   Install on VPS:    npm install puppeteer
-   Install on Termux: pkg install chromium && npm install puppeteer-core
 ══════════════════════════════════════════════════════════════ */
-const express      = require('express');
-const router       = express.Router();
-const { execSync } = require('child_process');
+const express = require('express');
+const router  = express.Router();
 
-/* ── Environment detection ───────────────────────────────── */
-function getChromiumPath() {
-  const candidates = [
-    '/data/data/com.termux/files/usr/bin/chromium-browser',
-    '/data/data/com.termux/files/usr/bin/chromium',
-    '/usr/bin/chromium-browser',
-    '/usr/bin/chromium',
-    '/usr/bin/google-chrome-stable',
-    '/usr/bin/google-chrome',
-  ];
-  for (const p of candidates) {
-    try { execSync(`test -f "${p}"`); return p; } catch(e) {}
-  }
-  return null; // Let full puppeteer use its bundled Chromium
-}
+/* ── Detect puppeteer + correct Chromium path ────────────── */
+function getPuppeteerAndPath() {
+  // Full puppeteer (VPS) — has its own bundled Chromium, use it directly
+  // No executablePath needed — puppeteer.executablePath() gives exact path
+  try {
+    const p = require('puppeteer');
+    return { puppeteer: p, executablePath: p.executablePath() };
+  } catch(e) {}
 
-function getPuppeteer() {
-  try { return require('puppeteer-core'); } catch(e) {}
-  try { return require('puppeteer');      } catch(e) {}
-  throw new Error('Run: npm install puppeteer');
+  // puppeteer-core (Termux) — needs system Chromium
+  try {
+    const { execSync } = require('child_process');
+    const p = require('puppeteer-core');
+    const candidates = [
+      '/data/data/com.termux/files/usr/bin/chromium-browser',
+      '/data/data/com.termux/files/usr/bin/chromium',
+    ];
+    for (const c of candidates) {
+      try { execSync(`test -f "${c}"`); return { puppeteer: p, executablePath: c }; } catch(e) {}
+    }
+    throw new Error('Chromium not found on Termux. Run: pkg install chromium');
+  } catch(e) { throw e; }
 }
 
 /* ── Singleton browser ───────────────────────────────────── */
@@ -47,9 +48,10 @@ async function getBrowser() {
     catch(e) { browser = null; }
   }
 
-  const puppeteer      = getPuppeteer();
-  const executablePath = getChromiumPath();
-  const opts = {
+  const { puppeteer, executablePath } = getPuppeteerAndPath();
+
+  browser = await puppeteer.launch({
+    executablePath,
     headless: 'new',
     args: [
       '--no-sandbox',
@@ -58,22 +60,20 @@ async function getBrowser() {
       '--disable-gpu',
       '--font-render-hinting=none',
     ],
-  };
-  if (executablePath) opts.executablePath = executablePath;
+  });
 
-  browser = await puppeteer.launch(opts);
   browser.on('disconnected', () => {
     browser = null;
     console.log('[PDF] Browser disconnected — will restart on next request');
   });
 
-  console.log('[PDF] Browser started —', executablePath || 'bundled Chromium');
+  console.log('[PDF] Browser started —', executablePath);
   return browser;
 }
 
 /* ── Concurrency queue ───────────────────────────────────── */
-const MAX_CONCURRENT = 3;   // PDFs generating at the same time
-const MAX_QUEUED     = 20;  // Requests waiting in line
+const MAX_CONCURRENT = 3;
+const MAX_QUEUED     = 20;
 const TIMEOUT_MS     = 25000;
 
 let active = 0;
@@ -88,7 +88,6 @@ function acquireSlot() {
     if (waitQueue.length >= MAX_QUEUED) {
       return reject(new Error('PDF service is busy — please try again in a moment.'));
     }
-    // Add timeout so requests don't wait forever
     const timer = setTimeout(() => {
       const idx = waitQueue.findIndex(w => w.resolve === resolve);
       if (idx !== -1) waitQueue.splice(idx, 1);
@@ -104,10 +103,7 @@ function acquireSlot() {
 
 function releaseSlot() {
   active = Math.max(0, active - 1);
-  if (waitQueue.length > 0) {
-    const next = waitQueue.shift();
-    next.resolve();
-  }
+  if (waitQueue.length > 0) waitQueue.shift().resolve();
 }
 
 /* ── Route ───────────────────────────────────────────────── */
@@ -115,14 +111,12 @@ router.post('/api/resume/pdf', async (req, res) => {
   const { html, filename } = req.body;
   if (!html) return res.status(400).json({ error: 'No HTML provided' });
 
-  // Queue status header — useful for monitoring
   res.setHeader('X-PDF-Queue', `active=${active} waiting=${waitQueue.length}`);
 
   let slotAcquired = false;
   let page;
 
   try {
-    // Wait for a free slot (or reject if overloaded)
     await acquireSlot();
     slotAcquired = true;
 
@@ -154,12 +148,12 @@ router.post('/api/resume/pdf', async (req, res) => {
   }
 });
 
-/* ── Health check (optional — useful for monitoring) ─────── */
+/* ── Status check ────────────────────────────────────────── */
 router.get('/api/resume/pdf/status', (req, res) => {
   res.json({
-    browser:  browser ? 'running' : 'stopped',
+    browser:       browser ? 'running' : 'stopped',
     active,
-    queued:   waitQueue.length,
+    queued:        waitQueue.length,
     maxConcurrent: MAX_CONCURRENT,
     maxQueued:     MAX_QUEUED,
   });
