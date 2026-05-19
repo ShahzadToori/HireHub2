@@ -1161,9 +1161,14 @@ async function downloadPDF() {
       '.tpl-exp-item, .rb-section-wrap { break-inside:avoid; page-break-inside:avoid; }',
       '.tpl-section-title { break-after:avoid; page-break-after:avoid; }',
       '.tpl-two-col { break-inside:avoid; page-break-inside:avoid; }',
+      // Page margins — page 1 flush to edge, page 2+ gets top margin
+      '@page { margin: 0; }',
+      '@page :first { margin-top: 0; }',
       // Print settings
       '@media print {',
-      '  @page { margin:0; size:A4 portrait; }',
+      '  @page { margin: 0; }',
+      '  @page :first { margin-top: 0 !important; }',
+      '  @page :not(:first) { margin-top: 1.2cm !important; }',
       '  body  { margin:0; padding:0; }',
       '  *     { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }',
       '  .tpl-exp-item, .rb-section-wrap { break-inside:avoid !important; page-break-inside:avoid !important; }',
