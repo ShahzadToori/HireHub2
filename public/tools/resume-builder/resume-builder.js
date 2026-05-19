@@ -1154,19 +1154,17 @@ async function downloadPDF() {
 
     // 3. Font size + print CSS injected after resume CSS so it wins cascade
     var extraCSS = [
-      // Font size control
       '.rb-resume { font-size:' + fontSize + 'pt !important; }',
       '.rb-resume * { font-size:inherit; }',
-      // Pull resume up by 1cm to cancel Puppeteer top margin on page 1 only
-      // Page 2+ content naturally gets the 1cm breathing room from Puppeteer
-      '.rb-resume { margin-top:-1cm; }',
-      // Keep sections together — no mid-section page breaks
+      // Keep sections together
       '.tpl-exp-item, .rb-section-wrap { break-inside:avoid; page-break-inside:avoid; }',
       '.tpl-section-title { break-after:avoid; page-break-after:avoid; }',
       '.tpl-two-col { break-inside:avoid; page-break-inside:avoid; }',
-      // Print settings
+      // Page 1: no top margin (header flush to edge)
+      // Page 2+: 1cm top margin — controlled by CSS since we omit top from Puppeteer margin
+      '@page { margin-top:1cm; margin-right:0; margin-bottom:0; margin-left:0; }',
+      '@page :first { margin-top:0; margin-right:0; margin-bottom:0; margin-left:0; }',
       '@media print {',
-      '  @page { margin-top:1cm; margin-right:0; margin-bottom:0; margin-left:0; size:A4 portrait; }',
       '  body  { margin:0; padding:0; }',
       '  *     { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }',
       '  .tpl-exp-item, .rb-section-wrap { break-inside:avoid !important; page-break-inside:avoid !important; }',
