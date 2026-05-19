@@ -15,7 +15,7 @@ const seoRoutes      = require('./routes/seo');
 const { router: alertsRouter, scheduleAutoDigest } = require('./routes/alerts');
 const reviewsRouter  = require('./routes/reviews');
 const blacklistRouter = require('./routes/blacklist');
-const pdfRoute       = require('./routes/pdf');
+const htmlLayout = require('./middleware/htmlLayout');
 
 const app  = express();
 app.set('trust proxy', 1);
@@ -51,6 +51,7 @@ app.use(session({
 }));
 
 // ── Static files ──────────────────────────────────────────────
+app.use(htmlLayout);
 app.use(express.static(path.join(__dirname, '../public')));
 app.use('/admin', express.static(path.join(__dirname, '../admin')));
 
@@ -82,7 +83,11 @@ app.use('/api/contact',   contactRoutes);
 app.use('/api/alerts',    alertsRouter);
 app.use('/api/reviews',   reviewsRouter);
 app.use('/api/blacklist', blacklistRouter);
-app.use(pdfRoute);   // ← PDF generation (POST /api/resume/pdf)
+// Only load PDF on VPS where Puppeteer is installed
+if (process.env.PDF_ENABLED !== 'false') {
+  const pdfRoute = require('./routes/pdf');
+  app.use(pdfRoute);
+}
 
 // ── SPA Fallback ──────────────────────────────────────────────
 app.get('/admin/*', (req, res) => {
@@ -91,8 +96,16 @@ app.get('/admin/*', (req, res) => {
 
 // NOTE: /job/* is handled by seoRoutes (SSR for bots).
 // If seoRoutes calls next() (job not found), it falls through here → 404
+//app.get('*', (req, res) => {
+  //res.sendFile(path.join(__dirname, '../public/index.html'));
+//});
+
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/index.html'));
+  const html = require('fs').readFileSync(
+    require('path').join(__dirname, '../public/index.html'), 'utf8'
+  );
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.send(htmlLayout.inject(html));
 });
 
 // ── Error handler ─────────────────────────────────────────────

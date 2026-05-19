@@ -1,0 +1,110 @@
+<footer class="site-footer">
+  <div class="container">
+    <div class="row g-4 align-items-start">
+      <div class="col-md-4">
+        <div class="footer-brand mb-2">
+          <span class="brand-name" id="footer-site-name">JobOrbit</span>
+        </div>
+        <p class="footer-desc">Connecting talent with opportunity. Find your next career move today.</p>
+      </div>
+      <div class="col-md-4">
+        <h6 class="footer-heading">Quick Links</h6>
+        <ul class="footer-links">
+          <li><a href="/">Browse Jobs</a></li>
+          <li><a href="/#categories">Categories</a></li>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/tools/">Career Tools</a></li>
+          <li><a href="/tools/resume-builder/">CV Builder</a></li>
+          <li><a href="/contact.html">Post a Job</a></li>
+        </ul>
+      </div>
+      <div class="col-md-4">
+        <h6 class="footer-heading">Legal &amp; Info</h6>
+        <ul class="footer-links">
+          <li><a href="/about.html">About Us</a></li>
+          <li><a href="/feedback.html">Contact Us</a></li>
+          <li><a href="/privacy-policy.html">Privacy Policy</a></li>
+          <li><a href="/terms.html">Terms &amp; Conditions</a></li>
+          <li><a href="/disclaimer.html">Disclaimer</a></li>
+        </ul>
+      </div>
+    </div>
+    <hr class="footer-divider">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <p class="mb-0 footer-copy">&copy; <span id="footerYear"></span> <span class="footer-brand-inline" id="footer-copy-name">JobOrbit</span>. All rights reserved.</p>
+      <div class="d-flex flex-wrap gap-3">
+        <a href="/about.html" class="footer-copy" style="text-decoration:none">About</a>
+        <a href="/privacy-policy.html" class="footer-copy" style="text-decoration:none">Privacy</a>
+        <a href="/terms.html" class="footer-copy" style="text-decoration:none">Terms</a>
+        <a href="/disclaimer.html" class="footer-copy" style="text-decoration:none">Disclaimer</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
+<script>
+/* ── Shared layout script — loaded on every page via footer partial ── */
+
+// loadSettings — skip if already defined by main.js (index.html)
+if (typeof loadSettings === 'undefined') {
+  window.loadSettings = async function() {
+    try {
+      const data = await fetch('/api/settings').then(r => r.json());
+      const s = data.settings;
+      if (s.primary_color)   document.documentElement.style.setProperty('--primary', s.primary_color);
+      if (s.secondary_color) document.documentElement.style.setProperty('--secondary', s.secondary_color);
+      if (s.site_name) {
+        document.querySelectorAll('.brand-name').forEach(el => el.textContent = s.site_name);
+        const cp = document.getElementById('footer-copy-name');
+        if (cp) cp.textContent = s.site_name;
+        document.title = document.title.replace('JobOrbit', s.site_name);
+      }
+      if (s.logo_url) {
+        const logo = document.getElementById('site-logo');
+        if (logo) { logo.src = s.logo_url; logo.classList.remove('d-none'); }
+      }
+      applyTheme(localStorage.getItem('theme') || s.default_theme || 'light', false);
+    } catch(e) {}
+  };
+}
+
+// applyTheme — skip if already defined by main.js
+if (typeof applyTheme === 'undefined') {
+  window.applyTheme = function(theme, save = true) {
+    document.documentElement.setAttribute('data-theme', theme);
+    document.documentElement.style.colorScheme = theme;
+    const icon = document.getElementById('themeIcon');
+    if (icon) icon.className = theme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+    if (save) localStorage.setItem('theme', theme);
+  };
+}
+
+// Theme toggle button — skip if main.js already wired it
+const _tt = document.getElementById('themeToggle');
+if (_tt && !_tt.dataset.wired) {
+  _tt.dataset.wired = '1';
+  _tt.addEventListener('click', () => {
+    applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  });
+}
+
+// Footer year
+const _fy = document.getElementById('footerYear');
+if (_fy) _fy.textContent = new Date().getFullYear();
+
+// Auto-highlight active nav link based on current URL
+document.querySelectorAll('.navbar-nav .nav-link').forEach(link => {
+  const href = link.getAttribute('href');
+  if (!href || href.startsWith('#') || href.startsWith('/#')) return;
+  const current = window.location.pathname;
+  const hPath = href.split('#')[0];
+  const isActive = hPath === '/'
+    ? current === '/'
+    : current === hPath || current.startsWith(hPath + '/');
+  if (isActive) link.classList.add('nav-link-active');
+});
+
+// Run loadSettings (safe to call even if main.js already called it — it's idempotent)
+if (typeof loadSettings === 'function') loadSettings();
+</script>
