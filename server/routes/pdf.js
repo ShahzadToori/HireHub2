@@ -132,11 +132,17 @@ router.post('/api/resume/pdf', async (req, res) => {
       margin:            { top: 0, right: 0, bottom: 0, left: 0 },
     });
 
+    // Explicitly convert to Buffer — Puppeteer v20+ may return Uint8Array
+    const buf = Buffer.isBuffer(pdfBuffer) ? pdfBuffer : Buffer.from(pdfBuffer);
+
     const safeName = (filename || 'Gulf-Resume').replace(/[^a-zA-Z0-9\-_]/g, '_');
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename="${safeName}.pdf"`);
-    res.setHeader('Content-Length', pdfBuffer.length);
-    res.send(pdfBuffer);
+    res.writeHead(200, {
+      'Content-Type':        'application/pdf',
+      'Content-Disposition': `attachment; filename="${safeName}.pdf"`,
+      'Content-Length':      buf.length,
+      'Cache-Control':       'no-cache',
+    });
+    res.end(buf);   // res.end() — direct binary, no Express encoding
 
   } catch (err) {
     const isOverload = err.message.includes('busy') || err.message.includes('timed out');

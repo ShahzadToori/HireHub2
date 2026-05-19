@@ -1185,26 +1185,12 @@ async function downloadPDF() {
       throw new Error(err.error || 'Server returned ' + response.status);
     }
 
-    // 6. Trigger download — open blob in new tab (reliable on Android Chrome)
-    //    a.click() on blobs is unreliable on mobile browsers
+    // 6. Open PDF in new tab — most reliable on Android Chrome
+    //    Chrome shows the PDF with a ⬇ download button the user taps
     var blob = await response.blob();
     var url  = URL.createObjectURL(blob);
-
-    // Try anchor download first (works on desktop)
-    var a = document.createElement('a');
-    a.href     = url;
-    a.download = firstName + '-JobOrbit.pdf';
-    a.style.display = 'none';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-
-    // Also open in new tab as fallback — on Android this shows PDF
-    // with a download button the user can tap
-    setTimeout(function() {
-      window.open(url, '_blank');
-      setTimeout(function() { URL.revokeObjectURL(url); }, 30000);
-    }, 500);
+    window.open(url, '_blank');
+    setTimeout(function() { URL.revokeObjectURL(url); }, 60000);
 
   } catch(err) {
     console.error('[downloadPDF] Error:', err);
