@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- ══ Primary SEO
+  
+  ═══════════════════════════════════════════ -->
+  <meta name="google-site-verification" content="RQeXVbVRJTQM6hhuRM6ugehGPt_Be6WaaoyavRJHbLk" />
+  <title>JobOrbit – Find Your Next Career Opportunity</title>
+  <meta name="description" content="Browse thousands of job listings across tech, marketing, finance and more. Connect directly with recruiters via WhatsApp, phone, or email.">
+  <meta name="keywords" content="jobs, job listings, career, recruitment, hiring, employment, vacancies, work">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <meta name="author" content="JobOrbit">
+  <link rel="canonical" href="/">
+
+  <!-- ══ Open Graph ════════════════════════════════════════════ -->
+  <meta property="og:type"        content="website">
+  <meta property="og:title"       content="JobOrbit – Find Your Next Career Opportunity">
+  <meta property="og:description" content="Browse thousands of job listings. Connect directly with recruiters via WhatsApp, phone, or email.">
+  <meta property="og:image"       content="/images/icon-512x512.svg">
+  <meta property="og:image:width"  content="512">
+  <meta property="og:image:height" content="512">
+  <meta property="og:image:alt"   content="JobOrbit Job Board">
+  <meta property="og:url"         content="/">
+  <meta property="og:site_name"   content="JobOrbit">
+  <meta property="og:locale"      content="en_US">
+
+  <!-- ══ Twitter Card ══════════════════════════════════════════ -->
+  <meta name="twitter:card"        content="summary_large_image">
+  <meta name="twitter:title"       content="JobOrbit – Find Your Next Career Opportunity">
+  <meta name="twitter:description" content="Browse thousands of job listings. Connect directly with recruiters.">
+  <meta name="twitter:image"       content="/images/icon-512x512.svg">
+
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+  <!-- ══ Structured Data (JS fills these in at runtime) ════════ -->
+  <script type="application/ld+json" id="schema-list"></script>
+  <script type="application/ld+json" id="schema-website"></script>
+  <script type="application/ld+json" id="schema-org"></script>
+  <script type="application/ld+json" id="schema-breadcrumb"></script>
+
+  <!-- ══ RSS Feed Discovery ════════════════════════════════════ -->
+  <link rel="alternate" type="application/rss+xml" title="JobOrbit – Latest Jobs" href="/feed.rss">
+
+  <!-- ══ Favicon ═══════════════════════════════════════════════ -->
+  <link rel="icon" type="image/svg+xml" href="/JobOrbitFavicon.png"> 
+
+  <!-- ══ PWA / Mobile App ══════════════════════════════════════ -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="JobOrbit">
+  <link rel="apple-touch-icon" href="/images/icon-192x192.svg">
+  <link rel="apple-touch-startup-image" href="/images/splash.svg">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#0f62fe" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0043ce" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="JobOrbit">
+  <meta name="msapplication-TileColor" content="#0f62fe">
+  <meta name="msapplication-TileImage" content="/images/icon-144x144.svg">
+
+  <!-- ══ Performance: DNS prefetch / Preconnect ════════════════ -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+
+  <!-- ══ Styles ════════════════════════════════════════════════ -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    /* ═══════════════════════════════════════════
+       PHASE 1 — URGENCY BADGES
+    ═══════════════════════════════════════════ */
+    .badge-urgency{display:inline-flex;align-items:center;gap:.25rem;font-size:.65rem;font-weight:700;padding:.18rem .55rem;border-radius:100px;letter-spacing:.03em}
+    .badge-urgent  {background:rgba(239,68,68,.12);color:#dc2626;border:1px solid rgba(239,68,68,.28)}
+    .badge-new     {background:rgba(16,185,129,.12);color:#059669;border:1px solid rgba(16,185,129,.28)}
+    .badge-expiring{background:rgba(245,158,11,.12);color:#d97706;border:1px solid rgba(245,158,11,.28)}
+    .badge-expired {background:rgba(107,114,128,.08);color:#6b7280;border:1px solid rgba(107,114,128,.2)}
+    [data-theme="dark"] .badge-urgent  {background:rgba(239,68,68,.18);color:#f87171}
+    [data-theme="dark"] .badge-new     {background:rgba(16,185,129,.18);color:#34d399}
+    [data-theme="dark"] .badge-expiring{background:rgba(245,158,11,.18);color:#fbbf24}
+    [data-theme="dark"] .badge-expired {background:rgba(107,114,128,.14);color:#9ca3af}
+    .card-expired{opacity:.7}
+    /* ═══════════════════════════════════════════
+       PHASE 1 — SALARY + VISA + CITIES + FILTERS
+    ═══════════════════════════════════════════ */
+    .card-highlights{display:flex;flex-wrap:wrap;gap:.35rem;margin:.4rem 0 .1rem}
+    .card-salary{display:inline-flex;align-items:center;gap:.2rem;font-size:.75rem;font-weight:700;color:#059669;background:rgba(16,185,129,.09);border:1px solid rgba(16,185,129,.22);border-radius:100px;padding:.18rem .65rem}
+    [data-theme="dark"] .card-salary{color:#34d399;background:rgba(16,185,129,.13)}
+    .card-visa-badge{display:inline-flex;align-items:center;gap:.2rem;font-size:.72rem;font-weight:700;color:#6366f1;background:rgba(99,102,241,.09);border:1px solid rgba(99,102,241,.22);border-radius:100px;padding:.18rem .65rem}
+    [data-theme="dark"] .card-visa-badge{color:#a5b4fc;background:rgba(99,102,241,.14)}
+    .cities-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.75rem}
+    @media(max-width:480px){.cities-grid{grid-template-columns:repeat(2,1fr)}}
+    .city-card{background:var(--bg-card);border:1.5px solid var(--border);border-radius:14px;padding:1rem .75rem;text-align:center;cursor:pointer;transition:transform .18s,box-shadow .18s,border-color .18s;text-decoration:none!important;display:block}
+    .city-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.1);border-color:var(--primary)}
+    [data-theme="dark"] .city-card:hover{box-shadow:0 8px 24px rgba(0,0,0,.35)}
+    .city-flag{font-size:1.8rem;display:block;margin-bottom:.35rem;line-height:1}
+    .city-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;color:var(--text-primary)}
+    .city-count{font-size:.7rem;color:var(--text-muted);margin-top:.2rem}
+    #filterCount{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;border-radius:9px;background:var(--primary);color:#fff;font-size:.62rem;font-weight:700;padding:0 .3rem;margin-left:.2rem;vertical-align:middle}
+    /* ═══════════════════════════════════════════
+       PHASE 2 — SKELETON LOADING
+    ═══════════════════════════════════════════ */
+    @keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+    .skeleton-card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:1.25rem;height:100%}
+    .skel-line{border-radius:6px;margin-bottom:.65rem;background:linear-gradient(90deg,var(--border) 25%,var(--surface) 50%,var(--border) 75%);background-size:400px 100%;animation:shimmer 1.4s ease-in-out infinite}
+    .skel-badge{height:20px;width:60px;border-radius:100px}
+    .skel-title{height:20px;width:80%;margin-top:.5rem}
+    .skel-company{height:14px;width:55%}
+    .skel-meta{height:13px;width:45%}
+    .skel-desc{height:12px;width:100%}
+    .skel-desc.short{width:70%}
+    .skel-footer{display:flex;justify-content:space-between;align-items:center;margin-top:.75rem}
+    .skel-date{height:13px;width:80px;margin-bottom:0}
+    .skel-btn{height:28px;width:90px;border-radius:8px;margin-bottom:0}
+    /* ═══════════════════════════════════════════
+       PHASE 2 — REPORT JOB BUTTON
+    ═══════════════════════════════════════════ */
+    .btn-report-job{position:absolute;top:.6rem;right:.6rem;background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:.78rem;padding:.25rem;border-radius:6px;line-height:1;opacity:0;transition:opacity .15s,color .15s}
+    .job-card{position:relative}
+    .job-card:hover .btn-report-job{opacity:1}
+    .btn-report-job:hover{color:#ef4444}
+    /* ═══════════════════════════════════════════
+       PHASE 2 — RECENTLY VIEWED
+    ═══════════════════════════════════════════ */
+    .rv-item{display:flex;flex-direction:column;padding:.55rem .75rem;border-radius:8px;cursor:pointer;transition:background .15s;border-bottom:1px solid var(--border)}
+    .rv-item:last-child{border-bottom:none}
+    .rv-item:hover{background:var(--surface)}
+    .rv-title{font-size:.82rem;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .rv-meta{font-size:.72rem;color:var(--text-muted);margin-top:.1rem}
+    /* ═══════════════════════════════════════════
+       PHASE 2 — SEARCH HISTORY DROPDOWN
+    ═══════════════════════════════════════════ */
+    #searchHistoryDrop{display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:999;padding:.5rem;min-width:240px}
+    #searchHistoryDrop.show{display:block}
+    .sh-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);padding:.25rem .5rem .4rem}
+    .sh-item{display:flex;align-items:center;gap:.5rem;width:100%;padding:.45rem .7rem;border:none;background:none;border-radius:7px;font-size:.84rem;color:var(--text-primary);cursor:pointer;text-align:left}
+    .sh-item::before{content:'🕐';font-size:.8rem}
+    .sh-item:hover{background:var(--surface)}
+    .sh-clear{display:block;width:100%;padding:.35rem .7rem;margin-top:.25rem;border:none;background:none;border-radius:7px;font-size:.75rem;color:var(--text-muted);cursor:pointer;text-align:left;border-top:1px solid var(--border)}
+    .sh-clear:hover{color:#ef4444}
+    /* ═══════════════════════════════════════════
+       PHASE 2 — WHATSAPP ALERTS BUTTON
+    ═══════════════════════════════════════════ */
+    .btn-wa-alerts{display:flex;align-items:center;justify-content:center;gap:.5rem;width:100%;padding:.75rem;border-radius:11px;background:var(--primary);color:#fff;border:none;font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;transition:background .15s,transform .12s}
+    .btn-wa-alerts:hover{background:#0353e9;transform:translateY(-1px)}
+    .alert-msg{font-size:.82rem;padding:.6rem .9rem;border-radius:8px;margin-top:.75rem}
+    .alert-msg.success{background:rgba(16,185,129,.1);color:#059669;border:1px solid rgba(16,185,129,.25)}
+    .alert-msg.error{background:rgba(239,68,68,.08);color:#dc2626;border:1px solid rgba(239,68,68,.2)}
+    /* ═══════════════════════════════════════════
+       PHASE 2 — MOBILE BOTTOM NAV
+    ═══════════════════════════════════════════ */
+    .mobile-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--bg-card);border-top:1px solid var(--border);z-index:1000;padding:.4rem 0 calc(.4rem + env(safe-area-inset-bottom));box-shadow:0 -4px 20px rgba(0,0,0,.08)}
+    @media(max-width:768px){.mobile-bottom-nav{display:flex}}
+    @media(max-width:768px){body{padding-bottom:72px}}
+    .mbn-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:.2rem;padding:.4rem .25rem;text-decoration:none;color:var(--text-muted);font-size:.62rem;font-weight:600;transition:color .15s;background:none;border:none;cursor:pointer}
+    .mbn-item i{font-size:1.25rem;transition:transform .15s}
+    .mbn-item.active,.mbn-item:hover{color:var(--primary)}
+    .mbn-item.active i,.mbn-item:hover i{transform:translateY(-2px)}
+    .mbn-alert{color:var(--primary)!important}
+    .mbn-alert:hover i,.mbn-alert:hover{color:var(--primary)!important}
+    /* ── Share ─────────────────────────────────────────────── */
+    .share-wrap{position:relative;display:inline-block}
+    .btn-share{display:inline-flex;align-items:center;gap:.35rem;padding:.45rem .9rem;border-radius:9px;font-size:.82rem;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text-primary);transition:background .15s,color .15s;white-space:nowrap}
+    .btn-share:hover{background:var(--primary);color:#fff;border-color:var(--primary)}
+    .share-dropdown{display:none;position:absolute;bottom:calc(100% + 8px);right:0;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 28px rgba(0,0,0,.15);min-width:210px;padding:.5rem;z-index:9999;animation:shareIn .15s ease}
+    [data-theme="dark"] .share-dropdown{box-shadow:0 8px 28px rgba(0,0,0,.45)}
+    .share-dropdown.open{display:block}
+    @keyframes shareIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+    .share-item{display:flex;align-items:center;gap:.55rem;padding:.55rem .85rem;border-radius:8px;font-size:.84rem;color:var(--text-primary);text-decoration:none;transition:background .12s;cursor:pointer;border:none;background:none;width:100%;text-align:left}
+    .share-item:hover{background:var(--surface);text-decoration:none;color:var(--text-primary)}
+    .share-item i{font-size:1rem;width:18px;text-align:center;flex-shrink:0}
+    .share-wa i{color:#25d366}.share-tg i{color:#0088cc}.share-tw i{color:#000}
+    [data-theme="dark"] .share-tw i{color:#e7e9ea}
+    .share-fb i{color:#1877f2}
+    .share-copy{font-weight:500}
+    .share-copy.copied{color:var(--success)!important}
+    .share-hr{margin:.4rem 0;border-color:var(--border)}
+    .share-toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(20px);background:#161616;color:#fff;padding:.55rem 1.25rem;border-radius:100px;font-size:.82rem;font-weight:600;opacity:0;transition:all .25s;z-index:99999;pointer-events:none;white-space:nowrap}
+    .share-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+    /* ═══════════════════════════════════════════
+       PHASE 6 — JOB OF THE DAY
+    ═══════════════════════════════════════════ */
+    .jotd-card{background:linear-gradient(135deg,var(--bg-card) 0%,var(--surface) 100%);border:1.5px solid var(--primary);border-radius:18px;padding:1.5rem 2rem;display:flex;align-items:center;gap:1.5rem;box-shadow:0 4px 24px rgba(15,98,254,.1);cursor:pointer;transition:transform .18s,box-shadow .18s;position:relative;overflow:hidden}
+    .jotd-card::before{content:"🌟";position:absolute;right:1.5rem;top:1rem;font-size:1.5rem;opacity:.15}
+    .jotd-card:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(15,98,254,.18)}
+    @media(max-width:576px){.jotd-card{flex-direction:column;align-items:flex-start;padding:1.25rem}}
+    .jotd-badge{display:inline-flex;align-items:center;gap:.3rem;background:var(--primary);color:#fff;font-size:.65rem;font-weight:700;padding:.2rem .65rem;border-radius:100px;letter-spacing:.05em;text-transform:uppercase;margin-bottom:.5rem}
+    .jotd-title{font-family:"Syne",sans-serif;font-weight:800;font-size:1.2rem;color:var(--text-primary);margin-bottom:.35rem}
+    .jotd-meta{display:flex;flex-wrap:wrap;gap:.6rem;font-size:.82rem;color:var(--text-muted)}
+    .jotd-meta span{display:flex;align-items:center;gap:.25rem}
+    .jotd-cta{margin-left:auto;flex-shrink:0;background:var(--primary);color:#fff;padding:.6rem 1.5rem;border-radius:10px;font-family:"Syne",sans-serif;font-weight:700;font-size:.88rem;border:none;cursor:pointer;white-space:nowrap;transition:background .15s}
+    .jotd-cta:hover{background:#0353e9}
+    @media(max-width:576px){.jotd-cta{width:100%;margin-left:0}}
+    /* ═══════════════════════════════════════════
+       PHASE 6 — TRUST SCORE BADGE
+    ═══════════════════════════════════════════ */
+    .trust-score{display:inline-flex;align-items:center;gap:.2rem;font-size:.68rem;font-weight:700;border-radius:100px;padding:.18rem .6rem}
+    .trust-high{background:rgba(16,185,129,.1);color:#059669;border:1px solid rgba(16,185,129,.25)}
+    .trust-medium{background:rgba(245,158,11,.1);color:#d97706;border:1px solid rgba(245,158,11,.25)}
+    .trust-low{background:rgba(107,114,128,.1);color:#6b7280;border:1px solid rgba(107,114,128,.2)}
+    /* ═══════════════════════════════════════════
+       PHASE 6 — TOP CATEGORIES WIDGET
+    ═══════════════════════════════════════════ */
+    .top-cat-item{display:flex;align-items:center;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid var(--border);font-size:.84rem}
+    .top-cat-item:last-child{border-bottom:none}
+    .top-cat-name{color:var(--text-secondary)}
+    .top-cat-bar-wrap{flex:1;margin:0 .75rem;height:6px;background:var(--border);border-radius:3px}
+    .top-cat-bar{height:100%;background:var(--primary);border-radius:3px;transition:width .6s ease}
+    .top-cat-count{font-weight:700;color:var(--text-primary);font-size:.78rem}
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════
+     TOP BANNER AD
+════════════════════════════════════════════════ -->
+<div id="ad-top" class="ad-zone ad-top d-none">
+  <div class="container text-center py-1">
+    <span class="ad-label">Advertisement</span>
+    <div id="ad-top-code"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     NAVBAR
+════════════════════════════════════════════════ -->
+<nav class="navbar navbar-expand-lg sticky-top" id="mainNav">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+      <img id="site-logo" src="" alt="Logo" class="d-none" style="max-height:36px">
+      <!-- <span id="site-name" class="brand-name">JobOrbit</span> -->
+    </a>
+
+    <div class="d-flex align-items-center gap-2 ms-auto">
+      <button class="btn btn-icon theme-toggle" id="themeToggle" title="Toggle dark mode" aria-label="Toggle theme">
+        <i class="bi bi-moon-fill" id="themeIcon"></i>
+      </button>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <i class="bi bi-list fs-4"></i>
+      </button>
+    </div>
+
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+        <li class="nav-item"><a class="nav-link nav-link-active" href="#jobs">Browse Jobs</a></li>
+        <li class="nav-item"><a class="nav-link" href="#categories">Categories</a></li>
+        <li class="nav-item"><a class="nav-link" href="/blog/">Blog</a></li>
+        <li class="nav-item"><a class="nav-link" href="/tools/">Tools</a></li>
+        <li class="nav-item"><a class="nav-link" href="/tools/resume-builder/">CV Builder</a></li>
+        <li class="nav-item"><a class="nav-link" href="/contact.html">Post a Job</a></li>
+        <li class="nav-item"><a class="nav-link" href="/feedback.html">Feedback</a></li>
+        <li class="nav-item"><a class="nav-link" href="/about.html">About</a></li>
+        <!-- <li class="nav-item"><a class="nav-link" href="/admin" target="_blank">Admin</a></li> -->
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════
+     HERO
+════════════════════════════════════════════════ -->
+<header class="hero-section">
+  <div class="hero-bg"></div>
+  <div class="container position-relative">
+    <div class="row align-items-center min-vh-50">
+      <div class="col-lg-8 mx-auto text-center">
+        <div class="hero-badge mb-3">🚀 New jobs added daily</div>
+        <h1 class="hero-title" id="hero-title">Discover Jobs That Matter</h1>
+        <p class="hero-subtitle" id="hero-subtitle">Browse thousands of opportunities and connect directly with recruiters.</p>
+
+        <!-- Main Search Bar -->
+        <form class="hero-search-form" id="searchForm" role="search" aria-label="Search jobs">
+          <div class="search-bar-wrap">
+            <div class="search-field search-field-keyword" style="position:relative">
+              <i class="bi bi-search" aria-hidden="true"></i>
+              <input type="text" id="searchInput" placeholder="Job title, skill, or company…" autocomplete="off" aria-label="Search by job title, skill, or company">
+              <div id="searchHistoryDrop"></div>
+            </div>
+            <div class="search-field search-field-location">
+              <i class="bi bi-geo-alt" aria-hidden="true"></i>
+              <input type="text" id="locationInput" placeholder="Location" aria-label="Filter by location">
+            </div>
+            <button type="submit" class="btn btn-search">
+              <i class="bi bi-search me-1" aria-hidden="true"></i>Search
+            </button>
+          </div>
+          <div class="search-filters-row mt-3">
+            <select id="categoryFilter" class="filter-pill" aria-label="Filter by category">
+              <option value="">All Categories</option>
+            </select>
+            <select id="typeFilter" class="filter-pill" aria-label="Filter by job type">
+              <option value="">All Types</option>
+              <option value="Full-time">Full-time</option>
+              <option value="Part-time">Part-time</option>
+              <option value="Contract">Contract</option>
+              <option value="Freelance">Freelance</option>
+              <option value="Remote">Remote</option>
+            </select>
+            <select id="salaryFilter" class="filter-pill" aria-label="Filter by salary">
+              <option value="">Any Salary</option>
+              <option value="0-5000">Under SAR 5,000</option>
+              <option value="5000-10000">SAR 5K – 10K</option>
+              <option value="10000-20000">SAR 10K – 20K</option>
+              <option value="20000-35000">SAR 20K – 35K</option>
+              <option value="35000+">SAR 35K+</option>
+            </select>
+            <select id="visaFilter" class="filter-pill" aria-label="Filter by visa">
+              <option value="">All Listings</option>
+              <option value="1">✈ Visa Sponsored</option>
+            </select>
+            <select id="dateFilter" class="filter-pill" aria-label="Filter by date posted">
+              <option value="">Any Time</option>
+              <option value="1">Today</option>
+              <option value="7">Past Week</option>
+              <option value="30">Past Month</option>
+            </select>
+            <select id="sortFilter" class="filter-pill" aria-label="Sort jobs">
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+              <option value="title">A–Z</option>
+              <option value="salary_high">Salary: High to Low</option>
+            </select>
+            <button type="button" class="btn-clear-filters d-none" id="clearFilters">
+              <i class="bi bi-x-circle me-1"></i>Clear <span id="filterCount"></span>
+            </button>
+          </div>
+        </form>
+
+        <!-- Quick Stats -->
+        <div class="hero-stats d-flex justify-content-center gap-4 mt-4">
+          <div class="stat-pill"><span id="stat-total">…</span> Jobs</div>
+          <div class="stat-pill"><span id="stat-cats">…</span> Categories</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════
+     FEATURED JOBS
+════════════════════════════════════════════════ -->
+<section class="featured-section py-5" id="featured" aria-label="Featured Jobs">
+  <div class="container">
+    <div class="section-header mb-4">
+      <span class="section-tag">✦ Featured</span>
+      <h2 class="section-title">Top Opportunities</h2>
+    </div>
+    <div class="row g-4" id="featuredList">
+      <!-- Injected by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     JOB OF THE DAY
+════════════════════════════════════════════════ -->
+<section class="py-4 d-none" id="jobOfDaySection" aria-label="Job of the Day">
+  <div class="container">
+    <div class="section-header mb-3">
+      <span class="section-tag">🌟 Daily Pick</span>
+      <h2 class="section-title">Job of the Day</h2>
+    </div>
+    <div id="jobOfDayCard"><!-- injected by JS --></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     CATEGORIES
+════════════════════════════════════════════════ -->
+<section class="categories-section py-4" id="categories" aria-label="Job Categories">
+  <div class="container">
+    <div class="section-header mb-4">
+      <span class="section-tag">Browse by</span>
+      <h2 class="section-title">Category</h2>
+    </div>
+    <div class="categories-scroll" id="categoryChips" role="list">
+      <!-- Injected by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     JOBS BY CITY
+════════════════════════════════════════════════ -->
+<section class="cities-section py-4" id="cities" aria-label="Jobs by City">
+  <div class="container">
+    <div class="section-header mb-4">
+      <span class="section-tag">📍 Browse by</span>
+      <h2 class="section-title">City</h2>
+    </div>
+    <div class="cities-grid" id="citiesGrid">
+      <!-- Injected by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     HIRING TRENDS
+════════════════════════════════════════════════ -->
+<section class="py-4 d-none" id="hiringTrendsSection" aria-label="Hiring Trends">
+  <div class="container">
+    <div class="section-header mb-3">
+      <span class="section-tag">📈 Market Data</span>
+      <h2 class="section-title">Hiring Trends</h2>
+    </div>
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <div class="sidebar-widget">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="widget-title mb-0">Monthly Job Postings</h5>
+            <span style="font-size:.75rem;color:var(--text-muted)">Last 6 months</span>
+          </div>
+          <canvas id="hiringTrendsChart" height="200"></canvas>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="sidebar-widget">
+          <h5 class="widget-title">Top Categories This Month</h5>
+          <div id="topCatsWidget"><!-- injected by JS --></div>
+        </div>
+        <div class="sidebar-widget mt-3">
+          <h5 class="widget-title">Community Tools</h5>
+          <a href="/employers/reviews.html" style="display:flex;align-items:center;gap:.75rem;padding:.65rem .75rem;background:var(--surface);border:1px solid var(--border);border-radius:10px;text-decoration:none;margin-bottom:.5rem;transition:border-color .15s" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor=''">
+            <i class="bi bi-star-fill" style="color:#f59e0b;font-size:1.1rem"></i>
+            <div>
+              <div style="font-size:.85rem;font-weight:700;color:var(--text-primary)">Employer Reviews</div>
+              <div style="font-size:.72rem;color:var(--text-muted)">Rate your employer anonymously</div>
+            </div>
+          </a>
+          <a href="/employers/blacklist.html" style="display:flex;align-items:center;gap:.75rem;padding:.65rem .75rem;background:var(--surface);border:1px solid var(--border);border-radius:10px;text-decoration:none;transition:border-color .15s" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor=''">
+            <i class="bi bi-shield-exclamation" style="color:#dc2626;font-size:1.1rem"></i>
+            <div>
+              <div style="font-size:.85rem;font-weight:700;color:var(--text-primary)">Blacklisted Companies</div>
+              <div style="font-size:.72rem;color:var(--text-muted)">Check before you accept an offer</div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     JOB LISTINGS + SIDEBAR
+════════════════════════════════════════════════ -->
+<section class="jobs-section py-5" id="jobs" aria-label="Job Listings">
+  <div class="container">
+    <div class="row g-4">
+
+      <!-- Job Grid -->
+      <div class="col-lg-8">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <p class="results-info mb-0" id="resultsInfo" aria-live="polite">Loading jobs…</p>
+          <div class="d-flex align-items-center gap-2">
+            <button class="btn-grid-toggle active" id="viewGrid" title="Grid view" aria-label="Grid view"><i class="bi bi-grid-3x2-gap-fill"></i></button>
+            <button class="btn-grid-toggle" id="viewList" title="List view" aria-label="List view"><i class="bi bi-list-ul"></i></button>
+          </div>
+        </div>
+
+        <!-- Spinner -->
+        <div id="loadingSpinner" class="text-center py-5" role="status" aria-label="Loading jobs">
+          <div class="spinner-custom"></div>
+          <p class="mt-3 text-muted">Loading jobs…</p>
+        </div>
+
+        <div class="row g-3" id="jobsList">
+          <!-- Jobs injected here -->
+        </div>
+
+        <!-- Empty state -->
+        <div id="emptyState" class="empty-state d-none">
+          <i class="bi bi-search fs-1 mb-3" aria-hidden="true"></i>
+          <h4>No jobs found</h4>
+          <p>Try adjusting your search filters</p>
+          <button class="btn btn-primary" onclick="resetFilters()">Clear All Filters</button>
+        </div>
+
+        <!-- Pagination -->
+        <nav id="paginationWrap" class="mt-5 d-none" aria-label="Job listing pages">
+          <ul class="pagination justify-content-center" id="pagination"></ul>
+        </nav>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="col-lg-4">
+        <!-- Email Job Alerts Widget -->
+        <div class="sidebar-widget mb-4">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <i class="bi bi-bell-fill text-warning"></i>
+            <h5 class="widget-title mb-0">Job Alerts</h5>
+          </div>
+          <p class="text-muted small mb-3">Get new matching jobs delivered to your inbox — free, no account needed.</p>
+          <button class="btn-wa-alerts" onclick="openAlertsModal()">
+            <i class="bi bi-envelope-fill"></i> Get Email Alerts
+          </button>
+        </div>
+
+        <!-- Recently Viewed -->
+        <div class="sidebar-widget mb-4 d-none" id="recentlyViewedWrap">
+          <h5 class="widget-title"><i class="bi bi-clock-history me-2"></i>Recently Viewed</h5>
+          <ul class="list-unstyled mb-0" id="recentlyViewedList"></ul>
+        </div>
+
+        <!-- Sidebar Ad -->
+        <div id="ad-sidebar" class="ad-zone ad-sidebar d-none mb-4">
+          <span class="ad-label">Advertisement</span>
+          <div id="ad-sidebar-code"></div>
+        </div>
+
+        <!-- Category Stats Widget -->
+        <div class="sidebar-widget">
+          <h5 class="widget-title">Jobs by Category</h5>
+          <ul class="category-list" id="sidebarCats"></ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     JOB DETAIL MODAL
+════════════════════════════════════════════════ -->
+<div class="modal fade" id="jobModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content job-modal-content">
+
+      <!-- Sticky Header -->
+      <div class="job-modal-header">
+        <div class="d-flex justify-content-between align-items-start gap-3">
+          <div class="flex-grow-1">
+            <div id="modalBadges" class="d-flex flex-wrap gap-1 mb-2"></div>
+            <h3 class="modal-job-title" id="modalTitle">Loading…</h3>
+            <div class="modal-job-meta d-flex flex-wrap gap-2 mt-2">
+              <span class="meta-chip"><i class="bi bi-building me-1"></i><span id="modalCompany"></span></span>
+              <span class="meta-chip"><i class="bi bi-geo-alt me-1"></i><span id="modalLocation"></span></span>
+              <span class="meta-chip"><i class="bi bi-briefcase me-1"></i><span id="modalType"></span></span>
+              <span class="meta-chip"><i class="bi bi-tag me-1"></i><span id="modalCategory"></span></span>
+            </div>
+          </div>
+          <button type="button" class="btn-modal-close flex-shrink-0" data-bs-dismiss="modal" aria-label="Close">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Scrollable Body -->
+      <div class="modal-body job-modal-body">
+        <div class="modal-desc-label">
+          <i class="bi bi-file-text me-2"></i>Job Description
+        </div>
+        <div class="modal-job-desc" id="modalDescription"></div>
+        <div id="modalExtraFields" class="d-none"></div>
+      </div>
+
+      <!-- Sticky Footer – contact actions -->
+      <div class="job-modal-footer">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 w-100">
+          <small class="modal-posted-date" id="modalPosted">
+            <i class="bi bi-clock me-1"></i>
+          </small>
+          <div class="d-flex flex-wrap gap-2 align-items-center">
+            <a id="modalPhone" href="#" class="btn btn-contact btn-phone d-none" onclick="event.stopPropagation()">
+              <i class="bi bi-telephone-fill me-1"></i>Call
+            </a>
+            <a id="modalWhatsApp" href="#" class="btn btn-contact btn-whatsapp d-none"
+               target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">
+              <i class="bi bi-whatsapp me-1"></i>WhatsApp
+            </a>
+            <a id="modalMap" href="#" class="btn btn-contact btn-map d-none"
+               target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">
+              <i class="bi bi-geo-alt-fill me-1"></i>View on Map
+            </a>
+            <a id="modalEmail" href="#" class="btn btn-contact btn-email d-none" onclick="event.stopPropagation()">
+              <i class="bi bi-envelope-fill me-1"></i>Email
+            </a>
+            <a id="modalApplyLink" href="#" class="btn btn-contact btn-applylink d-none" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">
+  <i class="bi bi-box-arrow-up-right me-1"></i>Apply Link
+</a>
+
+            <!-- ── Share button ─────────────────────────────── -->
+            <div class="share-wrap" id="modalShareWrap" onclick="event.stopPropagation()">
+              <button class="btn btn-share" id="modalShareBtn" aria-label="Share this job" title="Share job">
+                <i class="bi bi-share-fill me-1"></i>Share
+              </button>
+              <div class="share-dropdown" id="modalShareDropdown" role="menu">
+                <a class="share-item share-wa"  id="shareWA"  href="#" target="_blank" rel="noopener">
+                  <i class="bi bi-whatsapp"></i> Share on WhatsApp
+                </a>
+                <a class="share-item share-tg"  id="shareTG"  href="#" target="_blank" rel="noopener">
+                  <i class="bi bi-telegram"></i> Share on Telegram
+                </a>
+                <a class="share-item share-tw"  id="shareTW"  href="#" target="_blank" rel="noopener">
+                  <i class="bi bi-twitter-x"></i> Share on X
+                </a>
+                <a class="share-item share-fb"  id="shareFB"  href="#" target="_blank" rel="noopener">
+                  <i class="bi bi-facebook"></i> Share on Facebook
+                </a>
+                <hr class="share-hr">
+                <button class="share-item share-copy" id="shareCopy">
+                  <i class="bi bi-link-45deg"></i> Copy job link
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════════ -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="row g-4 align-items-start">
+      <div class="col-md-4">
+        <div class="footer-brand mb-2">
+          <span class="brand-name" id="footer-site-name">JobOrbit</span>
+        </div>
+        <p class="footer-desc">Connecting talent with opportunity. Find your next career move today.</p>
+      </div>
+      <div class="col-md-4">
+        <h6 class="footer-heading">Quick Links</h6>
+        <ul class="footer-links">
+          <li><a href="#jobs">Browse Jobs</a></li>
+          <li><a href="#categories">Categories</a></li>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/tools/">Career Tools</a></li>
+          <li><a href="/contact.html">Post a Job</a></li>
+          <!-- <li><a href="/admin" target="_blank">Admin Panel</a></li> -->
+        </ul>
+      </div>
+      <div class="col-md-4">
+        <h6 class="footer-heading">Legal &amp; Info</h6>
+        <ul class="footer-links">
+          <li><a href="/about.html">About Us</a></li>
+          <li><a href="/feedback.html">Contact Us</a></li>
+          <li><a href="/privacy-policy.html">Privacy Policy</a></li>
+          <li><a href="/terms.html">Terms &amp; Conditions</a></li>
+          <li><a href="/disclaimer.html">Disclaimer</a></li>
+          <!-- <li><a href="/sitemap.xml" target="_blank">Sitemap</a></li> -->
+        </ul>
+      </div>
+    </div>
+    <hr class="footer-divider">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <p class="mb-0 footer-copy">© <span id="footerYear"></span> <span class="footer-brand-inline" id="footer-copy-name">JobOrbit</span>. All rights reserved.</p>
+      <div class="d-flex flex-wrap gap-3">
+        <a href="/about.html" class="footer-copy" style="text-decoration:none">About</a>
+        <a href="/privacy-policy.html" class="footer-copy" style="text-decoration:none">Privacy</a>
+        <a href="/terms.html" class="footer-copy" style="text-decoration:none">Terms</a>
+        <a href="/disclaimer.html" class="footer-copy" style="text-decoration:none">Disclaimer</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ══════════════════════════════════════════════
+     PHASE 2 — WHATSAPP JOB ALERTS MODAL
+════════════════════════════════════════════════ -->
+<div class="modal fade" id="alertsModal" tabindex="-1" aria-labelledby="alertsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:18px;border:1px solid var(--border);background:var(--bg-card)">
+      <div class="modal-header border-0 pb-0">
+        <div>
+          <h5 class="modal-title fw-bold" id="alertsModalLabel" style="font-family:'Syne',sans-serif">
+            <i class="bi bi-envelope-fill me-2" style="color:var(--primary)"></i>Email Job Alerts
+          </h5>
+          <p class="text-muted small mb-0">New matching jobs delivered to your inbox. Free, no account needed.</p>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body pt-3">
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Email Address <span class="text-danger">*</span></label>
+          <input type="email" class="form-control" id="alertEmail" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Job Category <span class="text-muted fw-normal">(optional)</span></label>
+          <select class="form-select" id="alertCategorySelect">
+            <option value="">All Categories — send me everything</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">City <span class="text-muted fw-normal">(optional)</span></label>
+          <input type="text" class="form-control" id="alertCity" placeholder="e.g. Riyadh, Jeddah, Dubai">
+        </div>
+        <div id="alertMsg"></div>
+        <div style="background:rgba(15,98,254,.06);border:1px solid rgba(15,98,254,.2);border-radius:10px;padding:.7rem .9rem;font-size:.78rem;color:var(--text-secondary);margin-top:.75rem">
+          <i class="bi bi-shield-check me-1" style="color:var(--primary)"></i>
+          You will receive a confirmation email first. One-click unsubscribe anytime.
+        </div>
+      </div>
+      <div class="modal-footer border-0 pt-0">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="alertSubmitBtn" onclick="submitAlerts()" style="font-family:'Syne',sans-serif;font-weight:700">
+          <i class="bi bi-envelope-fill me-1"></i>Subscribe
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     PHASE 2 — MOBILE BOTTOM NAV
+════════════════════════════════════════════════ -->
+<nav class="mobile-bottom-nav" aria-label="Mobile navigation">
+  <a href="#jobs" class="mbn-item" onclick="document.getElementById('jobs').scrollIntoView({behavior:'smooth'});return false">
+    <i class="bi bi-briefcase-fill"></i>
+    <span>Jobs</span>
+  </a>
+  <a href="#categories" class="mbn-item" onclick="document.getElementById('categories').scrollIntoView({behavior:'smooth'});return false">
+    <i class="bi bi-grid-fill"></i>
+    <span>Browse</span>
+  </a>
+  <button class="mbn-item mbn-alert" onclick="openAlertsModal()" aria-label="Get email job alerts">
+    <i class="bi bi-envelope-fill"></i>
+    <span>Alerts</span>
+  </button>
+  <a href="/contact.html" class="mbn-item">
+    <i class="bi bi-plus-circle-fill"></i>
+    <span>Post Job</span>
+  </a>
+  <button class="mbn-item" onclick="toggleTheme()" aria-label="Toggle dark mode">
+    <i class="bi bi-moon-fill" id="mbnThemeIcon"></i>
+    <span>Theme</span>
+  </button>
+</nav>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
+<!-- App JS -->
+<script src="/js/main.js"></script>
+</body>
+</html>

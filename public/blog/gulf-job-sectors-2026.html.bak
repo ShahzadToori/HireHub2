@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fastest Growing Job Sectors in the Gulf in 2026 - JobOrbit</title>
+  <meta name="description" content="Which industries are creating the most jobs in Saudi Arabia and the Gulf in 2026 — AI, renewable energy, fintech, healthcare, hospitality, and more.">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="/blog/gulf-job-sectors-2026.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Fastest Growing Job Sectors in the Gulf in 2026">
+  <meta property="og:description" content="Which industries are creating the most jobs in Saudi Arabia and the Gulf in 2026 — AI, renewable energy, fintech, healthcare, hospitality, and more.">
+  <meta property="og:site_name" content="JobOrbit">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/svg+xml" href="/JobOrbitFavicon.svg">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0f62fe">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+  .blog-hero{background:linear-gradient(135deg,#0d1117 0%,#161b22 55%,#0f2744 100%);padding:4rem 0 3rem;position:relative;overflow:hidden}
+  .blog-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(15,98,254,.2),transparent 70%)}
+  .blog-hero-inner{position:relative;text-align:center}
+  .blog-hero-badge{display:inline-flex;align-items:center;gap:.4rem;background:rgba(15,98,254,.2);border:1px solid rgba(15,98,254,.35);border-radius:100px;padding:.3rem .9rem;font-size:.75rem;font-weight:700;color:#60a5fa;text-transform:uppercase;letter-spacing:.07em;margin-bottom:1rem}
+  .blog-hero-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.8rem,4.5vw,3rem);color:#fff;line-height:1.15;margin-bottom:.75rem}
+  .blog-hero-sub{color:rgba(255,255,255,.6);font-size:.95rem;max-width:580px;margin:0 auto}
+  .blog-hero-meta{display:flex;justify-content:center;align-items:center;gap:1rem;margin-top:1.25rem;flex-wrap:wrap}
+  .blog-hero-meta span{font-size:.78rem;color:rgba(255,255,255,.45);display:flex;align-items:center;gap:.3rem}
+  .article-body h2{font-family:'Syne',sans-serif;font-weight:700;font-size:1.35rem;color:var(--text-primary);margin:2rem 0 .75rem;padding-bottom:.4rem;border-bottom:2px solid var(--border)}
+  .article-body h3{font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;color:var(--text-primary);margin:1.5rem 0 .5rem}
+  .article-body p{color:var(--text-secondary);font-size:.95rem;line-height:1.8;margin-bottom:1rem}
+  .article-body ul,.article-body ol{color:var(--text-secondary);font-size:.95rem;line-height:1.8;padding-left:1.5rem;margin-bottom:1rem}
+  .article-body li{margin-bottom:.4rem}
+  .article-body strong{color:var(--text-primary);font-weight:600}
+  .article-body a{color:var(--primary)}
+  .article-highlight{background:rgba(15,98,254,.06);border-left:3px solid var(--primary);border-radius:0 10px 10px 0;padding:1rem 1.25rem;margin:1.5rem 0}
+  [data-theme="dark"] .article-highlight{background:rgba(15,98,254,.1)}
+  .article-highlight p{margin:0;font-size:.9rem;color:var(--text-secondary)}
+  .sidebar-widget{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:1.25rem;margin-bottom:1.25rem}
+  .sidebar-widget-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:1rem}
+  .rel-link{display:flex;align-items:flex-start;gap:.6rem;padding:.5rem 0;border-bottom:1px solid var(--border);text-decoration:none}
+  .rel-link:last-child{border-bottom:none}
+  .rel-link:hover .rel-title{color:var(--primary)}
+  .rel-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
+  .rel-title{font-size:.83rem;font-weight:600;color:var(--text-primary);line-height:1.3;transition:color .15s}
+  .rel-cat{font-size:.72rem;color:var(--text-muted);margin-top:.1rem}
+  .cta-widget{background:linear-gradient(135deg,#0f62fe,#0353e9);border-radius:14px;padding:1.5rem;text-align:center}
+  .cta-widget h5{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;color:#fff;margin-bottom:.5rem}
+  .cta-widget p{font-size:.82rem;color:rgba(255,255,255,.85);margin-bottom:1rem}
+  .cta-widget a{background:#fff;color:#0f62fe;border-radius:8px;padding:.5rem 1.25rem;font-size:.85rem;font-weight:700;text-decoration:none;display:inline-block}
+  .breadcrumb-bar{display:flex;align-items:center;gap:.4rem;font-size:.82rem;color:var(--text-muted);margin-bottom:1.5rem;flex-wrap:wrap}
+  .breadcrumb-bar a{color:var(--text-muted);text-decoration:none}
+  .breadcrumb-bar a:hover{color:var(--primary)}
+  /* Salary table */
+  .salary-table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem}
+  .salary-table th{background:var(--primary);color:#fff;padding:.65rem 1rem;font-family:'Syne',sans-serif;font-size:.8rem;text-align:left}
+  .salary-table td{padding:.6rem 1rem;border-bottom:1px solid var(--border);font-size:.875rem;color:var(--text-secondary)}
+  .salary-table tr:last-child td{border-bottom:none}
+  .salary-table tr:nth-child(even) td{background:var(--surface)}
+  .salary-table .salary-high{color:#059669;font-weight:700}
+  /* Tip box */
+  .tip-box{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.3);border-radius:10px;padding:.9rem 1.1rem;margin:1.25rem 0;display:flex;gap:.75rem}
+  .tip-box i{color:#d97706;font-size:1.1rem;flex-shrink:0;margin-top:.1rem}
+  .tip-box p{margin:0;font-size:.88rem;color:var(--text-secondary)}
+  /* Step list */
+  .step-list{counter-reset:steps;list-style:none;padding:0;margin:1rem 0 1.5rem}
+  .step-list li{counter-increment:steps;display:flex;gap:.85rem;padding:.75rem 0;border-bottom:1px solid var(--border)}
+  .step-list li:last-child{border-bottom:none}
+  .step-list li::before{content:counter(steps);width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;flex-shrink:0;font-family:'Syne',sans-serif}
+  .step-list li > div{font-size:.92rem;color:var(--text-secondary);line-height:1.65}
+  .step-list li strong{color:var(--text-primary);display:block;margin-bottom:.2rem}
+</style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg sticky-top" id="mainNav">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+      <img id="site-logo" src="" alt="Logo" class="d-none" style="max-height:36px">
+      
+    </a>
+    <div class="d-flex align-items-center gap-2 ms-auto">
+      <button class="btn btn-icon theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <i class="bi bi-moon-fill" id="themeIcon"></i>
+      </button>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <i class="bi bi-list fs-4"></i>
+      </button>
+    </div>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+        <li class="nav-item"><a class="nav-link" href="/">Browse Jobs</a></li>
+        <li class="nav-item"><a class="nav-link nav-link-active" href="/blog/">Blog</a></li>
+        <li class="nav-item"><a class="nav-link" href="/contact.html">Post a Job</a></li>
+        <li class="nav-item"><a class="nav-link" href="/about.html">About</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<section class="blog-hero">
+  <div class="container blog-hero-inner">
+    <div class="breadcrumb-bar" style="justify-content:center;margin-bottom:.75rem">
+      <a href="/">Home</a><i class="bi bi-chevron-right" style="font-size:.65rem"></i>
+      <a href="/blog/">Blog</a><i class="bi bi-chevron-right" style="font-size:.65rem"></i>
+      <span style="color:rgba(255,255,255,.45)">Market Insights</span>
+    </div>
+    <div class="blog-hero-badge"><i class="bi bi-graph-up-arrow me-1"></i>Market Insights</div>
+    <h1 class="blog-hero-title">Fastest Growing Job Sectors in the Gulf in 2026</h1>
+    <p class="blog-hero-sub">AI, renewable energy, fintech, healthcare, tourism, and construction — the sectors creating the most opportunities across the GCC right now.</p>
+    <div class="blog-hero-meta">
+      <span><i class="bi bi-clock"></i>8 min read</span>
+      <span><i class="bi bi-calendar3"></i>June 2025</span>
+      <span><i class="bi bi-person"></i>JobOrbit Editorial</span>
+    </div>
+  </div>
+</section>
+
+<div class="container py-5">
+  <div class="row g-4 g-lg-5">
+    <div class="col-lg-8">
+      <div class="breadcrumb-bar">
+        <a href="/blog/"><i class="bi bi-arrow-left me-1"></i>Back to Blog</a>
+      </div>
+      <article class="article-body">
+
+<p>The Gulf Cooperation Council (GCC) economies are in the middle of the most dramatic structural transformation in their history. Vision 2030 in Saudi Arabia, the UAE's economic diversification strategy, Qatar's post-World Cup development agenda, and Kuwait's New Kuwait 2035 plan are all simultaneously redirecting investment away from oil dependency and toward knowledge-based, technology-driven, and experience economy sectors. The result is a jobs market that is creating entirely new categories of employment while simultaneously disrupting traditional ones.</p>
+<p>Here are the sectors generating the most new roles across the Gulf in 2026, the specific skills in demand, and how to position yourself to benefit.</p>
+
+<h2>1. Artificial Intelligence and Data Science</h2>
+<p><strong>Growth driver:</strong> Saudi Arabia's National Data and AI Strategy (NSDAI) has committed to making the Kingdom a global AI leader by 2030, with SDAIA (Saudi Data and AI Authority) investing across government digitisation, healthcare AI, smart city infrastructure, and financial AI applications.</p>
+<p><strong>Roles in demand:</strong> Machine learning engineers, data scientists, AI product managers, NLP specialists, computer vision engineers, AI ethics advisors, and data engineers building the pipelines that feed AI systems.</p>
+<p><strong>Salary range:</strong> SAR 18,000–50,000/month depending on seniority and specialisation.</p>
+<p><strong>Companies hiring:</strong> SDAIA, Saudi Aramco's digital arm, STC, Noon, Tamara, and dozens of VC-backed AI startups emerging from the Riyadh tech ecosystem.</p>
+
+<h2>2. Renewable Energy and Green Technology</h2>
+<p><strong>Growth driver:</strong> Saudi Arabia has committed to generating 50% of its electricity from renewable sources by 2030. NEOM's energy infrastructure, ACWA Power's solar projects, and the Kingdom's push toward green hydrogen production are creating a massive talent need in energy transition roles.</p>
+<p><strong>Roles in demand:</strong> Solar and wind engineers, energy storage specialists, grid integration engineers, sustainability consultants, ESG analysts, green hydrogen project managers, and environmental impact assessment professionals.</p>
+<p><strong>Salary range:</strong> SAR 14,000–35,000/month.</p>
+<p><strong>Companies hiring:</strong> ACWA Power, NEOM Energy, Saudi Aramco's sustainability division, SABIC, and international developers like EDF Renewables and TotalEnergies operating in the Kingdom.</p>
+
+<h2>3. Tourism and Hospitality</h2>
+<p><strong>Growth driver:</strong> Saudi Arabia received 100 million visitors in 2023 — its Vision 2030 target, achieved 7 years early. The tourism sector is now scaling aggressively to handle continued growth, with Red Sea Project, AlUla, Diriyah, and NEOM all requiring enormous hospitality workforces.</p>
+<p><strong>Roles in demand:</strong> Hotel general managers, revenue managers, guest experience designers, F&B directors, concierge professionals, luxury retail managers, event planners, and tourism marketing specialists.</p>
+<p><strong>Salary range:</strong> SAR 8,000–35,000/month depending on level and property tier.</p>
+<p><strong>Note:</strong> Saudi Arabia is actively recruiting internationally for luxury hospitality talent, particularly from Europe and Southeast Asia, with attractive packages including accommodation and flights.</p>
+
+<h2>4. Healthcare and MedTech</h2>
+<p><strong>Growth driver:</strong> Saudi Arabia is building 300+ new healthcare facilities and expanding its medical education system as part of the National Transformation Programme. The country faces a structural shortage of healthcare professionals that will persist for at least a decade.</p>
+<p><strong>Roles in demand:</strong> Specialist physicians across all disciplines, nurses (particularly ICU, oncology, and emergency), pharmacists, allied health professionals (physiotherapy, radiology, laboratory), and digital health/telemedicine professionals.</p>
+<p><strong>Salary range:</strong> SAR 15,000–70,000/month for specialist physicians; SAR 8,000–20,000 for nurses and allied health.</p>
+<p><strong>Key advantage:</strong> Healthcare packages in Saudi Arabia include free housing, return flights, and comprehensive medical insurance, making total compensation among the highest for healthcare professionals anywhere in the world.</p>
+
+<h2>5. FinTech and Digital Banking</h2>
+<p><strong>Growth driver:</strong> Saudi Arabia's fintech sector has grown over 400% since 2020, driven by the Saudi Central Bank's (SAMA) progressive licensing framework, Vision 2030's push for a cashless society, and a young, mobile-first consumer base.</p>
+<p><strong>Roles in demand:</strong> Product managers for financial apps, payment engineers, compliance and AML specialists, open banking developers, Islamic finance product designers, and financial data analysts.</p>
+<p><strong>Companies hiring:</strong> Tamara, Tabby, STC Pay, Saudi National Bank's digital division, Saudi Fransi, and dozens of licensed fintech startups.</p>
+<p><strong>Salary range:</strong> SAR 15,000–40,000/month for experienced product and engineering roles.</p>
+
+<h2>6. Construction and Urban Development (Giga-Projects)</h2>
+<p><strong>Growth driver:</strong> NEOM (the $500 billion smart city project), The Line, Diriyah Gate, Red Sea Project, Qiddiya Entertainment City, and dozens of other giga-projects represent the largest simultaneous construction programme in human history. The demand for construction professionals at every level will remain intense through 2030 and beyond.</p>
+<p><strong>Roles in demand:</strong> Civil, structural, MEP, and geotechnical engineers; quantity surveyors; project and programme managers; BIM specialists; contract administrators; and site safety officers.</p>
+<p><strong>Salary range:</strong> SAR 12,000–45,000/month depending on seniority and project.</p>
+
+<h2>7. E-Commerce and Logistics</h2>
+<p><strong>Growth driver:</strong> Saudi Arabia's e-commerce market is growing at 25%+ annually, driven by high smartphone penetration, a young demographic, and Saudi Aramco Logistics' development of world-class distribution infrastructure.</p>
+<p><strong>Roles in demand:</strong> E-commerce managers, last-mile delivery operations managers, warehouse automation specialists, supply chain analysts, and marketplace category managers.</p>
+<p><strong>Companies hiring:</strong> Noon, Amazon.sa, Nana Direct, Jarir Bookstore's e-commerce division, Careem, and logistics players like Aramex and Fetchr.</p>
+
+<h2>How to Position Yourself for Gulf Growth Sectors</h2>
+<p>The common thread across all these sectors is that <strong>Saudi Arabia is in a talent import phase</strong> — building capabilities at a pace that outstrips local supply. This creates genuine opportunities for professionals willing to develop relevant skills and relocate.</p>
+<ul>
+<li>Identify which of these sectors aligns with your existing skills or where you can credibly upskill within 12 months.</li>
+<li>Research the top 10 employers in that sector operating in Saudi Arabia and track their hiring activity.</li>
+<li>Build a sector-specific network on LinkedIn by connecting with professionals already working in your target area in the Gulf.</li>
+<li>Consider certifications that signal commitment: AWS/Azure for tech, ACCA for finance, PMP for project management, or relevant healthcare licensing bodies.</li>
+</ul>
+
+<div class="article-highlight">
+  <p><strong>The window is now:</strong> Saudi Arabia's talent shortage in these sectors is structural and will persist for years. Professionals who establish themselves in the Gulf over the next 2–3 years will be well-positioned as the market matures and competition for experienced Gulf-market professionals intensifies.</p>
+</div>
+      </article>
+      <div class="article-highlight mt-4">
+        <p><strong>Ready to take action?</strong> Browse current job openings across Saudi Arabia and the Gulf on <a href="/">JobOrbit</a> — and apply directly to employers via WhatsApp, phone, or email.</p>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div style="position:sticky;top:80px;padding-top:1rem">
+        <div class="sidebar-widget">
+  <div class="sidebar-widget-title">More Articles</div>
+  <a href="/blog/find-job-saudi-arabia.html" class="rel-link">
+    <div class="rel-icon" style="background:rgba(15,98,254,.1);color:#0f62fe"><i class="bi bi-search"></i></div>
+    <div><div class="rel-title">How to Find a Job in Saudi Arabia</div><div class="rel-cat">Job Search</div></div>
+  </a>
+  <a href="/blog/high-paying-jobs-riyadh.html" class="rel-link">
+    <div class="rel-icon" style="background:rgba(16,185,129,.1);color:#059669"><i class="bi bi-currency-dollar"></i></div>
+    <div><div class="rel-title">Top 10 High-Paying Jobs in Riyadh</div><div class="rel-cat">Salary Guide</div></div>
+  </a>
+  <a href="/blog/resume-writing-tips-2026.html" class="rel-link">
+    <div class="rel-icon" style="background:rgba(245,158,11,.1);color:#d97706"><i class="bi bi-file-earmark-text"></i></div>
+    <div><div class="rel-title">Resume Writing Tips for 2026</div><div class="rel-cat">Career Advice</div></div>
+  </a>
+  <a href="/blog/interview-questions-engineers.html" class="rel-link">
+    <div class="rel-icon" style="background:rgba(99,102,241,.1);color:#6366f1"><i class="bi bi-person-workspace"></i></div>
+    <div><div class="rel-title">Interview Questions for Engineers</div><div class="rel-cat">Interview Prep</div></div>
+  </a>
+  <a href="/blog/remote-work-trends-gulf.html" class="rel-link">
+    <div class="rel-icon" style="background:rgba(236,72,153,.1);color:#db2777"><i class="bi bi-laptop"></i></div>
+    <div><div class="rel-title">Remote Work Trends in the Gulf</div><div class="rel-cat">Work Trends</div></div>
+  </a>
+  <a href="/blog/work-visa-guide-saudi-arabia.html" class="rel-link">
+    <div class="rel-icon" style="background:rgba(139,92,246,.1);color:#7c3aed"><i class="bi bi-passport"></i></div>
+    <div><div class="rel-title">Work Visa Guide: Saudi Arabia</div><div class="rel-cat">Visas & Legal</div></div>
+  </a>
+  <a href="/blog/saudi-labor-law-guide.html" class="rel-link">
+    <div class="rel-icon" style="background:rgba(239,68,68,.1);color:#dc2626"><i class="bi bi-journal-text"></i></div>
+    <div><div class="rel-title">Saudi Labor Law: Employee Rights</div><div class="rel-cat">Legal Guide</div></div>
+  </a>
+  <a href="/blog/networking-tips-gulf.html" class="rel-link">
+    <div class="rel-icon" style="background:rgba(20,184,166,.1);color:#0d9488"><i class="bi bi-people-fill"></i></div>
+    <div><div class="rel-title">Networking in the Gulf: How It Really Works</div><div class="rel-cat">Career Growth</div></div>
+  </a>
+  <a href="/blog/gulf-job-sectors-2026.html" class="rel-link">
+    <div class="rel-icon" style="background:rgba(249,115,22,.1);color:#ea580c"><i class="bi bi-graph-up-arrow"></i></div>
+    <div><div class="rel-title">Fastest Growing Job Sectors in the Gulf</div><div class="rel-cat">Market Insights</div></div>
+  </a>
+  <a href="/blog/expat-guide-working-saudi-arabia.html" class="rel-link">
+    <div class="rel-icon" style="background:rgba(6,182,212,.1);color:#0891b2"><i class="bi bi-globe2"></i></div>
+    <div><div class="rel-title">Complete Expat Guide to Working in Saudi Arabia</div><div class="rel-cat">Expat Life</div></div>
+  </a>
+</div>
+<div class="cta-widget">
+  <h5>Find your next job</h5>
+  <p>Browse verified listings in Saudi Arabia and the Gulf. Apply directly.</p>
+  <a href="/">Browse Jobs Now</a>
+</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="row g-4 align-items-start">
+      <div class="col-md-4">
+        <div class="footer-brand mb-2">
+          <span class="brand-name" id="footer-site-name">JobOrbit</span>
+        </div>
+        <p class="footer-desc">Connecting talent with opportunity. Find your next career move today.</p>
+      </div>
+      <div class="col-md-4">
+        <h6 class="footer-heading">Quick Links</h6>
+        <ul class="footer-links">
+          <li><a href="#jobs">Browse Jobs</a></li>
+          <li><a href="#categories">Categories</a></li>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/contact.html">Post a Job</a></li>
+          <!-- <li><a href="/admin" target="_blank">Admin Panel</a></li> -->
+        </ul>
+      </div>
+      <div class="col-md-4">
+        <h6 class="footer-heading">Legal &amp; Info</h6>
+        <ul class="footer-links">
+          <li><a href="/about.html">About Us</a></li>
+          <li><a href="/feedback.html">Contact Us</a></li>
+          <li><a href="/privacy-policy.html">Privacy Policy</a></li>
+          <li><a href="/terms.html">Terms &amp; Conditions</a></li>
+          <li><a href="/disclaimer.html">Disclaimer</a></li>
+          <!-- <li><a href="/sitemap.xml" target="_blank">Sitemap</a></li> -->
+        </ul>
+      </div>
+    </div>
+    <hr class="footer-divider">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <p class="mb-0 footer-copy">© <span id="footerYear"></span> <span class="footer-brand-inline" id="footer-copy-name">JobOrbit</span>. All rights reserved.</p>
+      <div class="d-flex flex-wrap gap-3">
+        <a href="/about.html" class="footer-copy" style="text-decoration:none">About</a>
+        <a href="/privacy-policy.html" class="footer-copy" style="text-decoration:none">Privacy</a>
+        <a href="/terms.html" class="footer-copy" style="text-decoration:none">Terms</a>
+        <a href="/disclaimer.html" class="footer-copy" style="text-decoration:none">Disclaimer</a>
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
+<script>
+async function loadSettings(){try{const d=await fetch('/api/settings').then(r=>r.json());const s=d.settings;if(s.primary_color)document.documentElement.style.setProperty('--primary',s.primary_color);if(s.site_name){document.querySelectorAll('.brand-name').forEach(e=>e.textContent=s.site_name);document.getElementById('footer-copy-name').textContent=s.site_name;}if(s.logo_url){const l=document.getElementById('site-logo');l.src=s.logo_url;l.classList.remove('d-none');}applyTheme(localStorage.getItem('theme')||s.default_theme||'light',false);}catch(e){}}
+function applyTheme(t,save=true){document.documentElement.setAttribute('data-theme',t);document.documentElement.style.colorScheme=t;document.getElementById('themeIcon').className=t==='dark'?'bi bi-sun-fill':'bi bi-moon-fill';if(save)localStorage.setItem('theme',t);}
+document.getElementById('themeToggle').addEventListener('click',()=>{applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');});
+document.getElementById('footerYear').textContent=new Date().getFullYear();
+loadSettings();
+</script>
+</body>
+</html>

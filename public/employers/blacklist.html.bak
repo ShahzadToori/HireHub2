@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blacklisted Companies Gulf — Salary Delays & Iqama Issues | JobOrbit</title>
+  <meta name="description" content="Community-reported blacklisted companies in Saudi Arabia and the Gulf. Check for salary delays, iqama issues, and fake job offers before you accept a job.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="/employers/blacklist.html">
+  <link rel="icon" type="image/svg+xml" href="/JobOrbitFavicon.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0f62fe">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .page-hero{background:linear-gradient(135deg,#0d1117 0%,#161b22 55%,#450a0a 100%);padding:3.5rem 0 2.75rem;text-align:center;position:relative;overflow:hidden}
+    .page-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(239,68,68,.15),transparent 70%)}
+    .page-hero-inner{position:relative}
+    .page-badge{display:inline-flex;align-items:center;gap:.4rem;background:rgba(239,68,68,.18);border:1px solid rgba(239,68,68,.3);border-radius:100px;padding:.28rem .85rem;font-size:.72rem;font-weight:700;color:#fca5a5;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.9rem}
+    .page-hero h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.7rem,4vw,2.6rem);color:#fff;margin-bottom:.6rem}
+    .page-hero p{color:rgba(255,255,255,.6);font-size:.95rem;max-width:520px;margin:0 auto}
+    .form-card{background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:2rem;box-shadow:var(--shadow)}
+    @media(max-width:576px){.form-card{padding:1.25rem;border-radius:14px}}
+    .bl-card{background:var(--bg-card);border:1.5px solid rgba(239,68,68,.25);border-radius:14px;padding:1.25rem;margin-bottom:.85rem}
+    .bl-company{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--text-primary);margin-bottom:.2rem}
+    .bl-meta{font-size:.78rem;color:var(--text-muted);margin-bottom:.6rem}
+    .bl-issue{display:inline-flex;align-items:center;gap:.3rem;font-size:.72rem;font-weight:700;padding:.2rem .7rem;border-radius:100px;background:rgba(239,68,68,.1);color:#dc2626;border:1px solid rgba(239,68,68,.2);margin-bottom:.65rem}
+    .bl-text{font-size:.875rem;color:var(--text-secondary);line-height:1.7}
+    .bl-count{font-size:.72rem;color:var(--text-muted);margin-top:.5rem}
+    .search-box{position:relative;margin-bottom:1.5rem}
+    .search-box input{width:100%;padding:.85rem 1rem .85rem 2.75rem;border:1.5px solid var(--border);border-radius:11px;background:var(--bg-card);color:var(--text-primary);font-size:.93rem;outline:none;transition:border-color .18s}
+    .search-box input:focus{border-color:#dc2626;box-shadow:0 0 0 3px rgba(239,68,68,.1)}
+    .search-box i{position:absolute;left:.95rem;top:50%;transform:translateY(-50%);color:var(--text-muted)}
+    .result-safe{background:rgba(16,185,129,.08);border:1.5px solid rgba(16,185,129,.25);border-radius:12px;padding:1.25rem;text-align:center}
+    .result-found{background:rgba(239,68,68,.07);border:1.5px solid rgba(239,68,68,.25);border-radius:12px;padding:1.25rem}
+    .msg-box{padding:.9rem 1.1rem;border-radius:10px;font-size:.88rem;margin-top:.75rem;display:none}
+    .msg-success{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);color:#059669}
+    .msg-error{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:#dc2626}
+    @media(max-width:991.98px){#navMenu{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:.75rem 1rem 1rem;margin-top:.5rem;box-shadow:0 8px 28px rgba(0,0,0,.14)}#navMenu .nav-link{padding:.6rem .85rem;border-radius:9px}}
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg sticky-top" id="mainNav">
+  <div class="container">
+    <a class="navbar-brand" href="/"><img id="site-logo" src="" alt="Logo" class="d-none" style="max-height:36px"><span class="brand-name" id="site-name">JobOrbit</span></a>
+    <div class="d-flex align-items-center gap-2 ms-auto">
+      <button class="btn btn-icon theme-toggle" id="themeToggle" aria-label="Toggle theme"><i class="bi bi-moon-fill" id="themeIcon"></i></button>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu"><i class="bi bi-list fs-4"></i></button>
+    </div>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+        <li class="nav-item"><a class="nav-link" href="/">Browse Jobs</a></li>
+        <li class="nav-item"><a class="nav-link" href="/blog/">Blog</a></li>
+        <li class="nav-item"><a class="nav-link" href="/tools/">Tools</a></li>
+        <li class="nav-item"><a class="nav-link" href="/contact.html">Post a Job</a></li>
+        <li class="nav-item"><a class="nav-link" href="/about.html">About</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<section class="page-hero">
+  <div class="container page-hero-inner">
+    <div class="page-badge"><i class="bi bi-shield-exclamation me-1"></i>Community Warning</div>
+    <h1>Blacklisted Companies</h1>
+    <p>Community-reported employers with salary delays, iqama issues, passport confiscation, or fake job offers. Check before you sign.</p>
+  </div>
+</section>
+
+<div class="container py-5">
+
+  <!-- Check a company -->
+  <div class="form-card mb-5">
+    <h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.15rem;color:var(--text-primary);margin-bottom:.35rem">
+      <i class="bi bi-search me-2" style="color:#dc2626"></i>Check a Company
+    </h2>
+    <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:1.25rem">Search before you accept a job offer.</p>
+    <div class="search-box">
+      <i class="bi bi-search"></i>
+      <input type="text" id="blSearch" placeholder="Type company name to check…" autocomplete="off">
+    </div>
+    <div id="blSearchResult"></div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Left: List -->
+    <div class="col-lg-7">
+      <h2 style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;color:var(--text-primary);margin-bottom:1rem">Reported Companies</h2>
+      <div id="blList">
+        <div class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm me-2"></div>Loading…</div>
+      </div>
+    </div>
+
+    <!-- Right: Report Form -->
+    <div class="col-lg-5">
+      <div class="form-card" style="position:sticky;top:80px">
+        <h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.15rem;color:var(--text-primary);margin-bottom:.35rem">Report a Company</h2>
+        <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:1.25rem">Anonymous. Help protect other workers.</p>
+
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Company Name *</label>
+          <input type="text" class="form-control" id="blCompany" placeholder="Exact company name">
+        </div>
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">City</label>
+          <input type="text" class="form-control" id="blCity" placeholder="e.g. Riyadh">
+        </div>
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Issue Type *</label>
+          <select class="form-select" id="blIssue">
+            <option value="">Select the issue…</option>
+            <option value="salary_delay">Salary delay or non-payment</option>
+            <option value="no_iqama">Iqama not processed / delayed</option>
+            <option value="passport_held">Passport confiscated illegally</option>
+            <option value="fake_offer">Fake job offer / misleading contract</option>
+            <option value="poor_conditions">Poor working conditions</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Description *</label>
+          <textarea class="form-control" id="blDesc" rows="4" placeholder="Describe the issue in detail (min 20 characters). Year it happened, how many workers affected, etc."></textarea>
+        </div>
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Year Reported</label>
+          <input type="number" class="form-control" id="blYear" placeholder="e.g. 2024" min="2010" max="2026">
+        </div>
+
+        <div id="blMsg" class="msg-box"></div>
+
+        <button class="btn btn-danger w-100 mt-2" style="font-family:'Syne',sans-serif;font-weight:700" onclick="submitBlacklist()">
+          <i class="bi bi-exclamation-triangle-fill me-1"></i>Submit Report
+        </button>
+        <p style="font-size:.72rem;color:var(--text-muted);text-align:center;margin-top:.75rem">
+          <i class="bi bi-shield-check me-1"></i>Anonymous · Reviewed before publishing
+        </p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="row g-4 align-items-start">
+      <div class="col-md-4"><div class="footer-brand mb-2"><span class="brand-name" id="footer-site-name">JobOrbit</span></div><p class="footer-desc">Connecting talent with opportunity across the Gulf.</p></div>
+      <div class="col-md-4"><h6 class="footer-heading">Quick Links</h6><ul class="footer-links"><li><a href="/">Browse Jobs</a></li><li><a href="/blog/">Blog</a></li><li><a href="/tools/">Tools</a></li></ul></div>
+      <div class="col-md-4"><h6 class="footer-heading">Legal</h6><ul class="footer-links"><li><a href="/privacy-policy.html">Privacy Policy</a></li><li><a href="/terms.html">Terms &amp; Conditions</a></li><li><a href="/disclaimer.html">Disclaimer</a></li></ul></div>
+    </div>
+    <hr class="footer-divider">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <p class="mb-0 footer-copy">&copy; <span id="footerYear"></span> <span id="footer-copy-name">JobOrbit</span>. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
+<script>
+(function(){
+  async function ls(){try{const d=await fetch('/api/settings').then(r=>r.json());const s=d.settings;if(s.primary_color)document.documentElement.style.setProperty('--primary',s.primary_color);if(s.site_name){document.querySelectorAll('.brand-name').forEach(e=>e.textContent=s.site_name);const fc=document.getElementById('footer-copy-name');if(fc)fc.textContent=s.site_name;}if(s.logo_url){const l=document.getElementById('site-logo');if(l){l.src=s.logo_url;l.classList.remove('d-none');}}at(localStorage.getItem('theme')||s.default_theme||'light',false);}catch(e){}}
+  function at(t,save=true){document.documentElement.setAttribute('data-theme',t);document.documentElement.style.colorScheme=t;const i=document.getElementById('themeIcon');if(i)i.className=t==='dark'?'bi bi-sun-fill':'bi bi-moon-fill';if(save)localStorage.setItem('theme',t);}
+  const tb=document.getElementById('themeToggle');if(tb)tb.addEventListener('click',()=>at(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+  const fy=document.getElementById('footerYear');if(fy)fy.textContent=new Date().getFullYear();
+  ls();
+})();
+</script>
+<script>
+const ISSUE_LABELS = {
+  salary_delay: '💰 Salary Delay',
+  no_iqama: '📋 Iqama Issues',
+  passport_held: '🛂 Passport Held',
+  fake_offer: '⚠ Fake Offer',
+  poor_conditions: '😓 Poor Conditions',
+  other: '⚑ Other'
+};
+
+async function loadBlacklist() {
+  try {
+    const data = await fetch('/api/blacklist').then(r=>r.json());
+    const wrap = document.getElementById('blList');
+    if (!data.entries?.length) {
+      wrap.innerHTML = '<div style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:12px;padding:1.5rem;text-align:center"><i class="bi bi-check-circle-fill" style="color:#059669;font-size:1.5rem;display:block;margin-bottom:.5rem"></i><strong>No companies reported yet.</strong><br><span style="font-size:.85rem;color:var(--text-muted)">This database is built by the community.</span></div>';
+      return;
+    }
+    wrap.innerHTML = data.entries.map(e => `
+      <div class="bl-card">
+        <div class="bl-company">${e.company_name}</div>
+        <div class="bl-meta">${e.city ? e.city + ' · ' : ''}<{e.reported_year || ''}</div>
+        <div><span class="bl-issue"><i class="bi bi-exclamation-triangle-fill me-1"></i>${ISSUE_LABELS[e.issue_type]||e.issue_type}</span></div>
+        <div class="bl-text">${e.description}</div>
+        <div class="bl-count"><i class="bi bi-people me-1"></i>${e.report_count} report${e.report_count!==1?'s':''}</div>
+      </div>`).join('');
+  } catch(e) {
+    document.getElementById('blList').innerHTML = '<p class="text-muted small">Could not load data.</p>';
+  }
+}
+
+let searchTimer;
+document.getElementById('blSearch').addEventListener('input', function() {
+  clearTimeout(searchTimer);
+  const q = this.value.trim();
+  const res = document.getElementById('blSearchResult');
+  if (q.length < 2) { res.innerHTML = ''; return; }
+  searchTimer = setTimeout(async () => {
+    try {
+      const data = await fetch('/api/blacklist/search?q=' + encodeURIComponent(q)).then(r=>r.json());
+      if (!data.found) {
+        res.innerHTML = '<div class="result-safe"><i class="bi bi-check-circle-fill" style="color:#059669;font-size:1.3rem;display:block;margin-bottom:.5rem"></i><strong style="color:#059669">No reports found for "' + q + '"</strong><br><span style="font-size:.82rem;color:var(--text-muted)">This company has not been reported to our database.</span></div>';
+      } else {
+        res.innerHTML = '<div class="result-found"><i class="bi bi-exclamation-triangle-fill" style="color:#dc2626;font-size:1.1rem"></i> <strong style="color:#dc2626">' + data.entries.length + ' report(s) found for "' + q + '"</strong><div style="margin-top:.75rem">' +
+          data.entries.map(e => `<div style="padding:.5rem 0;border-bottom:1px solid rgba(239,68,68,.15)"><div style="font-weight:700;font-size:.88rem;color:var(--text-primary)">${ISSUE_LABELS[e.issue_type]||e.issue_type}</div><div style="font-size:.82rem;color:var(--text-secondary)">${e.description}</div></div>`).join('') +
+          '</div></div>';
+      }
+    } catch(e) {}
+  }, 400);
+});
+
+async function submitBlacklist() {
+  const company = document.getElementById('blCompany').value.trim();
+  const issue   = document.getElementById('blIssue').value;
+  const desc    = document.getElementById('blDesc').value.trim();
+  const msg     = document.getElementById('blMsg');
+  const btn     = document.querySelector('button[onclick="submitBlacklist()"]');
+
+  if (!company) { showBlMsg('error', 'Please enter the company name.'); return; }
+  if (!issue)   { showBlMsg('error', 'Please select the issue type.'); return; }
+  if (desc.length < 20) { showBlMsg('error', 'Description must be at least 20 characters.'); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Submitting…';
+
+  try {
+    const res  = await fetch('/api/blacklist', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        company_name:  company,
+        city:          document.getElementById('blCity').value.trim(),
+        issue_type:    issue,
+        description:   desc,
+        reported_year: document.getElementById('blYear').value || null
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showBlMsg('success', data.message);
+      btn.innerHTML = '<i class="bi bi-check-lg me-1"></i>Submitted!';
+    } else {
+      showBlMsg('error', data.message || 'Error. Please try again.');
+      btn.disabled = false;
+      btn.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-1"></i>Submit Report';
+    }
+  } catch(e) {
+    showBlMsg('error', 'Network error. Please try again.');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-1"></i>Submit Report';
+  }
+}
+
+function showBlMsg(type, text) {
+  const el = document.getElementById('blMsg');
+  el.className = 'msg-box msg-' + type;
+  el.style.display = 'block';
+  el.textContent = text;
+}
+
+loadBlacklist();
+</script>
+</body>
+</html>

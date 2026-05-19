@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="page-title">Article – JobOrbit Blog</title>
+  <meta name="description" id="page-desc" content="">
+  <meta property="og:title" id="og-title" content="">
+  <meta property="og:description" id="og-desc" content="">
+  <meta property="og:image" id="og-image" content="">
+  <meta property="og:type" content="article">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" id="page-canonical" href="">
+  <link rel="icon" type="image/png" href="/JobOrbitFavicon.png">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .article-hero{background:linear-gradient(135deg,#0d1117 0%,#161b22 60%,#0f2744 100%);padding:3.5rem 0 2.5rem;position:relative;overflow:hidden}
+    .article-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(15,98,254,.18) 0%,transparent 70%)}
+    .article-breadcrumb{font-size:.8rem;color:rgba(255,255,255,.5);margin-bottom:1rem;position:relative}
+    .article-breadcrumb a{color:rgba(255,255,255,.6);text-decoration:none}
+    .article-breadcrumb a:hover{color:#fff}
+    .article-category-badge{display:inline-block;background:rgba(15,98,254,.25);border:1px solid rgba(15,98,254,.4);color:#93c5fd;font-size:.72rem;font-weight:700;padding:.2rem .75rem;border-radius:100px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.85rem;position:relative}
+    .article-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.6rem,4vw,2.5rem);color:#fff;line-height:1.2;margin-bottom:1rem;position:relative}
+    .article-meta{display:flex;flex-wrap:wrap;gap:1rem;color:rgba(255,255,255,.55);font-size:.82rem;position:relative}
+    .article-meta span{display:flex;align-items:center;gap:.35rem}
+    .article-featured-img{width:100%;max-height:420px;object-fit:cover;border-radius:16px;margin:2rem 0;box-shadow:0 8px 32px rgba(0,0,0,.2)}
+    .article-body{font-size:1.02rem;line-height:1.85;color:var(--text-secondary)}
+    .article-body h2{font-family:'Syne',sans-serif;font-weight:700;font-size:1.4rem;color:var(--text-primary);margin:2rem 0 .85rem;padding-bottom:.5rem;border-bottom:2px solid var(--border)}
+    .article-body h3{font-family:'Syne',sans-serif;font-weight:700;font-size:1.15rem;color:var(--text-primary);margin:1.5rem 0 .65rem}
+    .article-body p{margin-bottom:1.25rem}
+    .article-body ul,.article-body ol{padding-left:1.5rem;margin-bottom:1.25rem}
+    .article-body li{margin-bottom:.4rem}
+    .article-body blockquote{border-left:4px solid var(--primary);padding:.75rem 1.25rem;background:rgba(15,98,254,.06);border-radius:0 10px 10px 0;margin:1.5rem 0;color:var(--text-secondary);font-style:italic}
+    .article-body img{max-width:100%;border-radius:10px;margin:1rem 0}
+    .article-body a{color:var(--primary);text-decoration:none}
+    .article-body a:hover{text-decoration:underline}
+    .article-body code{background:var(--surface);padding:.15rem .4rem;border-radius:4px;font-size:.88em;color:var(--primary)}
+    .article-body pre{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem;overflow-x:auto;margin:1.25rem 0}
+    .article-tags{display:flex;flex-wrap:wrap;gap:.5rem;margin:2rem 0}
+    .article-tag{background:var(--surface);border:1px solid var(--border);border-radius:100px;padding:.2rem .75rem;font-size:.75rem;color:var(--text-muted);text-decoration:none;transition:all .15s}
+    .article-tag:hover{border-color:var(--primary);color:var(--primary)}
+    .article-share{display:flex;align-items:center;gap:.75rem;padding:1.25rem;background:var(--surface);border:1px solid var(--border);border-radius:14px;margin:2rem 0;flex-wrap:wrap}
+    .article-share-label{font-weight:700;font-size:.85rem;color:var(--text-primary)}
+    .share-btn{display:inline-flex;align-items:center;gap:.4rem;padding:.4rem .9rem;border-radius:8px;font-size:.8rem;font-weight:600;text-decoration:none;transition:all .15s;border:1px solid var(--border);color:var(--text-primary);background:var(--bg-card);cursor:pointer}
+    .share-btn:hover{transform:translateY(-1px)}
+    .share-btn.wa{color:#25d366;border-color:rgba(37,211,102,.3)}
+    .share-btn.tg{color:#0088cc;border-color:rgba(0,136,204,.3)}
+    .share-btn.copy{color:var(--text-secondary)}
+    .related-card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:transform .18s,box-shadow .18s;text-decoration:none;display:block}
+    .related-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.1);text-decoration:none}
+    .related-card img{width:100%;height:140px;object-fit:cover}
+    .related-card-body{padding:1rem}
+    .related-card-cat{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--primary);margin-bottom:.35rem}
+    .related-card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.92rem;color:var(--text-primary);line-height:1.35;margin-bottom:.35rem}
+    .related-card-meta{font-size:.73rem;color:var(--text-muted)}
+    .draft-banner{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);border-radius:10px;padding:.75rem 1rem;color:#d97706;font-size:.85rem;font-weight:600;margin-bottom:1.5rem;display:flex;align-items:center;gap:.5rem}
+    .toc-widget{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:1.25rem;position:sticky;top:80px}
+    .toc-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:.75rem}
+    .toc-list{list-style:none;padding:0;margin:0}
+    .toc-list li a{display:block;padding:.3rem .5rem;border-radius:6px;font-size:.82rem;color:var(--text-secondary);text-decoration:none;transition:all .12s;border-left:2px solid transparent}
+    .toc-list li a:hover,.toc-list li a.active{background:var(--surface);color:var(--primary);border-left-color:var(--primary)}
+  </style>
+</head>
+<body>
+<!-- NAVBAR -->
+
+<div id="draft-notice" class="container mt-3 d-none">
+  <div class="draft-banner"><i class="bi bi-eye-slash-fill"></i> This article is a draft — only visible to admins</div>
+</div>
+
+<!-- Article Hero -->
+<section class="article-hero" id="article-hero">
+  <div class="container position-relative">
+    <div class="article-breadcrumb">
+      <a href="/">Home</a> <i class="bi bi-chevron-right" style="font-size:.65rem"></i>
+      <a href="/blog/">Blog</a> <i class="bi bi-chevron-right" style="font-size:.65rem"></i>
+      <span id="hero-category">Article</span>
+    </div>
+    <div id="article-category-badge" class="article-category-badge"></div>
+    <h1 class="article-title" id="article-title">Loading…</h1>
+    <div class="article-meta">
+      <span><i class="bi bi-person-fill"></i> <span id="article-author"></span></span>
+      <span><i class="bi bi-calendar3"></i> <span id="article-date"></span></span>
+      <span><i class="bi bi-clock"></i> <span id="article-reading-time"></span> min read</span>
+      <span><i class="bi bi-eye"></i> <span id="article-views"></span> views</span>
+    </div>
+  </div>
+</section>
+
+<!-- Article Body -->
+<section class="py-5">
+  <div class="container">
+    <div class="row g-4 justify-content-center">
+
+      <!-- Main Content -->
+      <div class="col-lg-8">
+        <img id="article-featured-img" src="" alt="" class="article-featured-img d-none">
+        <div class="article-body" id="article-content"></div>
+
+        <!-- Tags -->
+        <div class="article-tags" id="article-tags"></div>
+
+        <!-- Share -->
+        <div class="article-share">
+          <span class="article-share-label"><i class="bi bi-share-fill me-1"></i>Share this article</span>
+          <a class="share-btn wa" id="share-wa" href="#" target="_blank" rel="noopener">
+            <i class="bi bi-whatsapp"></i> WhatsApp
+          </a>
+          <a class="share-btn tg" id="share-tg" href="#" target="_blank" rel="noopener">
+            <i class="bi bi-telegram"></i> Telegram
+          </a>
+          <button class="share-btn copy" id="share-copy" onclick="copyLink()">
+            <i class="bi bi-link-45deg"></i> Copy Link
+          </button>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="col-lg-4 d-none d-lg-block">
+        <div class="toc-widget">
+          <div class="toc-title"><i class="bi bi-list-ul me-1"></i>Contents</div>
+          <ul class="toc-list" id="toc-list"></ul>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Related Articles -->
+    <div class="mt-5 pt-3" id="related-section" style="display:none">
+      <h3 style="font-family:'Syne',sans-serif;font-weight:700;margin-bottom:1.25rem">Related Articles</h3>
+      <div class="row g-3" id="related-articles"></div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+
+<script>
+const slug = window.location.pathname.replace('/blog/', '').replace(/\/$/, '');
+
+async function loadArticle() {
+  try {
+    const res  = await fetch(`/api/blog/${slug}`);
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      document.getElementById('article-title').textContent = 'Article not found';
+      document.getElementById('article-content').innerHTML = '<p>This article could not be found.</p>';
+      return;
+    }
+
+    const a = data.article;
+
+    // Meta
+    document.getElementById('page-title').textContent        = (a.meta_title || a.title) + ' – JobOrbit Blog';
+    document.getElementById('page-desc').content             = a.meta_description || a.excerpt || '';
+    document.getElementById('og-title').content              = a.meta_title || a.title;
+    document.getElementById('og-desc').content               = a.meta_description || a.excerpt || '';
+    document.getElementById('og-image').content              = a.featured_image || '/images/icon-512x512.svg';
+    document.getElementById('page-canonical').href           = window.location.href;
+
+    // Hero
+    document.getElementById('article-title').textContent     = a.title;
+    document.getElementById('hero-category').textContent     = a.category;
+    document.getElementById('article-category-badge').textContent = a.category;
+    document.getElementById('article-author').textContent    = a.author;
+    document.getElementById('article-date').textContent      = new Date(a.published_at || a.created_at).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+    document.getElementById('article-reading-time').textContent = a.reading_time;
+    document.getElementById('article-views').textContent     = a.views?.toLocaleString() || '0';
+
+    // Draft notice
+    if (a.status === 'draft') document.getElementById('draft-notice').classList.remove('d-none');
+
+    // Featured image
+    if (a.featured_image) {
+      const img = document.getElementById('article-featured-img');
+      img.src = a.featured_image;
+      img.alt = a.title;
+      img.classList.remove('d-none');
+    }
+
+    // Content
+    document.getElementById('article-content').innerHTML = a.content;
+
+    // Tags
+    if (a.tags) {
+      const tagWrap = document.getElementById('article-tags');
+      a.tags.split(',').filter(Boolean).forEach(tag => {
+        const el = document.createElement('a');
+        el.href = `/blog/?tag=${encodeURIComponent(tag.trim())}`;
+        el.className = 'article-tag';
+        el.textContent = '#' + tag.trim();
+        tagWrap.appendChild(el);
+      });
+    }
+
+    // Share links
+    const url  = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent(a.title + ' – JobOrbit Blog');
+    document.getElementById('share-wa').href = `https://wa.me/?text=${text}%20${url}`;
+    document.getElementById('share-tg').href = `https://t.me/share/url?url=${url}&text=${text}`;
+
+    // Table of contents
+    buildTOC();
+
+    // Related
+    if (data.related?.length) {
+      document.getElementById('related-section').style.display = 'block';
+      const grid = document.getElementById('related-articles');
+      data.related.forEach(r => {
+        grid.innerHTML += `
+          <div class="col-md-4">
+            <a href="/blog/${r.slug}" class="related-card">
+              ${r.featured_image ? `<img src="${r.featured_image}" alt="${r.title}" loading="lazy">` : ''}
+              <div class="related-card-body">
+                <div class="related-card-cat">${r.category}</div>
+                <div class="related-card-title">${r.title}</div>
+                <div class="related-card-meta"><i class="bi bi-clock me-1"></i>${r.reading_time} min read</div>
+              </div>
+            </a>
+          </div>`;
+      });
+    }
+
+    // Structured data
+    const schema = {
+      "@context":"https://schema.org","@type":"BlogPosting",
+      "headline": a.title,
+      "description": a.excerpt || '',
+      "image": a.featured_image || '',
+      "author": { "@type":"Person","name": a.author },
+      "publisher": { "@type":"Organization","name":"JobOrbit" },
+      "datePublished": a.published_at || a.created_at,
+      "dateModified": a.updated_at || a.created_at
+    };
+    const sd = document.createElement('script');
+    sd.type = 'application/ld+json';
+    sd.textContent = JSON.stringify(schema);
+    document.head.appendChild(sd);
+
+  } catch (err) {
+    console.error(err);
+    document.getElementById('article-title').textContent = 'Failed to load article';
+  }
+}
+
+function buildTOC() {
+  const headings = document.querySelectorAll('#article-content h2, #article-content h3');
+  if (headings.length < 2) return;
+  const toc = document.getElementById('toc-list');
+  headings.forEach((h, i) => {
+    const id = `heading-${i}`;
+    h.id = id;
+    const li = document.createElement('li');
+    li.style.paddingLeft = h.tagName === 'H3' ? '1rem' : '0';
+    li.innerHTML = `<a href="#${id}">${h.textContent}</a>`;
+    toc.appendChild(li);
+  });
+  // Highlight active heading on scroll
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      const link = toc.querySelector(`a[href="#${e.target.id}"]`);
+      if (link) link.classList.toggle('active', e.isIntersecting);
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  headings.forEach(h => observer.observe(h));
+}
+
+function copyLink() {
+  navigator.clipboard.writeText(window.location.href).then(() => {
+    const btn = document.getElementById('share-copy');
+    btn.innerHTML = '<i class="bi bi-check-lg"></i> Copied!';
+    setTimeout(() => { btn.innerHTML = '<i class="bi bi-link-45deg"></i> Copy Link'; }, 2000);
+  });
+}
+
+loadArticle();
+</script>
+</body>
+</html>

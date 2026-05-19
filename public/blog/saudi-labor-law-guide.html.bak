@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Saudi Arabia Labour Law: A Complete Guide to Employee Rights (2026) - JobOrbit</title>
+  <meta name="description" content="A plain-language guide to Saudi Arabia's Labour Law — contracts, working hours, annual leave, EOSB gratuity, notice periods, and dispute resolution.">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="/blog/saudi-labor-law-guide.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Saudi Arabia Labour Law: A Complete Guide to Employee Rights (2026)">
+  <meta property="og:description" content="A plain-language guide to Saudi Arabia's Labour Law — contracts, working hours, annual leave, EOSB gratuity, notice periods, and dispute resolution.">
+  <meta property="og:site_name" content="JobOrbit">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/svg+xml" href="/JobOrbitFavicon.svg">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0f62fe">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+  .blog-hero{background:linear-gradient(135deg,#0d1117 0%,#161b22 55%,#0f2744 100%);padding:4rem 0 3rem;position:relative;overflow:hidden}
+  .blog-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(15,98,254,.2),transparent 70%)}
+  .blog-hero-inner{position:relative;text-align:center}
+  .blog-hero-badge{display:inline-flex;align-items:center;gap:.4rem;background:rgba(15,98,254,.2);border:1px solid rgba(15,98,254,.35);border-radius:100px;padding:.3rem .9rem;font-size:.75rem;font-weight:700;color:#60a5fa;text-transform:uppercase;letter-spacing:.07em;margin-bottom:1rem}
+  .blog-hero-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.8rem,4.5vw,3rem);color:#fff;line-height:1.15;margin-bottom:.75rem}
+  .blog-hero-sub{color:rgba(255,255,255,.6);font-size:.95rem;max-width:580px;margin:0 auto}
+  .blog-hero-meta{display:flex;justify-content:center;align-items:center;gap:1rem;margin-top:1.25rem;flex-wrap:wrap}
+  .blog-hero-meta span{font-size:.78rem;color:rgba(255,255,255,.45);display:flex;align-items:center;gap:.3rem}
+  .article-body h2{font-family:'Syne',sans-serif;font-weight:700;font-size:1.35rem;color:var(--text-primary);margin:2rem 0 .75rem;padding-bottom:.4rem;border-bottom:2px solid var(--border)}
+  .article-body h3{font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;color:var(--text-primary);margin:1.5rem 0 .5rem}
+  .article-body p{color:var(--text-secondary);font-size:.95rem;line-height:1.8;margin-bottom:1rem}
+  .article-body ul,.article-body ol{color:var(--text-secondary);font-size:.95rem;line-height:1.8;padding-left:1.5rem;margin-bottom:1rem}
+  .article-body li{margin-bottom:.4rem}
+  .article-body strong{color:var(--text-primary);font-weight:600}
+  .article-body a{color:var(--primary)}
+  .article-highlight{background:rgba(15,98,254,.06);border-left:3px solid var(--primary);border-radius:0 10px 10px 0;padding:1rem 1.25rem;margin:1.5rem 0}
+  [data-theme="dark"] .article-highlight{background:rgba(15,98,254,.1)}
+  .article-highlight p{margin:0;font-size:.9rem;color:var(--text-secondary)}
+  .sidebar-widget{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:1.25rem;margin-bottom:1.25rem}
+  .sidebar-widget-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:1rem}
+  .rel-link{display:flex;align-items:flex-start;gap:.6rem;padding:.5rem 0;border-bottom:1px solid var(--border);text-decoration:none}
+  .rel-link:last-child{border-bottom:none}
+  .rel-link:hover .rel-title{color:var(--primary)}
+  .rel-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
+  .rel-title{font-size:.83rem;font-weight:600;color:var(--text-primary);line-height:1.3;transition:color .15s}
+  .rel-cat{font-size:.72rem;color:var(--text-muted);margin-top:.1rem}
+  .cta-widget{background:linear-gradient(135deg,#0f62fe,#0353e9);border-radius:14px;padding:1.5rem;text-align:center}
+  .cta-widget h5{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;color:#fff;margin-bottom:.5rem}
+  .cta-widget p{font-size:.82rem;color:rgba(255,255,255,.85);margin-bottom:1rem}
+  .cta-widget a{background:#fff;color:#0f62fe;border-radius:8px;padding:.5rem 1.25rem;font-size:.85rem;font-weight:700;text-decoration:none;display:inline-block}
+  .breadcrumb-bar{display:flex;align-items:center;gap:.4rem;font-size:.82rem;color:var(--text-muted);margin-bottom:1.5rem;flex-wrap:wrap}
+  .breadcrumb-bar a{color:var(--text-muted);text-decoration:none}
+  .breadcrumb-bar a:hover{color:var(--primary)}
+  /* Salary table */
+  .salary-table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem}
+  .salary-table th{background:var(--primary);color:#fff;padding:.65rem 1rem;font-family:'Syne',sans-serif;font-size:.8rem;text-align:left}
+  .salary-table td{padding:.6rem 1rem;border-bottom:1px solid var(--border);font-size:.875rem;color:var(--text-secondary)}
+  .salary-table tr:last-child td{border-bottom:none}
+  .salary-table tr:nth-child(even) td{background:var(--surface)}
+  .salary-table .salary-high{color:#059669;font-weight:700}
+  /* Tip box */
+  .tip-box{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.3);border-radius:10px;padding:.9rem 1.1rem;margin:1.25rem 0;display:flex;gap:.75rem}
+  .tip-box i{color:#d97706;font-size:1.1rem;flex-shrink:0;margin-top:.1rem}
+  .tip-box p{margin:0;font-size:.88rem;color:var(--text-secondary)}
+  /* Step list */
+  .step-list{counter-reset:steps;list-style:none;padding:0;margin:1rem 0 1.5rem}
+  .step-list li{counter-increment:steps;display:flex;gap:.85rem;padding:.75rem 0;border-bottom:1px solid var(--border)}
+  .step-list li:last-child{border-bottom:none}
+  .step-list li::before{content:counter(steps);width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;flex-shrink:0;font-family:'Syne',sans-serif}
+  .step-list li > div{font-size:.92rem;color:var(--text-secondary);line-height:1.65}
+  .step-list li strong{color:var(--text-primary);display:block;margin-bottom:.2rem}
+</style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg sticky-top" id="mainNav">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+      <img id="site-logo" src="" alt="Logo" class="d-none" style="max-height:36px">
+      
+    </a>
+    <div class="d-flex align-items-center gap-2 ms-auto">
+      <button class="btn btn-icon theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <i class="bi bi-moon-fill" id="themeIcon"></i>
+      </button>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <i class="bi bi-list fs-4"></i>
+      </button>
+    </div>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+        <li class="nav-item"><a class="nav-link" href="/">Browse Jobs</a></li>
+        <li class="nav-item"><a class="nav-link nav-link-active" href="/blog/">Blog</a></li>
+        <li class="nav-item"><a class="nav-link" href="/contact.html">Post a Job</a></li>
+        <li class="nav-item"><a class="nav-link" href="/about.html">About</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<section class="blog-hero">
+  <div class="container blog-hero-inner">
+    <div class="breadcrumb-bar" style="justify-content:center;margin-bottom:.75rem">
+      <a href="/">Home</a><i class="bi bi-chevron-right" style="font-size:.65rem"></i>
+      <a href="/blog/">Blog</a><i class="bi bi-chevron-right" style="font-size:.65rem"></i>
+      <span style="color:rgba(255,255,255,.45)">Legal Guide</span>
+    </div>
+    <div class="blog-hero-badge"><i class="bi bi-journal-text me-1"></i>Legal Guide</div>
+    <h1 class="blog-hero-title">Saudi Arabia Labour Law: A Complete Guide to Employee Rights (2026)</h1>
+    <p class="blog-hero-sub">Know your rights — contracts, annual leave, end of service gratuity, termination rules, and how to resolve disputes.</p>
+    <div class="blog-hero-meta">
+      <span><i class="bi bi-clock"></i>9 min read</span>
+      <span><i class="bi bi-calendar3"></i>June 2025</span>
+      <span><i class="bi bi-person"></i>JobOrbit Editorial</span>
+    </div>
+  </div>
+</section>
+
+<div class="container py-5">
+  <div class="row g-4 g-lg-5">
+    <div class="col-lg-8">
+      <div class="breadcrumb-bar">
+        <a href="/blog/"><i class="bi bi-arrow-left me-1"></i>Back to Blog</a>
+      </div>
+      <article class="article-body">
+
+<p>Saudi Arabia's Labour Law governs the employment relationship for virtually all private sector workers in the Kingdom — both Saudi nationals and expatriates. Whether you are signing your first contract, navigating a termination, or trying to understand your entitlements after five years of service, this guide provides a plain-language breakdown of the most important provisions every worker in Saudi Arabia should know.</p>
+
+<h2>Who is Covered by Saudi Labour Law?</h2>
+<p>The Labour Law (Royal Decree M/51, as amended) covers all workers employed in the private sector. Domestic workers (housemaids, drivers, gardeners) are covered under a separate domestic workers law. Government (public sector) employees are governed by the Civil Service Law and are not covered here.</p>
+<p>Both Saudi nationals and expatriate workers are protected by the Labour Law once legally employed. Your rights apply regardless of your nationality.</p>
+
+<h2>Employment Contracts</h2>
+<p>Every employment relationship in Saudi Arabia must be governed by a written contract. Key points to know:</p>
+<ul>
+<li><strong>Fixed-term vs. open-ended:</strong> Contracts are either fixed-term (a specific end date) or open-ended (no end date). Renewing a fixed-term contract twice or continuing work after the end date automatically converts it to an open-ended contract.</li>
+<li><strong>Language:</strong> Your contract must be in Arabic (or Arabic plus your language). If there is any discrepancy between versions, the Arabic version takes precedence in Saudi courts.</li>
+<li><strong>Probation period:</strong> Maximum 90 days (can be extended to 180 days by written agreement). During probation, either party can terminate with no notice.</li>
+<li><strong>What must be included:</strong> Start date, job title, salary, work location, working hours, annual leave entitlement, and contract duration (if fixed-term).</li>
+</ul>
+
+<h2>Working Hours</h2>
+<p>The standard working day in Saudi Arabia is 8 hours, with a maximum of 48 hours per week (6 days). During the holy month of Ramadan, Muslim workers are entitled to a reduced working day of 6 hours (36 hours/week).</p>
+<p>Workers are entitled to a daily rest break of at least 30 minutes during shifts longer than 5 hours. These breaks are not counted as working time.</p>
+<p>Overtime is paid at 150% of the regular hourly rate. Work on official public holidays is paid at 200% of the regular hourly rate. Workers cannot be compelled to work more than 12 hours in a single day.</p>
+
+<h2>Annual Leave Entitlements</h2>
+<p>Saudi Labour Law provides the following minimum annual leave:</p>
+<table class="salary-table">
+  <thead><tr><th>Years of Service</th><th>Annual Leave Entitlement</th></tr></thead>
+  <tbody>
+    <tr><td>Less than 5 years</td><td>21 calendar days</td></tr>
+    <tr><td>5 years or more</td><td>30 calendar days</td></tr>
+  </tbody>
+</table>
+<p>Leave must be granted with full pay. Workers can carry over up to half their unused annual leave to the following year with employer agreement. Unused leave must be paid out on termination.</p>
+<p>In addition to annual leave, Saudi Labour Law provides paid leave for:</p>
+<ul>
+<li>Official public holidays (Eid Al-Fitr, Eid Al-Adha, National Day, Founding Day)</li>
+<li>Sick leave: 30 days full pay, 60 days at 75% pay, 30 days unpaid (per illness cycle)</li>
+<li>Hajj leave: Once during employment, up to 10 days (for Muslim employees)</li>
+<li>Paternity leave: 3 days for male employees on the birth of a child</li>
+<li>Bereavement leave: 5 days for death of a spouse or first-degree relative</li>
+<li>Maternity leave: 10 weeks for female employees (4 before, 6 after birth), extendable by 4 weeks unpaid</li>
+</ul>
+
+<h2>End of Service Benefits (EOSB)</h2>
+<p>One of the most important financial provisions of Saudi Labour Law is the end of service benefit — a gratuity payment made to all workers upon termination of employment (regardless of who initiates termination). The calculation:</p>
+<table class="salary-table">
+  <thead><tr><th>Years of Service</th><th>EOSB Rate</th></tr></thead>
+  <tbody>
+    <tr><td>First 5 years</td><td>Half month's salary per year</td></tr>
+    <tr><td>After 5 years</td><td>One full month's salary per year</td></tr>
+  </tbody>
+</table>
+<p>For example: an employee earning SAR 10,000/month who works for 7 years would receive: (5 × 5,000) + (2 × 10,000) = SAR 45,000 in EOSB. This is calculated on your <em>final</em> basic salary, not your total package including allowances.</p>
+
+<div class="tip-box">
+  <i class="bi bi-info-circle-fill"></i>
+  <p><strong>Important nuance:</strong> If <em>you</em> resign before completing 2 years of service, you are not entitled to EOSB. After 2 years but less than 5, you receive one-third of the calculated EOSB. After 5 years, you receive the full calculation regardless of who terminates.</p>
+</div>
+
+<h2>Termination and Notice Periods</h2>
+<p>Either party may terminate an open-ended contract with written notice. The minimum notice period is 60 days. Either party may pay salary in lieu of notice rather than requiring the employee to work through the notice period.</p>
+<p>For fixed-term contracts, early termination by the employer without cause entitles the employee to compensation equivalent to the remaining contract salary.</p>
+<p>Employees may be terminated without notice (and without EOSB) only for specific gross misconduct reasons listed explicitly in the Labour Law, including: impersonation, physical assault of a supervisor, repeated absence without cause, and disclosure of trade secrets. These are serious thresholds — general performance issues do not qualify.</p>
+
+<h2>Dispute Resolution</h2>
+<p>If you have a labour dispute with your employer, Saudi Arabia has a formal dispute resolution system:</p>
+<ul>
+<li><strong>Step 1 — Mediation:</strong> The Ministry of Human Resources operates free mediation services. File a complaint through the Musaned platform or at a ministry office. Most disputes are resolved at this stage.</li>
+<li><strong>Step 2 — Labour Courts:</strong> If mediation fails, the case proceeds to the Labour Court. Proceedings are conducted in Arabic — consider legal representation if your Arabic is limited.</li>
+<li><strong>Musaned platform:</strong> For domestic workers, the Musaned platform handles complaints and dispute resolution separately from the main Labour Court system.</li>
+</ul>
+
+<h2>Non-Discrimination Provisions</h2>
+<p>Saudi Labour Law prohibits discrimination in employment on the basis of sex, disability, or age (with some exceptions for retirement age provisions). Female workers have specific protections including the right to equal pay for equal work, maternity leave protections, and restrictions on employers from terminating employees during maternity leave.</p>
+
+<div class="article-highlight">
+  <p><strong>Know your rights:</strong> Many workers in Saudi Arabia — both Saudi and expatriate — are unaware of their EOSB entitlements and annual leave rights. Keep copies of your contract, payslips, and any written communications with your employer. These documents are your evidence if a dispute arises. The Labour Court system does work — and commonly finds in favour of employees when documentation is clear.</p>
+</div>
+      </article>
+      <div class="article-highlight mt-4">
+        <p><strong>Ready to take action?</strong> Browse current job openings across Saudi Arabia and the Gulf on <a href="/">JobOrbit</a> — and apply directly to employers via WhatsApp, phone, or email.</p>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div style="position:sticky;top:80px;padding-top:1rem">
+        <div class="sidebar-widget">
+  <div class="sidebar-widget-title">More Articles</div>
+  <a href="/blog/find-job-saudi-arabia.html" class="rel-link">
+    <div class="rel-icon" style="background:rgba(15,98,254,.1);color:#0f62fe"><i class="bi bi-search"></i></div>
+    <div><div class="rel-title">How to Find a Job in Saudi Arabia</div><div class="rel-cat">Job Search</div></div>
+  </a>
+  <a href="/blog/high-paying-jobs-riyadh.html" class="rel-link">
+    <div class="rel-icon" style="background:rgba(16,185,129,.1);color:#059669"><i class="bi bi-currency-dollar"></i></div>
+    <div><div class="rel-title">Top 10 High-Paying Jobs in Riyadh</div><div class="rel-cat">Salary Guide</div></div>
+  </a>
+  <a href="/blog/resume-writing-tips-2026.html" class="rel-link">
+    <div class="rel-icon" style="background:rgba(245,158,11,.1);color:#d97706"><i class="bi bi-file-earmark-text"></i></div>
+    <div><div class="rel-title">Resume Writing Tips for 2026</div><div class="rel-cat">Career Advice</div></div>
+  </a>
+  <a href="/blog/interview-questions-engineers.html" class="rel-link">
+    <div class="rel-icon" style="background:rgba(99,102,241,.1);color:#6366f1"><i class="bi bi-person-workspace"></i></div>
+    <div><div class="rel-title">Interview Questions for Engineers</div><div class="rel-cat">Interview Prep</div></div>
+  </a>
+  <a href="/blog/remote-work-trends-gulf.html" class="rel-link">
+    <div class="rel-icon" style="background:rgba(236,72,153,.1);color:#db2777"><i class="bi bi-laptop"></i></div>
+    <div><div class="rel-title">Remote Work Trends in the Gulf</div><div class="rel-cat">Work Trends</div></div>
+  </a>
+  <a href="/blog/work-visa-guide-saudi-arabia.html" class="rel-link">
+    <div class="rel-icon" style="background:rgba(139,92,246,.1);color:#7c3aed"><i class="bi bi-passport"></i></div>
+    <div><div class="rel-title">Work Visa Guide: Saudi Arabia</div><div class="rel-cat">Visas & Legal</div></div>
+  </a>
+  <a href="/blog/saudi-labor-law-guide.html" class="rel-link">
+    <div class="rel-icon" style="background:rgba(239,68,68,.1);color:#dc2626"><i class="bi bi-journal-text"></i></div>
+    <div><div class="rel-title">Saudi Labor Law: Employee Rights</div><div class="rel-cat">Legal Guide</div></div>
+  </a>
+  <a href="/blog/networking-tips-gulf.html" class="rel-link">
+    <div class="rel-icon" style="background:rgba(20,184,166,.1);color:#0d9488"><i class="bi bi-people-fill"></i></div>
+    <div><div class="rel-title">Networking in the Gulf: How It Really Works</div><div class="rel-cat">Career Growth</div></div>
+  </a>
+  <a href="/blog/gulf-job-sectors-2026.html" class="rel-link">
+    <div class="rel-icon" style="background:rgba(249,115,22,.1);color:#ea580c"><i class="bi bi-graph-up-arrow"></i></div>
+    <div><div class="rel-title">Fastest Growing Job Sectors in the Gulf</div><div class="rel-cat">Market Insights</div></div>
+  </a>
+  <a href="/blog/expat-guide-working-saudi-arabia.html" class="rel-link">
+    <div class="rel-icon" style="background:rgba(6,182,212,.1);color:#0891b2"><i class="bi bi-globe2"></i></div>
+    <div><div class="rel-title">Complete Expat Guide to Working in Saudi Arabia</div><div class="rel-cat">Expat Life</div></div>
+  </a>
+</div>
+<div class="cta-widget">
+  <h5>Find your next job</h5>
+  <p>Browse verified listings in Saudi Arabia and the Gulf. Apply directly.</p>
+  <a href="/">Browse Jobs Now</a>
+</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="row g-4 align-items-start">
+      <div class="col-md-4">
+        <div class="footer-brand mb-2">
+          <span class="brand-name" id="footer-site-name">JobOrbit</span>
+        </div>
+        <p class="footer-desc">Connecting talent with opportunity. Find your next career move today.</p>
+      </div>
+      <div class="col-md-4">
+        <h6 class="footer-heading">Quick Links</h6>
+        <ul class="footer-links">
+          <li><a href="#jobs">Browse Jobs</a></li>
+          <li><a href="#categories">Categories</a></li>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/contact.html">Post a Job</a></li>
+          <!-- <li><a href="/admin" target="_blank">Admin Panel</a></li> -->
+        </ul>
+      </div>
+      <div class="col-md-4">
+        <h6 class="footer-heading">Legal &amp; Info</h6>
+        <ul class="footer-links">
+          <li><a href="/about.html">About Us</a></li>
+          <li><a href="/feedback.html">Contact Us</a></li>
+          <li><a href="/privacy-policy.html">Privacy Policy</a></li>
+          <li><a href="/terms.html">Terms &amp; Conditions</a></li>
+          <li><a href="/disclaimer.html">Disclaimer</a></li>
+          <!-- <li><a href="/sitemap.xml" target="_blank">Sitemap</a></li> -->
+        </ul>
+      </div>
+    </div>
+    <hr class="footer-divider">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <p class="mb-0 footer-copy">© <span id="footerYear"></span> <span class="footer-brand-inline" id="footer-copy-name">JobOrbit</span>. All rights reserved.</p>
+      <div class="d-flex flex-wrap gap-3">
+        <a href="/about.html" class="footer-copy" style="text-decoration:none">About</a>
+        <a href="/privacy-policy.html" class="footer-copy" style="text-decoration:none">Privacy</a>
+        <a href="/terms.html" class="footer-copy" style="text-decoration:none">Terms</a>
+        <a href="/disclaimer.html" class="footer-copy" style="text-decoration:none">Disclaimer</a>
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
+<script>
+async function loadSettings(){try{const d=await fetch('/api/settings').then(r=>r.json());const s=d.settings;if(s.primary_color)document.documentElement.style.setProperty('--primary',s.primary_color);if(s.site_name){document.querySelectorAll('.brand-name').forEach(e=>e.textContent=s.site_name);document.getElementById('footer-copy-name').textContent=s.site_name;}if(s.logo_url){const l=document.getElementById('site-logo');l.src=s.logo_url;l.classList.remove('d-none');}applyTheme(localStorage.getItem('theme')||s.default_theme||'light',false);}catch(e){}}
+function applyTheme(t,save=true){document.documentElement.setAttribute('data-theme',t);document.documentElement.style.colorScheme=t;document.getElementById('themeIcon').className=t==='dark'?'bi bi-sun-fill':'bi bi-moon-fill';if(save)localStorage.setItem('theme',t);}
+document.getElementById('themeToggle').addEventListener('click',()=>{applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');});
+document.getElementById('footerYear').textContent=new Date().getFullYear();
+loadSettings();
+</script>
+</body>
+</html>

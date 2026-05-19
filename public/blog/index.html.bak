@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Career Advice Blog - JobOrbit - JobOrbit</title>
+  <meta name="description" content="Expert career tips, job search guides, and salary insights for professionals in Saudi Arabia and the Gulf region.">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="/blog/">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Career Advice Blog - JobOrbit">
+  <meta property="og:description" content="Expert career tips, job search guides, and salary insights for professionals in Saudi Arabia and the Gulf region.">
+  <meta property="og:site_name" content="JobOrbit">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/svg+xml" href="/JobOrbitFavicon.svg">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0f62fe">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+<style>
+  /* ── Blog shared ─── */
+  .blog-hero{background:linear-gradient(135deg,#0d1117 0%,#161b22 55%,#0f2744 100%);padding:4rem 0 3rem;position:relative;overflow:hidden}
+  .blog-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(15,98,254,.2),transparent 70%)}
+  .blog-hero-inner{position:relative;text-align:center}
+  .blog-hero-badge{display:inline-flex;align-items:center;gap:.4rem;background:rgba(15,98,254,.2);border:1px solid rgba(15,98,254,.35);border-radius:100px;padding:.3rem .9rem;font-size:.75rem;font-weight:700;color:#60a5fa;text-transform:uppercase;letter-spacing:.07em;margin-bottom:1rem}
+  .blog-hero-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.8rem,4.5vw,3rem);color:#fff;line-height:1.15;margin-bottom:.75rem}
+  .blog-hero-sub{color:rgba(255,255,255,.6);font-size:.95rem;max-width:580px;margin:0 auto}
+  .blog-hero-meta{display:flex;justify-content:center;align-items:center;gap:1rem;margin-top:1.25rem;flex-wrap:wrap}
+  .blog-hero-meta span{font-size:.78rem;color:rgba(255,255,255,.45);display:flex;align-items:center;gap:.3rem}
+  /* Cards */
+  .blog-card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:transform .2s,box-shadow .2s;height:100%;display:flex;flex-direction:column}
+  .blog-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.12)}
+  .blog-card-thumb{aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;font-size:3rem}
+  .blog-card-body{padding:1.5rem;flex:1;display:flex;flex-direction:column}
+  .blog-card-cat{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--primary);margin-bottom:.5rem}
+  .blog-card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;color:var(--text-primary);line-height:1.3;margin-bottom:.6rem}
+  .blog-card-title a{color:inherit;text-decoration:none}
+  .blog-card-title a:hover{color:var(--primary)}
+  .blog-card-excerpt{color:var(--text-secondary);font-size:.875rem;line-height:1.65;flex:1;margin-bottom:1rem}
+  .blog-card-footer{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);padding-top:.75rem;margin-top:auto}
+  .blog-card-meta{font-size:.75rem;color:var(--text-muted);display:flex;align-items:center;gap:.35rem}
+  .blog-card-read{font-size:.78rem;font-weight:600;color:var(--primary);text-decoration:none;display:flex;align-items:center;gap:.25rem}
+  .blog-card-read:hover{text-decoration:underline}
+  /* Featured */
+  .blog-featured{background:var(--bg-card);border:1px solid var(--border);border-radius:20px;overflow:hidden;display:flex;flex-direction:column;margin-bottom:2.5rem}
+  @media(min-width:768px){.blog-featured{flex-direction:row}}
+  .blog-featured-thumb{min-height:200px;flex:0 0 42%;display:flex;align-items:center;justify-content:center;font-size:4rem}
+  .blog-featured-body{padding:2rem;display:flex;flex-direction:column;justify-content:center}
+  /* Article */
+  .article-body h2{font-family:'Syne',sans-serif;font-weight:700;font-size:1.35rem;color:var(--text-primary);margin:2rem 0 .75rem;padding-bottom:.4rem;border-bottom:2px solid var(--border)}
+  .article-body h3{font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;color:var(--text-primary);margin:1.5rem 0 .5rem}
+  .article-body p{color:var(--text-secondary);font-size:.95rem;line-height:1.8;margin-bottom:1rem}
+  .article-body ul,.article-body ol{color:var(--text-secondary);font-size:.95rem;line-height:1.8;padding-left:1.5rem;margin-bottom:1rem}
+  .article-body li{margin-bottom:.35rem}
+  .article-body strong{color:var(--text-primary);font-weight:600}
+  .article-body a{color:var(--primary)}
+  .article-highlight{background:rgba(15,98,254,.06);border-left:3px solid var(--primary);border-radius:0 10px 10px 0;padding:1rem 1.25rem;margin:1.5rem 0}
+  [data-theme="dark"] .article-highlight{background:rgba(15,98,254,.1)}
+  .article-highlight p{margin:0;font-size:.9rem;color:var(--text-secondary)}
+  /* Sidebar */
+  .sidebar-widget{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:1.25rem;margin-bottom:1.25rem}
+  .sidebar-widget-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:1rem}
+  .rel-link{display:flex;align-items:flex-start;gap:.6rem;padding:.5rem 0;border-bottom:1px solid var(--border);text-decoration:none}
+  .rel-link:last-child{border-bottom:none;padding-bottom:0}
+  .rel-link:hover .rel-title{color:var(--primary)}
+  .rel-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
+  .rel-title{font-size:.83rem;font-weight:600;color:var(--text-primary);line-height:1.3;transition:color .15s}
+  .rel-cat{font-size:.72rem;color:var(--text-muted);margin-top:.1rem}
+  .cta-widget{background:linear-gradient(135deg,#0f62fe,#0353e9);border-radius:14px;padding:1.5rem;text-align:center}
+  .cta-widget h5{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;color:#fff;margin-bottom:.5rem}
+  .cta-widget p{font-size:.82rem;color:rgba(255,255,255,.85);margin-bottom:1rem}
+  .cta-widget a{background:#fff;color:#0f62fe;border-radius:8px;padding:.5rem 1.25rem;font-size:.85rem;font-weight:700;text-decoration:none;display:inline-block}
+  /* Breadcrumb */
+  .breadcrumb-bar{display:flex;align-items:center;gap:.4rem;font-size:.82rem;color:var(--text-muted);margin-bottom:1.5rem;flex-wrap:wrap}
+  .breadcrumb-bar a{color:var(--text-muted);text-decoration:none}
+  .breadcrumb-bar a:hover{color:var(--primary)}
+</style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg sticky-top" id="mainNav">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+      <img id="site-logo" src="" alt="Logo" class="d-none" style="max-height:36px">
+      
+    </a>
+    <div class="d-flex align-items-center gap-2 ms-auto">
+      <button class="btn btn-icon theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <i class="bi bi-moon-fill" id="themeIcon"></i>
+      </button>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <i class="bi bi-list fs-4"></i>
+      </button>
+    </div>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+        <li class="nav-item"><a class="nav-link" href="/">Browse Jobs</a></li>
+        <li class="nav-item"><a class="nav-link" href="/#categories">Categories</a></li>
+        <li class="nav-item"><a class="nav-link nav-link-active" href="/blog/">Blog</a></li>
+        <li class="nav-item"><a class="nav-link" href="/contact.html">Post a Job</a></li>
+        <li class="nav-item"><a class="nav-link" href="/about.html">About</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<section class="blog-hero">
+  <div class="container blog-hero-inner">
+    <div class="blog-hero-badge"><i class="bi bi-pencil-square me-1"></i>JobOrbit Blog</div>
+    <h1 class="blog-hero-title">Career Advice &amp; Job Market Insights</h1>
+    <p class="blog-hero-sub">Expert guides on job hunting, resume writing, interview prep, and career growth in Saudi Arabia and the Gulf.</p>
+  </div>
+</section>
+
+<div class="container py-5">
+
+  <!-- Featured -->
+  <div class="blog-featured mb-5">
+    <div class="blog-featured-thumb" style="background:linear-gradient(135deg,#0d1117,#0f2744)">&#127462;&#127480;</div>
+    <div class="blog-featured-body">
+      <div class="blog-card-cat">Job Search &middot; Featured</div>
+      <div class="blog-card-title" style="font-size:1.45rem;margin-bottom:.75rem">
+        <a href="/blog/find-job-saudi-arabia.html">How to Find a Job in Saudi Arabia in 2026</a>
+      </div>
+      <p class="blog-card-excerpt" style="font-size:.93rem">Saudi Arabia's Vision 2030 is creating tens of thousands of new jobs across every sector. This step-by-step guide walks you through finding, applying for, and landing your ideal role in the Kingdom.</p>
+      <div class="d-flex align-items-center gap-3 mt-auto flex-wrap">
+        <span class="blog-card-meta"><i class="bi bi-clock"></i>7 min read</span>
+        <span class="blog-card-meta"><i class="bi bi-calendar3"></i>June 2025</span>
+        <a href="/blog/find-job-saudi-arabia.html" class="blog-card-read ms-auto">Read article <i class="bi bi-arrow-right"></i></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grid — all 9 non-featured articles -->
+  <div class="row g-4">
+
+    <div class="col-sm-6 col-lg-4">
+      <div class="blog-card">
+        <div class="blog-card-thumb" style="background:linear-gradient(135deg,#064e3b,#065f46)">&#128176;</div>
+        <div class="blog-card-body">
+          <div class="blog-card-cat">Career &amp; Salary</div>
+          <div class="blog-card-title"><a href="/blog/high-paying-jobs-riyadh.html">Top 10 High-Paying Jobs in Riyadh (2026)</a></div>
+          <p class="blog-card-excerpt">Which roles command the highest salaries in the Saudi capital — from software engineers to finance directors.</p>
+          <div class="blog-card-footer">
+            <span class="blog-card-meta"><i class="bi bi-clock"></i>6 min</span>
+            <a href="/blog/high-paying-jobs-riyadh.html" class="blog-card-read">Read <i class="bi bi-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-4">
+      <div class="blog-card">
+        <div class="blog-card-thumb" style="background:linear-gradient(135deg,#78350f,#92400e)">&#128196;</div>
+        <div class="blog-card-body">
+          <div class="blog-card-cat">Career Advice</div>
+          <div class="blog-card-title"><a href="/blog/resume-writing-tips-2026.html">Resume Writing Tips for 2026: Stand Out in the Gulf</a></div>
+          <p class="blog-card-excerpt">A polished, ATS-optimised CV is your ticket to an interview. Learn exactly what Gulf employers want to see.</p>
+          <div class="blog-card-footer">
+            <span class="blog-card-meta"><i class="bi bi-clock"></i>7 min</span>
+            <a href="/blog/resume-writing-tips-2026.html" class="blog-card-read">Read <i class="bi bi-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-4">
+      <div class="blog-card">
+        <div class="blog-card-thumb" style="background:linear-gradient(135deg,#1e1b4b,#312e81)">&#128296;</div>
+        <div class="blog-card-body">
+          <div class="blog-card-cat">Interview Prep</div>
+          <div class="blog-card-title"><a href="/blog/interview-questions-engineers.html">Interview Questions for Engineers (With Answers)</a></div>
+          <p class="blog-card-excerpt">Civil, software, mechanical, and electrical — the most common Gulf engineering interview questions, fully answered.</p>
+          <div class="blog-card-footer">
+            <span class="blog-card-meta"><i class="bi bi-clock"></i>8 min</span>
+            <a href="/blog/interview-questions-engineers.html" class="blog-card-read">Read <i class="bi bi-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-4">
+      <div class="blog-card">
+        <div class="blog-card-thumb" style="background:linear-gradient(135deg,#500724,#881337)">&#128187;</div>
+        <div class="blog-card-body">
+          <div class="blog-card-cat">Work Trends</div>
+          <div class="blog-card-title"><a href="/blog/remote-work-trends-gulf.html">Remote Work Trends in the Gulf 2026</a></div>
+          <p class="blog-card-excerpt">Which industries are going hybrid, what changed since 2020, and how to position yourself for flexible Gulf roles.</p>
+          <div class="blog-card-footer">
+            <span class="blog-card-meta"><i class="bi bi-clock"></i>6 min</span>
+            <a href="/blog/remote-work-trends-gulf.html" class="blog-card-read">Read <i class="bi bi-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-4">
+      <div class="blog-card">
+        <div class="blog-card-thumb" style="background:linear-gradient(135deg,#1c1917,#44403c)">&#128cumentation;</div>
+        <div class="blog-card-thumb" style="background:linear-gradient(135deg,#3b0764,#581c87);display:flex;align-items:center;justify-content:center;font-size:3rem;aspect-ratio:16/9">&#128220;</div>
+        <div class="blog-card-body">
+          <div class="blog-card-cat">Visas &amp; Legal</div>
+          <div class="blog-card-title"><a href="/blog/work-visa-guide-saudi-arabia.html">Complete Work Visa Guide for Saudi Arabia</a></div>
+          <p class="blog-card-excerpt">Step-by-step: how to get your work visa and iqama, required documents, timeline, and your rights as a worker.</p>
+          <div class="blog-card-footer">
+            <span class="blog-card-meta"><i class="bi bi-clock"></i>9 min</span>
+            <a href="/blog/work-visa-guide-saudi-arabia.html" class="blog-card-read">Read <i class="bi bi-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-4">
+      <div class="blog-card">
+        <div class="blog-card-thumb" style="background:linear-gradient(135deg,#7f1d1d,#991b1b);display:flex;align-items:center;justify-content:center;font-size:3rem;aspect-ratio:16/9">&#9878;&#65039;</div>
+        <div class="blog-card-body">
+          <div class="blog-card-cat">Legal Guide</div>
+          <div class="blog-card-title"><a href="/blog/saudi-labor-law-guide.html">Saudi Labour Law: Complete Employee Rights Guide</a></div>
+          <p class="blog-card-excerpt">Annual leave, end of service gratuity, termination rules, notice periods, and how to resolve disputes in Saudi Arabia.</p>
+          <div class="blog-card-footer">
+            <span class="blog-card-meta"><i class="bi bi-clock"></i>9 min</span>
+            <a href="/blog/saudi-labor-law-guide.html" class="blog-card-read">Read <i class="bi bi-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-4">
+      <div class="blog-card">
+        <div class="blog-card-thumb" style="background:linear-gradient(135deg,#042f2e,#134e4a);display:flex;align-items:center;justify-content:center;font-size:3rem;aspect-ratio:16/9">&#129309;</div>
+        <div class="blog-card-body">
+          <div class="blog-card-cat">Career Growth</div>
+          <div class="blog-card-title"><a href="/blog/networking-tips-gulf.html">Networking in the Gulf: How Wasta Works</a></div>
+          <p class="blog-card-excerpt">How professional networking really works in Saudi Arabia — wasta explained, where to network, and what actually gets results.</p>
+          <div class="blog-card-footer">
+            <span class="blog-card-meta"><i class="bi bi-clock"></i>8 min</span>
+            <a href="/blog/networking-tips-gulf.html" class="blog-card-read">Read <i class="bi bi-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-4">
+      <div class="blog-card">
+        <div class="blog-card-thumb" style="background:linear-gradient(135deg,#172554,#1e3a8a);display:flex;align-items:center;justify-content:center;font-size:3rem;aspect-ratio:16/9">&#128200;</div>
+        <div class="blog-card-body">
+          <div class="blog-card-cat">Market Insights</div>
+          <div class="blog-card-title"><a href="/blog/gulf-job-sectors-2026.html">Fastest Growing Job Sectors in the Gulf 2026</a></div>
+          <p class="blog-card-excerpt">AI, renewable energy, fintech, healthcare, tourism — which sectors are creating the most new jobs and why.</p>
+          <div class="blog-card-footer">
+            <span class="blog-card-meta"><i class="bi bi-clock"></i>8 min</span>
+            <a href="/blog/gulf-job-sectors-2026.html" class="blog-card-read">Read <i class="bi bi-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-4">
+      <div class="blog-card">
+        <div class="blog-card-thumb" style="background:linear-gradient(135deg,#082f49,#0c4a6e);display:flex;align-items:center;justify-content:center;font-size:3rem;aspect-ratio:16/9">&#9992;&#65039;</div>
+        <div class="blog-card-body">
+          <div class="blog-card-cat">Expat Life</div>
+          <div class="blog-card-title"><a href="/blog/expat-guide-working-saudi-arabia.html">Complete Expat Guide to Working in Saudi Arabia</a></div>
+          <p class="blog-card-excerpt">Iqama setup, banking, accommodation, cost of living, cultural norms, and making the most of tax-free income.</p>
+          <div class="blog-card-footer">
+            <span class="blog-card-meta"><i class="bi bi-clock"></i>12 min</span>
+            <a href="/blog/expat-guide-working-saudi-arabia.html" class="blog-card-read">Read <i class="bi bi-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+<footer class="site-footer">
+  <div class="container">
+    <div class="row g-4 align-items-start">
+      <div class="col-md-4">
+        <div class="footer-brand mb-2">
+          <span class="brand-name" id="footer-site-name">JobOrbit</span>
+        </div>
+        <p class="footer-desc">Connecting talent with opportunity. Find your next career move today.</p>
+      </div>
+      <div class="col-md-4">
+        <h6 class="footer-heading">Quick Links</h6>
+        <ul class="footer-links">
+          <li><a href="#jobs">Browse Jobs</a></li>
+          <li><a href="#categories">Categories</a></li>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/contact.html">Post a Job</a></li>
+          <!-- <li><a href="/admin" target="_blank">Admin Panel</a></li> -->
+        </ul>
+      </div>
+      <div class="col-md-4">
+        <h6 class="footer-heading">Legal &amp; Info</h6>
+        <ul class="footer-links">
+          <li><a href="/about.html">About Us</a></li>
+          <li><a href="/feedback.html">Contact Us</a></li>
+          <li><a href="/privacy-policy.html">Privacy Policy</a></li>
+          <li><a href="/terms.html">Terms &amp; Conditions</a></li>
+          <li><a href="/disclaimer.html">Disclaimer</a></li>
+          <!-- <li><a href="/sitemap.xml" target="_blank">Sitemap</a></li> -->
+        </ul>
+      </div>
+    </div>
+    <hr class="footer-divider">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <p class="mb-0 footer-copy">© <span id="footerYear"></span> <span class="footer-brand-inline" id="footer-copy-name">JobOrbit</span>. All rights reserved.</p>
+      <div class="d-flex flex-wrap gap-3">
+        <a href="/about.html" class="footer-copy" style="text-decoration:none">About</a>
+        <a href="/privacy-policy.html" class="footer-copy" style="text-decoration:none">Privacy</a>
+        <a href="/terms.html" class="footer-copy" style="text-decoration:none">Terms</a>
+        <a href="/disclaimer.html" class="footer-copy" style="text-decoration:none">Disclaimer</a>
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
+<script>
+async function loadSettings() {
+  try {
+    const data = await fetch('/api/settings').then(r=>r.json());
+    const s = data.settings;
+    if (s.primary_color) document.documentElement.style.setProperty('--primary', s.primary_color);
+    if (s.secondary_color) document.documentElement.style.setProperty('--secondary', s.secondary_color);
+    if (s.site_name) {
+      document.querySelectorAll('.brand-name').forEach(el => el.textContent = s.site_name);
+      document.getElementById('footer-copy-name').textContent = s.site_name;
+    }
+    if (s.logo_url) { const l=document.getElementById('site-logo'); l.src=s.logo_url; l.classList.remove('d-none'); }
+    applyTheme(localStorage.getItem('theme') || s.default_theme || 'light', false);
+  } catch(e) {}
+}
+function applyTheme(t, save=true) {
+  document.documentElement.setAttribute('data-theme', t);
+  document.documentElement.style.colorScheme = t;
+  document.getElementById('themeIcon').className = t==='dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+  if (save) localStorage.setItem('theme', t);
+}
+document.getElementById('themeToggle').addEventListener('click', ()=>{
+  applyTheme(document.documentElement.getAttribute('data-theme')==='dark' ? 'light' : 'dark');
+});
+document.getElementById('footerYear').textContent = new Date().getFullYear();
+loadSettings();
+</script>
+</body>
+</html>

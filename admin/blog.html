@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog Manager – Admin</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <!-- Quill rich text editor -->
+  <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet">
+  <link rel="stylesheet" href="/admin/css/admin.css">
+  <style>
+    .ql-container{font-family:'DM Sans',sans-serif;font-size:.95rem;min-height:380px;border-radius:0 0 10px 10px}
+    .ql-toolbar{border-radius:10px 10px 0 0;background:var(--surface)}
+    [data-theme="dark"] .ql-toolbar{background:#1e2530}
+    [data-theme="dark"] .ql-container,[data-theme="dark"] .ql-toolbar{border-color:var(--border)}
+    [data-theme="dark"] .ql-editor{background:#161b22;color:var(--text-primary)}
+    [data-theme="dark"] .ql-picker-label,[data-theme="dark"] .ql-stroke{color:var(--text-primary)!important;stroke:var(--text-primary)!important}
+    .status-badge{display:inline-flex;align-items:center;gap:.3rem;padding:.2rem .65rem;border-radius:100px;font-size:.72rem;font-weight:700}
+    .status-published{background:rgba(16,185,129,.12);color:#059669;border:1px solid rgba(16,185,129,.25)}
+    .status-draft{background:rgba(245,158,11,.12);color:#d97706;border:1px solid rgba(245,158,11,.25)}
+    .img-preview{width:100%;height:160px;object-fit:cover;border-radius:10px;margin-top:.5rem;display:none}
+    .char-count{font-size:.72rem;color:var(--text-muted);text-align:right;margin-top:.2rem}
+    .char-count.warn{color:#d97706}
+    .char-count.over{color:#dc2626}
+    #editor-panel{display:none}
+    #list-panel{display:block}
+    .article-row{cursor:pointer;transition:background .12s}
+    .article-row:hover{background:var(--surface)}
+  </style>
+</head>
+<body>
+<div class="admin-wrapper">
+  <!-- Sidebar injected by admin JS -->
+  <div class="admin-sidebar" id="adminSidebar"></div>
+
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <h4 class="admin-page-title" id="panel-title"><i class="bi bi-journal-richtext me-2"></i>Blog Manager</h4>
+      <div class="d-flex gap-2">
+        <button class="btn btn-primary btn-sm" id="btn-new" onclick="openEditor(null)">
+          <i class="bi bi-plus-lg me-1"></i>New Article
+        </button>
+        <button class="btn btn-outline-secondary btn-sm d-none" id="btn-back" onclick="showList()">
+          <i class="bi bi-arrow-left me-1"></i>Back to List
+        </button>
+      </div>
+    </div>
+
+    <!-- ── ARTICLE LIST ──────────────────────────────────── -->
+    <div id="list-panel">
+      <!-- Stats row -->
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+          <div class="admin-stat-card"><div class="stat-val" id="stat-total">—</div><div class="stat-lbl">Total Articles</div></div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="admin-stat-card"><div class="stat-val text-success" id="stat-pub">—</div><div class="stat-lbl">Published</div></div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="admin-stat-card"><div class="stat-val text-warning" id="stat-draft">—</div><div class="stat-lbl">Drafts</div></div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="admin-stat-card"><div class="stat-val text-primary" id="stat-views">—</div><div class="stat-lbl">Total Views</div></div>
+        </div>
+      </div>
+
+      <!-- Filter / search -->
+      <div class="d-flex gap-2 mb-3 flex-wrap">
+        <input type="text" class="form-control form-control-sm" style="max-width:260px" id="list-search" placeholder="Search articles…" oninput="filterList()">
+        <select class="form-select form-select-sm" style="max-width:150px" id="list-status" onchange="filterList()">
+          <option value="">All Status</option>
+          <option value="published">Published</option>
+          <option value="draft">Draft</option>
+        </select>
+      </div>
+
+      <div class="admin-table-wrap">
+        <table class="table admin-table" id="articles-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th class="d-none d-md-table-cell">Category</th>
+              <th>Status</th>
+              <th class="d-none d-md-table-cell">Views</th>
+              <th class="d-none d-md-table-cell">Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="articles-tbody">
+            <tr><td colspan="6" class="text-center py-4 text-muted">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── EDITOR ────────────────────────────────────────── -->
+    <div id="editor-panel">
+      <form id="article-form" onsubmit="saveArticle(event)">
+        <input type="hidden" id="edit-id">
+
+        <div class="row g-4">
+          <!-- Left col: main fields -->
+          <div class="col-lg-8">
+            <!-- Title -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Title <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="field-title" required placeholder="Article title" maxlength="255"
+                     oninput="updateSlugPreview();updateCharCount(this,'title-count',255)">
+              <div class="char-count" id="title-count">0 / 255</div>
+            </div>
+
+            <!-- Slug preview -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold text-muted" style="font-size:.8rem">URL Preview</label>
+              <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.45rem .85rem;font-size:.82rem;color:var(--text-muted);font-family:monospace">
+                joborbit.org/blog/<span id="slug-preview" style="color:var(--primary)">article-slug</span>
+              </div>
+            </div>
+
+            <!-- Content editor -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Content <span class="text-danger">*</span></label>
+              <div id="quill-editor"></div>
+            </div>
+
+            <!-- Excerpt -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Excerpt <span class="text-muted fw-normal">(shown in card previews)</span></label>
+              <textarea class="form-control" id="field-excerpt" rows="3" maxlength="320"
+                        placeholder="Brief summary of the article…" oninput="updateCharCount(this,'excerpt-count',320)"></textarea>
+              <div class="char-count" id="excerpt-count">0 / 320</div>
+            </div>
+          </div>
+
+          <!-- Right col: meta -->
+          <div class="col-lg-4">
+            <!-- Publish settings -->
+            <div class="admin-widget mb-3">
+              <h6 class="widget-title">Publish</h6>
+              <div class="mb-3">
+                <label class="form-label fw-semibold" style="font-size:.83rem">Status</label>
+                <select class="form-select form-select-sm" id="field-status">
+                  <option value="draft">💾 Draft</option>
+                  <option value="published">🌐 Published</option>
+                </select>
+              </div>
+              <button type="submit" class="btn btn-primary w-100" id="save-btn">
+                <i class="bi bi-floppy-fill me-1"></i>Save Article
+              </button>
+              <div id="save-msg" class="mt-2" style="font-size:.82rem"></div>
+            </div>
+
+            <!-- Featured image -->
+            <div class="admin-widget mb-3">
+              <h6 class="widget-title">Featured Image</h6>
+              <input type="file" class="form-control form-control-sm" id="field-image" accept="image/*" onchange="uploadImage(this)">
+              <img id="img-preview" class="img-preview" src="" alt="Preview">
+              <input type="hidden" id="field-image-url">
+              <button type="button" class="btn btn-outline-danger btn-sm mt-2 d-none" id="btn-remove-img" onclick="removeImage()">
+                <i class="bi bi-trash me-1"></i>Remove Image
+              </button>
+            </div>
+
+            <!-- Article details -->
+            <div class="admin-widget mb-3">
+              <h6 class="widget-title">Details</h6>
+              <div class="mb-2">
+                <label class="form-label fw-semibold" style="font-size:.83rem">Category</label>
+                <select class="form-select form-select-sm" id="field-category">
+                  <option>Job Search</option>
+                  <option>Resume & CV</option>
+                  <option>Interview Tips</option>
+                  <option>Career Growth</option>
+                  <option>Gulf Market</option>
+                  <option>Salary & Benefits</option>
+                  <option>Visa & Iqama</option>
+                  <option>General</option>
+                </select>
+              </div>
+              <div class="mb-2">
+                <label class="form-label fw-semibold" style="font-size:.83rem">Author</label>
+                <input type="text" class="form-control form-control-sm" id="field-author" placeholder="Author name" value="JobOrbit Team">
+              </div>
+              <div class="mb-2">
+                <label class="form-label fw-semibold" style="font-size:.83rem">Tags <span class="text-muted fw-normal">(comma-separated)</span></label>
+                <input type="text" class="form-control form-control-sm" id="field-tags" placeholder="saudi jobs, career tips">
+              </div>
+              <div class="mb-2">
+                <label class="form-label fw-semibold" style="font-size:.83rem">Reading Time (min)</label>
+                <input type="number" class="form-control form-control-sm" id="field-rt" min="1" max="60" placeholder="Auto">
+              </div>
+            </div>
+
+            <!-- SEO -->
+            <div class="admin-widget">
+              <h6 class="widget-title"><i class="bi bi-search me-1"></i>SEO</h6>
+              <div class="mb-2">
+                <label class="form-label fw-semibold" style="font-size:.83rem">Meta Title</label>
+                <input type="text" class="form-control form-control-sm" id="field-meta-title" maxlength="60"
+                       placeholder="Leave blank to use article title" oninput="updateCharCount(this,'mt-count',60)">
+                <div class="char-count" id="mt-count">0 / 60</div>
+              </div>
+              <div class="mb-2">
+                <label class="form-label fw-semibold" style="font-size:.83rem">Meta Description</label>
+                <textarea class="form-control form-control-sm" id="field-meta-desc" rows="3" maxlength="160"
+                          placeholder="Leave blank to use excerpt" oninput="updateCharCount(this,'md-count',160)"></textarea>
+                <div class="char-count" id="md-count">0 / 160</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+<script src="/admin/js/admin.js"></script>
+<script>
+let quill, allArticles = [];
+
+/* ── Init Quill ───────────────────────────────────────────── */
+quill = new Quill('#quill-editor', {
+  theme: 'snow',
+  placeholder: 'Write your article here…',
+  modules: {
+    toolbar: [
+      [{ header: [2, 3, false] }],
+      ['bold','italic','underline','strike'],
+      ['blockquote','code-block'],
+      [{ list:'ordered' },{ list:'bullet' }],
+      ['link','image'],
+      [{ align: [] }],
+      ['clean']
+    ]
+  }
+});
+
+// Handle image insertion via upload
+quill.getModule('toolbar').addHandler('image', () => {
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = 'image/*';
+  input.onchange = async () => {
+    const fd = new FormData(); fd.append('image', input.files[0]);
+    const r = await fetch('/api/admin/blog/upload-image', { method:'POST', body:fd });
+    const d = await r.json();
+    if (d.url) {
+      const range = quill.getSelection(true);
+      quill.insertEmbed(range.index, 'image', d.url);
+    }
+  };
+  input.click();
+});
+
+/* ── Load article list ────────────────────────────────────── */
+async function loadArticles() {
+  const res  = await fetch('/api/admin/blog');
+  const data = await res.json();
+  allArticles = data.articles || [];
+
+  // Stats
+  const pub   = allArticles.filter(a => a.status === 'published').length;
+  const views = allArticles.reduce((s,a) => s + (a.views||0), 0);
+  document.getElementById('stat-total').textContent  = allArticles.length;
+  document.getElementById('stat-pub').textContent    = pub;
+  document.getElementById('stat-draft').textContent  = allArticles.length - pub;
+  document.getElementById('stat-views').textContent  = views.toLocaleString();
+
+  renderList(allArticles);
+}
+
+function renderList(articles) {
+  const tbody = document.getElementById('articles-tbody');
+  if (!articles.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted">No articles yet. Click "New Article" to create one.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = articles.map(a => {
+    const date = new Date(a.created_at).toLocaleDateString('en-GB');
+    const badge = `<span class="status-badge status-${a.status}">${a.status}</span>`;
+    return `<tr class="article-row" onclick="openEditor(${a.id})">
+      <td><div style="font-weight:600;font-size:.88rem">${a.title}</div><div style="font-size:.73rem;color:var(--text-muted)">/blog/${a.slug}</div></td>
+      <td class="d-none d-md-table-cell"><span style="font-size:.82rem">${a.category}</span></td>
+      <td>${badge}</td>
+      <td class="d-none d-md-table-cell"><span style="font-size:.82rem">${(a.views||0).toLocaleString()}</span></td>
+      <td class="d-none d-md-table-cell"><span style="font-size:.82rem">${date}</span></td>
+      <td onclick="event.stopPropagation()">
+        <button class="btn btn-sm btn-outline-primary me-1" onclick="openEditor(${a.id})"><i class="bi bi-pencil"></i></button>
+        <a class="btn btn-sm btn-outline-secondary me-1" href="/blog/${a.slug}" target="_blank"><i class="bi bi-eye"></i></a>
+        <button class="btn btn-sm btn-outline-danger" onclick="deleteArticle(${a.id},'${a.title.replace(/'/g,"\\'")}')"><i class="bi bi-trash"></i></button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterList() {
+  const q   = document.getElementById('list-search').value.toLowerCase();
+  const st  = document.getElementById('list-status').value;
+  const filtered = allArticles.filter(a =>
+    (!q || a.title.toLowerCase().includes(q) || a.category.toLowerCase().includes(q)) &&
+    (!st || a.status === st)
+  );
+  renderList(filtered);
+}
+
+/* ── Open editor ──────────────────────────────────────────── */
+async function openEditor(id) {
+  document.getElementById('list-panel').style.display = 'none';
+  document.getElementById('editor-panel').style.display = 'block';
+  document.getElementById('btn-new').classList.add('d-none');
+  document.getElementById('btn-back').classList.remove('d-none');
+  document.getElementById('panel-title').innerHTML = id
+    ? '<i class="bi bi-pencil-square me-2"></i>Edit Article'
+    : '<i class="bi bi-plus-circle me-2"></i>New Article';
+
+  // Reset form
+  document.getElementById('article-form').reset();
+  document.getElementById('edit-id').value = '';
+  document.getElementById('field-author').value = 'JobOrbit Team';
+  quill.setContents([]);
+  removeImage();
+  document.getElementById('save-msg').textContent = '';
+  document.querySelectorAll('.char-count').forEach(el => el.textContent = '0 / ' + el.textContent.split('/')[1]?.trim());
+
+  if (!id) return;
+
+  const res  = await fetch(`/api/admin/blog/${id}`);
+  const data = await res.json();
+  if (!data.success) return;
+  const a = data.article;
+
+  document.getElementById('edit-id').value              = a.id;
+  document.getElementById('field-title').value          = a.title;
+  document.getElementById('field-excerpt').value        = a.excerpt || '';
+  document.getElementById('field-status').value         = a.status;
+  document.getElementById('field-category').value       = a.category;
+  document.getElementById('field-author').value         = a.author;
+  document.getElementById('field-tags').value           = a.tags || '';
+  document.getElementById('field-rt').value             = a.reading_time || '';
+  document.getElementById('field-meta-title').value     = a.meta_title || '';
+  document.getElementById('field-meta-desc').value      = a.meta_description || '';
+  quill.clipboard.dangerouslyPasteHTML(a.content || '');
+  updateSlugPreview();
+  updateCharCount(document.getElementById('field-title'), 'title-count', 255);
+  updateCharCount(document.getElementById('field-excerpt'), 'excerpt-count', 320);
+
+  if (a.featured_image) {
+    document.getElementById('field-image-url').value = a.featured_image;
+    const prev = document.getElementById('img-preview');
+    prev.src = a.featured_image; prev.style.display = 'block';
+    document.getElementById('btn-remove-img').classList.remove('d-none');
+  }
+}
+
+function showList() {
+  document.getElementById('list-panel').style.display = 'block';
+  document.getElementById('editor-panel').style.display = 'none';
+  document.getElementById('btn-new').classList.remove('d-none');
+  document.getElementById('btn-back').classList.add('d-none');
+  document.getElementById('panel-title').innerHTML = '<i class="bi bi-journal-richtext me-2"></i>Blog Manager';
+  loadArticles();
+}
+
+/* ── Save article ─────────────────────────────────────────── */
+async function saveArticle(e) {
+  e.preventDefault();
+  const id      = document.getElementById('edit-id').value;
+  const title   = document.getElementById('field-title').value.trim();
+  const content = quill.getSemanticHTML();
+  const msg     = document.getElementById('save-msg');
+  const btn     = document.getElementById('save-btn');
+
+  if (!title || quill.getText().trim().length < 10) {
+    msg.innerHTML = '<span class="text-danger">Title and content are required.</span>';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Saving…';
+
+  const body = {
+    title,
+    content,
+    excerpt:          document.getElementById('field-excerpt').value,
+    featured_image:   document.getElementById('field-image-url').value,
+    category:         document.getElementById('field-category').value,
+    tags:             document.getElementById('field-tags').value,
+    author:           document.getElementById('field-author').value,
+    reading_time:     document.getElementById('field-rt').value || null,
+    status:           document.getElementById('field-status').value,
+    meta_title:       document.getElementById('field-meta-title').value,
+    meta_description: document.getElementById('field-meta-desc').value,
+  };
+
+  const url    = id ? `/api/admin/blog/${id}` : '/api/admin/blog';
+  const method = id ? 'PUT' : 'POST';
+
+  const res  = await fetch(url, { method, headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+  const data = await res.json();
+
+  btn.disabled = false;
+  btn.innerHTML = '<i class="bi bi-floppy-fill me-1"></i>Save Article';
+
+  if (data.success) {
+    msg.innerHTML = `<span class="text-success"><i class="bi bi-check-circle me-1"></i>${data.message}${data.slug ? ` — <a href="/blog/${data.slug}" target="_blank">View article</a>` : ''}</span>`;
+    if (!id && data.slug) {
+      // Set the ID so subsequent saves use PUT
+      const newRes  = await fetch('/api/admin/blog');
+      const newData = await newRes.json();
+      const created = newData.articles?.find(a => a.slug === data.slug);
+      if (created) document.getElementById('edit-id').value = created.id;
+    }
+  } else {
+    msg.innerHTML = `<span class="text-danger"><i class="bi bi-x-circle me-1"></i>${data.error}</span>`;
+  }
+}
+
+/* ── Delete article ───────────────────────────────────────── */
+async function deleteArticle(id, title) {
+  if (!confirm(`Delete "${title}"?\nThis cannot be undone.`)) return;
+  const res = await fetch(`/api/admin/blog/${id}`, { method:'DELETE' });
+  const d   = await res.json();
+  if (d.success) loadArticles();
+  else alert('Delete failed: ' + d.error);
+}
+
+/* ── Image upload ─────────────────────────────────────────── */
+async function uploadImage(input) {
+  if (!input.files[0]) return;
+  const fd = new FormData(); fd.append('image', input.files[0]);
+  const res  = await fetch('/api/admin/blog/upload-image', { method:'POST', body:fd });
+  const data = await res.json();
+  if (data.url) {
+    document.getElementById('field-image-url').value = data.url;
+    const prev = document.getElementById('img-preview');
+    prev.src = data.url; prev.style.display = 'block';
+    document.getElementById('btn-remove-img').classList.remove('d-none');
+  }
+}
+
+function removeImage() {
+  document.getElementById('field-image-url').value = '';
+  document.getElementById('field-image').value = '';
+  const prev = document.getElementById('img-preview');
+  prev.src = ''; prev.style.display = 'none';
+  document.getElementById('btn-remove-img').classList.add('d-none');
+}
+
+/* ── Helpers ──────────────────────────────────────────────── */
+function updateSlugPreview() {
+  const val = document.getElementById('field-title').value
+    .toLowerCase().replace(/[^a-z0-9\s-]/g,'').replace(/\s+/g,'-').slice(0,60);
+  document.getElementById('slug-preview').textContent = val || 'article-slug';
+}
+
+function updateCharCount(el, countId, max) {
+  const len  = el.value.length;
+  const span = document.getElementById(countId);
+  span.textContent = `${len} / ${max}`;
+  span.className = 'char-count' + (len > max * .9 ? (len >= max ? ' over' : ' warn') : '');
+}
+
+loadArticles();
+</script>
+</body>
+</html>

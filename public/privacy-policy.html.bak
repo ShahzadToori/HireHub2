@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-S3HNGSBYPQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-S3HNGSBYPQ');
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy – JobOrbit</title>
+  <meta name="description" content="Read JobOrbit's Privacy Policy to understand how we collect, use, and protect your personal data.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="/privacy-policy.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Privacy Policy – JobOrbit">
+  <meta property="og:description" content="Read JobOrbit's Privacy Policy to understand how we collect, use, and protect your personal data.">
+  <meta property="og:site_name" content="JobOrbit">
+  <link rel="icon" type="image/svg+xml" href="/JobOrbitFavicon.svg">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0f62fe">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .lp-hero{background:linear-gradient(135deg,#0d1117 0%,#161b22 60%,#0f2744 100%);padding:4rem 0 3rem;text-align:center;position:relative;overflow:hidden}
+    .lp-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(15,98,254,.18) 0%,transparent 70%)}
+    .lp-hero-icon{width:64px;height:64px;border-radius:18px;background:rgba(15,98,254,.2);border:1px solid rgba(15,98,254,.35);display:inline-flex;align-items:center;justify-content:center;font-size:1.75rem;color:#60a5fa;margin-bottom:1.25rem;position:relative}
+    .lp-hero-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.75rem,4vw,2.75rem);color:#fff;margin-bottom:.6rem;position:relative}
+    .lp-hero-sub{color:rgba(255,255,255,.6);font-size:.95rem;max-width:540px;margin:0 auto;position:relative}
+    .lp-updated{display:inline-block;margin-top:1rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:100px;padding:.25rem .85rem;font-size:.75rem;color:rgba(255,255,255,.5);position:relative}
+    .lp-body{padding:3.5rem 0 4rem}
+    .lp-card{background:var(--bg-card);border:1px solid var(--border);border-radius:18px;padding:2.5rem;max-width:820px;margin:0 auto;box-shadow:var(--shadow)}
+    @media(max-width:576px){.lp-card{padding:1.5rem 1.25rem;border-radius:12px}}
+    .lp-section{margin-bottom:2.25rem}
+    .lp-section:last-child{margin-bottom:0}
+    .lp-section-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;color:var(--text-primary);margin-bottom:.75rem;padding-bottom:.5rem;border-bottom:2px solid var(--border);display:flex;align-items:center;gap:.5rem}
+    .lp-section-title i{color:var(--primary);font-size:1rem}
+    .lp-card p,.lp-card li{color:var(--text-secondary);font-size:.93rem;line-height:1.75;margin-bottom:.5rem}
+    .lp-card ul,.lp-card ol{padding-left:1.4rem;margin-bottom:.75rem}
+    .lp-card a{color:var(--primary);text-decoration:none}
+    .lp-card a:hover{text-decoration:underline}
+    .lp-highlight{background:rgba(15,98,254,.06);border-left:3px solid var(--primary);border-radius:0 8px 8px 0;padding:.75rem 1rem;margin:1rem 0;font-size:.88rem;color:var(--text-secondary)}
+    [data-theme="dark"] .lp-highlight{background:rgba(15,98,254,.1)}
+    .lp-toc{position:sticky;top:80px;background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:1.25rem}
+    .lp-toc-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:.75rem}
+    .lp-toc a{display:block;padding:.3rem .5rem;border-radius:7px;font-size:.83rem;color:var(--text-secondary);text-decoration:none;transition:all .15s}
+    .lp-toc a:hover{background:var(--surface);color:var(--primary)}
+    .about-stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin:1.5rem 0}
+    @media(max-width:576px){.about-stat-grid{grid-template-columns:1fr 1fr}}
+    .about-stat{text-align:center;padding:1.1rem;background:var(--surface);border-radius:12px}
+    .about-stat-num{font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;color:var(--primary)}
+    .about-stat-lbl{font-size:.75rem;color:var(--text-muted);margin-top:.2rem}
+    .value-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;margin-top:1rem}
+    .value-card{padding:1.1rem;background:var(--surface);border-radius:12px;border-left:3px solid var(--primary)}
+    .value-card i{color:var(--primary);font-size:1.2rem;margin-bottom:.4rem;display:block}
+    .value-card-title{font-weight:700;font-size:.88rem;color:var(--text-primary);margin-bottom:.25rem}
+    .value-card p{margin:0;font-size:.8rem!important}
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg sticky-top" id="mainNav">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+      <img id="site-logo" src="" alt="Logo" class="d-none" style="max-height:36px">
+      <!-- <span id="site-name" class="brand-name">JobOrbit</span> -->
+    </a>
+    <div class="d-flex align-items-center gap-2 ms-auto">
+      <button class="btn btn-icon theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <i class="bi bi-moon-fill" id="themeIcon"></i>
+      </button>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <i class="bi bi-list fs-4"></i>
+      </button>
+    </div>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+        <li class="nav-item"><a class="nav-link" href="/">Browse Jobs</a></li>
+        <li class="nav-item"><a class="nav-link" href="/#categories">Categories</a></li>
+        <li class="nav-item"><a class="nav-link" href="/contact.html">Post a Job</a></li>
+        <li class="nav-item"><a class="nav-link" href="/about.html">About</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<section class="lp-hero">
+  <div class="container position-relative">
+    <div class="lp-hero-icon"><i class="bi bi-shield-lock-fill"></i></div>
+    <h1 class="lp-hero-title">Privacy Policy</h1>
+    <p class="lp-hero-sub">How we collect, use, and protect your information.</p>
+    <span class="lp-updated"><i class="bi bi-calendar3 me-1"></i>Last updated: June 2025</span>
+  </div>
+</section>
+
+<section class="lp-body">
+  <div class="container">
+    <div class="row g-4 justify-content-center">
+      <div class="col-lg-3 d-none d-lg-block">
+        <div class="lp-toc">
+          <div class="lp-toc-title">Contents</div>
+          <a href="#info-collect">Information We Collect</a>
+          <a href="#info-use">How We Use It</a>
+          <a href="#cookies">Cookies</a>
+          <a href="#third-party">Third Parties</a>
+          <a href="#advertising">Advertising</a>
+          <a href="#data-security">Data Security</a>
+          <a href="#your-rights">Your Rights</a>
+          <a href="#children">Children</a>
+          <a href="#changes">Policy Changes</a>
+          <a href="#contact-pp">Contact Us</a>
+        </div>
+      </div>
+      <div class="col-lg-9">
+        <div class="lp-card">
+          <div class="lp-section" id="info-collect">
+            <h2 class="lp-section-title"><i class="bi bi-database-fill"></i>Information We Collect</h2>
+            <p>We collect information you provide directly to us and information collected automatically when you use our service:</p>
+            <ul>
+              <li><strong>Contact form submissions:</strong> Name, email address, phone number, company name, and message content when you post a job or contact us.</li>
+              <li><strong>Usage data:</strong> Pages visited, time spent, browser type, device type, IP address (anonymised), and referring URLs.</li>
+              <li><strong>Job listing data:</strong> Job title, company, location, description, and contact details provided by employers.</li>
+              <li><strong>Cookies and local storage:</strong> Theme preference, session identifiers, and analytics identifiers.</li>
+            </ul>
+          </div>
+          <div class="lp-section" id="info-use">
+            <h2 class="lp-section-title"><i class="bi bi-gear-fill"></i>How We Use Your Information</h2>
+            <p>We use the information we collect to:</p>
+            <ul>
+              <li>Publish and manage job listings on the platform</li>
+              <li>Respond to your inquiries and provide customer support</li>
+              <li>Improve and personalise your experience on JobOrbit</li>
+              <li>Monitor and analyse usage trends to improve the service</li>
+              <li>Detect, prevent, and address technical issues or fraud</li>
+              <li>Send service-related communications when necessary</li>
+            </ul>
+            <div class="lp-highlight">We do not sell, rent, or trade your personal information to third parties for marketing purposes.</div>
+          </div>
+          <div class="lp-section" id="cookies">
+            <h2 class="lp-section-title"><i class="bi bi-cookie"></i>Cookies</h2>
+            <p>We use cookies and similar tracking technologies to improve your browsing experience. Cookies we use include:</p>
+            <ul>
+              <li><strong>Essential cookies:</strong> Required for the site to function correctly (e.g. admin session cookies).</li>
+              <li><strong>Preference cookies:</strong> Remember your theme preference (light/dark mode).</li>
+              <li><strong>Analytics cookies:</strong> Help us understand how visitors interact with our site (e.g. Google Analytics).</li>
+              <li><strong>Advertising cookies:</strong> Used by Google AdSense and similar partners to show relevant ads.</li>
+            </ul>
+            <p>You can control or disable cookies through your browser settings. Note that disabling certain cookies may affect site functionality.</p>
+          </div>
+          <div class="lp-section" id="third-party">
+            <h2 class="lp-section-title"><i class="bi bi-share-fill"></i>Third-Party Services</h2>
+            <p>We use trusted third-party services that may have access to certain data:</p>
+            <ul>
+              <li><strong>Google Analytics:</strong> Website traffic and behaviour analysis. <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google Privacy Policy</a></li>
+              <li><strong>Google AdSense:</strong> Advertising on our platform. <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener">AdSense Policy</a></li>
+              <li><strong>Google Fonts &amp; CDN libraries:</strong> Font delivery and Bootstrap (no personal data transmitted).</li>
+              <li><strong>WhatsApp:</strong> When you click a WhatsApp contact button, you are redirected to WhatsApp. Their privacy policy applies.</li>
+            </ul>
+          </div>
+          <div class="lp-section" id="advertising">
+            <h2 class="lp-section-title"><i class="bi bi-megaphone-fill"></i>Advertising (Google AdSense)</h2>
+            <p>JobOrbit uses Google AdSense to display advertisements. Google uses cookies to serve ads based on a user's prior visits to our site and other sites on the Internet. You may opt out of personalised advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener">Google Ad Settings</a>.</p>
+            <p>Third-party vendors, including Google, use cookies to serve ads based on your prior visits to our site and/or other sites on the Internet.</p>
+          </div>
+          <div class="lp-section" id="data-security">
+            <h2 class="lp-section-title"><i class="bi bi-lock-fill"></i>Data Security</h2>
+            <p>We implement reasonable technical and organisational measures to protect your information against unauthorised access, alteration, disclosure, or destruction. However, no method of transmission over the Internet is 100% secure, and we cannot guarantee absolute security.</p>
+          </div>
+          <div class="lp-section" id="your-rights">
+            <h2 class="lp-section-title"><i class="bi bi-person-check-fill"></i>Your Rights</h2>
+            <p>Depending on your location, you may have the following rights regarding your personal data:</p>
+            <ul>
+              <li>Right to access the personal data we hold about you</li>
+              <li>Right to request correction of inaccurate data</li>
+              <li>Right to request deletion of your personal data</li>
+              <li>Right to object to or restrict certain processing</li>
+              <li>Right to data portability</li>
+            </ul>
+            <p>To exercise any of these rights, please <a href="/contact.html">contact us</a>.</p>
+          </div>
+          <div class="lp-section" id="children">
+            <h2 class="lp-section-title"><i class="bi bi-person-fill-x"></i>Children's Privacy</h2>
+            <p>JobOrbit is not intended for individuals under the age of 16. We do not knowingly collect personal information from children. If you believe a child has provided us with personal information, please contact us and we will delete it promptly.</p>
+          </div>
+          <div class="lp-section" id="changes">
+            <h2 class="lp-section-title"><i class="bi bi-arrow-clockwise"></i>Changes to This Policy</h2>
+            <p>We may update this Privacy Policy from time to time. We will notify you of any significant changes by posting the new policy on this page with an updated date. Continued use of JobOrbit after changes constitutes acceptance of the updated policy.</p>
+          </div>
+          <div class="lp-section" id="contact-pp">
+            <h2 class="lp-section-title"><i class="bi bi-envelope-fill"></i>Contact Us</h2>
+            <p>If you have any questions about this Privacy Policy or how we handle your data, please <a href="/contact.html">contact us</a>. We aim to respond within 48 hours.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="footer-brand mb-2"><span class="brand-name" id="footer-site-name">JobOrbit</span></div>
+        <p class="footer-desc">Connecting talent with opportunity. Find your next career move today.</p>
+      </div>
+      <div class="col-md-4">
+        <h6 class="footer-heading">Quick Links</h6>
+        <ul class="footer-links">
+          <li><a href="/">Browse Jobs</a></li>
+          <li><a href="/contact.html">Post a Job</a></li>
+          <li><a href="/about.html">About Us</a></li>
+        </ul>
+      </div>
+      <div class="col-md-4">
+        <h6 class="footer-heading">Legal</h6>
+        <ul class="footer-links">
+          <li><a href="/privacy-policy.html">Privacy Policy</a></li>
+          <li><a href="/terms.html">Terms &amp; Conditions</a></li>
+          <li><a href="/disclaimer.html">Disclaimer</a></li>
+        </ul>
+      </div>
+    </div>
+    <hr class="footer-divider">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <p class="mb-0 footer-copy">&copy; <span id="footerYear"></span> <span id="footer-copy-name">JobOrbit</span>. All rights reserved.</p>
+      <div class="d-flex gap-3">
+        <a href="/privacy-policy.html" class="footer-copy" style="text-decoration:none">Privacy</a>
+        <a href="/terms.html" class="footer-copy" style="text-decoration:none">Terms</a>
+        <a href="/disclaimer.html" class="footer-copy" style="text-decoration:none">Disclaimer</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
+<script>
+async function loadSettings() {
+  try {
+    const data = await fetch('/api/settings').then(r => r.json());
+    const s = data.settings;
+    if (s.primary_color)   document.documentElement.style.setProperty('--primary', s.primary_color);
+    if (s.secondary_color) document.documentElement.style.setProperty('--secondary', s.secondary_color);
+    if (s.site_name) {
+      document.querySelectorAll('.brand-name').forEach(el => el.textContent = s.site_name);
+      document.getElementById('footer-copy-name').textContent = s.site_name;
+      document.title = document.title.replace('JobOrbit', s.site_name);
+    }
+    if (s.logo_url) {
+      const logo = document.getElementById('site-logo');
+      logo.src = s.logo_url; logo.classList.remove('d-none');
+    }
+    applyTheme(localStorage.getItem('theme') || s.default_theme || 'light', false);
+  } catch {}
+}
+function applyTheme(theme, save = true) {
+  document.documentElement.setAttribute('data-theme', theme);
+  document.documentElement.style.colorScheme = theme;
+  document.getElementById('themeIcon').className = theme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+  if (save) localStorage.setItem('theme', theme);
+}
+document.getElementById('themeToggle').addEventListener('click', () => {
+  applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+});
+document.getElementById('footerYear').textContent = new Date().getFullYear();
+loadSettings();
+</script>
+</body>
+</html>

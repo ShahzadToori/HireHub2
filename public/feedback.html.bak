@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feedback & Contact – HireHub</title>
+  <meta name="description" content="Get in touch with HireHub. Report an issue, share feedback, ask a question, or suggest a feature.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="/feedback.html">
+  <meta property="og:type"        content="website">
+  <meta property="og:title"       content="Feedback & Contact – HireHub">
+  <meta property="og:description" content="Get in touch with the HireHub team.">
+  <meta property="og:site_name"   content="HireHub">
+  <link rel="icon" type="image/svg+xml" href="/JobOrbitFavicon.svg">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0f62fe">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    /* ═══════════════════════════════════════════════════════
+       FEEDBACK PAGE — refined editorial aesthetic
+       Syne display + DM Sans body, primary blue accents,
+       floating label fields, animated progress indicators
+    ═══════════════════════════════════════════════════════ */
+
+    /* ── Page hero ───────────────────────────────────────── */
+    .fb-hero {
+      background: linear-gradient(135deg, #0d1117 0%, #161b22 55%, #0f2744 100%);
+      padding: 4rem 0 3.5rem;
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+    }
+    .fb-hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(15,98,254,.22) 0%, transparent 70%);
+    }
+    .fb-hero-inner { position: relative; }
+    .fb-hero-eyebrow {
+      display: inline-flex; align-items: center; gap: .45rem;
+      background: rgba(15,98,254,.18); border: 1px solid rgba(15,98,254,.35);
+      border-radius: 100px; padding: .3rem .95rem;
+      font-size: .72rem; font-weight: 700; color: #60a5fa;
+      text-transform: uppercase; letter-spacing: .08em;
+      margin-bottom: 1.1rem;
+    }
+    .fb-hero-title {
+      font-family: 'Syne', sans-serif; font-weight: 800;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      color: #fff; line-height: 1.1; margin-bottom: .75rem;
+    }
+    .fb-hero-title span { color: #60a5fa; }
+    .fb-hero-sub {
+      color: rgba(255,255,255,.58); font-size: .97rem;
+      max-width: 520px; margin: 0 auto;
+    }
+
+    /* ── Page body ───────────────────────────────────────── */
+    .fb-body { padding: 3.5rem 0 5rem; }
+
+    /* ── Type selector ───────────────────────────────────── */
+    .type-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: .6rem;
+      margin-bottom: 2rem;
+    }
+    @media(max-width: 640px) { .type-grid { grid-template-columns: repeat(2, 1fr); } }
+
+    .type-btn {
+      display: flex; flex-direction: column; align-items: center;
+      gap: .4rem; padding: .85rem .5rem;
+      border-radius: 14px; border: 2px solid var(--border);
+      background: var(--bg-card); cursor: pointer;
+      transition: all .18s; font-size: .75rem; font-weight: 600;
+      color: var(--text-secondary); text-align: center;
+    }
+    .type-btn i { font-size: 1.35rem; transition: transform .2s; }
+    .type-btn:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-2px); }
+    .type-btn:hover i { transform: scale(1.1); }
+    .type-btn.active {
+      border-color: var(--primary); background: rgba(15,98,254,.07);
+      color: var(--primary); box-shadow: 0 0 0 3px rgba(15,98,254,.12);
+    }
+    [data-theme="dark"] .type-btn.active { background: rgba(15,98,254,.12); }
+
+    /* ── Main card ───────────────────────────────────────── */
+    .fb-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2.25rem 2.5rem;
+      box-shadow: var(--shadow);
+      max-width: 660px;
+      margin: 0 auto;
+    }
+    @media(max-width: 600px) { .fb-card { padding: 1.5rem 1.25rem; border-radius: 14px; } }
+
+    /* ── Floating label field ────────────────────────────── */
+    .fl-group {
+      position: relative;
+      margin-bottom: 1.25rem;
+    }
+    .fl-group .fl-input,
+    .fl-group .fl-textarea {
+      width: 100%;
+      padding: 1.25rem 1rem .55rem;
+      border: 1.5px solid var(--border);
+      border-radius: 11px;
+      background: var(--bg-card);
+      color: var(--text-primary);
+      font-family: 'DM Sans', sans-serif;
+      font-size: .93rem;
+      outline: none;
+      transition: border-color .18s, box-shadow .18s;
+      appearance: none;
+    }
+    .fl-group .fl-textarea {
+      resize: vertical;
+      min-height: 130px;
+      padding-top: 1.4rem;
+    }
+    .fl-group .fl-input:focus,
+    .fl-group .fl-textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(15,98,254,.12);
+    }
+    .fl-group .fl-input.is-invalid,
+    .fl-group .fl-textarea.is-invalid {
+      border-color: #ef4444;
+      box-shadow: 0 0 0 3px rgba(239,68,68,.1);
+    }
+    .fl-label {
+      position: absolute; top: .95rem; left: 1rem;
+      font-size: .82rem; color: var(--text-muted);
+      pointer-events: none;
+      transition: all .16s;
+      font-family: 'DM Sans', sans-serif;
+      white-space: nowrap;
+    }
+    .fl-group .fl-input:focus ~ .fl-label,
+    .fl-group .fl-input:not(:placeholder-shown) ~ .fl-label,
+    .fl-group .fl-textarea:focus ~ .fl-label,
+    .fl-group .fl-textarea:not(:placeholder-shown) ~ .fl-label {
+      top: .32rem; font-size: .68rem;
+      color: var(--primary); font-weight: 600;
+      letter-spacing: .03em;
+    }
+    .fl-hint { font-size: .73rem; color: var(--text-muted); margin-top: .3rem; padding-left: .25rem; }
+    .fl-error { font-size: .73rem; color: #ef4444; margin-top: .3rem; padding-left: .25rem; display: none; }
+    .fl-group .fl-input.is-invalid ~ .fl-error,
+    .fl-group .fl-textarea.is-invalid ~ .fl-error { display: block; }
+
+    /* ── Rating ──────────────────────────────────────────── */
+    .rating-wrap {
+      display: flex; gap: .4rem; align-items: center;
+      margin-bottom: 1.25rem;
+    }
+    .rating-label {
+      font-size: .82rem; font-weight: 600;
+      color: var(--text-secondary); margin-right: .35rem;
+    }
+    .star-btn {
+      background: none; border: none; cursor: pointer;
+      font-size: 1.5rem; color: var(--border-strong);
+      padding: 0; line-height: 1;
+      transition: transform .15s, color .15s;
+    }
+    .star-btn:hover, .star-btn.lit { color: #f59e0b; transform: scale(1.15); }
+    .star-btn.lit ~ .star-btn { color: var(--border-strong); transform: none; }
+
+    /* ── Character counter ────────────────────────────────── */
+    .char-counter {
+      font-size: .7rem; color: var(--text-muted);
+      text-align: right; margin-top: .25rem;
+    }
+    .char-counter.warn { color: #f59e0b; }
+    .char-counter.over { color: #ef4444; }
+
+    /* ── Submit button ───────────────────────────────────── */
+    .fb-submit {
+      width: 100%; padding: .85rem;
+      background: var(--primary); color: #fff;
+      border: none; border-radius: 11px;
+      font-family: 'Syne', sans-serif; font-weight: 700;
+      font-size: .97rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: .5rem;
+      transition: background .18s, transform .15s, box-shadow .18s;
+      margin-top: .5rem;
+    }
+    .fb-submit:hover:not(:disabled) {
+      background: var(--primary-hover, #0353e9);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(15,98,254,.3);
+    }
+    .fb-submit:disabled { opacity: .65; cursor: not-allowed; transform: none; }
+    .fb-submit .btn-spinner {
+      width: 18px; height: 18px; border: 2.5px solid rgba(255,255,255,.4);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin .7s linear infinite; display: none;
+    }
+    .fb-submit.loading .btn-spinner { display: block; }
+    .fb-submit.loading .btn-text { display: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Alert ───────────────────────────────────────────── */
+    .fb-alert {
+      padding: 1rem 1.1rem; border-radius: 11px;
+      margin-bottom: 1.5rem; font-size: .88rem;
+      display: flex; align-items: flex-start; gap: .65rem;
+      animation: fadeIn .25s ease;
+    }
+    .fb-alert.success { background: rgba(16,185,129,.1); border: 1px solid rgba(16,185,129,.3); color: #065f46; }
+    .fb-alert.error   { background: rgba(239,68,68,.08);  border: 1px solid rgba(239,68,68,.25);  color: #991b1b; }
+    [data-theme="dark"] .fb-alert.success { color: #6ee7b7; border-color: rgba(16,185,129,.4); background: rgba(16,185,129,.12); }
+    [data-theme="dark"] .fb-alert.error   { color: #fca5a5; border-color: rgba(239,68,68,.35);  background: rgba(239,68,68,.1); }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:translateY(0); } }
+
+    /* ── Success state ────────────────────────────────────── */
+    .fb-success {
+      text-align: center; padding: 2.5rem 1.5rem;
+      display: none;
+    }
+    .fb-success.show { display: block; animation: fadeIn .3s ease; }
+    .success-icon {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: rgba(16,185,129,.15); border: 2px solid rgba(16,185,129,.4);
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 1.75rem; color: #059669; margin-bottom: 1.25rem;
+    }
+    .fb-success h3 { font-family: 'Syne',sans-serif; font-weight: 800; font-size: 1.45rem; margin-bottom: .5rem; color: var(--text-primary); }
+    .fb-success p  { color: var(--text-secondary); font-size: .92rem; max-width: 360px; margin: 0 auto 1.5rem; }
+
+    /* ── Sidebar info cards ───────────────────────────────── */
+    .info-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 1.35rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .info-card-icon {
+      width: 40px; height: 40px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.05rem; margin-bottom: .75rem;
+    }
+    .info-card-title { font-family: 'Syne',sans-serif; font-weight: 700; font-size: .88rem; color: var(--text-primary); margin-bottom: .3rem; }
+    .info-card p, .info-card a { font-size: .82rem; color: var(--text-secondary); line-height: 1.6; }
+    .info-card a { color: var(--primary); text-decoration: none; }
+    .info-card a:hover { text-decoration: underline; }
+
+    .faq-item {
+      border-bottom: 1px solid var(--border); padding: .85rem 0;
+    }
+    .faq-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .faq-q { font-size: .85rem; font-weight: 700; color: var(--text-primary); margin-bottom: .3rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+    .faq-q i { font-size: .75rem; color: var(--text-muted); transition: transform .2s; flex-shrink: 0; }
+    .faq-a { font-size: .8rem; color: var(--text-secondary); line-height: 1.65; max-height: 0; overflow: hidden; transition: max-height .3s ease, opacity .25s; opacity: 0; }
+    .faq-item.open .faq-a { max-height: 200px; opacity: 1; }
+    .faq-item.open .faq-q i { transform: rotate(180deg); }
+
+    /* ── Progress bar ─────────────────────────────────────── */
+    .fb-progress {
+      display: flex; gap: .3rem; margin-bottom: 2rem; align-items: center;
+    }
+    .progress-step {
+      flex: 1; height: 4px; border-radius: 4px;
+      background: var(--border); transition: background .3s;
+    }
+    .progress-step.done { background: var(--primary); }
+    .progress-step.active { background: var(--primary); opacity: .45; }
+    .progress-label { font-size: .72rem; color: var(--text-muted); margin-left: .6rem; white-space: nowrap; }
+
+    /* ── Section divider ─────────────────────────────────── */
+    .field-section-label {
+      font-size: .7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .08em; color: var(--text-muted);
+      margin-bottom: .85rem; padding-bottom: .45rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* ── Optional badge ──────────────────────────────────── */
+    .opt-badge {
+      font-size: .62rem; font-weight: 600; color: var(--text-muted);
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 4px; padding: .08rem .35rem;
+      vertical-align: middle; margin-left: .35rem;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════
+     NAVBAR
+═══════════════════════════════════════════════ -->
+<nav class="navbar navbar-expand-lg sticky-top" id="mainNav">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+      <img id="site-logo" src="" alt="Logo" class="d-none" style="max-height:36px">
+      <span id="site-name" class="brand-name">HireHub</span>
+    </a>
+    <div class="d-flex align-items-center gap-2 ms-auto">
+      <button class="btn btn-icon theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <i class="bi bi-moon-fill" id="themeIcon"></i>
+      </button>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <i class="bi bi-list fs-4"></i>
+      </button>
+    </div>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+        <li class="nav-item"><a class="nav-link" href="/">Browse Jobs</a></li>
+        <li class="nav-item"><a class="nav-link" href="/#categories">Categories</a></li>
+        <li class="nav-item"><a class="nav-link" href="/blog/">Blog</a></li>
+        <li class="nav-item"><a class="nav-link" href="/contact.html">Post a Job</a></li>
+        <li class="nav-item"><a class="nav-link nav-link-active" href="/feedback.html">Feedback</a></li>
+        <li class="nav-item"><a class="nav-link" href="/about.html">About</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════
+     HERO
+═══════════════════════════════════════════════ -->
+<section class="fb-hero">
+  <div class="container fb-hero-inner">
+    <div class="fb-hero-eyebrow"><i class="bi bi-chat-heart-fill"></i> We're listening</div>
+    <h1 class="fb-hero-title">Say <span>hello</span>.<br>We read everything.</h1>
+    <p class="fb-hero-sub">Got a question, found a bug, or just want to share your thoughts? Drop us a message and we'll get back to you.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     BODY
+═══════════════════════════════════════════════ -->
+<section class="fb-body">
+  <div class="container">
+    <div class="row g-4 g-lg-5 justify-content-center">
+
+      <!-- ── Main form column ───────────────────── -->
+      <div class="col-lg-7">
+        <div class="fb-card">
+
+          <!-- Progress bar -->
+          <div class="fb-progress" id="fbProgress" aria-hidden="true">
+            <div class="progress-step active" id="ps1"></div>
+            <div class="progress-step" id="ps2"></div>
+            <div class="progress-step" id="ps3"></div>
+            <span class="progress-label" id="psLabel">Choose type</span>
+          </div>
+
+          <!-- Alert area -->
+          <div id="fbAlert" class="fb-alert d-none" role="alert"></div>
+
+          <!-- ── Step 1: Message type ──────────── -->
+          <div id="step1">
+            <p class="field-section-label">What is this about?</p>
+            <div class="type-grid">
+              <button class="type-btn" data-type="feedback" onclick="selectType(this)">
+                <i class="bi bi-stars"></i> Feedback
+              </button>
+              <button class="type-btn" data-type="bug" onclick="selectType(this)">
+                <i class="bi bi-bug-fill"></i> Report Bug
+              </button>
+              <button class="type-btn" data-type="question" onclick="selectType(this)">
+                <i class="bi bi-question-circle-fill"></i> Question
+              </button>
+              <button class="type-btn" data-type="other" onclick="selectType(this)">
+                <i class="bi bi-three-dots"></i> Other
+              </button>
+            </div>
+            <div style="text-align:center;margin-top:1.5rem">
+              <button class="fb-submit" style="max-width:240px" onclick="goStep2()" id="nextBtn" disabled>
+                <span class="btn-text">Continue <i class="bi bi-arrow-right ms-1"></i></span>
+              </button>
+            </div>
+          </div>
+
+          <!-- ── Step 2: Contact details ───────── -->
+          <div id="step2" style="display:none">
+            <p class="field-section-label">Your details</p>
+
+            <div class="row g-3">
+              <div class="col-sm-6">
+                <div class="fl-group">
+                  <input type="text" class="fl-input" id="fbName" placeholder=" " maxlength="120" autocomplete="name">
+                  <label class="fl-label" for="fbName">Full Name *</label>
+                  <span class="fl-error">Please enter your name.</span>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="fl-group">
+                  <input type="email" class="fl-input" id="fbEmail" placeholder=" " maxlength="160" autocomplete="email">
+                  <label class="fl-label" for="fbEmail">Email Address *</label>
+                  <span class="fl-error">Please enter a valid email.</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="fl-group">
+              <input type="tel" class="fl-input" id="fbPhone" placeholder=" " maxlength="30" autocomplete="tel">
+              <label class="fl-label" for="fbPhone">Phone <span class="opt-badge">optional</span></label>
+            </div>
+
+            <div style="display:flex;gap:.75rem;margin-top:.25rem">
+              <button class="fb-submit" style="background:var(--surface);color:var(--text-primary);border:1px solid var(--border);flex:0 0 auto;width:auto;padding:.75rem 1.25rem" onclick="goStep1()">
+                <span class="btn-text"><i class="bi bi-arrow-left me-1"></i> Back</span>
+              </button>
+              <button class="fb-submit" style="flex:1" onclick="goStep3()">
+                <span class="btn-text">Continue <i class="bi bi-arrow-right ms-1"></i></span>
+              </button>
+            </div>
+          </div>
+
+          <!-- ── Step 3: Message ────────────────── -->
+          <div id="step3" style="display:none">
+            <p class="field-section-label" id="step3Label">Your feedback</p>
+
+            <!-- Rating (shown for feedback type) -->
+            <div id="ratingWrap" class="d-none">
+              <div class="rating-wrap">
+                <span class="rating-label">Overall experience:</span>
+                <button class="star-btn" data-v="1" onclick="setStar(1)" aria-label="1 star">&#9733;</button>
+                <button class="star-btn" data-v="2" onclick="setStar(2)" aria-label="2 stars">&#9733;</button>
+                <button class="star-btn" data-v="3" onclick="setStar(3)" aria-label="3 stars">&#9733;</button>
+                <button class="star-btn" data-v="4" onclick="setStar(4)" aria-label="4 stars">&#9733;</button>
+                <button class="star-btn" data-v="5" onclick="setStar(5)" aria-label="5 stars">&#9733;</button>
+              </div>
+            </div>
+
+            <div class="fl-group">
+              <input type="text" class="fl-input" id="fbSubject" placeholder=" " maxlength="200">
+              <label class="fl-label" for="fbSubject">Subject *</label>
+              <span class="fl-error">Please enter a subject.</span>
+            </div>
+
+            <div class="fl-group">
+              <textarea class="fl-textarea" id="fbMessage" placeholder=" " maxlength="3000" rows="5"></textarea>
+              <label class="fl-label" for="fbMessage">Message *</label>
+              <span class="fl-error">Please write a message (min 15 characters).</span>
+            </div>
+            <div class="char-counter" id="charCounter">0 / 3000</div>
+
+            <div style="display:flex;gap:.75rem;margin-top:1rem">
+              <button class="fb-submit" style="background:var(--surface);color:var(--text-primary);border:1px solid var(--border);flex:0 0 auto;width:auto;padding:.75rem 1.25rem" onclick="goStep2()">
+                <span class="btn-text"><i class="bi bi-arrow-left me-1"></i> Back</span>
+              </button>
+              <button class="fb-submit" id="submitBtn" style="flex:1" onclick="submitForm()">
+                <div class="btn-spinner"></div>
+                <span class="btn-text"><i class="bi bi-send-fill me-1"></i> Send Message</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- ── Success state ──────────────────── -->
+          <div class="fb-success" id="fbSuccess">
+            <div class="success-icon"><i class="bi bi-check-lg"></i></div>
+            <h3>Message received!</h3>
+            <p>Thanks for getting in touch. We typically reply within 24–48 hours.</p>
+            <button class="fb-submit" style="max-width:220px;margin:0 auto" onclick="resetForm()">
+              <span class="btn-text"><i class="bi bi-plus-circle me-1"></i> Send another</span>
+            </button>
+          </div>
+
+        </div><!-- /.fb-card -->
+      </div><!-- /.col -->
+
+      <!-- ── Sidebar ─────────────────────────────────────── -->
+      <div class="col-lg-4 col-xl-4">
+
+        <div class="info-card">
+          <div class="info-card-icon" style="background:rgba(15,98,254,.1);color:var(--primary)">
+            <i class="bi bi-lightning-charge-fill"></i>
+          </div>
+          <div class="info-card-title">Response time</div>
+          <p>We aim to reply to all messages within <strong>24–48 hours</strong> during working days. Urgent issues are prioritised.</p>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-icon" style="background:rgba(16,185,129,.1);color:#059669">
+            <i class="bi bi-briefcase-fill"></i>
+          </div>
+          <div class="info-card-title">Posting a job?</div>
+          <p>Use our <a href="/contact.html">Post a Job</a> page instead. Standard listings are free and go live within 24 hours.</p>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-icon" style="background:rgba(245,158,11,.1);color:#d97706">
+            <i class="bi bi-question-circle-fill"></i>
+          </div>
+          <div class="info-card-title">Common questions</div>
+
+          <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-q">How do I remove my job listing? <i class="bi bi-chevron-down"></i></div>
+            <div class="faq-a">Contact us with the job title and company name and we will remove it within 24 hours.</div>
+          </div>
+          <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-q">Can I edit a listing after posting? <i class="bi bi-chevron-down"></i></div>
+            <div class="faq-a">Yes. Send us the updated details and we will update your listing at no charge.</div>
+          </div>
+          <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-q">How long do listings stay live? <i class="bi bi-chevron-down"></i></div>
+            <div class="faq-a">Standard listings stay active for 30 days. Featured and Sponsored listings are renewed monthly.</div>
+          </div>
+          <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-q">I found a fake or scam listing. <i class="bi bi-chevron-down"></i></div>
+            <div class="faq-a">Please report it using the Bug/Report option in the form. We investigate and remove scam listings immediately.</div>
+          </div>
+
+        </div>
+
+      </div><!-- /.sidebar -->
+
+    </div><!-- /.row -->
+  </div><!-- /.container -->
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════════ -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="row g-4 align-items-start">
+      <div class="col-md-4">
+        <div class="footer-brand mb-2"><span class="brand-name" id="footer-site-name">HireHub</span></div>
+        <p class="footer-desc">Connecting talent with opportunity across the Gulf.</p>
+      </div>
+      <div class="col-md-4">
+        <h6 class="footer-heading">Quick Links</h6>
+        <ul class="footer-links">
+          <li><a href="/">Browse Jobs</a></li>
+           <li><a href="#categories">Categories</a></li>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/contact.html">Post a Job</a></li>
+         
+        </ul>
+      </div>
+      <div class="col-md-4">
+        <h6 class="footer-heading">Legal &amp; Info</h6>
+        <ul class="footer-links">
+           <li><a href="/about.html">About Us</a></li>
+          <li><a href="/feedback.html">Contact Us</a></li>
+          <li><a href="/privacy-policy.html">Privacy Policy</a></li>
+          <li><a href="/terms.html">Terms &amp; Conditions</a></li>
+          <li><a href="/disclaimer.html">Disclaimer</a></li>
+        </ul>
+      </div>
+    </div>
+    <hr class="footer-divider">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <p class="mb-0 footer-copy">&copy; <span id="footerYear"></span> <span id="footer-copy-name">HireHub</span>. All rights reserved.</p>
+      <div class="d-flex gap-3">
+        <a href="/about.html" class="footer-copy" style="text-decoration:none">About</a>
+        <a href="/privacy-policy.html" class="footer-copy" style="text-decoration:none">Privacy</a>
+        <a href="/terms.html"          class="footer-copy" style="text-decoration:none">Terms</a>
+        <a href="/disclaimer.html"     class="footer-copy" style="text-decoration:none">Disclaimer</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
+<script>
+'use strict';
+
+/* ── State ─────────────────────────────────────────────── */
+let currentStep = 1;
+let selectedType = null;
+let selectedRating = 0;
+
+/* ── Settings & theme ─────────────────────────────────── */
+async function loadSettings() {
+  try {
+    const data = await fetch('/api/settings').then(r => r.json());
+    const s = data.settings;
+    if (s.primary_color)   document.documentElement.style.setProperty('--primary',   s.primary_color);
+    if (s.secondary_color) document.documentElement.style.setProperty('--secondary', s.secondary_color);
+    if (s.site_name) {
+      document.querySelectorAll('.brand-name').forEach(el => el.textContent = s.site_name);
+      document.getElementById('footer-copy-name').textContent = s.site_name;
+      document.title = `Feedback & Contact – ${s.site_name}`;
+    }
+    if (s.logo_url) {
+      const logo = document.getElementById('site-logo');
+      logo.src = s.logo_url; logo.classList.remove('d-none');
+    }
+    applyTheme(localStorage.getItem('theme') || s.default_theme || 'light', false);
+  } catch {}
+}
+
+function applyTheme(theme, save = true) {
+  document.documentElement.setAttribute('data-theme', theme);
+  document.documentElement.style.colorScheme = theme;
+  document.getElementById('themeIcon').className = theme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+  if (save) localStorage.setItem('theme', theme);
+}
+
+document.getElementById('themeToggle').addEventListener('click', () => {
+  applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+});
+
+/* ── Type selector ────────────────────────────────────── */
+function selectType(btn) {
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedType = btn.dataset.type;
+  document.getElementById('nextBtn').disabled = false;
+
+  // Animate button
+  btn.style.transform = 'scale(.96)';
+  setTimeout(() => btn.style.transform = '', 120);
+}
+
+/* ── Progress update ──────────────────────────────────── */
+function updateProgress(step) {
+  const labels = ['Choose type', 'Your details', 'Your message'];
+  for (let i = 1; i <= 3; i++) {
+    const el = document.getElementById('ps' + i);
+    el.className = 'progress-step' + (i < step ? ' done' : i === step ? ' active' : '');
+  }
+  document.getElementById('psLabel').textContent = labels[step - 1];
+}
+
+/* ── Step navigation ──────────────────────────────────── */
+function goStep1() {
+  show('step1'); hide('step2'); hide('step3');
+  currentStep = 1;
+  updateProgress(1);
+  clearAlert();
+}
+
+function goStep2() {
+  if (!selectedType) { showAlert('error', 'Please select a message type first.'); return; }
+  show('step2'); hide('step1'); hide('step3');
+  currentStep = 2;
+  updateProgress(2);
+  clearAlert();
+  document.getElementById('fbName').focus();
+}
+
+function goStep3() {
+  const name  = document.getElementById('fbName');
+  const email = document.getElementById('fbEmail');
+  let ok = true;
+
+  clearValidation(name); clearValidation(email);
+
+  if (!name.value.trim())  { setInvalid(name);  ok = false; }
+  if (!isValidEmail(email.value)) { setInvalid(email); ok = false; }
+
+  if (!ok) { showAlert('error', 'Please fix the highlighted fields.'); return; }
+
+  show('step3'); hide('step2'); hide('step1');
+  currentStep = 3;
+  updateProgress(3);
+  clearAlert();
+
+  // Set step label & show rating for feedback type
+  const labels = { feedback: 'Your feedback', bug: 'Describe the bug', question: 'Your question', other: 'Your message' };
+  document.getElementById('step3Label').textContent = labels[selectedType] || 'Your message';
+
+  const ratingWrap = document.getElementById('ratingWrap');
+  if (selectedType === 'feedback') ratingWrap.classList.remove('d-none');
+  else ratingWrap.classList.add('d-none');
+
+  // Pre-fill subject if empty
+  const subjects = { feedback: 'Site feedback', bug: 'Bug report', question: 'Question', other: 'General enquiry' };
+  const subj = document.getElementById('fbSubject');
+  if (!subj.value) subj.value = subjects[selectedType] || '';
+
+  document.getElementById('fbMessage').focus();
+}
+
+/* ── Star rating ──────────────────────────────────────── */
+function setStar(val) {
+  selectedRating = val;
+  document.querySelectorAll('.star-btn').forEach(btn => {
+    const v = parseInt(btn.dataset.v);
+    btn.classList.toggle('lit', v <= val);
+    btn.style.color = v <= val ? '#f59e0b' : '';
+  });
+}
+
+/* ── Character counter ───────────────────────────────── */
+document.getElementById('fbMessage').addEventListener('input', function() {
+  const len = this.value.length;
+  const max = 3000;
+  const counter = document.getElementById('charCounter');
+  counter.textContent = `${len} / ${max}`;
+  counter.className = 'char-counter' + (len > max * .9 ? (len >= max ? ' over' : ' warn') : '');
+});
+
+/* ── Submit ───────────────────────────────────────────── */
+async function submitForm() {
+  const subj = document.getElementById('fbSubject');
+  const msg  = document.getElementById('fbMessage');
+  let ok = true;
+
+  clearValidation(subj); clearValidation(msg);
+
+  if (!subj.value.trim())            { setInvalid(subj); ok = false; }
+  if (msg.value.trim().length < 15)  { setInvalid(msg);  ok = false; }
+
+  if (!ok) { showAlert('error', 'Please fill in the subject and message.'); return; }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.classList.add('loading');
+  clearAlert();
+
+  // Build subject with type prefix and optional rating
+  let fullSubject = subj.value.trim();
+  const typeLabel = { feedback: 'Feedback', bug: 'Bug Report', question: 'Question', other: 'General' };
+  fullSubject = `[${typeLabel[selectedType] || 'Contact'}] ${fullSubject}`;
+  if (selectedType === 'feedback' && selectedRating > 0) {
+    fullSubject += ` [${selectedRating}★]`;
+  }
+
+  // Build full message with metadata
+  let fullMessage = msg.value.trim();
+  if (selectedType === 'feedback' && selectedRating > 0) {
+    fullMessage = `Rating: ${'★'.repeat(selectedRating)}${'☆'.repeat(5 - selectedRating)}\n\n` + fullMessage;
+  }
+  fullMessage += `\n\n---\nType: ${selectedType}\nPage: ${window.location.href}\nUA: ${navigator.userAgent.substring(0, 100)}`;
+
+  try {
+    const res = await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name:    document.getElementById('fbName').value.trim(),
+        email:   document.getElementById('fbEmail').value.trim().toLowerCase(),
+        phone:   document.getElementById('fbPhone').value.trim() || null,
+        subject: fullSubject,
+        message: fullMessage
+      })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      // Hide all steps, show success
+      hide('step1'); hide('step2'); hide('step3');
+      hide('fbProgress');
+      const s = document.getElementById('fbSuccess');
+      s.style.display = 'block';
+      s.classList.add('show');
+    } else {
+      showAlert('error', data.message || 'Something went wrong. Please try again.');
+      btn.disabled = false;
+      btn.classList.remove('loading');
+    }
+  } catch {
+    showAlert('error', 'Network error. Please check your connection and try again.');
+    btn.disabled = false;
+    btn.classList.remove('loading');
+  }
+}
+
+/* ── Reset ────────────────────────────────────────────── */
+function resetForm() {
+  selectedType = null; selectedRating = 0; currentStep = 1;
+  document.getElementById('fbName').value    = '';
+  document.getElementById('fbEmail').value   = '';
+  document.getElementById('fbPhone').value   = '';
+  document.getElementById('fbSubject').value = '';
+  document.getElementById('fbMessage').value = '';
+  document.getElementById('charCounter').textContent = '0 / 3000';
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.star-btn').forEach(b => { b.classList.remove('lit'); b.style.color = ''; });
+  document.getElementById('nextBtn').disabled = true;
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('submitBtn').classList.remove('loading');
+
+  const s = document.getElementById('fbSuccess');
+  s.style.display = 'none'; s.classList.remove('show');
+  show('fbProgress');
+  show('step1'); hide('step2'); hide('step3');
+  updateProgress(1);
+  clearAlert();
+}
+
+/* ── FAQ accordion ────────────────────────────────────── */
+function toggleFaq(item) {
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+  if (!isOpen) item.classList.add('open');
+}
+
+/* ── Helpers ──────────────────────────────────────────── */
+function show(id) { const el = document.getElementById(id); if (el) el.style.display = ''; }
+function hide(id) { const el = document.getElementById(id); if (el) el.style.display = 'none'; }
+
+function showAlert(type, msg) {
+  const el = document.getElementById('fbAlert');
+  el.className = `fb-alert ${type}`;
+  el.innerHTML = `<i class="bi bi-${type === 'success' ? 'check-circle-fill' : 'exclamation-circle-fill'}" style="flex-shrink:0;margin-top:.1rem"></i><span>${msg}</span>`;
+}
+function clearAlert() {
+  const el = document.getElementById('fbAlert');
+  el.className = 'fb-alert d-none'; el.textContent = '';
+}
+
+function setInvalid(el) { el.classList.add('is-invalid'); el.focus(); }
+function clearValidation(el) { el.classList.remove('is-invalid'); }
+
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+// Clear validation on input
+['fbName','fbEmail','fbSubject','fbMessage'].forEach(id => {
+  document.getElementById(id)?.addEventListener('input', function() {
+    this.classList.remove('is-invalid');
+  });
+});
+
+/* ── Init ─────────────────────────────────────────────── */
+document.getElementById('footerYear').textContent = new Date().getFullYear();
+loadSettings();
+</script>
+</body>
+</html>

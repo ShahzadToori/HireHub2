@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gulf Relocation Checklist 2026 — Moving to Saudi Arabia UAE Qatar - JobOrbit</title>
+  <meta name="description" content="Get a personalised relocation checklist for moving to work in Saudi Arabia, UAE, Qatar, Kuwait, Bahrain or Oman. Documents, banking, iqama and more.">
+  <meta name="robots" content="index, follow, max-snippet:-1">
+  <link rel="canonical" href="/tools/relocation-checklist.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Gulf Relocation Checklist 2026 — Moving to Saudi Arabia UAE Qatar">
+  <meta property="og:description" content="Get a personalised relocation checklist for moving to work in Saudi Arabia, UAE, Qatar, Kuwait, Bahrain or Oman. Documents, banking, iqama and more.">
+  <meta property="og:site_name" content="JobOrbit">
+  <link rel="icon" type="image/svg+xml" href="/JobOrbitFavicon.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0f62fe">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+  .tool-hero{background:linear-gradient(135deg,#0d1117 0%,#161b22 55%,#0f2744 100%);padding:3.5rem 0 2.75rem;position:relative;overflow:hidden;text-align:center}
+  .tool-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(15,98,254,.2),transparent 70%)}
+  .tool-hero-inner{position:relative}
+  .tool-badge{display:inline-flex;align-items:center;gap:.4rem;background:rgba(15,98,254,.18);border:1px solid rgba(15,98,254,.3);border-radius:100px;padding:.28rem .85rem;font-size:.72rem;font-weight:700;color:#60a5fa;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.9rem}
+  .tool-hero h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.7rem,4vw,2.8rem);color:#fff;line-height:1.12;margin-bottom:.6rem}
+  .tool-hero p{color:rgba(255,255,255,.6);font-size:.95rem;max-width:540px;margin:0 auto}
+  .calc-card{background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:2.25rem;box-shadow:var(--shadow)}
+  @media(max-width:576px){.calc-card{padding:1.5rem 1.25rem;border-radius:14px}}
+  .calc-label{font-size:.82rem;font-weight:700;color:var(--text-secondary);margin-bottom:.4rem;display:block}
+  .calc-input,.calc-select{width:100%;padding:.7rem .95rem;border:1.5px solid var(--border);border-radius:11px;background:var(--bg-card);color:var(--text-primary);font-family:'DM Sans',sans-serif;font-size:.93rem;outline:none;transition:border-color .18s,box-shadow .18s;appearance:none}
+  .calc-input:focus,.calc-select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(15,98,254,.12)}
+  .result-box{background:linear-gradient(135deg,rgba(15,98,254,.08),rgba(15,98,254,.04));border:1.5px solid rgba(15,98,254,.2);border-radius:14px;padding:1.5rem;margin-top:1.5rem;display:none}
+  .result-box.show{display:block;animation:fadeUp .25s ease}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  .result-main{font-family:'Syne',sans-serif;font-weight:800;font-size:2rem;color:var(--primary);margin-bottom:.25rem}
+  .result-label{font-size:.82rem;color:var(--text-muted);margin-bottom:1rem}
+  .result-row{display:flex;justify-content:space-between;align-items:center;padding:.45rem 0;border-bottom:1px solid var(--border);font-size:.875rem}
+  .result-row:last-child{border-bottom:none}
+  .result-row-label{color:var(--text-secondary)}
+  .result-row-val{font-weight:700;color:var(--text-primary)}
+  .result-row-val.green{color:#059669}
+  .result-row-val.blue{color:var(--primary)}
+  .result-row-val.red{color:#dc2626}
+  .btn-calc{width:100%;padding:.85rem;background:var(--primary);color:#fff;border:none;border-radius:11px;font-family:'Syne',sans-serif;font-weight:700;font-size:.97rem;cursor:pointer;transition:background .15s,transform .12s,box-shadow .15s;margin-top:.25rem}
+  .btn-calc:hover{background:#0353e9;transform:translateY(-1px);box-shadow:0 6px 20px rgba(15,98,254,.28)}
+  .info-box{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.25);border-radius:10px;padding:.85rem 1rem;font-size:.82rem;color:var(--text-secondary);margin-top:1.25rem;display:flex;gap:.65rem}
+  .info-box i{color:#d97706;flex-shrink:0;margin-top:.1rem}
+  .success-box{background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.25);border-radius:10px;padding:.85rem 1rem;font-size:.82rem;color:var(--text-secondary);margin-top:1.25rem;display:flex;gap:.65rem}
+  .success-box i{color:#059669;flex-shrink:0;margin-top:.1rem}
+  .related-tool{display:flex;align-items:center;gap:.85rem;padding:.85rem 1rem;background:var(--surface);border:1px solid var(--border);border-radius:12px;text-decoration:none;transition:border-color .15s,transform .15s;margin-bottom:.6rem}
+  .related-tool:hover{border-color:var(--primary);transform:translateX(3px);text-decoration:none}
+  .related-tool-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.05rem;flex-shrink:0}
+  .related-tool-title{font-weight:700;font-size:.88rem;color:var(--text-primary);display:block}
+  .related-tool-desc{font-size:.75rem;color:var(--text-muted)}
+  .sidebar-widget{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:1.25rem;margin-bottom:1.25rem}
+  .sidebar-widget-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:.85rem}
+  /* Step indicator for decision tree */
+  .step-wrap{margin-bottom:1.5rem}
+  .step-indicator{display:flex;gap:.5rem;margin-bottom:1.25rem;flex-wrap:wrap}
+  .step-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:var(--text-muted);transition:all .2s;flex-shrink:0}
+  .step-dot.done{background:var(--primary);border-color:var(--primary);color:#fff}
+  .step-dot.active{border-color:var(--primary);color:var(--primary)}
+  .step-line{flex:1;height:2px;background:var(--border);margin-top:13px;min-width:20px;border-radius:2px;transition:background .2s}
+  .step-line.done{background:var(--primary)}
+  /* Checklist items */
+  .check-list{list-style:none;padding:0;margin:0}
+  .check-item{display:flex;align-items:flex-start;gap:.75rem;padding:.6rem 0;border-bottom:1px solid var(--border);font-size:.875rem;color:var(--text-secondary)}
+  .check-item:last-child{border-bottom:none}
+  .check-item i{color:var(--primary);flex-shrink:0;margin-top:.1rem;font-size:1rem}
+  /* Country table */
+  .country-table{width:100%;border-collapse:collapse;font-size:.84rem}
+  .country-table th{background:var(--primary);color:#fff;padding:.6rem .9rem;text-align:left}
+  .country-table td{padding:.6rem .9rem;border-bottom:1px solid var(--border);color:var(--text-secondary)}
+  .country-table tr:nth-child(even) td{background:var(--surface)}
+  .country-table .yes{color:#059669;font-weight:700}
+  .country-table .no{color:#dc2626;font-weight:700}
+  .country-table .partial{color:#d97706;font-weight:700}
+</style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg sticky-top" id="mainNav">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+      <img id="site-logo" src="" alt="Logo" class="d-none" style="max-height:36px">
+    </a>
+    <div class="d-flex align-items-center gap-2 ms-auto">
+      <button class="btn btn-icon theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <i class="bi bi-moon-fill" id="themeIcon"></i>
+      </button>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <i class="bi bi-list fs-4"></i>
+      </button>
+    </div>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+        <li class="nav-item"><a class="nav-link" href="/">Browse Jobs</a></li>
+        <li class="nav-item"><a class="nav-link" href="/blog/">Blog</a></li>
+        <li class="nav-item"><a class="nav-link nav-link-active" href="/tools/">Tools</a></li>
+        <li class="nav-item"><a class="nav-link" href="/contact.html">Post a Job</a></li>
+        <li class="nav-item"><a class="nav-link" href="/about.html">About</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<section class="tool-hero">
+  <div class="container tool-hero-inner">
+    <div class="tool-badge"><i class="bi bi-list-check me-1"></i>Relocation Checklist</div>
+    <h1>Gulf Relocation Checklist Generator</h1>
+    <p>Get a personalised step-by-step checklist for moving to work in Saudi Arabia, UAE, Qatar, Kuwait, Bahrain, or Oman.</p>
+  </div>
+</section>
+<div class="container py-5">
+  <div class="row g-4 g-lg-5">
+    <div class="col-lg-8">
+<div class="calc-card">
+  <h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;color:var(--text-primary);margin-bottom:.35rem">Relocation Checklist Generator</h2>
+  <p style="font-size:.88rem;color:var(--text-muted);margin-bottom:1.5rem">Get a personalised step-by-step checklist for moving to work in the Gulf</p>
+
+  <div class="row g-3">
+    <div class="col-sm-6">
+      <label class="calc-label" for="relocFrom">Your Home Country / Region</label>
+      <select class="calc-select" id="relocFrom">
+        <option value="south_asia">South Asia (Pakistan, India, Bangladesh, Nepal)</option>
+        <option value="southeast_asia">Southeast Asia (Philippines, Indonesia, Sri Lanka)</option>
+        <option value="arab">Arab World (Egypt, Jordan, Syria, Morocco)</option>
+        <option value="africa">Africa (Ethiopia, Kenya, Nigeria, Ghana)</option>
+        <option value="western">Western (Europe, North America, Australia)</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    <div class="col-sm-6">
+      <label class="calc-label" for="relocTo">Moving To</label>
+      <select class="calc-select" id="relocTo">
+        <option value="sa">Saudi Arabia 🇸🇦</option>
+        <option value="ae">UAE 🇦🇪</option>
+        <option value="qa">Qatar 🇶🇦</option>
+        <option value="kw">Kuwait 🇰🇼</option>
+        <option value="bh">Bahrain 🇧🇭</option>
+        <option value="om">Oman 🇴🇲</option>
+      </select>
+    </div>
+    <div class="col-sm-6">
+      <label class="calc-label" for="relocJob">Job Sector</label>
+      <select class="calc-select" id="relocJob">
+        <option value="tech">Technology / IT</option>
+        <option value="engineering">Engineering / Construction</option>
+        <option value="healthcare">Healthcare / Medical</option>
+        <option value="finance">Finance / Accounting</option>
+        <option value="hospitality">Hospitality / Retail</option>
+        <option value="blue_collar">Driver / Security / Labour</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    <div class="col-sm-6">
+      <label class="calc-label" for="relocFamily">Moving With Family?</label>
+      <select class="calc-select" id="relocFamily">
+        <option value="no">No — moving alone</option>
+        <option value="spouse">Spouse only</option>
+        <option value="family">Spouse + children</option>
+      </select>
+    </div>
+    <div class="col-12">
+      <button class="btn-calc" onclick="genChecklist()"><i class="bi bi-list-check me-2"></i>Generate My Checklist</button>
+    </div>
+  </div>
+
+  <div id="checklistResult" class="d-none" style="margin-top:1.5rem"></div>
+</div></div>
+    <div class="col-lg-4"><div class="sidebar-widget">
+  <div class="sidebar-widget-title">All Tools</div>
+  <a href="/tools/eosb-calculator.html" class="related-tool">
+    <div class="related-tool-icon" style="background:rgba(16,185,129,.1);color:#059669"><i class="bi bi-cash-stack"></i></div>
+    <div><span class="related-tool-title">EOSB Calculator</span><span class="related-tool-desc">End of service gratuity</span></div>
+  </a>
+  <a href="/tools/salary-calculator.html" class="related-tool">
+    <div class="related-tool-icon" style="background:rgba(15,98,254,.1);color:var(--primary)"><i class="bi bi-currency-dollar"></i></div>
+    <div><span class="related-tool-title">Salary Calculator</span><span class="related-tool-desc">Gulf salary benchmarks</span></div>
+  </a>
+  <a href="/tools/net-salary-calculator.html" class="related-tool">
+    <div class="related-tool-icon" style="background:rgba(139,92,246,.1);color:#7c3aed"><i class="bi bi-wallet2"></i></div>
+    <div><span class="related-tool-title">Net Salary Calculator</span><span class="related-tool-desc">Take-home after GOSI</span></div>
+  </a>
+  <a href="/tools/overtime-calculator.html" class="related-tool">
+    <div class="related-tool-icon" style="background:rgba(245,158,11,.1);color:#d97706"><i class="bi bi-clock-history"></i></div>
+    <div><span class="related-tool-title">Overtime Calculator</span><span class="related-tool-desc">Legal overtime pay</span></div>
+  </a>
+  <a href="/tools/notice-period-calculator.html" class="related-tool">
+    <div class="related-tool-icon" style="background:rgba(239,68,68,.1);color:#dc2626"><i class="bi bi-calendar-check"></i></div>
+    <div><span class="related-tool-title">Notice Period</span><span class="related-tool-desc">Last working day</span></div>
+  </a>
+  <a href="/tools/iqama-transfer-checker.html" class="related-tool">
+    <div class="related-tool-icon" style="background:rgba(6,182,212,.1);color:#0891b2"><i class="bi bi-passport"></i></div>
+    <div><span class="related-tool-title">Iqama Transfer</span><span class="related-tool-desc">Eligibility checker</span></div>
+  </a>
+  <a href="/tools/remittance-calculator.html" class="related-tool">
+    <div class="related-tool-icon" style="background:rgba(16,185,129,.1);color:#059669"><i class="bi bi-arrow-left-right"></i></div>
+    <div><span class="related-tool-title">Remittance Calculator</span><span class="related-tool-desc">Send money home</span></div>
+  </a>
+  <a href="/tools/relocation-checklist.html" class="related-tool">
+    <div class="related-tool-icon" style="background:rgba(249,115,22,.1);color:#ea580c"><i class="bi bi-list-check"></i></div>
+    <div><span class="related-tool-title">Relocation Checklist</span><span class="related-tool-desc">Moving to the Gulf</span></div>
+  </a>
+  <a href="/tools/driving-license-checker.html" class="related-tool">
+    <div class="related-tool-icon" style="background:rgba(99,102,241,.1);color:#6366f1"><i class="bi bi-car-front-fill"></i></div>
+    <div><span class="related-tool-title">Driving License</span><span class="related-tool-desc">Conversion eligibility</span></div>
+  </a>
+</div>
+<div class="sidebar-widget">
+  <div class="sidebar-widget-title">Find a Job</div>
+  <p style="font-size:.85rem;color:var(--text-secondary);margin-bottom:1rem">Browse thousands of verified Gulf jobs.</p>
+  <a href="/" style="display:flex;align-items:center;justify-content:center;gap:.5rem;padding:.75rem;background:var(--primary);color:#fff;border-radius:11px;font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;text-decoration:none">
+    <i class="bi bi-briefcase-fill"></i> Browse Jobs
+  </a>
+</div></div>
+  </div>
+</div>
+<footer class="site-footer">
+  <div class="container">
+    <div class="row g-4 align-items-start">
+      <div class="col-md-4">
+        <div class="footer-brand mb-2"><span class="brand-name" id="footer-site-name">JobOrbit</span></div>
+        <p class="footer-desc">Connecting talent with opportunity across the Gulf region.</p>
+      </div>
+      <div class="col-md-4">
+        <h6 class="footer-heading">Quick Links</h6>
+        <ul class="footer-links">
+          <li><a href="/">Browse Jobs</a></li>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/tools/">Career Tools</a></li>
+          <li><a href="/contact.html">Post a Job</a></li>
+        </ul>
+      </div>
+      <div class="col-md-4">
+        <h6 class="footer-heading">Legal</h6>
+        <ul class="footer-links">
+          <li><a href="/about.html">About Us</a></li>
+          <li><a href="/privacy-policy.html">Privacy Policy</a></li>
+          <li><a href="/terms.html">Terms &amp; Conditions</a></li>
+          <li><a href="/disclaimer.html">Disclaimer</a></li>
+        </ul>
+      </div>
+    </div>
+    <hr class="footer-divider">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <p class="mb-0 footer-copy">&copy; <span id="footerYear"></span> <span id="footer-copy-name">JobOrbit</span>. All rights reserved.</p>
+      <div class="d-flex gap-3">
+        <a href="/tools/" class="footer-copy" style="text-decoration:none">Tools</a>
+        <a href="/privacy-policy.html" class="footer-copy" style="text-decoration:none">Privacy</a>
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
+<script>
+(function(){
+  async function loadSettings(){
+    try{
+      const d=await fetch('/api/settings').then(r=>r.json());
+      const s=d.settings;
+      if(s.primary_color)document.documentElement.style.setProperty('--primary',s.primary_color);
+      if(s.secondary_color)document.documentElement.style.setProperty('--secondary',s.secondary_color);
+      if(s.site_name){document.querySelectorAll('.brand-name').forEach(e=>e.textContent=s.site_name);const fc=document.getElementById('footer-copy-name');if(fc)fc.textContent=s.site_name;}
+      if(s.logo_url){const l=document.getElementById('site-logo');if(l){l.src=s.logo_url;l.classList.remove('d-none');}}
+      applyTheme(localStorage.getItem('theme')||s.default_theme||'light',false);
+    }catch(e){}
+  }
+  function applyTheme(t,save=true){
+    document.documentElement.setAttribute('data-theme',t);
+    document.documentElement.style.colorScheme=t;
+    const i=document.getElementById('themeIcon');if(i)i.className=t==='dark'?'bi bi-sun-fill':'bi bi-moon-fill';
+    if(save)localStorage.setItem('theme',t);
+  }
+  const tb=document.getElementById('themeToggle');
+  if(tb)tb.addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+  const fy=document.getElementById('footerYear');if(fy)fy.textContent=new Date().getFullYear();
+  loadSettings();
+})();
+</script>
+<script>
+const COUNTRY_NAMES = {sa:'Saudi Arabia',ae:'UAE',qa:'Qatar',kw:'Kuwait',bh:'Bahrain',om:'Oman'};
+
+const ITEMS = {
+  // Phase 1 — Always required (before you leave)
+  before_always: [
+    {icon:'bi-file-earmark-text', text:'Get your employment contract in writing. Verify it matches what was verbally agreed.'},
+    {icon:'bi-passport', text:'Check passport validity — must have at least 6 months validity beyond your intended stay.'},
+    {icon:'bi-camera', text:'Take 20+ passport-sized photos (white background) — you will need them constantly.'},
+    {icon:'bi-translate', text:'Get all certificates (degree, experience letters) officially translated to Arabic and notarised.'},
+    {icon:'bi-shield-check', text:'Complete a medical examination at a GAMCA-approved clinic (required for Gulf work visas).'},
+    {icon:'bi-file-earmark-medical', text:'Collect a police clearance certificate from your home country and get it authenticated.'},
+    {icon:'bi-mortarboard', text:'Authenticate educational certificates: notarise locally → foreign ministry → Saudi/Gulf embassy.'},
+    {icon:'bi-bank', text:'Inform your home country bank of your move to prevent cards being blocked abroad.'},
+    {icon:'bi-cloud-upload', text:'Scan and upload all important documents to Google Drive or iCloud — keep digital copies.'},
+    {icon:'bi-currency-exchange', text:'Keep 2–3 months expenses in accessible savings. Setup costs in the Gulf are significant.'},
+    {icon:'bi-phone', text:'Unlock your mobile phone before leaving — you will need a local SIM card on arrival.'},
+  ],
+  before_sa: [
+    {icon:'bi-building-check', text:'Saudi Arabia requires your degree to be attested by HEC/IBCC (Pakistan) or equivalent board in your country.'},
+    {icon:'bi-globe', text:'Check if your profession requires a Saudi licence (doctors → SCFHS, engineers → SEC, nurses → SCHS).'},
+  ],
+  before_ae: [
+    {icon:'bi-building-check', text:'UAE requires degree attestation through MOFA in your country, then UAE embassy.'},
+  ],
+  before_family: [
+    {icon:'bi-people', text:'Get marriage certificate officially translated and authenticated — required for spouse visa.'},
+    {icon:'bi-person-badge', text:'Get birth certificates for children authenticated through the same chain as your degree.'},
+    {icon:'bi-heart-pulse', text:'Research international schools at your destination before arriving. Waiting lists can be long.'},
+    {icon:'bi-hospital', text:'Research hospital options for family healthcare. Confirm what your employer health insurance covers.'},
+  ],
+  before_healthcare: [
+    {icon:'bi-clipboard2-pulse', text:'Healthcare professionals must apply for Gulf licence BEFORE arriving. SCFHS (Saudi) takes 3–6 months.'},
+    {icon:'bi-award', text:'Keep original certificates + certified copies of all medical qualifications — inspected on arrival.'},
+  ],
+  // After arrival
+  arrival_always: [
+    {icon:'bi-sim', text:'Buy a local SIM card at the airport immediately. You need it for OTPs and Absher registration.'},
+    {icon:'bi-fingerprint', text:'Register fingerprints and photo at the relevant government centre within the first few days.'},
+    {icon:'bi-bank2', text:'Open a local bank account as soon as possible — your employer pays salary via local bank only.'},
+    {icon:'bi-house', text:'If not provided accommodation, research areas near work. Confirm transport options.'},
+    {icon:'bi-app', text:'Download key apps: Absher (Saudi), AMER (UAE), or relevant country app for government services.'},
+    {icon:'bi-car-front', text:'If you drive: check if your home licence is valid in your destination country (see Driving Licence Checker).'},
+  ],
+  arrival_sa: [
+    {icon:'bi-card-text', text:'Your employer must process your Iqama within 90 days. Chase HR to confirm progress.'},
+    {icon:'bi-phone-flip', text:'Register on Absher (absher.sa) with your arrival stamp details. You need it for almost everything.'},
+    {icon:'bi-geo-alt', text:'Register your address with your employer for official records — required for Iqama processing.'},
+  ],
+  arrival_family: [
+    {icon:'bi-person-plus', text:'Your employer must apply for dependent visas (family iqama) after your own Iqama is issued.'},
+    {icon:'bi-book', text:'Enrol children in school promptly. Some schools require documents within a specific window.'},
+  ],
+  // Financial setup
+  financial: [
+    {icon:'bi-piggy-bank', text:'Set up a monthly remittance plan. Compare rates on Wise, Remitly, or your bank before first transfer.'},
+    {icon:'bi-receipt', text:'Track your end of service benefit entitlement from Day 1. You earn it every year you work.'},
+    {icon:'bi-calendar-event', text:'Note your iqama expiry date in your phone calendar with a 60-day reminder. Expired iqama = daily fines.'},
+    {icon:'bi-shield', text:'Understand your health insurance: what is covered, how to make a claim, which hospitals are approved.'},
+  ]
+};
+
+function genChecklist() {
+  const from   = document.getElementById('relocFrom').value;
+  const to     = document.getElementById('relocTo').value;
+  const job    = document.getElementById('relocJob').value;
+  const family = document.getElementById('relocFamily').value;
+  const cn     = COUNTRY_NAMES[to];
+
+  let sections = [
+    { title: '🗂 Before You Leave — Documents', items: [...ITEMS.before_always] },
+    { title: '✈ After You Arrive in ' + cn, items: [...ITEMS.arrival_always] },
+    { title: '💰 Financial Setup', items: [...ITEMS.financial] },
+  ];
+
+  // Country-specific
+  if (to === 'sa') {
+    sections[0].items.push(...ITEMS.before_sa);
+    sections[1].items.push(...ITEMS.arrival_sa);
+  } else if (to === 'ae') {
+    sections[0].items.push(...ITEMS.before_ae);
+  }
+
+  // Job-specific
+  if (job === 'healthcare') sections[0].items.push(...ITEMS.before_healthcare);
+
+  // Family
+  if (family !== 'no') {
+    sections[0].items.push(...ITEMS.before_family);
+    sections[1].items.push(...ITEMS.arrival_family);
+  }
+
+  const total = sections.reduce((a, s) => a + s.items.length, 0);
+
+  const html = sections.map(s => `
+    <div style="margin-bottom:1.5rem">
+      <h3 style="font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;color:var(--text-primary);margin-bottom:.75rem;padding-bottom:.4rem;border-bottom:2px solid var(--border)">${s.title}</h3>
+      <ul class="check-list">
+        ${s.items.map((item, i) => `
+        <li class="check-item">
+          <i class="bi ${item.icon}"></i>
+          <span>${item.text}</span>
+        </li>`).join('')}
+      </ul>
+    </div>`).join('');
+
+  const result = document.getElementById('checklistResult');
+  result.classList.remove('d-none');
+  result.innerHTML = `
+    <div style="background:rgba(15,98,254,.06);border:1px solid rgba(15,98,254,.2);border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem">
+      <i class="bi bi-list-check" style="color:var(--primary);font-size:1.4rem;flex-shrink:0"></i>
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-weight:700;color:var(--text-primary)">${total} items in your checklist</div>
+        <div style="font-size:.8rem;color:var(--text-muted)">Personalised for ${cn} · ${family !== 'no' ? 'With family' : 'Solo'}</div>
+      </div>
+    </div>
+    ${html}
+    <button class="btn-calc" style="background:var(--surface);color:var(--text-primary);border:1px solid var(--border)" onclick="window.print()">
+      <i class="bi bi-printer me-1"></i> Print Checklist
+    </button>`;
+}</script>
+</body>
+</html>

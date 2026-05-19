@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Employer Reviews Gulf — Rate Your Employer | JobOrbit</title>
+  <meta name="description" content="Anonymous employer reviews for Gulf companies. Was your salary paid on time? Was your iqama processed? Rate your employer and help fellow workers.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="/employers/reviews.html">
+  <link rel="icon" type="image/svg+xml" href="/JobOrbitFavicon.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0f62fe">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .page-hero{background:linear-gradient(135deg,#0d1117 0%,#161b22 55%,#0f2744 100%);padding:3.5rem 0 2.75rem;text-align:center;position:relative;overflow:hidden}
+    .page-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(15,98,254,.2),transparent 70%)}
+    .page-hero-inner{position:relative}
+    .page-badge{display:inline-flex;align-items:center;gap:.4rem;background:rgba(245,158,11,.18);border:1px solid rgba(245,158,11,.3);border-radius:100px;padding:.28rem .85rem;font-size:.72rem;font-weight:700;color:#fbbf24;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.9rem}
+    .page-hero h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.7rem,4vw,2.6rem);color:#fff;margin-bottom:.6rem}
+    .page-hero p{color:rgba(255,255,255,.6);font-size:.95rem;max-width:520px;margin:0 auto}
+    .form-card{background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:2rem;box-shadow:var(--shadow)}
+    @media(max-width:576px){.form-card{padding:1.25rem;border-radius:14px}}
+    .rating-stars{display:flex;gap:.4rem;margin-bottom:.25rem}
+    .star-inp{font-size:1.6rem;cursor:pointer;color:var(--border);transition:color .12s;background:none;border:none;padding:0;line-height:1}
+    .star-inp.lit{color:#f59e0b}
+    .review-card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:1.25rem;margin-bottom:.85rem}
+    .review-stars{color:#f59e0b;font-size:.9rem;letter-spacing:1px}
+    .review-company{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;color:var(--text-primary)}
+    .review-meta{font-size:.78rem;color:var(--text-muted);margin:.25rem 0 .75rem}
+    .review-text{font-size:.875rem;color:var(--text-secondary);line-height:1.7}
+    .rating-pill{display:inline-flex;align-items:center;gap:.3rem;font-size:.72rem;padding:.2rem .6rem;border-radius:100px;font-weight:600}
+    .rating-good{background:rgba(16,185,129,.1);color:#059669;border:1px solid rgba(16,185,129,.2)}
+    .rating-mid{background:rgba(245,158,11,.1);color:#d97706;border:1px solid rgba(245,158,11,.2)}
+    .rating-bad{background:rgba(239,68,68,.1);color:#dc2626;border:1px solid rgba(239,68,68,.2)}
+    .msg-box{padding:.9rem 1.1rem;border-radius:10px;font-size:.88rem;margin-top:.75rem;display:none}
+    .msg-success{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);color:#059669}
+    .msg-error{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:#dc2626}
+    .search-box{position:relative}
+    .search-box input{width:100%;padding:.75rem 1rem .75rem 2.75rem;border:1.5px solid var(--border);border-radius:11px;background:var(--bg-card);color:var(--text-primary);font-size:.93rem;outline:none;transition:border-color .18s}
+    .search-box input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(15,98,254,.12)}
+    .search-box i{position:absolute;left:.95rem;top:50%;transform:translateY(-50%);color:var(--text-muted)}
+    @media(max-width:991.98px){#navMenu{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:.75rem 1rem 1rem;margin-top:.5rem;box-shadow:0 8px 28px rgba(0,0,0,.14)}#navMenu .nav-link{padding:.6rem .85rem;border-radius:9px}}
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg sticky-top" id="mainNav">
+  <div class="container">
+    <a class="navbar-brand" href="/"><img id="site-logo" src="" alt="Logo" class="d-none" style="max-height:36px"><span class="brand-name" id="site-name">JobOrbit</span></a>
+    <div class="d-flex align-items-center gap-2 ms-auto">
+      <button class="btn btn-icon theme-toggle" id="themeToggle" aria-label="Toggle theme"><i class="bi bi-moon-fill" id="themeIcon"></i></button>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu"><i class="bi bi-list fs-4"></i></button>
+    </div>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+        <li class="nav-item"><a class="nav-link" href="/">Browse Jobs</a></li>
+        <li class="nav-item"><a class="nav-link" href="/blog/">Blog</a></li>
+        <li class="nav-item"><a class="nav-link" href="/tools/">Tools</a></li>
+        <li class="nav-item"><a class="nav-link" href="/contact.html">Post a Job</a></li>
+        <li class="nav-item"><a class="nav-link" href="/about.html">About</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<section class="page-hero">
+  <div class="container page-hero-inner">
+    <div class="page-badge"><i class="bi bi-star-fill me-1"></i>Community Reviews</div>
+    <h1>Employer Reviews</h1>
+    <p>Anonymous Gulf-specific employer reviews. Was your salary paid on time? Iqama processed? Help fellow workers make informed decisions.</p>
+  </div>
+</section>
+
+<div class="container py-5">
+  <div class="row g-4 g-lg-5">
+
+    <!-- Left: Search + Recent Reviews -->
+    <div class="col-lg-7">
+      <!-- Search -->
+      <div class="form-card mb-4">
+        <h2 style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;color:var(--text-primary);margin-bottom:1rem">Search for a Company</h2>
+        <div class="search-box">
+          <i class="bi bi-search"></i>
+          <input type="text" id="searchCompany" placeholder="Type company name…" autocomplete="off">
+        </div>
+        <div id="searchResults" class="mt-3"></div>
+      </div>
+
+      <!-- Recent reviews -->
+      <h2 style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;color:var(--text-primary);margin-bottom:1rem">Recent Reviews</h2>
+      <div id="recentReviews">
+        <div class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm me-2"></div>Loading reviews…</div>
+      </div>
+    </div>
+
+    <!-- Right: Submit Form -->
+    <div class="col-lg-5">
+      <div class="form-card" style="position:sticky;top:80px">
+        <h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.15rem;color:var(--text-primary);margin-bottom:.35rem">Write a Review</h2>
+        <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:1.25rem">100% anonymous. No account required.</p>
+
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Company Name *</label>
+          <input type="text" class="form-control" id="rvCompany" placeholder="e.g. Aramco, STC, Al-Rajhi">
+        </div>
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Your Job Title <span class="text-muted fw-normal">(optional)</span></label>
+          <input type="text" class="form-control" id="rvJobTitle" placeholder="e.g. Software Engineer">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Overall Rating *</label>
+          <div class="rating-stars" id="starsOverall" data-key="overall">
+            <button class="star-inp" data-v="1" onclick="setStar('overall',1)">★</button>
+            <button class="star-inp" data-v="2" onclick="setStar('overall',2)">★</button>
+            <button class="star-inp" data-v="3" onclick="setStar('overall',3)">★</button>
+            <button class="star-inp" data-v="4" onclick="setStar('overall',4)">★</button>
+            <button class="star-inp" data-v="5" onclick="setStar('overall',5)">★</button>
+          </div>
+        </div>
+
+        <div class="row g-2 mb-3">
+          <div class="col-6">
+            <label class="form-label small fw-semibold" style="font-size:.75rem">Salary paid on time?</label>
+            <div class="rating-stars" id="starsSalary" data-key="salary">
+              <button class="star-inp" style="font-size:1.2rem" data-v="1" onclick="setStar('salary',1)">★</button>
+              <button class="star-inp" style="font-size:1.2rem" data-v="2" onclick="setStar('salary',2)">★</button>
+              <button class="star-inp" style="font-size:1.2rem" data-v="3" onclick="setStar('salary',3)">★</button>
+              <button class="star-inp" style="font-size:1.2rem" data-v="4" onclick="setStar('salary',4)">★</button>
+              <button class="star-inp" style="font-size:1.2rem" data-v="5" onclick="setStar('salary',5)">★</button>
+            </div>
+          </div>
+          <div class="col-6">
+            <label class="form-label small fw-semibold" style="font-size:.75rem">Iqama processed?</label>
+            <div class="rating-stars" id="starsIqama" data-key="iqama">
+              <button class="star-inp" style="font-size:1.2rem" data-v="1" onclick="setStar('iqama',1)">★</button>
+              <button class="star-inp" style="font-size:1.2rem" data-v="2" onclick="setStar('iqama',2)">★</button>
+              <button class="star-inp" style="font-size:1.2rem" data-v="3" onclick="setStar('iqama',3)">★</button>
+              <button class="star-inp" style="font-size:1.2rem" data-v="4" onclick="setStar('iqama',4)">★</button>
+              <button class="star-inp" style="font-size:1.2rem" data-v="5" onclick="setStar('iqama',5)">★</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Your Review *</label>
+          <textarea class="form-control" id="rvText" rows="4" placeholder="Share your experience (minimum 30 characters). What was good? What was bad?"></textarea>
+        </div>
+
+        <div class="row g-2 mb-3">
+          <div class="col-6">
+            <label class="form-label small fw-semibold" style="font-size:.75rem">Year Started</label>
+            <input type="number" class="form-control form-control-sm" id="rvFrom" placeholder="e.g. 2021" min="2000" max="2026">
+          </div>
+          <div class="col-6">
+            <label class="form-label small fw-semibold" style="font-size:.75rem">Year Left / Present</label>
+            <input type="text" class="form-control form-control-sm" id="rvTo" placeholder="e.g. 2024 or Present">
+          </div>
+        </div>
+
+        <div id="rvMsg" class="msg-box"></div>
+
+        <button class="btn btn-primary w-100 mt-2" style="font-family:'Syne',sans-serif;font-weight:700" onclick="submitReview()">
+          <i class="bi bi-send-fill me-1"></i>Submit Review
+        </button>
+        <p style="font-size:.72rem;color:var(--text-muted);text-align:center;margin-top:.75rem">
+          <i class="bi bi-shield-check me-1"></i>100% anonymous · Moderated before publishing
+        </p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="row g-4 align-items-start">
+      <div class="col-md-4"><div class="footer-brand mb-2"><span class="brand-name" id="footer-site-name">JobOrbit</span></div><p class="footer-desc">Connecting talent with opportunity across the Gulf.</p></div>
+      <div class="col-md-4"><h6 class="footer-heading">Quick Links</h6><ul class="footer-links"><li><a href="/">Browse Jobs</a></li><li><a href="/blog/">Blog</a></li><li><a href="/tools/">Tools</a></li></ul></div>
+      <div class="col-md-4"><h6 class="footer-heading">Legal</h6><ul class="footer-links"><li><a href="/privacy-policy.html">Privacy Policy</a></li><li><a href="/terms.html">Terms &amp; Conditions</a></li><li><a href="/disclaimer.html">Disclaimer</a></li></ul></div>
+    </div>
+    <hr class="footer-divider">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <p class="mb-0 footer-copy">&copy; <span id="footerYear"></span> <span id="footer-copy-name">JobOrbit</span>. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
+<script>
+(function(){
+  async function ls(){try{const d=await fetch('/api/settings').then(r=>r.json());const s=d.settings;if(s.primary_color)document.documentElement.style.setProperty('--primary',s.primary_color);if(s.site_name){document.querySelectorAll('.brand-name').forEach(e=>e.textContent=s.site_name);const fc=document.getElementById('footer-copy-name');if(fc)fc.textContent=s.site_name;}if(s.logo_url){const l=document.getElementById('site-logo');if(l){l.src=s.logo_url;l.classList.remove('d-none');}}at(localStorage.getItem('theme')||s.default_theme||'light',false);}catch(e){}}
+  function at(t,save=true){document.documentElement.setAttribute('data-theme',t);document.documentElement.style.colorScheme=t;const i=document.getElementById('themeIcon');if(i)i.className=t==='dark'?'bi bi-sun-fill':'bi bi-moon-fill';if(save)localStorage.setItem('theme',t);}
+  const tb=document.getElementById('themeToggle');if(tb)tb.addEventListener('click',()=>at(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+  const fy=document.getElementById('footerYear');if(fy)fy.textContent=new Date().getFullYear();
+  ls();
+})();
+</script>
+<script>
+const ratings = { overall: 0, salary: 0, iqama: 0 };
+
+function setStar(key, val) {
+  ratings[key] = val;
+  const wrap = document.getElementById('stars' + key.charAt(0).toUpperCase() + key.slice(1));
+  wrap?.querySelectorAll('.star-inp').forEach(b => {
+    b.classList.toggle('lit', parseInt(b.dataset.v) <= val);
+  });
+}
+
+async function submitReview() {
+  const company = document.getElementById('rvCompany').value.trim();
+  const text    = document.getElementById('rvText').value.trim();
+  const msg     = document.getElementById('rvMsg');
+  const btn     = document.querySelector('button[onclick="submitReview()"]');
+
+  if (!company) { showMsg('error', 'Please enter the company name.'); return; }
+  if (!ratings.overall) { showMsg('error', 'Please give an overall rating.'); return; }
+  if (text.length < 30) { showMsg('error', 'Please write at least 30 characters.'); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Submitting…';
+
+  try {
+    const res  = await fetch('/api/reviews', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        company_name:     company,
+        job_title:        document.getElementById('rvJobTitle').value.trim(),
+        rating_overall:   ratings.overall,
+        rating_salary:    ratings.salary || null,
+        rating_iqama:     ratings.iqama  || null,
+        review_text:      text,
+        worked_from:      document.getElementById('rvFrom').value || null,
+        worked_to:        document.getElementById('rvTo').value   || null
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showMsg('success', data.message);
+      btn.innerHTML = '<i class="bi bi-check-lg me-1"></i>Submitted!';
+    } else {
+      showMsg('error', data.message || 'Error submitting review.');
+      btn.disabled = false;
+      btn.innerHTML = '<i class="bi bi-send-fill me-1"></i>Submit Review';
+    }
+  } catch (e) {
+    showMsg('error', 'Network error. Please try again.');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="bi bi-send-fill me-1"></i>Submit Review';
+  }
+}
+
+function showMsg(type, text) {
+  const el = document.getElementById('rvMsg');
+  el.className = 'msg-box msg-' + type;
+  el.style.display = 'block';
+  el.textContent = text;
+}
+
+function starStr(n) {
+  return '★'.repeat(Math.round(n)) + '☆'.repeat(5 - Math.round(n));
+}
+
+function ratingPill(label, val) {
+  if (!val) return '';
+  const cls = val >= 4 ? 'good' : val >= 3 ? 'mid' : 'bad';
+  return `<span class="rating-pill rating-${cls}">✓ ${label}: ${starStr(val)}</span>`;
+}
+
+async function loadRecentReviews() {
+  try {
+    const res  = await fetch('/api/reviews/%20'); // search with space = all
+    const data = await res.json();
+    const wrap = document.getElementById('recentReviews');
+
+    if (!data.reviews?.length) {
+      wrap.innerHTML = '<p class="text-muted" style="font-size:.88rem">No approved reviews yet. Be the first to submit one!</p>';
+      return;
+    }
+    wrap.innerHTML = data.reviews.map(r => `
+      <div class="review-card">
+        <div class="d-flex justify-content-between align-items-start mb-1">
+          <div class="review-company">${r.company_name}</div>
+          <div class="review-stars">${starStr(r.rating_overall)}</div>
+        </div>
+        <div class="review-meta">
+          ${r.job_title ? r.job_title + ' · ' : ''}
+          ${r.worked_from || ''}${r.worked_from && r.worked_to ? '–' : ''}${r.worked_to || ''}
+        </div>
+        <div class="d-flex flex-wrap gap-1 mb-2">
+          ${ratingPill('Salary', r.rating_salary)}
+          ${ratingPill('Iqama', r.rating_iqama)}
+        </div>
+        <div class="review-text">${r.review_text}</div>
+      </div>`).join('');
+  } catch (e) {
+    document.getElementById('recentReviews').innerHTML = '<p class="text-muted small">Could not load reviews.</p>';
+  }
+}
+
+// Search
+let searchTimer;
+document.getElementById('searchCompany').addEventListener('input', function() {
+  clearTimeout(searchTimer);
+  const q = this.value.trim();
+  if (q.length < 2) { document.getElementById('searchResults').innerHTML = ''; return; }
+  searchTimer = setTimeout(async () => {
+    try {
+      const data = await fetch('/api/reviews/' + encodeURIComponent(q)).then(r => r.json());
+      const wrap = document.getElementById('searchResults');
+      if (!data.reviews?.length) {
+        wrap.innerHTML = '<p class="text-muted small">No reviews found for "' + q + '".</p>'; return;
+      }
+      wrap.innerHTML = `<div style="font-size:.82rem;color:var(--text-muted);margin-bottom:.75rem">${data.total} review${data.total!==1?'s':''} · Avg: ${data.avg_rating}★</div>` +
+        data.reviews.map(r => `
+          <div class="review-card">
+            <div class="d-flex justify-content-between align-items-start mb-1">
+              <div class="review-company">${r.company_name}</div>
+              <div class="review-stars">${starStr(r.rating_overall)}</div>
+            </div>
+            <div class="review-meta">${r.job_title||''} ${r.worked_from||''}${r.worked_to?'–'+r.worked_to:''}</div>
+            <div class="review-text">${r.review_text}</div>
+          </div>`).join('');
+    } catch(e) {}
+  }, 400);
+});
+
+loadRecentReviews();
+</script>
+</body>
+</html>

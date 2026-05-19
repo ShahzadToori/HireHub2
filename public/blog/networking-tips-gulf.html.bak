@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Networking in the Gulf: How Wasta Works and How to Build Real Connections - JobOrbit</title>
+  <meta name="description" content="How professional networking really works in Saudi Arabia and the Gulf — understanding wasta, where to network, and the cultural rules that matter.">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="/blog/networking-tips-gulf.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Networking in the Gulf: How Wasta Works and How to Build Real Connections">
+  <meta property="og:description" content="How professional networking really works in Saudi Arabia and the Gulf — understanding wasta, where to network, and the cultural rules that matter.">
+  <meta property="og:site_name" content="JobOrbit">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/svg+xml" href="/JobOrbitFavicon.svg">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0f62fe">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+  .blog-hero{background:linear-gradient(135deg,#0d1117 0%,#161b22 55%,#0f2744 100%);padding:4rem 0 3rem;position:relative;overflow:hidden}
+  .blog-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(15,98,254,.2),transparent 70%)}
+  .blog-hero-inner{position:relative;text-align:center}
+  .blog-hero-badge{display:inline-flex;align-items:center;gap:.4rem;background:rgba(15,98,254,.2);border:1px solid rgba(15,98,254,.35);border-radius:100px;padding:.3rem .9rem;font-size:.75rem;font-weight:700;color:#60a5fa;text-transform:uppercase;letter-spacing:.07em;margin-bottom:1rem}
+  .blog-hero-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.8rem,4.5vw,3rem);color:#fff;line-height:1.15;margin-bottom:.75rem}
+  .blog-hero-sub{color:rgba(255,255,255,.6);font-size:.95rem;max-width:580px;margin:0 auto}
+  .blog-hero-meta{display:flex;justify-content:center;align-items:center;gap:1rem;margin-top:1.25rem;flex-wrap:wrap}
+  .blog-hero-meta span{font-size:.78rem;color:rgba(255,255,255,.45);display:flex;align-items:center;gap:.3rem}
+  .article-body h2{font-family:'Syne',sans-serif;font-weight:700;font-size:1.35rem;color:var(--text-primary);margin:2rem 0 .75rem;padding-bottom:.4rem;border-bottom:2px solid var(--border)}
+  .article-body h3{font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;color:var(--text-primary);margin:1.5rem 0 .5rem}
+  .article-body p{color:var(--text-secondary);font-size:.95rem;line-height:1.8;margin-bottom:1rem}
+  .article-body ul,.article-body ol{color:var(--text-secondary);font-size:.95rem;line-height:1.8;padding-left:1.5rem;margin-bottom:1rem}
+  .article-body li{margin-bottom:.4rem}
+  .article-body strong{color:var(--text-primary);font-weight:600}
+  .article-body a{color:var(--primary)}
+  .article-highlight{background:rgba(15,98,254,.06);border-left:3px solid var(--primary);border-radius:0 10px 10px 0;padding:1rem 1.25rem;margin:1.5rem 0}
+  [data-theme="dark"] .article-highlight{background:rgba(15,98,254,.1)}
+  .article-highlight p{margin:0;font-size:.9rem;color:var(--text-secondary)}
+  .sidebar-widget{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:1.25rem;margin-bottom:1.25rem}
+  .sidebar-widget-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:1rem}
+  .rel-link{display:flex;align-items:flex-start;gap:.6rem;padding:.5rem 0;border-bottom:1px solid var(--border);text-decoration:none}
+  .rel-link:last-child{border-bottom:none}
+  .rel-link:hover .rel-title{color:var(--primary)}
+  .rel-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
+  .rel-title{font-size:.83rem;font-weight:600;color:var(--text-primary);line-height:1.3;transition:color .15s}
+  .rel-cat{font-size:.72rem;color:var(--text-muted);margin-top:.1rem}
+  .cta-widget{background:linear-gradient(135deg,#0f62fe,#0353e9);border-radius:14px;padding:1.5rem;text-align:center}
+  .cta-widget h5{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;color:#fff;margin-bottom:.5rem}
+  .cta-widget p{font-size:.82rem;color:rgba(255,255,255,.85);margin-bottom:1rem}
+  .cta-widget a{background:#fff;color:#0f62fe;border-radius:8px;padding:.5rem 1.25rem;font-size:.85rem;font-weight:700;text-decoration:none;display:inline-block}
+  .breadcrumb-bar{display:flex;align-items:center;gap:.4rem;font-size:.82rem;color:var(--text-muted);margin-bottom:1.5rem;flex-wrap:wrap}
+  .breadcrumb-bar a{color:var(--text-muted);text-decoration:none}
+  .breadcrumb-bar a:hover{color:var(--primary)}
+  /* Salary table */
+  .salary-table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem}
+  .salary-table th{background:var(--primary);color:#fff;padding:.65rem 1rem;font-family:'Syne',sans-serif;font-size:.8rem;text-align:left}
+  .salary-table td{padding:.6rem 1rem;border-bottom:1px solid var(--border);font-size:.875rem;color:var(--text-secondary)}
+  .salary-table tr:last-child td{border-bottom:none}
+  .salary-table tr:nth-child(even) td{background:var(--surface)}
+  .salary-table .salary-high{color:#059669;font-weight:700}
+  /* Tip box */
+  .tip-box{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.3);border-radius:10px;padding:.9rem 1.1rem;margin:1.25rem 0;display:flex;gap:.75rem}
+  .tip-box i{color:#d97706;font-size:1.1rem;flex-shrink:0;margin-top:.1rem}
+  .tip-box p{margin:0;font-size:.88rem;color:var(--text-secondary)}
+  /* Step list */
+  .step-list{counter-reset:steps;list-style:none;padding:0;margin:1rem 0 1.5rem}
+  .step-list li{counter-increment:steps;display:flex;gap:.85rem;padding:.75rem 0;border-bottom:1px solid var(--border)}
+  .step-list li:last-child{border-bottom:none}
+  .step-list li::before{content:counter(steps);width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;flex-shrink:0;font-family:'Syne',sans-serif}
+  .step-list li > div{font-size:.92rem;color:var(--text-secondary);line-height:1.65}
+  .step-list li strong{color:var(--text-primary);display:block;margin-bottom:.2rem}
+</style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg sticky-top" id="mainNav">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+      <img id="site-logo" src="" alt="Logo" class="d-none" style="max-height:36px">
+      
+    </a>
+    <div class="d-flex align-items-center gap-2 ms-auto">
+      <button class="btn btn-icon theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <i class="bi bi-moon-fill" id="themeIcon"></i>
+      </button>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <i class="bi bi-list fs-4"></i>
+      </button>
+    </div>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+        <li class="nav-item"><a class="nav-link" href="/">Browse Jobs</a></li>
+        <li class="nav-item"><a class="nav-link nav-link-active" href="/blog/">Blog</a></li>
+        <li class="nav-item"><a class="nav-link" href="/contact.html">Post a Job</a></li>
+        <li class="nav-item"><a class="nav-link" href="/about.html">About</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<section class="blog-hero">
+  <div class="container blog-hero-inner">
+    <div class="breadcrumb-bar" style="justify-content:center;margin-bottom:.75rem">
+      <a href="/">Home</a><i class="bi bi-chevron-right" style="font-size:.65rem"></i>
+      <a href="/blog/">Blog</a><i class="bi bi-chevron-right" style="font-size:.65rem"></i>
+      <span style="color:rgba(255,255,255,.45)">Career Growth</span>
+    </div>
+    <div class="blog-hero-badge"><i class="bi bi-people-fill me-1"></i>Career Growth</div>
+    <h1 class="blog-hero-title">Networking in the Gulf: How Wasta Works and How to Build Real Connections</h1>
+    <p class="blog-hero-sub">Understanding wasta, where to network in Riyadh, LinkedIn strategies, and the cultural rules that determine whether Gulf networking actually works for you.</p>
+    <div class="blog-hero-meta">
+      <span><i class="bi bi-clock"></i>8 min read</span>
+      <span><i class="bi bi-calendar3"></i>June 2025</span>
+      <span><i class="bi bi-person"></i>JobOrbit Editorial</span>
+    </div>
+  </div>
+</section>
+
+<div class="container py-5">
+  <div class="row g-4 g-lg-5">
+    <div class="col-lg-8">
+      <div class="breadcrumb-bar">
+        <a href="/blog/"><i class="bi bi-arrow-left me-1"></i>Back to Blog</a>
+      </div>
+      <article class="article-body">
+
+<p>Anyone who has spent time working in Saudi Arabia, the UAE, or Kuwait will tell you the same thing: <em>who you know matters enormously</em>. The Arabic concept of wasta — roughly translated as social capital, connections, or influence — is a real and significant factor in Gulf hiring. But that does not mean networking is impossible for outsiders, or that it is about corruption. It means that relationships, trust, and personal introductions are deeply valued in Gulf business culture, and building genuine professional relationships will accelerate your career faster than applications alone ever could.</p>
+
+<h2>Understanding Wasta Without Misunderstanding It</h2>
+<p>Wasta is frequently mischaracterised in Western media as simply bribery or nepotism. That misses the point. At its core, wasta is about trust and vouching. When someone with good wasta recommends you for a role, they are staking their own reputation on your performance. It is a system built on mutual accountability — and that is why it works.</p>
+<p>For professionals building careers in the Gulf, the implication is clear: people hire those they know, trust, and have been vouched for. Building authentic relationships — not transactional networking — is the path to accessing the best opportunities, many of which are never advertised publicly.</p>
+
+<h2>Building a Professional Network in Saudi Arabia: Where to Start</h2>
+
+<h3>LinkedIn: Still the Most Important Platform</h3>
+<p>LinkedIn penetration among professionals in Saudi Arabia is exceptionally high. Riyadh has one of the highest LinkedIn user densities of any global city. A complete, professional LinkedIn profile is non-negotiable. But Saudi professionals use LinkedIn differently from many Western users — direct, personalised outreach is more effective than generic connection requests.</p>
+<p>When connecting with Saudi professionals, always include a brief personal note explaining why you want to connect. Reference a shared industry, a specific piece of their work, or a mutual connection. Generic "I'd like to add you to my network" messages are ignored.</p>
+
+<h3>In-Person Networking Events</h3>
+<p>Saudi Arabia hosts a significant number of professional events, particularly in Riyadh and Jeddah. Key venues for networking include:</p>
+<ul>
+<li><strong>Cityscape Saudi Arabia</strong> — Real estate and development professionals</li>
+<li><strong>LEAP Tech Conference</strong> — One of the world's largest tech events, held in Riyadh every February</li>
+<li><strong>Saudi HR Summit</strong> — HR, talent, and organisational development professionals</li>
+<li><strong>ADIPEC / Saudi Aramco events</strong> — Oil, gas, and energy sector professionals</li>
+<li><strong>Chamber of Commerce events</strong> — General business and cross-sector networking through SCCI and regional chambers</li>
+<li><strong>University alumni networks</strong> — KAUST, KFUPM, and King Saud University all have active alumni communities</li>
+</ul>
+
+<h3>Majlis Culture: The Original Networking Event</h3>
+<p>The majlis is a traditional gathering — usually hosted by a senior figure — where community members come to discuss, connect, and seek counsel. In a business context, senior Saudi executives sometimes hold professional majlis gatherings. If you receive an invitation, attend. Come prepared to listen more than you speak, show genuine curiosity, and never rush the conversation toward business topics. The relationship comes first; business follows naturally.</p>
+
+<h2>Cultural Nuances That Will Make or Break Your Networking</h2>
+
+<h3>Invest in the Relationship First</h3>
+<p>Gulf networking operates on a long-term relationship model. Do not ask for a favour, referral, or introduction at a first meeting. The sequence is: meet, build rapport over multiple interactions, and then — when there is genuine mutual trust — ask for help. Rushing this sequence is culturally tone-deaf and counterproductive.</p>
+
+<h3>Hospitality is a Language</h3>
+<p>If a Saudi professional invites you for coffee, a meal, or a visit to their office, this is meaningful. Accept whenever possible. The social time over Arabic coffee (qahwa) and dates is where relationships are actually built — not during formal meetings. Reciprocate by hosting when you can.</p>
+
+<h3>Respect for Hierarchy</h3>
+<p>Saudi business culture is hierarchical. When networking, understand where people sit in their organisations and communicate accordingly. Addressing senior figures with appropriate deference and titles is noticed and appreciated. First names are generally acceptable once a relationship is established, but follow the lead of your Saudi contact.</p>
+
+<h3>Gender Dynamics</h3>
+<p>The professional landscape in Saudi Arabia has changed significantly since 2017's social reforms. Women now work across virtually all sectors, attend events, and are present at the highest levels of business. Mixed-gender professional networking is now normal in major Saudi cities. However, some traditional Saudi professionals may still prefer gender-segregated professional contexts. Be attentive and responsive to social cues.</p>
+
+<h2>Digital Networking Strategies That Work in the Gulf</h2>
+<ul>
+<li><strong>Publish original content on LinkedIn</strong> — Professionals who share genuine insights about their field — market analysis, career advice, project case studies — consistently report more inbound outreach from Gulf employers and decision-makers.</li>
+<li><strong>WhatsApp professional groups</strong> — Industry-specific WhatsApp groups are extremely active in the Gulf. Getting added to relevant groups (usually through a mutual contact) gives you regular visibility with dozens of industry professionals.</li>
+<li><strong>Comment thoughtfully, not just like</strong> — Adding substantive comments to posts from senior Gulf professionals creates visibility and starts conversations that connection requests alone never would.</li>
+<li><strong>Arabic content</strong> — If you speak Arabic, publishing some content in Arabic dramatically expands your reach with Saudi professionals who are less active on English-language content.</li>
+</ul>
+
+<h2>Maintaining Your Network Long-Term</h2>
+<p>Gulf professional networks reward consistency. The contacts you built in your first year in Riyadh may be your most valuable career asset five years later — but only if you have maintained the relationship through occasional check-ins, congratulatory messages on promotions, and genuine engagement with their work.</p>
+<p>A practical approach: keep a simple list of your 20 most important professional relationships in the Gulf. Schedule a brief check-in with each person every 3–4 months, whether that is a LinkedIn message, a coffee meeting, or a WhatsApp note. It takes very little time and keeps relationships warm.</p>
+
+<div class="article-highlight">
+  <p><strong>The long game:</strong> The most successful international professionals in Saudi Arabia consistently report that their best opportunities came through relationships built over 2–5 years, not through job applications. Invest in your Gulf network consistently, authentically, and patiently — the returns compound over time in ways that are difficult to quantify but impossible to miss.</p>
+</div>
+      </article>
+      <div class="article-highlight mt-4">
+        <p><strong>Ready to take action?</strong> Browse current job openings across Saudi Arabia and the Gulf on <a href="/">JobOrbit</a> — and apply directly to employers via WhatsApp, phone, or email.</p>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div style="position:sticky;top:80px;padding-top:1rem">
+        <div class="sidebar-widget">
+  <div class="sidebar-widget-title">More Articles</div>
+  <a href="/blog/find-job-saudi-arabia.html" class="rel-link">
+    <div class="rel-icon" style="background:rgba(15,98,254,.1);color:#0f62fe"><i class="bi bi-search"></i></div>
+    <div><div class="rel-title">How to Find a Job in Saudi Arabia</div><div class="rel-cat">Job Search</div></div>
+  </a>
+  <a href="/blog/high-paying-jobs-riyadh.html" class="rel-link">
+    <div class="rel-icon" style="background:rgba(16,185,129,.1);color:#059669"><i class="bi bi-currency-dollar"></i></div>
+    <div><div class="rel-title">Top 10 High-Paying Jobs in Riyadh</div><div class="rel-cat">Salary Guide</div></div>
+  </a>
+  <a href="/blog/resume-writing-tips-2026.html" class="rel-link">
+    <div class="rel-icon" style="background:rgba(245,158,11,.1);color:#d97706"><i class="bi bi-file-earmark-text"></i></div>
+    <div><div class="rel-title">Resume Writing Tips for 2026</div><div class="rel-cat">Career Advice</div></div>
+  </a>
+  <a href="/blog/interview-questions-engineers.html" class="rel-link">
+    <div class="rel-icon" style="background:rgba(99,102,241,.1);color:#6366f1"><i class="bi bi-person-workspace"></i></div>
+    <div><div class="rel-title">Interview Questions for Engineers</div><div class="rel-cat">Interview Prep</div></div>
+  </a>
+  <a href="/blog/remote-work-trends-gulf.html" class="rel-link">
+    <div class="rel-icon" style="background:rgba(236,72,153,.1);color:#db2777"><i class="bi bi-laptop"></i></div>
+    <div><div class="rel-title">Remote Work Trends in the Gulf</div><div class="rel-cat">Work Trends</div></div>
+  </a>
+  <a href="/blog/work-visa-guide-saudi-arabia.html" class="rel-link">
+    <div class="rel-icon" style="background:rgba(139,92,246,.1);color:#7c3aed"><i class="bi bi-passport"></i></div>
+    <div><div class="rel-title">Work Visa Guide: Saudi Arabia</div><div class="rel-cat">Visas & Legal</div></div>
+  </a>
+  <a href="/blog/saudi-labor-law-guide.html" class="rel-link">
+    <div class="rel-icon" style="background:rgba(239,68,68,.1);color:#dc2626"><i class="bi bi-journal-text"></i></div>
+    <div><div class="rel-title">Saudi Labor Law: Employee Rights</div><div class="rel-cat">Legal Guide</div></div>
+  </a>
+  <a href="/blog/networking-tips-gulf.html" class="rel-link">
+    <div class="rel-icon" style="background:rgba(20,184,166,.1);color:#0d9488"><i class="bi bi-people-fill"></i></div>
+    <div><div class="rel-title">Networking in the Gulf: How It Really Works</div><div class="rel-cat">Career Growth</div></div>
+  </a>
+  <a href="/blog/gulf-job-sectors-2026.html" class="rel-link">
+    <div class="rel-icon" style="background:rgba(249,115,22,.1);color:#ea580c"><i class="bi bi-graph-up-arrow"></i></div>
+    <div><div class="rel-title">Fastest Growing Job Sectors in the Gulf</div><div class="rel-cat">Market Insights</div></div>
+  </a>
+  <a href="/blog/expat-guide-working-saudi-arabia.html" class="rel-link">
+    <div class="rel-icon" style="background:rgba(6,182,212,.1);color:#0891b2"><i class="bi bi-globe2"></i></div>
+    <div><div class="rel-title">Complete Expat Guide to Working in Saudi Arabia</div><div class="rel-cat">Expat Life</div></div>
+  </a>
+</div>
+<div class="cta-widget">
+  <h5>Find your next job</h5>
+  <p>Browse verified listings in Saudi Arabia and the Gulf. Apply directly.</p>
+  <a href="/">Browse Jobs Now</a>
+</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="row g-4 align-items-start">
+      <div class="col-md-4">
+        <div class="footer-brand mb-2">
+          <span class="brand-name" id="footer-site-name">JobOrbit</span>
+        </div>
+        <p class="footer-desc">Connecting talent with opportunity. Find your next career move today.</p>
+      </div>
+      <div class="col-md-4">
+        <h6 class="footer-heading">Quick Links</h6>
+        <ul class="footer-links">
+          <li><a href="#jobs">Browse Jobs</a></li>
+          <li><a href="#categories">Categories</a></li>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/contact.html">Post a Job</a></li>
+          <!-- <li><a href="/admin" target="_blank">Admin Panel</a></li> -->
+        </ul>
+      </div>
+      <div class="col-md-4">
+        <h6 class="footer-heading">Legal &amp; Info</h6>
+        <ul class="footer-links">
+          <li><a href="/about.html">About Us</a></li>
+          <li><a href="/feedback.html">Contact Us</a></li>
+          <li><a href="/privacy-policy.html">Privacy Policy</a></li>
+          <li><a href="/terms.html">Terms &amp; Conditions</a></li>
+          <li><a href="/disclaimer.html">Disclaimer</a></li>
+          <!-- <li><a href="/sitemap.xml" target="_blank">Sitemap</a></li> -->
+        </ul>
+      </div>
+    </div>
+    <hr class="footer-divider">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <p class="mb-0 footer-copy">© <span id="footerYear"></span> <span class="footer-brand-inline" id="footer-copy-name">JobOrbit</span>. All rights reserved.</p>
+      <div class="d-flex flex-wrap gap-3">
+        <a href="/about.html" class="footer-copy" style="text-decoration:none">About</a>
+        <a href="/privacy-policy.html" class="footer-copy" style="text-decoration:none">Privacy</a>
+        <a href="/terms.html" class="footer-copy" style="text-decoration:none">Terms</a>
+        <a href="/disclaimer.html" class="footer-copy" style="text-decoration:none">Disclaimer</a>
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
+<script>
+async function loadSettings(){try{const d=await fetch('/api/settings').then(r=>r.json());const s=d.settings;if(s.primary_color)document.documentElement.style.setProperty('--primary',s.primary_color);if(s.site_name){document.querySelectorAll('.brand-name').forEach(e=>e.textContent=s.site_name);document.getElementById('footer-copy-name').textContent=s.site_name;}if(s.logo_url){const l=document.getElementById('site-logo');l.src=s.logo_url;l.classList.remove('d-none');}applyTheme(localStorage.getItem('theme')||s.default_theme||'light',false);}catch(e){}}
+function applyTheme(t,save=true){document.documentElement.setAttribute('data-theme',t);document.documentElement.style.colorScheme=t;document.getElementById('themeIcon').className=t==='dark'?'bi bi-sun-fill':'bi bi-moon-fill';if(save)localStorage.setItem('theme',t);}
+document.getElementById('themeToggle').addEventListener('click',()=>{applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');});
+document.getElementById('footerYear').textContent=new Date().getFullYear();
+loadSettings();
+</script>
+</body>
+</html>

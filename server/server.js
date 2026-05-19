@@ -16,6 +16,9 @@ const { router: alertsRouter, scheduleAutoDigest } = require('./routes/alerts');
 const reviewsRouter  = require('./routes/reviews');
 const blacklistRouter = require('./routes/blacklist');
 const htmlLayout = require('./middleware/htmlLayout');
+const blogRoutes    = require('./routes/blog');
+const blogSeoRoutes = require('./routes/blog-routes');
+
 
 const app  = express();
 app.set('trust proxy', 1);
@@ -52,6 +55,8 @@ app.use(session({
 
 // ── Static files ──────────────────────────────────────────────
 app.use(htmlLayout);
+app.use(blogSeoRoutes);
+app.use(blogRoutes);
 app.use(express.static(path.join(__dirname, '../public')));
 app.use('/admin', express.static(path.join(__dirname, '../admin')));
 

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-S3HNGSBYPQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-S3HNGSBYPQ');
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resume Writing Tips for 2026: Stand Out in the Gulf Job Market - JobOrbit</title>
+  <meta name="description" content="How to write a winning CV for Gulf employers in 2026. ATS optimisation, what Saudi hiring managers want to see, and Gulf-specific formatting tips.">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="/blog/resume-writing-tips-2026.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Resume Writing Tips for 2026: Stand Out in the Gulf Job Market">
+  <meta property="og:description" content="How to write a winning CV for Gulf employers in 2026. ATS optimisation, what Saudi hiring managers want to see, and Gulf-specific formatting tips.">
+  <meta property="og:site_name" content="JobOrbit">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/svg+xml" href="/JobOrbitFavicon.svg">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0f62fe">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+<style>
+  /* ── Blog shared ─── */
+  .blog-hero{background:linear-gradient(135deg,#0d1117 0%,#161b22 55%,#0f2744 100%);padding:4rem 0 3rem;position:relative;overflow:hidden}
+  .blog-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(15,98,254,.2),transparent 70%)}
+  .blog-hero-inner{position:relative;text-align:center}
+  .blog-hero-badge{display:inline-flex;align-items:center;gap:.4rem;background:rgba(15,98,254,.2);border:1px solid rgba(15,98,254,.35);border-radius:100px;padding:.3rem .9rem;font-size:.75rem;font-weight:700;color:#60a5fa;text-transform:uppercase;letter-spacing:.07em;margin-bottom:1rem}
+  .blog-hero-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.8rem,4.5vw,3rem);color:#fff;line-height:1.15;margin-bottom:.75rem}
+  .blog-hero-sub{color:rgba(255,255,255,.6);font-size:.95rem;max-width:580px;margin:0 auto}
+  .blog-hero-meta{display:flex;justify-content:center;align-items:center;gap:1rem;margin-top:1.25rem;flex-wrap:wrap}
+  .blog-hero-meta span{font-size:.78rem;color:rgba(255,255,255,.45);display:flex;align-items:center;gap:.3rem}
+  /* Cards */
+  .blog-card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:transform .2s,box-shadow .2s;height:100%;display:flex;flex-direction:column}
+  .blog-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.12)}
+  .blog-card-thumb{aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;font-size:3rem}
+  .blog-card-body{padding:1.5rem;flex:1;display:flex;flex-direction:column}
+  .blog-card-cat{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--primary);margin-bottom:.5rem}
+  .blog-card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;color:var(--text-primary);line-height:1.3;margin-bottom:.6rem}
+  .blog-card-title a{color:inherit;text-decoration:none}
+  .blog-card-title a:hover{color:var(--primary)}
+  .blog-card-excerpt{color:var(--text-secondary);font-size:.875rem;line-height:1.65;flex:1;margin-bottom:1rem}
+  .blog-card-footer{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);padding-top:.75rem;margin-top:auto}
+  .blog-card-meta{font-size:.75rem;color:var(--text-muted);display:flex;align-items:center;gap:.35rem}
+  .blog-card-read{font-size:.78rem;font-weight:600;color:var(--primary);text-decoration:none;display:flex;align-items:center;gap:.25rem}
+  .blog-card-read:hover{text-decoration:underline}
+  /* Featured */
+  .blog-featured{background:var(--bg-card);border:1px solid var(--border);border-radius:20px;overflow:hidden;display:flex;flex-direction:column;margin-bottom:2.5rem}
+  @media(min-width:768px){.blog-featured{flex-direction:row}}
+  .blog-featured-thumb{min-height:200px;flex:0 0 42%;display:flex;align-items:center;justify-content:center;font-size:4rem}
+  .blog-featured-body{padding:2rem;display:flex;flex-direction:column;justify-content:center}
+  /* Article */
+  .article-body h2{font-family:'Syne',sans-serif;font-weight:700;font-size:1.35rem;color:var(--text-primary);margin:2rem 0 .75rem;padding-bottom:.4rem;border-bottom:2px solid var(--border)}
+  .article-body h3{font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;color:var(--text-primary);margin:1.5rem 0 .5rem}
+  .article-body p{color:var(--text-secondary);font-size:.95rem;line-height:1.8;margin-bottom:1rem}
+  .article-body ul,.article-body ol{color:var(--text-secondary);font-size:.95rem;line-height:1.8;padding-left:1.5rem;margin-bottom:1rem}
+  .article-body li{margin-bottom:.35rem}
+  .article-body strong{color:var(--text-primary);font-weight:600}
+  .article-body a{color:var(--primary)}
+  .article-highlight{background:rgba(15,98,254,.06);border-left:3px solid var(--primary);border-radius:0 10px 10px 0;padding:1rem 1.25rem;margin:1.5rem 0}
+  [data-theme="dark"] .article-highlight{background:rgba(15,98,254,.1)}
+  .article-highlight p{margin:0;font-size:.9rem;color:var(--text-secondary)}
+  /* Sidebar */
+  .sidebar-widget{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:1.25rem;margin-bottom:1.25rem}
+  .sidebar-widget-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:1rem}
+  .rel-link{display:flex;align-items:flex-start;gap:.6rem;padding:.5rem 0;border-bottom:1px solid var(--border);text-decoration:none}
+  .rel-link:last-child{border-bottom:none;padding-bottom:0}
+  .rel-link:hover .rel-title{color:var(--primary)}
+  .rel-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
+  .rel-title{font-size:.83rem;font-weight:600;color:var(--text-primary);line-height:1.3;transition:color .15s}
+  .rel-cat{font-size:.72rem;color:var(--text-muted);margin-top:.1rem}
+  .cta-widget{background:linear-gradient(135deg,#0f62fe,#0353e9);border-radius:14px;padding:1.5rem;text-align:center}
+  .cta-widget h5{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;color:#fff;margin-bottom:.5rem}
+  .cta-widget p{font-size:.82rem;color:rgba(255,255,255,.85);margin-bottom:1rem}
+  .cta-widget a{background:#fff;color:#0f62fe;border-radius:8px;padding:.5rem 1.25rem;font-size:.85rem;font-weight:700;text-decoration:none;display:inline-block}
+  /* Breadcrumb */
+  .breadcrumb-bar{display:flex;align-items:center;gap:.4rem;font-size:.82rem;color:var(--text-muted);margin-bottom:1.5rem;flex-wrap:wrap}
+  .breadcrumb-bar a{color:var(--text-muted);text-decoration:none}
+  .breadcrumb-bar a:hover{color:var(--primary)}
+</style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg sticky-top" id="mainNav">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+      <img id="site-logo" src="" alt="Logo" class="d-none" style="max-height:36px">
+      <!-- <span id="site-name" class="brand-name">JobOrbit</span> -->
+    </a>
+    <div class="d-flex align-items-center gap-2 ms-auto">
+      <button class="btn btn-icon theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <i class="bi bi-moon-fill" id="themeIcon"></i>
+      </button>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <i class="bi bi-list fs-4"></i>
+      </button>
+    </div>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+        <li class="nav-item"><a class="nav-link" href="/">Browse Jobs</a></li>
+        <li class="nav-item"><a class="nav-link" href="/#categories">Categories</a></li>
+        <li class="nav-item"><a class="nav-link nav-link-active" href="/blog/">Blog</a></li>
+        <li class="nav-item"><a class="nav-link" href="/contact.html">Post a Job</a></li>
+        <li class="nav-item"><a class="nav-link" href="/feedback.html">Feedback</a></li>
+        <li class="nav-item"><a class="nav-link" href="/about.html">About</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<section class="blog-hero">
+  <div class="container blog-hero-inner">
+    <div class="breadcrumb-bar" style="justify-content:center;margin-bottom:.75rem">
+      <a href="/">Home</a><i class="bi bi-chevron-right" style="font-size:.65rem"></i>
+      <a href="/blog/">Blog</a><i class="bi bi-chevron-right" style="font-size:.65rem"></i>
+      <span style="color:rgba(255,255,255,.45)">Career Advice</span>
+    </div>
+    <div class="blog-hero-badge"><i class="bi bi-file-earmark-text me-1"></i>Career Advice</div>
+    <h1 class="blog-hero-title">Resume Writing Tips for 2026: Stand Out in the Gulf Job Market</h1>
+    <p class="blog-hero-sub">ATS optimisation, Gulf-specific formatting, and exactly what Saudi hiring managers want to see.</p>
+    <div class="blog-hero-meta">
+      <span><i class="bi bi-clock"></i>7 min read</span>
+      <span><i class="bi bi-calendar3"></i>June 2025</span>
+      <span><i class="bi bi-person"></i>JobOrbit Editorial</span>
+    </div>
+  </div>
+</section>
+
+<div class="container py-5">
+  <div class="row g-4 g-lg-5">
+    <div class="col-lg-8">
+      <div class="breadcrumb-bar">
+        <a href="/blog/"><i class="bi bi-arrow-left me-1"></i>Back to Blog</a>
+      </div>
+      <article class="article-body">
+
+<p>Your CV is the first impression you make on a hiring manager — and in the Gulf job market, first impressions carry enormous weight. With recruiters spending an average of seven to ten seconds scanning each application before deciding whether to read further, a poorly structured or cluttered resume will cost you interviews regardless of how strong your experience genuinely is. Here is everything you need to know to write a Gulf-ready CV in 2026 that gets you noticed.</p>
+
+<h2>1. Lead with a Punchy Professional Summary</h2>
+<p>Just below your name and contact details, include a 3-4 line professional summary. This is not an "objective statement" (those are outdated). It is a mini-pitch: who you are, what you specialise in, and the value you bring. For example:</p>
+<p style="background:var(--surface);border-radius:10px;padding:.875rem 1rem;font-style:italic;font-size:.9rem;color:var(--text-secondary)">"Results-driven software engineer with 7 years of experience building scalable fintech platforms. Delivered a payment gateway processing SAR 2 billion in annual transactions at my current role. Seeking a senior engineering position in Saudi Arabia's growing tech sector."</p>
+<p>This tells the recruiter immediately what you do, proves it with a concrete number, and signals your intent clearly. Tailor it for every application.</p>
+
+<h2>2. Quantify Every Achievement You Can</h2>
+<p>Vague claims are the single biggest weakness in most CVs. Compare these two bullet points:</p>
+<ul>
+<li><strong>Weak:</strong> Managed a sales team and helped increase revenue.</li>
+<li><strong>Strong:</strong> Led a 12-person sales team to achieve 142% of annual revenue target (SAR 8.4M), ranking first in the region for two consecutive years.</li>
+</ul>
+<p>Numbers create credibility and make you memorable. Go through every line of your CV and ask: can I attach a number, percentage, or scale to this? Team sizes, budgets managed, revenue generated, cost savings achieved, project timelines — all of these transform a generic claim into compelling evidence.</p>
+
+<h2>3. Optimise for ATS (Applicant Tracking Systems)</h2>
+<p>Most medium and large companies in the Gulf now use ATS software to filter CVs before a human ever sees them. ATS systems scan for keywords matching the job description. If your CV does not contain those keywords, it gets filtered out — even if you are perfectly qualified for the role.</p>
+<p>To optimise for ATS:</p>
+<ul>
+<li>Read the job description carefully and note key skills, qualifications, and role titles mentioned.</li>
+<li>Mirror that exact language in your CV wherever honest and accurate.</li>
+<li>Avoid tables, text boxes, headers/footers, and unusual fonts — ATS often cannot parse these correctly.</li>
+<li>Use a clean, straightforward layout with standard section headings.</li>
+<li>Submit as .docx or .pdf — check which the employer prefers when both are accepted.</li>
+</ul>
+
+<h2>4. Structure Your CV Correctly</h2>
+<p>For most professionals with 3 or more years of experience, the optimal structure is:</p>
+<ol>
+<li><strong>Header:</strong> Name, current location, phone number, email, LinkedIn URL</li>
+<li><strong>Professional Summary</strong> (3-4 lines, tailored per role)</li>
+<li><strong>Core Skills</strong> (6-10 keywords as a compact horizontal or grid list)</li>
+<li><strong>Professional Experience</strong> (reverse chronological, bullet points, quantified)</li>
+<li><strong>Education</strong></li>
+<li><strong>Certifications and Training</strong></li>
+<li><strong>Languages</strong> (important in the Gulf — always list Arabic if you speak it)</li>
+</ol>
+<p>Keep it to two pages maximum. One page is entirely appropriate for candidates with fewer than five years of experience.</p>
+
+<h2>5. Gulf-Specific Considerations</h2>
+<p>The Gulf job market has nuances that differ meaningfully from Western CV conventions:</p>
+<ul>
+<li><strong>Photo:</strong> Including a professional headshot is standard and expected across most Gulf markets, including Saudi Arabia, UAE, Kuwait, and Qatar.</li>
+<li><strong>Nationality:</strong> Include your nationality — it is directly relevant for visa sponsorship and Saudisation compliance considerations.</li>
+<li><strong>Current visa status:</strong> If you are already in-country on a transferable iqama, state this clearly. It significantly accelerates the hiring process for employers.</li>
+<li><strong>Notice period:</strong> Gulf employers ask about this early. State your available start date on the CV or cover letter.</li>
+<li><strong>Languages:</strong> Bilingual Arabic-English professionals command a meaningful salary premium in Saudi Arabia. If you speak Arabic, make this prominent — do not bury it.</li>
+</ul>
+
+<h2>6. What to Leave Out</h2>
+<p>Equally important as what you include is what you exclude from your CV:</p>
+<ul>
+<li>Do not list references — "available upon request" uses space better left for your achievements.</li>
+<li>Avoid listing basic skills like Microsoft Word or email — these are assumed.</li>
+<li>Skip a hobbies section unless genuinely impressive or relevant to the role (competitive programming, published writing, etc.).</li>
+<li>Remove roles from more than 15 years ago unless directly and significantly relevant.</li>
+</ul>
+
+<div class="article-highlight">
+<p><strong>Final check:</strong> Before sending any CV, proofread it twice. Then ask a trusted colleague or friend to read it. Spelling errors and inconsistent formatting immediately signal a lack of attention to detail — exactly the opposite of the impression you want to leave.</p>
+</div>
+
+<h2>Write a Targeted Cover Letter Too</h2>
+<p>Many Gulf candidates skip cover letters entirely — which is a mistake when applying for senior or competitive roles. A concise, well-written cover letter that explains exactly why you want this specific role at this specific company stands out immediately. Keep it to three paragraphs: why this role interests you, your single most relevant achievement, and a clear call to action. Address it to the hiring manager by name wherever possible.</p>
+      </article>
+      <div class="article-highlight mt-4">
+        <p><strong>Ready to put this advice into action?</strong> Browse current job openings on <a href="/">JobOrbit</a> and connect directly with employers via WhatsApp, phone, or email.</p>
+      </div>
+    </div>
+    <div class="col-lg-4 pt-lg-0" style="padding-top:0">
+      <div style="position:sticky;top:80px;padding-top:1rem">
+        <div class="sidebar-widget">
+  <div class="sidebar-widget-title">More Articles</div>
+  <a href="/blog/find-job-saudi-arabia.html" class="rel-link">
+    <div class="rel-icon" style="background:rgba(15,98,254,.1);color:#0f62fe"><i class="bi bi-search"></i></div>
+    <div><div class="rel-title">How to Find a Job in Saudi Arabia</div><div class="rel-cat">Job Search</div></div>
+  </a>
+  <a href="/blog/high-paying-jobs-riyadh.html" class="rel-link">
+    <div class="rel-icon" style="background:rgba(16,185,129,.1);color:#059669"><i class="bi bi-currency-dollar"></i></div>
+    <div><div class="rel-title">Top 10 High-Paying Jobs in Riyadh</div><div class="rel-cat">Salary Guide</div></div>
+  </a>
+  <a href="/blog/resume-writing-tips-2026.html" class="rel-link">
+    <div class="rel-icon" style="background:rgba(245,158,11,.1);color:#d97706"><i class="bi bi-file-earmark-text"></i></div>
+    <div><div class="rel-title">Resume Writing Tips for 2026</div><div class="rel-cat">Career Advice</div></div>
+  </a>
+  <a href="/blog/interview-questions-engineers.html" class="rel-link">
+    <div class="rel-icon" style="background:rgba(99,102,241,.1);color:#6366f1"><i class="bi bi-person-workspace"></i></div>
+    <div><div class="rel-title">Interview Questions for Engineers</div><div class="rel-cat">Interview Prep</div></div>
+  </a>
+  <a href="/blog/remote-work-trends-gulf.html" class="rel-link">
+    <div class="rel-icon" style="background:rgba(236,72,153,.1);color:#db2777"><i class="bi bi-laptop"></i></div>
+    <div><div class="rel-title">Remote Work Trends in the Gulf</div><div class="rel-cat">Work Trends</div></div>
+  </a>
+  <a href="/blog/work-visa-guide-saudi-arabia.html" class="rel-link">
+    <div class="rel-icon" style="background:rgba(139,92,246,.1);color:#7c3aed"><i class="bi bi-passport"></i></div>
+    <div><div class="rel-title">Work Visa Guide: Saudi Arabia</div><div class="rel-cat">Visas & Legal</div></div>
+  </a>
+  <a href="/blog/saudi-labor-law-guide.html" class="rel-link">
+    <div class="rel-icon" style="background:rgba(239,68,68,.1);color:#dc2626"><i class="bi bi-journal-text"></i></div>
+    <div><div class="rel-title">Saudi Labor Law: Employee Rights</div><div class="rel-cat">Legal Guide</div></div>
+  </a>
+  <a href="/blog/networking-tips-gulf.html" class="rel-link">
+    <div class="rel-icon" style="background:rgba(20,184,166,.1);color:#0d9488"><i class="bi bi-people-fill"></i></div>
+    <div><div class="rel-title">Networking in the Gulf: How It Really Works</div><div class="rel-cat">Career Growth</div></div>
+  </a>
+  <a href="/blog/gulf-job-sectors-2026.html" class="rel-link">
+    <div class="rel-icon" style="background:rgba(249,115,22,.1);color:#ea580c"><i class="bi bi-graph-up-arrow"></i></div>
+    <div><div class="rel-title">Fastest Growing Job Sectors in the Gulf</div><div class="rel-cat">Market Insights</div></div>
+  </a>
+  <a href="/blog/expat-guide-working-saudi-arabia.html" class="rel-link">
+    <div class="rel-icon" style="background:rgba(6,182,212,.1);color:#0891b2"><i class="bi bi-globe2"></i></div>
+    <div><div class="rel-title">Complete Expat Guide to Working in Saudi Arabia</div><div class="rel-cat">Expat Life</div></div>
+  </a>
+</div>
+<div class="cta-widget">
+  <h5>Find your next job</h5>
+  <p>Browse verified listings in Saudi Arabia and the Gulf. Apply directly.</p>
+  <a href="/">Browse Jobs Now</a>
+</div>
+      </div>
+    </div>
+  </div>
+</div>
+<footer class="site-footer">
+  <div class="container">
+    <div class="row g-4 align-items-start">
+      <div class="col-md-4">
+        <div class="footer-brand mb-2">
+          <span class="brand-name" id="footer-site-name">JobOrbit</span>
+        </div>
+        <p class="footer-desc">Connecting talent with opportunity. Find your next career move today.</p>
+      </div>
+      <div class="col-md-4">
+        <h6 class="footer-heading">Quick Links</h6>
+        <ul class="footer-links">
+          <li><a href="#jobs">Browse Jobs</a></li>
+          <li><a href="#categories">Categories</a></li>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/contact.html">Post a Job</a></li>
+          <!-- <li><a href="/admin" target="_blank">Admin Panel</a></li> -->
+        </ul>
+      </div>
+      <div class="col-md-4">
+        <h6 class="footer-heading">Legal &amp; Info</h6>
+        <ul class="footer-links">
+          <li><a href="/about.html">About Us</a></li>
+          <li><a href="/feedback.html">Contact Us</a></li>
+          <li><a href="/privacy-policy.html">Privacy Policy</a></li>
+          <li><a href="/terms.html">Terms &amp; Conditions</a></li>
+          <li><a href="/disclaimer.html">Disclaimer</a></li>
+          <!-- <li><a href="/sitemap.xml" target="_blank">Sitemap</a></li> -->
+        </ul>
+      </div>
+    </div>
+    <hr class="footer-divider">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <p class="mb-0 footer-copy">© <span id="footerYear"></span> <span class="footer-brand-inline" id="footer-copy-name">JobOrbit</span>. All rights reserved.</p>
+      <div class="d-flex flex-wrap gap-3">
+        <a href="/about.html" class="footer-copy" style="text-decoration:none">About</a>
+        <a href="/privacy-policy.html" class="footer-copy" style="text-decoration:none">Privacy</a>
+        <a href="/terms.html" class="footer-copy" style="text-decoration:none">Terms</a>
+        <a href="/disclaimer.html" class="footer-copy" style="text-decoration:none">Disclaimer</a>
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
+<script>
+async function loadSettings() {
+  try {
+    const data = await fetch('/api/settings').then(r=>r.json());
+    const s = data.settings;
+    if (s.primary_color) document.documentElement.style.setProperty('--primary', s.primary_color);
+    if (s.secondary_color) document.documentElement.style.setProperty('--secondary', s.secondary_color);
+    if (s.site_name) {
+      document.querySelectorAll('.brand-name').forEach(el => el.textContent = s.site_name);
+      document.getElementById('footer-copy-name').textContent = s.site_name;
+    }
+    if (s.logo_url) { const l=document.getElementById('site-logo'); l.src=s.logo_url; l.classList.remove('d-none'); }
+    applyTheme(localStorage.getItem('theme') || s.default_theme || 'light', false);
+  } catch(e) {}
+}
+function applyTheme(t, save=true) {
+  document.documentElement.setAttribute('data-theme', t);
+  document.documentElement.style.colorScheme = t;
+  document.getElementById('themeIcon').className = t==='dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+  if (save) localStorage.setItem('theme', t);
+}
+document.getElementById('themeToggle').addEventListener('click', ()=>{
+  applyTheme(document.documentElement.getAttribute('data-theme')==='dark' ? 'light' : 'dark');
+});
+document.getElementById('footerYear').textContent = new Date().getFullYear();
+loadSettings();
+</script>
+</body>
+</html>
