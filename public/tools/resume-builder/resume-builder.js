@@ -1123,12 +1123,18 @@ async function downloadPDF() {
   if (overlay) overlay.classList.add('show');
 
   try {
-    // 1. Fetch resume CSS to embed inline in the sent HTML
-    var cssText = '';
+    // 1. Fetch resume CSS + Bootstrap Icons CSS to embed inline
+    //    Puppeteer can't reliably load CDN fonts — embed everything
+    var cssText   = '';
+    var iconsCSS  = '';
     try {
-      var r = await fetch('/tools/resume-builder/resume-builder.css');
-      if (r.ok) cssText = await r.text();
-    } catch(e) { console.warn('Could not load CSS:', e); }
+      var r1 = await fetch('/tools/resume-builder/resume-builder.css');
+      if (r1.ok) cssText = await r1.text();
+    } catch(e) {}
+    try {
+      var r2 = await fetch('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css');
+      if (r2.ok) iconsCSS = await r2.text();
+    } catch(e) {}
 
     // 2. Build resume HTML
     var resumeHTML = buildResumeHTML(
@@ -1161,8 +1167,8 @@ async function downloadPDF() {
       '<meta name="viewport" content="width=794">',
       // Google Fonts — server waits for networkidle0 so fonts load fully
       '<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">',
-      '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">',
-      '<style>' + cssText + extraCSS + '</style>',
+      // Bootstrap Icons embedded inline via iconsCSS — no CDN dependency
+      '<style>' + iconsCSS + cssText + extraCSS + '</style>',
       '</head>',
       '<body style="margin:0;padding:0;background:#ffffff">',
       resumeHTML,
