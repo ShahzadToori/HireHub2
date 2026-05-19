@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express       = require('express');
-const session       = require('express-session');
+const session      = require('express-session');
+const MySQLStore   = require('express-mysql-session')(session);
 const helmet        = require('helmet');
 const cors          = require('cors');
 const path          = require('path');
@@ -42,12 +43,25 @@ app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ extended: true, limit: '5mb' }));
 
 // ── Sessions ──────────────────────────────────────────────────
+const sessionStore = new MySQLStore({
+  host:               process.env.DB_HOST     || 'localhost',
+  port:               process.env.DB_PORT     || 3306,
+  user:               process.env.DB_USER     || 'root',
+  password:           process.env.DB_PASSWORD || '',
+  database:           process.env.DB_NAME     || 'hirehub_db',
+  clearExpired:       true,
+  checkExpirationInterval: 900000,
+  expiration:         28800000,
+  createDatabaseTable: true,
+});
+
 app.use(session({
   secret:            process.env.SESSION_SECRET || 'super-secret-key',
   resave:            false,
   saveUninitialized: false,
+  store:             sessionStore,
   cookie: {
-    secure: process.env.NODE_ENV === 'production',
+    secure:   process.env.NODE_ENV === 'production',
     httpOnly: true,
     maxAge:   8 * 60 * 60 * 1000
   }
