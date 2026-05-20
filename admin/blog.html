@@ -28,7 +28,15 @@
     #list-panel{display:block}
     .article-row{cursor:pointer;transition:background .12s}
     .article-row:hover{background:var(--surface)}
-  </style>
+  
+  .img-picker{display:grid;grid-template-columns:repeat(5,1fr);gap:.4rem;margin-top:.5rem}
+  .img-option{border:2px solid transparent;border-radius:8px;overflow:hidden;cursor:pointer;transition:all .15s;aspect-ratio:16/9;position:relative}
+  .img-option img{width:100%;height:100%;object-fit:cover;display:block}
+  .img-option:hover{border-color:var(--primary,#0f62fe);transform:scale(1.03)}
+  .img-option.selected{border-color:var(--primary,#0f62fe);box-shadow:0 0 0 3px rgba(15,98,254,.3)}
+  .img-option .img-check{display:none;position:absolute;top:3px;right:3px;background:#0f62fe;color:#fff;border-radius:50%;width:18px;height:18px;font-size:10px;align-items:center;justify-content:center}
+  .img-option.selected .img-check{display:flex}
+</style>
 </head>
 <body>
 <div class="admin-wrapper">
@@ -156,8 +164,10 @@
             <div class="admin-widget mb-3">
               <h6 class="widget-title">Featured Image</h6>
               <input type="file" class="form-control form-control-sm" id="field-image" accept="image/*" onchange="uploadImage(this)">
-              <button type="button" class="btn btn-primary btn-sm w-100 mt-2" id="btn-ai-img" onclick="generateAIImage()"><i class="bi bi-stars me-1"></i>Generate with AI</button>
+              <button type="button" class="btn btn-primary btn-sm w-100 mt-2" id="btn-ai-img" onclick="generateAIImage()"><i class="bi bi-image me-1"></i>Find Stock Photos</button>
               <div id="ai-img-msg" class="mt-1" style="font-size:.75rem"></div>
+              <div id="img-picker" class="img-picker" style="display:none"></div>
+              <button type="button" class="btn btn-success btn-sm w-100 mt-1 d-none" id="btn-use-img" onclick="useSelectedImage()"><i class="bi bi-check-lg me-1"></i>Use Selected Photo</button>
               <img id="img-preview" class="img-preview" src="" alt="Preview">
               <input type="hidden" id="field-image-url">
               <button type="button" class="btn btn-outline-danger btn-sm mt-2 d-none" id="btn-remove-img" onclick="removeImage()">
@@ -221,40 +231,88 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+
+let _unsplashPhotos = [], _selectedPhoto = null;
+
 async function generateAIImage() {
   const title = document.getElementById('field-title').value.trim();
-  const category = document.getElementById('field-category').value;
+  const excerpt = document.getElementById('field-excerpt').value.trim();
   if (!title) { alert('Please enter an article title first'); return; }
   const btn = document.getElementById('btn-ai-img');
   const msg = document.getElementById('ai-img-msg');
+  const picker = document.getElementById('img-picker');
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Generating...';
-  msg.innerHTML = '<span class="text-muted">Contacting AI... 15-30 seconds...</span>';
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Searching...';
+  msg.innerHTML = '<span class="text-muted">Finding relevant photos...</span>';
+  picker.style.display = 'none';
+  document.getElementById('btn-use-img').classList.add('d-none');
   try {
     const res = await fetch('/api/admin/blog/generate-image', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({title, category})
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ title, excerpt })
     });
     const data = await res.json();
-    if (data.retry) {
-      msg.innerHTML = '<span class="text-warning">Model loading, retrying in 30s...</span>';
-      setTimeout(generateAIImage, 30000);
-    } else if (data.success) {
-      document.getElementById('field-image-url').value = data.url;
-      const prev = document.getElementById('img-preview');
-      prev.src = data.url + '?' + Date.now();
-      prev.style.display = 'block';
-      document.getElementById('btn-remove-img').classList.remove('d-none');
-      msg.innerHTML = '<span class="text-success"><i class="bi bi-check-circle me-1"></i>Image generated!</span>';
+    if (data.success && data.photos && data.photos.length) {
+      _unsplashPhotos = data.photos;
+      _selectedPhoto = null;
+      picker.style.display = 'grid';
+      picker.innerHTML = data.photos.map(function(p, i) {
+        return '<div class="img-option" onclick="selectPhoto(' + i + ')" title="' + p.attribution + '">' +
+          '<img src="' + p.thumb + '" alt="photo ' + (i+1) + '" loading="lazy">' +
+          '<div class="img-check"><i class="bi bi-check-lg" style="font-size:8px"></i></div>' +
+          '</div>';
+      }).join('');
+      msg.innerHTML = '<span class="text-muted" style="font-size:.7rem">Click a photo to select, then click Use Selected Photo</span>';
     } else {
-      msg.innerHTML = '<span class="text-danger">' + (data.error || 'Unknown error') + '</span>';
+      msg.innerHTML = '<span class="text-danger">' + (data.error || 'No photos found') + '</span>';
     }
   } catch(e) {
     msg.innerHTML = '<span class="text-danger">Error: ' + e.message + '</span>';
   }
   btn.disabled = false;
-  btn.innerHTML = '<i class="bi bi-stars me-1"></i>Generate with AI';
+  btn.innerHTML = '<i class="bi bi-image me-1"></i>Find Stock Photos';
+}
+
+function selectPhoto(i) {
+  _selectedPhoto = _unsplashPhotos[i];
+  document.querySelectorAll('.img-option').forEach(function(el, idx) {
+    el.classList.toggle('selected', idx === i);
+  });
+  document.getElementById('btn-use-img').classList.remove('d-none');
+}
+
+async function useSelectedImage() {
+  if (!_selectedPhoto) return;
+  const btn = document.getElementById('btn-use-img');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Saving...';
+  try {
+    const res = await fetch('/api/admin/blog/select-image', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        photoUrl: _selectedPhoto.full,
+        downloadLocation: _selectedPhoto.downloadLocation,
+        attribution: _selectedPhoto.attribution,
+        attributionLink: _selectedPhoto.attributionLink
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById('field-image-url').value = data.url;
+      const prev = document.getElementById('img-preview');
+      prev.src = data.url + '?' + Date.now(); prev.style.display = 'block';
+      document.getElementById('btn-remove-img').classList.remove('d-none');
+      document.getElementById('ai-img-msg').innerHTML = '<span class="text-success"><i class="bi bi-check-circle me-1"></i>' + data.attribution + '</span>';
+      document.getElementById('img-picker').style.display = 'none';
+      btn.classList.add('d-none');
+    } else {
+      document.getElementById('ai-img-msg').innerHTML = '<span class="text-danger">' + data.error + '</span>';
+    }
+  } catch(e) {
+    document.getElementById('ai-img-msg').innerHTML = '<span class="text-danger">Error: ' + e.message + '</span>';
+  }
+  btn.disabled = false;
+  btn.innerHTML = '<i class="bi bi-check-lg me-1"></i>Use Selected Photo';
 }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>

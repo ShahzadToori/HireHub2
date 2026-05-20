@@ -244,26 +244,77 @@ router.post('/api/admin/blog/upload-image', requireAdmin, blogUpload.single('ima
   res.json({ success: true, url: `/uploads/blog/${req.file.filename}` });
 });
 
-/* POST /api/admin/blog/generate-image — Pollinations AI */
+/* POST /api/admin/blog/generate-image — Unsplash 5 options */
 router.post('/api/admin/blog/generate-image', requireAdmin, async (req, res) => {
-  const title = req.body.title;
-  if (!title) return res.status(400).json({ success: false, error: 'Title required' });
+  const title = req.body.title || '';
+  const excerpt = req.body.excerpt || '';
+  const key = process.env.UNSPLASH_ACCESS_KEY;
+  if (!key) return res.status(500).json({ success: false, error: 'UNSPLASH_ACCESS_KEY not set' });
   try {
-    const prompt = encodeURIComponent('Professional blog header, ' + title + ', Gulf Saudi Arabia, modern business, photorealistic, no text, no watermark');
-    const url = 'https://image.pollinations.ai/prompt/' + prompt + '?width=1200&height=630&nologo=true&model=flux';
-    const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 60000);
-    const imgRes = await fetch(url, { signal: ctrl.signal });
-    clearTimeout(timer);
-    if (!imgRes.ok) return res.status(500).json({ success: false, error: 'Generation failed: ' + imgRes.status });
+    const text = (title + ' ' + excerpt).toLowerCase();
+    let query = 'professional business office';
+    if (text.match(/aramco|oil|petroleum|gas|refin|drill/)) query = 'oil refinery energy industrial';
+    else if (text.match(/nurs|hospital|doctor|medical|health|clinic|patient/)) query = 'hospital healthcare medical professional';
+    else if (text.match(/engineer|civil|mechanical|structural|construction|infrastructure/)) query = 'construction engineering infrastructure project';
+    else if (text.match(/salary|pay|wage|income|earn|eosb|gratuity|compens/)) query = 'salary finance money professional';
+    else if (text.match(/resume|cv|curriculum/)) query = 'resume career job application';
+    else if (text.match(/interview|hiring|recruit|hire/)) query = 'job interview hiring professional';
+    else if (text.match(/visa|iqama|permit|residency|passport|expat/)) query = 'passport visa travel documents';
+    else if (text.match(/linkedin|networking|social media/)) query = 'professional networking business connection';
+    else if (text.match(/bank|financ|invest|cfa|accounting|audit/)) query = 'banking finance investment';
+    else if (text.match(/hse|safety|nebosh|osha|hazard|accident/)) query = 'safety construction worker hard hat';
+    else if (text.match(/remote|hybrid|work from home|digital nomad/)) query = 'remote work laptop home office';
+    else if (text.match(/woman|women|female|gender/)) query = 'businesswoman professional career';
+    else if (text.match(/neom|megaproject|giga|futur/)) query = 'futuristic city modern architecture';
+    else if (text.match(/cost|living|rent|apartment|city|riyadh|jeddah|dammam/)) query = 'modern city apartment urban living';
+    else if (text.match(/scam|fraud|fake|protect|warn/)) query = 'cybersecurity protection professional';
+    else if (text.match(/graduat|fresh|entry|junior|first job/)) query = 'graduate career start young professional';
+    else if (text.match(/promot|growth|career|advance|leader|manag/)) query = 'career growth leadership success';
+    else if (text.match(/ramadan|cultur|religio|prayer|mosque/)) query = 'culture workplace diversity professional';
+    else if (text.match(/driv|car|transport|licen/)) query = 'city highway driving modern';
+    else if (text.match(/saudi|gulf|riyadh|jeddah|ksa|arab/)) query = 'Saudi Arabia Gulf business professional';
+    else if (text.match(/job|career|work|employ|opportun/)) query = 'career job professional office';
+    else if (text.match(/certif|qualif|training|course|skill/)) query = 'professional certification training education';
+    else if (text.match(/negoti|offer|package|benefit/)) query = 'business negotiation deal handshake';
+    else if (text.match(/tech|it|software|digital|cyber|cloud|data|ai/)) query = 'technology software developer coding';
+
+    const url = 'https://api.unsplash.com/search/photos?query=' + encodeURIComponent(query) + '&per_page=5&orientation=landscape&client_id=' + key;
+    const r = await fetch(url);
+    const d = await r.json();
+    if (!r.ok || !d.results || !d.results.length) return res.status(500).json({ success: false, error: 'No photos found for: ' + query });
+
+    const photos = d.results.map(function(p) {
+      return {
+        id: p.id,
+        thumb: p.urls.small,
+        full: p.urls.regular,
+        attribution: 'Photo by ' + p.user.name + ' on Unsplash',
+        attributionLink: p.links.html,
+        downloadLocation: p.links.download_location
+      };
+    });
+
+    res.json({ success: true, photos, query });
+  } catch (err) {
+    console.error('[Unsplash]', err.message);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+/* POST /api/admin/blog/select-image — download chosen Unsplash photo */
+router.post('/api/admin/blog/select-image', requireAdmin, async (req, res) => {
+  const { photoUrl, downloadLocation, attribution, attributionLink } = req.body;
+  const key = process.env.UNSPLASH_ACCESS_KEY;
+  try {
+    fetch(downloadLocation + '?client_id=' + key).catch(() => {});
+    const imgRes = await fetch(photoUrl);
     const buf = Buffer.from(await imgRes.arrayBuffer());
-    const filename = 'blog-ai-' + Date.now() + '.jpg';
+    const filename = 'blog-unsplash-' + Date.now() + '.jpg';
     const dir = require('path').join(__dirname, '../../public/uploads/blog');
     require('fs').mkdirSync(dir, { recursive: true });
     require('fs').writeFileSync(require('path').join(dir, filename), buf);
-    res.json({ success: true, url: '/uploads/blog/' + filename });
-  } catch (err) {
-    console.error('[AI Image]', err.message);
+    res.json({ success: true, url: '/uploads/blog/' + filename, attribution, attributionLink });
+  } catch(err) {
     res.status(500).json({ success: false, error: err.message });
   }
 });
