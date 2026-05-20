@@ -244,4 +244,86 @@ router.post('/api/admin/blog/upload-image', requireAdmin, blogUpload.single('ima
   res.json({ success: true, url: `/uploads/blog/${req.file.filename}` });
 });
 
+
+
+/* POST /api/admin/blog/generate-image — AI image via Hugging Face */
+router.post('/api/admin/blog/generate-image', requireAdmin, async (req, res) => {
+  const { title, category } = req.body;
+  if (!title) return res.status(400).json({ success: false, error: 'Title required' });
+  const token = process.env.HF_TOKEN;
+  if (!token) return res.status(500).json({ success: false, error: 'HF_TOKEN not set in .env' });
+  try {
+    const prompt = 'Professional blog header image about: ' + title + '. Gulf region, Saudi Arabia, modern business setting, clean corporate style, high quality, photorealistic, no text, no watermark, 16:9 landscape';
+    const hfRes = await fetch('https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json', 'X-Use-Cache': 'false' },
+      body: JSON.stringify({ inputs: prompt, parameters: { width: 1024, height: 576, num_inference_steps: 4 } })
+    });
+    if (!hfRes.ok) {
+      const err = await hfRes.text();
+      if (hfRes.status === 503) return res.status(503).json({ success: false, error: 'Model loading, please retry in 30 seconds', retry: true });
+      return res.status(500).json({ success: false, error: 'HuggingFace error: ' + err.slice(0, 200) });
+    }
+    const imageBuffer = Buffer.from(await hfRes.arrayBuffer());
+    const filename = 'blog-ai-' + Date.now() + '.jpg';
+    const uploadDir = require('path').join(__dirname, '../../public/uploads/blog');
+    require('fs').mkdirSync(uploadDir, { recursive: true });
+    require('fs').writeFileSync(require('path').join(uploadDir, filename), imageBuffer);
+    res.json({ success: true, url: '/uploads/blog/' + filename });
+  } catch (err) {
+    console.error('[AI Image]', err.message);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 module.exports = router;
+
+/* POST /api/admin/blog/generate-image — AI image via Hugging Face */
+router.post('/api/admin/blog/generate-image', requireAdmin, async (req, res) => {
+  const { title, category } = req.body;
+  if (!title) return res.status(400).json({ success: false, error: 'Title required' });
+
+  const token = process.env.HF_TOKEN;
+  if (!token) return res.status(500).json({ success: false, error: 'HF_TOKEN not set in .env' });
+
+  try {
+    // Build a professional prompt from the article title
+    const prompt = `Professional blog header image for an article titled "${title}". ` +
+      `Gulf region, Saudi Arabia, modern business setting, clean corporate style, ` +
+      `${category ? category + ' theme, ' : ''}high quality, photorealistic, no text, no watermark`;
+
+    const hfRes = await fetch(
+      'https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell',
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'X-Use-Cache': 'false'
+        },
+        body: JSON.stringify({
+          inputs: prompt,
+          parameters: { width: 1024, height: 576, num_inference_steps: 4 }
+        })
+      }
+    );
+
+    if (!hfRes.ok) {
+      const err = await hfRes.text();
+      // Model loading — tell client to retry
+      if (hfRes.status === 503) return res.status(503).json({ success: false, error: 'Model loading, retry in 20 seconds', retry: true });
+      return res.status(500).json({ success: false, error: 'HuggingFace error: ' + err.slice(0, 200) });
+    }
+
+    const imageBuffer = Buffer.from(await hfRes.arrayBuffer());
+    const filename    = `blog-ai-${Date.now()}.jpg`;
+    const uploadDir   = require('path').join(__dirname, '../../public/uploads/blog');
+    require('fs').mkdirSync(uploadDir, { recursive: true });
+    require('fs').writeFileSync(require('path').join(uploadDir, filename), imageBuffer);
+
+    res.json({ success: true, url: `/uploads/blog/${filename}` });
+  } catch (err) {
+    console.error('[AI Image]', err.message);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});

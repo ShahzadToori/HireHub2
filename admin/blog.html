@@ -156,6 +156,8 @@
             <div class="admin-widget mb-3">
               <h6 class="widget-title">Featured Image</h6>
               <input type="file" class="form-control form-control-sm" id="field-image" accept="image/*" onchange="uploadImage(this)">
+              <button type="button" class="btn btn-primary btn-sm w-100 mt-2" id="btn-ai-img" onclick="generateAIImage()"><i class="bi bi-stars me-1"></i>Generate with AI</button>
+              <div id="ai-img-msg" class="mt-1" style="font-size:.75rem"></div>
               <img id="img-preview" class="img-preview" src="" alt="Preview">
               <input type="hidden" id="field-image-url">
               <button type="button" class="btn btn-outline-danger btn-sm mt-2 d-none" id="btn-remove-img" onclick="removeImage()">
@@ -363,6 +365,37 @@ function showList() {
   document.getElementById('btn-back').classList.add('d-none');
   document.getElementById('panel-title').innerHTML = '<i class="bi bi-journal-richtext me-2"></i>Blog Manager';
   loadArticles();
+
+async function generateAIImage() {
+  const title = document.getElementById('field-title').value.trim();
+  const category = document.getElementById('field-category').value;
+  if (!title) { alert('Please enter an article title first'); return; }
+  const btn = document.getElementById('btn-ai-img');
+  const msg = document.getElementById('ai-img-msg');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Generating...';
+  msg.innerHTML = '<span class="text-muted">This takes 15-30 seconds...</span>';
+  try {
+    const res = await fetch('/api/admin/blog/generate-image', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({title,category}) });
+    const data = await res.json();
+    if (data.retry) {
+      msg.innerHTML = '<span class="text-warning">Model loading, retrying in 30s...</span>';
+      setTimeout(generateAIImage, 30000);
+    } else if (data.success) {
+      document.getElementById('field-image-url').value = data.url;
+      const prev = document.getElementById('img-preview');
+      prev.src = data.url; prev.style.display = 'block';
+      document.getElementById('btn-remove-img').classList.remove('d-none');
+      msg.innerHTML = '<span class="text-success"><i class="bi bi-check-circle me-1"></i>Image generated!</span>';
+    } else {
+      msg.innerHTML = '<span class="text-danger">' + data.error + '</span>';
+    }
+  } catch(e) {
+    msg.innerHTML = '<span class="text-danger">Error: ' + e.message + '</span>';
+  }
+  btn.disabled = false;
+  btn.innerHTML = '<i class="bi bi-stars me-1"></i>Generate with AI';
+}
 }
 
 /* ── Save article ─────────────────────────────────────────── */
