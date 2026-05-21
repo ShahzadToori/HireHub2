@@ -30,8 +30,22 @@ router.post('/login', async (req, res) => {
 
     req.session.adminId  = admin.id;
     req.session.username = admin.username;
+    req.session.role     = admin.role || 'super_admin';
+    req.session.status   = admin.status || 'active';
 
-    res.json({ success: true, message: 'Login successful', username: admin.username });
+    if (admin.status === 'inactive') {
+      return res.status(403).json({ success: false, message: 'Account is disabled' });
+    }
+
+    // Fetch permissions for this role
+    const [roleRows] = await db.query(
+      'SELECT permissions FROM admin_roles WHERE name = ? LIMIT 1',
+      [admin.role || 'super_admin']
+    );
+    const permissions = roleRows.length ? (typeof roleRows[0].permissions === "string" ? JSON.parse(roleRows[0].permissions) : roleRows[0].permissions) : [];
+    req.session.permissions = permissions;
+
+    res.json({ success: true, message: 'Login successful', username: admin.username, role: admin.role, permissions });
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: 'Server error' });
@@ -46,9 +60,15 @@ router.post('/logout', (req, res) => {
 });
 
 // GET /api/auth/me
-router.get('/me', (req, res) => {
+router.get('/me', async (req, res) => {
   if (req.session.adminId) {
-    return res.json({ success: true, loggedIn: true, username: req.session.username });
+    // Refresh permissions from DB in case role changed
+    const [roleRows] = await db.query(
+      'SELECT permissions FROM admin_roles WHERE name = ? LIMIT 1',
+      [req.session.role || 'super_admin']
+    ).catch(() => [[]]);
+    const permissions = roleRows.length ? (typeof roleRows[0].permissions === "string" ? JSON.parse(roleRows[0].permissions) : roleRows[0].permissions) : (req.session.permissions || []);
+    return res.json({ success: true, loggedIn: true, username: req.session.username, role: req.session.role || 'super_admin', permissions });
   }
   res.json({ success: true, loggedIn: false });
 });

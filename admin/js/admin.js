@@ -13,6 +13,8 @@ async function requireAuth() {
       window.location.href = '/admin/index.html';
       return;
     }
+    window._adminPermissions = data.permissions || [];
+    window._adminRole = data.role || 'super_admin';
     const nameEl = document.getElementById('adminName');
     if (nameEl) {
       nameEl.textContent = (data.username || 'A')[0].toUpperCase();
@@ -87,24 +89,52 @@ function applyAdminTheme(theme, save = true) {
 }
 
 // ── Sidebar toggle (mobile) ─────────────────────────────────────
-function initSidebar() {
-  const sidebar      = document.getElementById('sidebar');
-  const overlay      = document.getElementById('sidebarOverlay');
-  const toggleBtn    = document.getElementById('sidebarToggle');
-  const closeBtn     = document.getElementById('sidebarClose');
+async function initSidebar() {
+  const sidebar   = document.getElementById('sidebar');
+  const overlay   = document.getElementById('sidebarOverlay');
+  const toggleBtn = document.getElementById('sidebarToggle');
+  const closeBtn  = document.getElementById('sidebarClose');
 
-  function openSidebar() {
-    sidebar.classList.add('open');
-    overlay.classList.remove('d-none');
-  }
-  function closeSidebar() {
-    sidebar.classList.remove('open');
-    overlay.classList.add('d-none');
-  }
-
+  function openSidebar()  { sidebar?.classList.add('open');    overlay?.classList.remove('d-none'); }
+  function closeSidebar() { sidebar?.classList.remove('open'); overlay?.classList.add('d-none'); }
   toggleBtn?.addEventListener('click', openSidebar);
   closeBtn?.addEventListener('click', closeSidebar);
   overlay?.addEventListener('click', closeSidebar);
+
+  // Fetch menu from DB
+  try {
+    const res  = await fetch('/api/admin-menu');
+    const data = await res.json();
+    if (!data.success || !data.menu) return;
+
+    const currentPage = window.location.pathname.split('/').pop() || 'dashboard.html';
+    const nav = sidebar?.querySelector('.sidebar-nav');
+    if (!nav) return;
+
+    // Check if current page is allowed
+    const allowed = data.menu.find(m => m.href === currentPage);
+    const role = window._adminRole || '';
+    if (!allowed && role !== 'super_admin') {
+      const first = data.menu[0];
+      if (first) { window.location.href = first.href; return; }
+    }
+
+    // Remove existing hardcoded links (keep divider + bottom links)
+    nav.querySelectorAll('a.sidebar-link').forEach(el => {
+      if (!el.getAttribute('target')) el.remove();
+    });
+
+    // Build menu from DB
+    const divider = nav.querySelector('.sidebar-divider');
+    data.menu.forEach(item => {
+      const a = document.createElement('a');
+      a.href = item.href;
+      a.className = 'sidebar-link' + (item.href === currentPage ? ' active' : '');
+      a.innerHTML = '<i class="bi ' + item.icon + '"></i><span>' + item.label + '</span>';
+      if (divider) nav.insertBefore(a, divider);
+      else nav.appendChild(a);
+    });
+  } catch(e) { console.warn('Menu load failed', e.message); }
 }
 
 // ── Logout ──────────────────────────────────────────────────────
