@@ -164,7 +164,10 @@
             <div class="admin-widget mb-3">
               <h6 class="widget-title">Featured Image</h6>
               <input type="file" class="form-control form-control-sm" id="field-image" accept="image/*" onchange="uploadImage(this)">
-              <button type="button" class="btn btn-primary btn-sm w-100 mt-2" id="btn-ai-img" onclick="generateAIImage()"><i class="bi bi-image me-1"></i>Find Stock Photos</button>
+              <div class="input-group mt-2">
+    <input type="text" class="form-control form-control-sm" id="custom-search" placeholder="Or type keywords e.g. Riyadh office..." onkeydown="if(event.key==='Enter')generateAIImage()">
+    <button type="button" class="btn btn-primary btn-sm" id="btn-ai-img" onclick="generateAIImage()"><i class="bi bi-search"></i></button>
+  </div>
               <div id="ai-img-msg" class="mt-1" style="font-size:.75rem"></div>
               <div id="img-picker" class="img-picker" style="display:none"></div>
               <button type="button" class="btn btn-success btn-sm w-100 mt-1 d-none" id="btn-use-img" onclick="useSelectedImage()"><i class="bi bi-check-lg me-1"></i>Use Selected Photo</button>
@@ -247,9 +250,10 @@ async function generateAIImage() {
   picker.style.display = 'none';
   document.getElementById('btn-use-img').classList.add('d-none');
   try {
+    const customSearch = document.getElementById('custom-search').value.trim();
     const res = await fetch('/api/admin/blog/generate-image', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ title, excerpt })
+      body: JSON.stringify({ title, excerpt, customSearch })
     });
     const data = await res.json();
     if (data.success && data.photos && data.photos.length) {

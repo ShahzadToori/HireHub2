@@ -277,6 +277,8 @@ router.post('/api/admin/blog/generate-image', requireAdmin, async (req, res) => 
     else if (text.match(/certif|qualif|training|course|skill/)) query = 'professional certification training education';
     else if (text.match(/negoti|offer|package|benefit/)) query = 'business negotiation deal handshake';
     else if (text.match(/tech|it|software|digital|cyber|cloud|data|ai/)) query = 'technology software developer coding';
+    if (req.body.customSearch && req.body.customSearch.trim()) query = req.body.customSearch.trim();
+    if (req.body.customSearch && req.body.customSearch.trim()) query = req.body.customSearch.trim();
 
     const url = 'https://api.unsplash.com/search/photos?query=' + encodeURIComponent(query) + '&per_page=5&orientation=landscape&client_id=' + key;
     const r = await fetch(url);
