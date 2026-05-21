@@ -41,10 +41,33 @@
 <body>
 <div class="admin-wrapper">
   <!-- Sidebar injected by admin JS -->
-  <div class="admin-sidebar" id="adminSidebar"></div>
+  <aside class="admin-sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <img src="/JobOrbitFavicon.svg" alt="JobOrbit" class="sidebar-brand" style="height:40px">
+    <span class="sidebar-brand">JobOrbit</span>
+    <button class="btn-sidebar-close d-lg-none" id="sidebarClose"><i class="bi bi-x-lg"></i></button>
+  </div>
+  <nav class="sidebar-nav">
+    <a href="dashboard.html"    class="sidebar-link"><i class="bi bi-speedometer2"></i><span>Dashboard</span></a>
+    <a href="jobs.html"         class="sidebar-link"><i class="bi bi-briefcase"></i><span>All Jobs</span></a>
+    <a href="add-job.html"      class="sidebar-link"><i class="bi bi-plus-circle"></i><span>Add Job</span></a>
+    <a href="bulk-upload.html"  class="sidebar-link"><i class="bi bi-upload"></i><span>Bulk Upload</span></a>
+    <a href="categories.html"   class="sidebar-link"><i class="bi bi-tag"></i><span>Categories</span></a>
+    <a href="blog.html"         class="sidebar-link active"><i class="bi bi-journal-richtext"></i><span>Blog</span></a>
+    <a href="messages.html"     class="sidebar-link"><i class="bi bi-envelope"></i><span>Messages</span></a>
+    <a href="monetization.html" class="sidebar-link"><i class="bi bi-currency-dollar"></i><span>Monetization</span></a>
+    <a href="settings.html"     class="sidebar-link"><i class="bi bi-gear"></i><span>Settings</span></a>
+    <a href="form-builder.html" class="sidebar-link"><i class="bi bi-ui-checks-grid"></i><span>Form Builder</span></a>
+    <hr class="sidebar-divider">
+    <a href="/" class="sidebar-link" target="_blank"><i class="bi bi-box-arrow-up-right"></i><span>View Site</span></a>
+    <button class="sidebar-link sidebar-btn" id="logoutBtn"><i class="bi bi-box-arrow-right"></i><span>Logout</span></button>
+  </nav>
+</aside>
+<div class="sidebar-overlay d-lg-none d-none" id="sidebarOverlay"></div>
 
   <div class="admin-main">
     <div class="admin-topbar">
+      <button class="btn-hamburger d-lg-none" id="sidebarToggle"><i class="bi bi-list fs-4"></i></button>
       <h4 class="admin-page-title" id="panel-title"><i class="bi bi-journal-richtext me-2"></i>Blog Manager</h4>
       <div class="d-flex gap-2">
         <button class="btn btn-primary btn-sm" id="btn-new" onclick="openEditor(null)">
@@ -88,7 +111,7 @@
         <table class="table admin-table" id="articles-table">
           <thead>
             <tr>
-              <th>Title</th>
+              <th style="width:60px">Image</th><th>Title</th>
               <th class="d-none d-md-table-cell">Category</th>
               <th>Status</th>
               <th class="d-none d-md-table-cell">Views</th>
@@ -377,13 +400,15 @@ async function loadArticles() {
 function renderList(articles) {
   const tbody = document.getElementById('articles-tbody');
   if (!articles.length) {
-    tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted">No articles yet. Click "New Article" to create one.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-muted">No articles yet. Click "New Article" to create one.</td></tr>';
     return;
   }
   tbody.innerHTML = articles.map(a => {
     const date = new Date(a.created_at).toLocaleDateString('en-GB');
     const badge = `<span class="status-badge status-${a.status}">${a.status}</span>`;
+    const imgThumb = a.featured_image ? `<img src="${a.featured_image}" style="width:50px;height:35px;object-fit:cover;border-radius:4px">` : `<div style="width:50px;height:35px;background:var(--surface);border-radius:4px;display:flex;align-items:center;justify-content:center"><i class="bi bi-image text-muted" style="font-size:.7rem"></i></div>`;
     return `<tr class="article-row" onclick="openEditor(${a.id})">
+      <td onclick="event.stopPropagation()">${imgThumb}</td>
       <td><div style="font-weight:600;font-size:.88rem">${a.title}</div><div style="font-size:.73rem;color:var(--text-muted)">/blog/${a.slug}</div></td>
       <td class="d-none d-md-table-cell"><span style="font-size:.82rem">${a.category}</span></td>
       <td>${badge}</td>
@@ -410,6 +435,7 @@ function filterList() {
 
 /* ── Open editor ──────────────────────────────────────────── */
 async function openEditor(id) {
+  window._listScrollY = window.scrollY;
   document.getElementById('list-panel').style.display = 'none';
   document.getElementById('editor-panel').style.display = 'block';
   document.getElementById('btn-new').classList.add('d-none');
@@ -459,6 +485,7 @@ async function openEditor(id) {
 
 function showList() {
   document.getElementById('list-panel').style.display = 'block';
+  setTimeout(function(){ window.scrollTo({top: window._listScrollY || 0, behavior:'instant'}); }, 50);
   document.getElementById('editor-panel').style.display = 'none';
   document.getElementById('btn-new').classList.remove('d-none');
   document.getElementById('btn-back').classList.add('d-none');
@@ -565,7 +592,10 @@ function updateCharCount(el, countId, max) {
   span.className = 'char-count' + (len > max * .9 ? (len >= max ? ' over' : ' warn') : '');
 }
 
-loadArticles();
+(async function(){
+  await requireAuth();
+  loadArticles();
+})();
 </script>
 </body>
 </html>

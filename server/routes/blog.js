@@ -119,7 +119,7 @@ router.get('/api/blog/:slug', async (req, res) => {
 router.get('/api/admin/blog', requireAdmin, async (req, res) => {
   try {
     const [rows] = await db.query(
-      `SELECT id, title, slug, category, status, author, views, created_at, published_at
+      `SELECT id, title, slug, category, status, author, views, created_at, published_at, featured_image
        FROM blog_articles ORDER BY created_at DESC`
     );
     res.json({ success: true, articles: rows });
