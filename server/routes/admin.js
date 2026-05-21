@@ -186,7 +186,8 @@ router.post('/jobs', async (req, res) => {
        featured_until || null, slug]
     );
 
-    res.json({ success: true, message: 'Job posted successfully', slug });
+    pingSitemaps();
+      res.json({ success: true, message: 'Job posted successfully', slug });
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: 'Server error' });

@@ -1,22 +1,16 @@
-# HireHub – robots.txt
-# ──────────────────────────────────────────
-
 User-agent: *
 Allow: /
 Allow: /job/
+Allow: /blog/
 Allow: /contact.html
 Allow: /sitemap.xml
 Allow: /feed.rss
-
-# Block admin and API from indexing
 Disallow: /admin/
 Disallow: /api/
 Disallow: /uploads/
 
-# Sitemap location
-Sitemap: /sitemap.xml
+Sitemap: https://joborbit.org/sitemap.xml
 
-# ── Specific crawler settings ──────────────
 User-agent: Googlebot
 Allow: /
 Crawl-delay: 1

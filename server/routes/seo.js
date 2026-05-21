@@ -47,7 +47,7 @@ async function getSiteUrl() {
 }
 
 async function getSiteName() {
-  return getSetting('site_name', 'HireHub');
+  return getSetting('site_name', 'JobOrbit');
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -72,6 +72,14 @@ router.get('/sitemap.xml', async (req, res) => {
          LEFT JOIN jobs j ON j.category_id = c.id AND j.status = 'active'
          GROUP BY c.id, c.slug
          ORDER BY c.name`
+    );
+
+    const [blogs] = await db.query(
+      `SELECT slug, updated_at, created_at
+         FROM blog_articles
+        WHERE status = 'published'
+        ORDER BY created_at DESC
+        LIMIT 1000`
     );
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -106,6 +114,22 @@ ${jobs.map(j => `  <url>
     <priority>0.9</priority>
     <lastmod>${new Date(j.updated_at || j.created_at).toISOString().split('T')[0]}</lastmod>
   </url>`).join('\n')}
+
+  <!-- ── Blog Articles ── -->
+${blogs.map(b => `  <url>
+    <loc>${siteUrl}/blog/${xe(b.slug)}</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>${new Date(b.updated_at || b.created_at).toISOString().split('T')[0]}</lastmod>
+  </url>`).join('\n')}
+
+  <!-- ── Blog Index ── -->
+  <url>
+    <loc>${siteUrl}/blog/</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <lastmod>${today}</lastmod>
+  </url>
 
 </urlset>`;
 
@@ -239,7 +263,7 @@ router.get('/job/:slug', async (req, res, next) => {
       identifier: { '@type': 'PropertyValue', name: siteName, value: String(job.id) },
       hiringOrganization: {
         '@type': 'Organization',
-        name: job.company,
+        name: job.company || 'Company Name Not Provided',
         sameAs: siteUrl
       },
       jobLocation: {
