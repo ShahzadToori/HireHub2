@@ -122,7 +122,37 @@ function buildPagination(pages){
   const pag=document.getElementById('pagination');
   pag.innerHTML='';
   if(pages<=1)return;
-  for(let i=1;i<=pages;i++) pag.innerHTML+=`<li class="page-item ${i===currentPage?'active':''}"><button class="page-link" onclick="loadArticles(${i})">${i}</button></li>`;
+
+  // Prev button
+  pag.innerHTML+=`<li class="page-item ${currentPage===1?'disabled':''}">
+    <button class="page-link" onclick="changePage(${currentPage-1})">&laquo;</button></li>`;
+
+  // Show max 5 page numbers around current
+  let start=Math.max(1,currentPage-2);
+  let end=Math.min(pages,start+4);
+  if(end-start<4)start=Math.max(1,end-4);
+
+  if(start>1)pag.innerHTML+=`<li class="page-item"><button class="page-link" onclick="changePage(1)">1</button></li>
+    ${start>2?'<li class="page-item disabled"><span class="page-link">…</span></li>':''}`;
+
+  for(let i=start;i<=end;i++)
+    pag.innerHTML+=`<li class="page-item ${i===currentPage?'active':''}">
+      <button class="page-link" onclick="changePage(${i})">${i}</button></li>`;
+
+  if(end<pages)pag.innerHTML+=`${end<pages-1?'<li class="page-item disabled"><span class="page-link">…</span></li>':''}
+    <li class="page-item"><button class="page-link" onclick="changePage(${pages})">${pages}</button></li>`;
+
+  // Next button
+  pag.innerHTML+=`<li class="page-item ${currentPage===pages?'disabled':''}">
+    <button class="page-link" onclick="changePage(${currentPage+1})">&raquo;</button></li>`;
+}
+
+function changePage(page){
+  if(page<1)return;
+  loadArticles(page);
+  // Smooth scroll to articles grid, not top of page
+  const grid=document.getElementById('articles-grid');
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 async function loadCategories(){
   const res=await fetch('/api/blog/categories');
