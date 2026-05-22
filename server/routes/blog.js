@@ -58,7 +58,7 @@ router.get('/api/blog', async (req, res) => {
       `SELECT id, title, slug, excerpt, featured_image, category, tags,
               author, reading_time, views, published_at, created_at
        FROM blog_articles ${where}
-       ORDER BY published_at DESC
+       ORDER BY published_at DESC, id DESC
        LIMIT ? OFFSET ?`,
       [...params, limit, offset]
     );
@@ -82,6 +82,26 @@ router.get('/api/blog/categories', async (req, res) => {
   } catch (err) {
     res.status(500).json({ success: false, error: 'Server error' });
   }
+});
+
+/* GET /api/blog/hero-image */
+let _heroCache = null, _heroTime = 0;
+router.get('/api/blog/hero-image', async (req, res) => {
+  try {
+    if (_heroCache && Date.now() - _heroTime < 86400000) return res.json({ success:true, url:_heroCache });
+    const key = process.env.UNSPLASH_ACCESS_KEY;
+    if (!key) return res.json({ success:false });
+    const r = await fetch('https://api.unsplash.com/search/photos?query=saudi+arabia+riyadh+skyline&per_page=5&orientation=landscape&client_id=' + key);
+    const d = await r.json();
+    if (d.results && d.results.length) {
+      const photo = d.results[Math.floor(Math.random() * d.results.length)];
+      _heroCache = photo.urls.regular;
+      _heroTime = Date.now();
+      fetch(photo.links.download_location + '?client_id=' + key).catch(()=>{});
+      return res.json({ success:true, url:_heroCache });
+    }
+    res.json({ success:false });
+  } catch(e) { res.json({ success:false }); }
 });
 
 /* GET /api/blog/:slug — single article */

@@ -13,7 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
   <style>
-    .blog-hero{background:linear-gradient(135deg,#0d1117 0%,#161b22 60%,#0f2744 100%);padding:4rem 0 3rem;text-align:center;position:relative;overflow:hidden}
+    .blog-hero{background:linear-gradient(135deg,#0d1117 0%,#161b22 60%,#0f2744 100%);padding:4rem 0 3rem;text-align:center;position:relative;overflow:hidden;background-size:cover;background-position:center;background-blend-mode:overlay}
     .blog-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(15,98,254,.18) 0%,transparent 70%)}
     .blog-hero-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.75rem,4vw,2.75rem);color:#fff;margin-bottom:.6rem;position:relative}
     .blog-hero-sub{color:rgba(255,255,255,.6);font-size:.95rem;max-width:540px;margin:0 auto;position:relative}
@@ -148,6 +148,7 @@ function buildPagination(pages){
 }
 
 function changePage(page){
+  history.replaceState(null,'','#page='+page);
   if(page<1)return;
   loadArticles(page);
   // Smooth scroll to articles grid, not top of page
@@ -188,7 +189,20 @@ function debounceSearch(){
   clearTimeout(searchTimer);
   searchTimer=setTimeout(()=>{currentSearch=document.getElementById('searchInput').value.trim();loadArticles(1);},350);
 }
-loadFeatured();loadCategories();loadArticles();
+async function loadHeroImage(){
+  try {
+    const r = await fetch('/api/blog/hero-image');
+    const d = await r.json();
+    if (d.url) {
+      const hero = document.querySelector('.blog-hero');
+      hero.style.backgroundImage = 'linear-gradient(135deg,rgba(13,17,23,.85) 0%,rgba(15,39,68,.8) 100%),url(' + d.url + ')';
+    }
+  } catch(e) {}
+}
+
+const hashPage = parseInt(window.location.hash.replace('#page=','')) || 1;
+loadFeatured();loadCategories();
+loadHeroImage();loadArticles(hashPage);
 </script>
 </body>
 </html>

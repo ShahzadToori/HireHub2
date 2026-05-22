@@ -19,6 +19,7 @@ const blacklistRouter = require('./routes/blacklist');
 const htmlLayout = require('./middleware/htmlLayout');
 const blogRoutes    = require('./routes/blog');
 const blogSeoRoutes = require('./routes/blog-routes');
+const adminUsersRoutes = require('./routes/admin-users');
 
 
 const app  = express();
@@ -71,6 +72,7 @@ app.use(session({
 app.use(htmlLayout);
 app.use(blogSeoRoutes);
 app.use(blogRoutes);
+app.use(adminUsersRoutes);
 app.use(express.static(path.join(__dirname, '../public')));
 app.use('/admin', express.static(path.join(__dirname, '../admin')));
 
