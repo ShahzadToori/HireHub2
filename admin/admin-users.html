@@ -410,16 +410,29 @@ async function loadMenuItems() {
 
 function renderMenuList(items) {
   const list = document.getElementById('menu-list');
-  list.innerHTML = items.map(item => `
-    <div class="menu-row" draggable="true" data-id="${item.id}" data-order="${item.order_num}"
-         ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="dropItem(event)" ondragend="dragEnd(event)">
-      <span class="drag-handle"><i class="bi bi-grip-vertical"></i></span>
-      <input type="checkbox" class="menu-toggle" ${item.is_active ? 'checked' : ''} onchange="toggleMenu(${item.id}, this.checked)" title="Show/Hide">
+  list.innerHTML = items.map((item, idx) => `
+    <div class="menu-row" data-id="${item.id}">
+      <div class="d-flex flex-column gap-1">
+        <button class="btn btn-sm btn-outline-secondary p-0" style="width:26px;height:22px" onclick="moveItem(${idx},-1)" ${idx===0?'disabled':''}><i class="bi bi-chevron-up" style="font-size:.65rem"></i></button>
+        <button class="btn btn-sm btn-outline-secondary p-0" style="width:26px;height:22px" onclick="moveItem(${idx},1)" ${idx===items.length-1?'disabled':''}><i class="bi bi-chevron-down" style="font-size:.65rem"></i></button>
+      </div>
+      <div class="form-check form-switch mb-0 ms-1">
+        <input class="form-check-input" type="checkbox" role="switch" ${item.is_active ? 'checked' : ''} onchange="toggleMenu(${item.id}, this.checked)" style="width:2.2em;height:1.2em;cursor:pointer">
+      </div>
       <i class="bi ${item.icon}" style="font-size:1.1rem;width:20px;text-align:center"></i>
       <span style="flex:1;font-weight:500">${item.label}</span>
-      <span style="font-size:.75rem;color:var(--text-muted)">${item.href}</span>
+      <span class="d-none d-md-inline" style="font-size:.75rem;color:var(--text-muted)">${item.href}</span>
       <button class="btn btn-sm btn-outline-secondary" onclick='openMenuModal(${JSON.stringify(item)})'><i class="bi bi-pencil"></i></button>
     </div>`).join('');
+}
+
+function moveItem(idx, dir) {
+  const newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= allMenuItems.length) return;
+  const tmp = allMenuItems[idx];
+  allMenuItems[idx] = allMenuItems[newIdx];
+  allMenuItems[newIdx] = tmp;
+  renderMenuList(allMenuItems);
 }
 
 function dragStart(e) {
@@ -446,8 +459,7 @@ function dropItem(e) { e.preventDefault(); }
 function dragEnd(e) { dragSrc.classList.remove('dragging'); dragSrc = null; }
 
 async function saveMenuOrder() {
-  const rows = [...document.querySelectorAll('#menu-list .menu-row')];
-  const order = rows.map((row, i) => ({ id: parseInt(row.dataset.id), order_num: i + 1 }));
+  const order = allMenuItems.map((item, i) => ({ id: item.id, order_num: i + 1 }));
   const res  = await fetch('/api/admin-menu/reorder', {
     method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ order })
   });
@@ -460,12 +472,15 @@ async function saveMenuOrder() {
 }
 
 async function toggleMenu(id, active) {
-  const item = allMenuItems.find(m => m.id === id);
-  if (!item) return;
-  await fetch('/api/admin-menu/' + id, {
+  const item = allMenuItems.find(m => String(m.id) === String(id));
+  if (!item) { console.log('item not found', id, allMenuItems.map(m=>m.id)); return; }
+  item.is_active = active ? 1 : 0;
+  const res = await fetch('/api/admin-menu/' + id, {
     method: 'PUT', headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ label: item.label, icon: item.icon, href: item.href, order_num: item.order_num, is_active: active })
+    body: JSON.stringify({ label: item.label, icon: item.icon, href: item.href, order_num: item.order_num, is_active: active ? 1 : 0 })
   });
+  const data = await res.json();
+  if (!data.success) alert('Failed: ' + (data.error || data.message));
 }
 
 function openMenuModal(item) {
