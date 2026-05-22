@@ -55,8 +55,11 @@ const $$ = (sel, ctx = document) => ctx.querySelectorAll(sel);
 // ── Date formatting ────────────────────────────────────────────
 function timeAgo(dateStr) {
   const diff = Date.now() - new Date(dateStr).getTime();
-  const days = Math.floor(diff / 86400000);
-  if (days === 0) return 'Today';
+  const mins  = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days  = Math.floor(diff / 86400000);
+  if (mins < 60)  return mins <= 1 ? 'Just now' : mins + 'm ago';
+  if (hours < 24) return hours + 'h ago';
   if (days === 1) return 'Yesterday';
   if (days < 7)  return `${days}d ago`;
   if (days < 30) return `${Math.floor(days/7)}w ago`;
