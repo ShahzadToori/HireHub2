@@ -100,11 +100,11 @@
       <!-- Filter / search -->
       <div class="d-flex gap-2 mb-3 flex-wrap">
         <input type="text" class="form-control form-control-sm" style="max-width:260px" id="list-search" placeholder="Search articles…" oninput="filterList()">
-        <select class="form-select form-select-sm" style="max-width:150px" id="list-status" onchange="filterList()">
+        <div class="d-flex gap-2"><select id="list-sort" class="form-select form-select-sm" onchange="sortList()" style="max-width:140px"><option value="date">Latest</option><option value="views">Most Viewed</option></select><select class="form-select form-select-sm" style="max-width:150px" id="list-status" onchange="filterList()">
           <option value="">All Status</option>
           <option value="published">Published</option>
           <option value="draft">Draft</option>
-        </select>
+        </select></div>
       </div>
 
       <div class="admin-table-wrap">
@@ -114,7 +114,7 @@
               <th style="width:60px">Image</th><th>Title</th>
               <th class="d-none d-md-table-cell">Category</th>
               <th>Status</th>
-              <th class="d-none d-md-table-cell">Views</th>
+              <th>Views</th>
               <th class="d-none d-md-table-cell">Date</th>
               <th>Actions</th>
             </tr>
@@ -412,7 +412,7 @@ function renderList(articles) {
       <td><div style="font-weight:600;font-size:.88rem">${a.title}</div><div style="font-size:.73rem;color:var(--text-muted)">/blog/${a.slug}</div></td>
       <td class="d-none d-md-table-cell"><span style="font-size:.82rem">${a.category}</span></td>
       <td>${badge}</td>
-      <td class="d-none d-md-table-cell"><span style="font-size:.82rem">${(a.views||0).toLocaleString()}</span></td>
+      <td><span style="font-size:.82rem;font-weight:600;color:var(--primary)">${(a.views||0).toLocaleString()} <i class="bi bi-eye" style="font-size:.7rem"></i></span></td>
       <td class="d-none d-md-table-cell"><span style="font-size:.82rem">${date}</span></td>
       <td onclick="event.stopPropagation()">
         <button class="btn btn-sm btn-outline-primary me-1" onclick="openEditor(${a.id})"><i class="bi bi-pencil"></i></button>
@@ -421,6 +421,12 @@ function renderList(articles) {
       </td>
     </tr>`;
   }).join('');
+}
+
+function sortList() {
+  const sort = document.getElementById('list-sort').value;
+  const sorted = [...allArticles].sort((a,b) => sort === 'views' ? (b.views||0)-(a.views||0) : new Date(b.created_at)-new Date(a.created_at));
+  renderList(sorted);
 }
 
 function filterList() {
