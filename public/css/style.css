@@ -906,7 +906,7 @@ img { max-width: 100%; }
   background:    var(--secondary);
   color:         rgba(255,255,255,.6);
   padding:       3rem 0 2rem;
-  margin-top:    4rem;
+  margin-top:    1.5rem;
 }
 
 [data-theme="dark"] .site-footer { background: #0a0d12; }
@@ -1085,3 +1085,6 @@ img { max-width: 100%; }
     padding-top: .15rem;
   }
 }
+
+.footer-social { color: rgba(255,255,255,.5); font-size: 1.2rem; transition: color .2s; }
+.footer-social:hover { color: #fff; }

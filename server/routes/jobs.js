@@ -172,16 +172,16 @@ router.get('/cities', async (req, res) => {
 // GET /api/jobs/job-of-day  – Phase 6: featured job of the day
 router.get('/job-of-day', async (req, res) => {
   try {
-    // Prefer featured/sponsored jobs, ordered by views
+    // Prefer featured/sponsored jobs from last 7 days
     let [rows] = await db.query(
       `SELECT j.id, j.title, j.company, j.location, j.job_type,
               j.slug, j.created_at, j.salary, j.visa_sponsored,
               j.whatsapp, j.phone, j.email, c.name AS category
          FROM jobs j JOIN categories c ON j.category_id = c.id
         WHERE j.status = 'active' AND (j.featured = 1 OR j.sponsored = 1)
-        ORDER BY j.views DESC, j.created_at DESC LIMIT 1`
+          AND j.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+        ORDER BY j.created_at DESC LIMIT 1`
     );
-    // Fallback to most-viewed active job
     if (rows.length === 0) {
       [rows] = await db.query(
         `SELECT j.id, j.title, j.company, j.location, j.job_type,
@@ -189,7 +189,7 @@ router.get('/job-of-day', async (req, res) => {
                 j.whatsapp, j.phone, j.email, c.name AS category
            FROM jobs j JOIN categories c ON j.category_id = c.id
           WHERE j.status = 'active'
-          ORDER BY j.views DESC, j.created_at DESC LIMIT 1`
+          ORDER BY j.created_at DESC LIMIT 1`
       );
     }
     if (rows.length === 0) return res.json({ success: false });

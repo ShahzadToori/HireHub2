@@ -276,6 +276,7 @@
               <option value="Freelance">Freelance</option>
               <option value="Remote">Remote</option>
             </select>
+            <button type="button" class="filter-pill" id="moreFiltersBtn" onclick="toggleMoreFilters()"><i class="bi bi-sliders me-1"></i> More Filters</button><div id="extraFilters" style="display:none;width:100%;flex-wrap:wrap;gap:.5rem;margin-top:.5rem">
             <select id="salaryFilter" class="filter-pill" aria-label="Filter by salary">
               <option value="">Any Salary</option>
               <option value="0-5000">Under SAR 5,000</option>
@@ -300,6 +301,7 @@
               <option value="title">A–Z</option>
               <option value="salary_high">Salary: High to Low</option>
             </select>
+            </div>
             <button type="button" class="btn-clear-filters d-none" id="clearFilters">
               <i class="bi bi-x-circle me-1"></i>Clear <span id="filterCount"></span>
             </button>
@@ -353,8 +355,9 @@
       <span class="section-tag">Browse by</span>
       <h2 class="section-title">Category</h2>
     </div>
-    <div class="categories-scroll" id="categoryChips" role="list">
-      <!-- Injected by JS -->
+    <div class="d-flex gap-2 justify-content-center">
+      <select id="categoryChips" class="form-select form-select-lg" style="max-width:380px;border-radius:50px;padding:.65rem 1.5rem;font-weight:600;font-size:1rem"></select>
+      <button class="btn btn-primary px-4" style="border-radius:50px;font-weight:700" onclick="filterByCategory(document.getElementById('categoryChips').value)">Go</button>
     </div>
   </div>
 </section>
@@ -362,7 +365,7 @@
 <!-- ══════════════════════════════════════════════
      JOBS BY CITY
 ════════════════════════════════════════════════ -->
-<section class="cities-section py-4" id="cities" aria-label="Jobs by City">
+<section class="cities-section py-4 d-none" id="cities" aria-label="Jobs by City">
   <div class="container">
     <div class="section-header mb-4">
       <span class="section-tag">📍 Browse by</span>

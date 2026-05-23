@@ -389,24 +389,15 @@ async function loadCategories() {
     $('#stat-cats').textContent = state.categories.length;
 
     const chipsContainer = $('#categoryChips');
-    chipsContainer.innerHTML = '';
-
-    const allChip = document.createElement('button');
-    allChip.className = 'category-chip active';
-    allChip.setAttribute('role', 'listitem');
-    allChip.innerHTML = `<i class="bi bi-grid" aria-hidden="true"></i> All <span class="cat-count">${state.categories.reduce((a,c)=>a+c.count,0)}</span>`;
-    allChip.addEventListener('click', () => filterByCategory(''));
-    chipsContainer.appendChild(allChip);
-
-    state.categories.forEach(c => {
-      const chip = document.createElement('button');
-      chip.className    = 'category-chip';
-      chip.dataset.slug = c.slug;
-      chip.setAttribute('role', 'listitem');
-      chip.innerHTML    = `${c.name} <span class="cat-count">${c.count}</span>`;
-      chip.addEventListener('click', () => filterByCategory(c.slug));
-      chipsContainer.appendChild(chip);
-    });
+    if (chipsContainer) {
+      chipsContainer.innerHTML = '<option value="">🗂 All Categories</option>';
+      state.categories.filter(c => c.count >= 5).forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.slug;
+        opt.textContent = c.name + ' (' + c.count + ')';
+        chipsContainer.appendChild(opt);
+      });
+    }
 
     const sidebarCats = $('#sidebarCats');
     state.categories.forEach(c => {
@@ -419,13 +410,7 @@ async function loadCategories() {
     // Sync with URL param if set
     if (state.filters.category) {
       catFilter.value = state.filters.category;
-      $$('.category-chip').forEach(chip => {
-        chip.classList.toggle('active',
-          state.filters.category === ''
-            ? !chip.dataset.slug
-            : chip.dataset.slug === state.filters.category
-        );
-      });
+      if (chipsContainer) chipsContainer.value = state.filters.category;
     }
   } catch (e) {
     console.warn('Categories load failed:', e);
@@ -435,9 +420,7 @@ async function loadCategories() {
 function filterByCategory(slug) {
   state.filters.category = slug;
   state.page = 1;
-  $$('.category-chip').forEach(chip => {
-    chip.classList.toggle('active', slug === '' ? !chip.dataset.slug : chip.dataset.slug === slug);
-  });
+  $('#categoryChips').value = slug;
   $('#categoryFilter').value = slug;
   loadJobs();
   toggleClearBtn();
@@ -1386,8 +1369,7 @@ window.resetFilters = function() {
   if (sf) sf.value = '';
   if (vf) vf.value = '';
   if (df) df.value = '';
-  $$('.category-chip').forEach(c => c.classList.remove('active'));
-  $$('.category-chip')[0]?.classList.add('active');
+  $('#categoryChips').value = '';
   toggleClearBtn();
   loadJobs();
 };
@@ -1598,3 +1580,16 @@ function initMobileNavActive() {
 }
 
 document.addEventListener('DOMContentLoaded', init);
+
+function toggleMoreFilters() {
+  const extra = document.getElementById('extraFilters');
+  const btn = document.getElementById('moreFiltersBtn');
+  const isHidden = extra.style.display === 'none' || extra.style.display === '';
+  extra.style.display = isHidden ? 'flex' : 'none';
+  extra.style.flexWrap = 'wrap';
+  extra.style.gap = '.5rem';
+  extra.style.marginTop = '.5rem';
+  btn.innerHTML = isHidden
+    ? '<i class="bi bi-sliders me-1"></i> Less Filters'
+    : '<i class="bi bi-sliders me-1"></i> More Filters';
+}
