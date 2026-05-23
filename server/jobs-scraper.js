@@ -46,6 +46,13 @@ async function saveJob(title, company, location, description, applyLink, jobType
     'SELECT id FROM jobs WHERE title=? AND company=? LIMIT 1', [title, company]
   );
   if (ex.length) return false;
+  // Skip jobs with old years in description (2020-2024)
+  const descText = (description || '') + ' ' + (title || '');
+  const oldYearMatch = descText.match(/\b(202[0-4])\b/);
+  if (oldYearMatch) {
+    console.log('[Scraper] Skipping old job (year ' + oldYearMatch[1] + '):', title);
+    return false;
+  }
   const catId = await getCategoryId(title);
   const slug  = makeSlug(title, company);
   await db.query(
@@ -94,6 +101,11 @@ async function runJSearch() {
       const data = await res.json();
       for (const j of (data.data || [])) {
         if (j.job_country && j.job_country !== 'Saudi Arabia') continue;
+        // Skip jobs older than 30 days
+        if (j.job_posted_at_timestamp) {
+          const daysOld = (Date.now()/1000 - j.job_posted_at_timestamp) / 86400;
+          if (daysOld > 30) continue;
+        }
         const salary = j.job_min_salary && j.job_max_salary
           ? `${j.job_min_salary}-${j.job_max_salary} ${j.job_salary_currency || 'SAR'}` : '';
         const type = j.job_employment_type === 'FULLTIME'   ? 'full-time'  :
