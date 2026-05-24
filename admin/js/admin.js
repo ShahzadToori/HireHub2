@@ -56,7 +56,13 @@ const adminApi = {
     }
     const res = await fetch(url, opts);
     return res.json();
-  }
+  },
+  patch: async (url, body = null) => {
+    const opts = { method: "PATCH" };
+    if (body) { opts.headers = { "Content-Type": "application/json" }; opts.body = JSON.stringify(body); }
+    const res = await fetch(url, opts);
+    return res.json();
+  },
 };
 
 // ── HTML escape ─────────────────────────────────────────────────

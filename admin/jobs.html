@@ -344,6 +344,7 @@ async function loadJobs(page = 1) {
         <td style="font-size:.8rem;color:var(--text-muted);white-space:nowrap">${timeAgo(job.created_at)}</td>
         <td>
           <div class="d-flex gap-1">
+            <button class="btn-action" onclick="toggleVerify(${job.id},this)" title="Toggle Verified" style="color:${job.verified?'#059669':'#9ca3af'}"><i class="bi bi-patch-check-fill"></i></button>
             <a href="edit-job.html?id=${job.id}" class="btn-action btn-action-edit" title="Edit"><i class="bi bi-pencil"></i></a>
             <button class="btn-action btn-action-del" onclick="deleteJob(${job.id},this)" title="Delete"><i class="bi bi-trash"></i></button>
           </div>
@@ -368,6 +369,7 @@ async function loadJobs(page = 1) {
         <div class="d-flex justify-content-between align-items-center">
           <small class="text-muted"><i class="bi bi-clock me-1"></i>${timeAgo(job.created_at)}</small>
           <div class="d-flex gap-1">
+            <button class="btn-action" onclick="toggleVerify(${job.id},this)" title="Toggle Verified" style="color:${job.verified?'#059669':'#9ca3af'}"><i class="bi bi-patch-check-fill"></i></button>
             <a href="edit-job.html?id=${job.id}" class="btn-action btn-action-edit" title="Edit"><i class="bi bi-pencil"></i></a>
             <button class="btn-action btn-action-del" onclick="deleteJob(${job.id},this)" title="Delete"><i class="bi bi-trash"></i></button>
           </div>
@@ -494,6 +496,14 @@ async function deleteJob(id, btn) {
     btn.closest('.job-mob-card')?.remove();
     selectedIds.delete(id); updateBulkBar();
   } catch { alert('Delete failed'); }
+}
+async function toggleVerify(id, btn) {
+  try {
+    const data = await adminApi.patch("/api/admin/jobs/" + id + "/verify");
+    const verified = data.verified;
+    btn.style.color = verified ? "#059669" : "#9ca3af";
+    btn.title = verified ? "Click to unverify" : "Click to verify";
+  } catch { alert("Failed to toggle verified status"); }
 }
 </script>
 </body>

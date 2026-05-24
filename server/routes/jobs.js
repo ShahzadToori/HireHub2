@@ -99,7 +99,7 @@ router.get('/', async (req, res) => {
               LEFT(j.description, 220) AS description,
               j.phone, j.whatsapp, j.email, j.map_link, j.apply_link,
               j.featured, j.sponsored, j.slug, j.created_at, j.views,
-              j.salary, j.visa_sponsored,
+              j.salary, j.visa_sponsored, j.verified,
               c.name AS category, c.slug AS category_slug
          FROM jobs j
          JOIN categories c ON j.category_id = c.id
@@ -132,7 +132,7 @@ router.get('/featured', async (req, res) => {
     const [jobs] = await db.query(
       `SELECT j.id, j.title, j.company, j.location, j.job_type,
               j.description, j.phone, j.whatsapp, j.email, j.map_link, j.extra_fields,
-              j.featured, j.sponsored, j.slug, j.created_at,
+              j.featured, j.sponsored, j.verified, j.slug, j.created_at,
               c.name AS category, c.slug AS category_slug
          FROM jobs j
          JOIN categories c ON j.category_id = c.id
@@ -187,7 +187,7 @@ router.get('/job-of-day', async (req, res) => {
     // Prefer featured/sponsored jobs from last 7 days
     let [rows] = await db.query(
       `SELECT j.id, j.title, j.company, j.location, j.job_type,
-              j.slug, j.created_at, j.salary, j.visa_sponsored,
+              j.slug, j.created_at, j.salary, j.visa_sponsored, j.verified,
               j.whatsapp, j.phone, j.email, c.name AS category
          FROM jobs j JOIN categories c ON j.category_id = c.id
         WHERE j.status = 'active' AND (j.featured = 1 OR j.sponsored = 1)
@@ -197,7 +197,7 @@ router.get('/job-of-day', async (req, res) => {
     if (rows.length === 0) {
       [rows] = await db.query(
         `SELECT j.id, j.title, j.company, j.location, j.job_type,
-                j.slug, j.created_at, j.salary, j.visa_sponsored,
+                j.slug, j.created_at, j.salary, j.visa_sponsored, j.verified,
                 j.whatsapp, j.phone, j.email, c.name AS category
            FROM jobs j JOIN categories c ON j.category_id = c.id
           WHERE j.status = 'active'

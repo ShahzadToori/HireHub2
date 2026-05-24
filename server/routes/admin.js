@@ -225,6 +225,19 @@ router.put('/jobs/:id', async (req, res) => {
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });
+// ── Toggle verified status ──────────────────────────────────────
+router.patch("/jobs/:id/verify", async (req, res) => {
+  try {
+    const [job] = await db.execute("SELECT verified FROM jobs WHERE id = ?", [req.params.id]);
+    if (!job.length) return res.status(404).json({ success: false, message: "Job not found" });
+    const newVal = job[0].verified ? 0 : 1;
+    await db.execute("UPDATE jobs SET verified = ? WHERE id = ?", [newVal, req.params.id]);
+    res.json({ success: true, verified: newVal });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
 
 // ── Delete single job ──────────────────────────────────────────
 router.delete('/jobs/:id', async (req, res) => {

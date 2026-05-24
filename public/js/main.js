@@ -575,6 +575,7 @@ function renderJobCard(job, isFeaturedSection = false) {
   const badges = [
     isSponsored  ? '<span class="badge-sponsored">📌 Sponsored</span>' : '',
     isFeatured   ? '<span class="badge-featured">⭐ Featured</span>'   : '',
+    job.verified == 1 ? '<span class="badge-verified"><i class="bi bi-patch-check-fill me-1"></i>Verified</span>' : '',
     urgencyBadge,
     `<span class="badge-category">${escHtml(job.category || '')}</span>`,
     `<span class="badge-type">${escHtml(job.job_type || 'Full-time')}</span>`,

@@ -433,6 +433,15 @@ img { max-width: 100%; }
   color:      white;
   font-size:  .7rem;
   padding:    .2rem .6rem;
+.badge-verified {
+  background: #059669;
+  color: white;
+  font-size: .7rem;
+  padding: .2rem .6rem;
+  border-radius: 4px;
+  font-weight: 600;
+  letter-spacing: .3px;
+}
   border-radius: 4px;
   font-weight: 600;
 }
