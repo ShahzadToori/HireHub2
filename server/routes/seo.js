@@ -665,6 +665,43 @@ const LANDING_PAGES = {
   }
 };
 
+const PAGE_FAQS = {
+  "aramco-jobs": [
+    { q: "How to apply for Aramco jobs?", a: "Browse Aramco job listings on JobOrbit and contact recruiters directly via WhatsApp or phone. No middlemen." },
+    { q: "What qualifications are needed for Aramco jobs?", a: "Aramco jobs require relevant technical certifications, experience in oil and gas, and often ARAMCO approval for roles like HSE and QC." },
+    { q: "Are there WPR jobs available in Aramco projects?", a: "Yes, Work Permit Receiver (WPR) jobs are frequently available in Aramco projects in Jubail, Yanbu and Ras Tanura." }
+  ],
+  "hse-jobs": [
+    { q: "What certifications are needed for HSE jobs in Saudi Arabia?", a: "Common certifications include NEBOSH, IOSH, OSHA, and first aid. Aramco projects often require additional safety training." },
+    { q: "What is the salary for HSE Officer jobs in Saudi Arabia?", a: "HSE Officer salaries in Saudi Arabia typically range from SAR 5,000 to SAR 15,000 depending on experience and project type." },
+    { q: "Are there fire watcher jobs available in Saudi Arabia?", a: "Yes, fire watcher positions are regularly available in industrial projects in Jubail, Yanbu and Dammam." }
+  ],
+  "qc-jobs": [
+    { q: "What qualifications are needed for QC Inspector jobs?", a: "QC Inspector roles typically require relevant technical certification, inspection experience, and knowledge of international standards like AWS, ASME, or ISO." },
+    { q: "What is the average salary for QC Inspector in Saudi Arabia?", a: "QC Inspector salaries in Saudi Arabia range from SAR 4,000 to SAR 12,000 depending on specialization and experience." },
+    { q: "What are the most in-demand QC jobs in Saudi Arabia?", a: "The most in-demand QC roles include Welding Inspector, Coating Inspector, Mechanical QC Inspector, and NDT Technician." }
+  ],
+  "wpr-jobs": [
+    { q: "What is a Work Permit Receiver (WPR)?", a: "A WPR is responsible for receiving and managing work permits in industrial facilities. They ensure all safety requirements are met before work begins." },
+    { q: "What qualifications are needed for WPR jobs?", a: "WPR jobs require safety training, knowledge of permit-to-work systems, and often Aramco or company-specific certification." },
+    { q: "Where are most WPR jobs located in Saudi Arabia?", a: "Most WPR jobs are in Jubail Industrial City, Yanbu, Ras Tanura, and Dhahran where major oil and gas facilities are located." }
+  ],
+  "shutdown-jobs": [
+    { q: "What are shutdown jobs in Saudi Arabia?", a: "Shutdown jobs are temporary positions during planned maintenance or turnaround of industrial facilities. They usually last 2-8 weeks with higher pay rates." },
+    { q: "Which cities have the most shutdown jobs in Saudi Arabia?", a: "Jubail, Yanbu, Ras Tanura, and Dammam are the main locations for shutdown and turnaround jobs in Saudi Arabia." },
+    { q: "How do I find shutdown jobs in Saudi Arabia?", a: "Browse JobOrbit daily for new shutdown job listings. Shutdown jobs are posted frequently especially before major plant turnarounds." }
+  ],
+  "jubail-jobs": [
+    { q: "What types of jobs are available in Jubail?", a: "Jubail Industrial City has many construction, HSE, QC, welding, rigging, instrumentation, and maintenance jobs." },
+    { q: "How can expatriates find jobs in Jubail?", a: "Expatriates can browse JobOrbit for Jubail job listings and contact recruiters directly. Many positions offer visa sponsorship." },
+    { q: "What is the average salary in Jubail Industrial City?", a: "Salaries in Jubail vary by role. Technical workers earn SAR 3,000-8,000, while engineers and supervisors earn SAR 8,000-20,000." }
+  ],
+  "transferable-iqama-jobs": [
+    { q: "What is a transferable iqama in Saudi Arabia?", a: "A transferable iqama allows expatriates to change employers without their current sponsor permission, giving more job flexibility." },
+    { q: "How do I find jobs for transferable iqama holders?", a: "Browse JobOrbit for local hiring jobs in Saudi Arabia that accept candidates with transferable iqama for immediate joining." },
+    { q: "What are the benefits of having a transferable iqama?", a: "With a transferable iqama you can join a new employer faster, negotiate better salary, and apply for local hire positions." }
+  ]
+};
 router.get('/:slug(aramco-jobs|hse-jobs|qc-jobs|wpr-jobs|shutdown-jobs|neom-jobs|oil-gas-jobs|jubail-jobs|dammam-jobs|riyadh-jobs|transferable-iqama-jobs|mep-jobs)', async (req, res) => {
   try {
     const page = LANDING_PAGES[req.params.slug];
@@ -729,6 +766,7 @@ router.get('/:slug(aramco-jobs|hse-jobs|qc-jobs|wpr-jobs|shutdown-jobs|neom-jobs
   <meta name="twitter:title" content="${he(page.title)}">
   <meta name="twitter:description" content="${he(page.desc)}">
   <script type="application/ld+json">${JSON.stringify(schema)}</script>
+  ${PAGE_FAQS[req.params.slug] ? `<script type="application/ld+json">${JSON.stringify({ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: PAGE_FAQS[req.params.slug].map(f => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) })}</script>` : ""}
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f8f9fa;color:#161616;line-height:1.65}
@@ -807,6 +845,7 @@ router.get('/:slug(aramco-jobs|hse-jobs|qc-jobs|wpr-jobs|shutdown-jobs|neom-jobs
   </div>
 </div>
 
+  ${(PAGE_FAQS[req.params.slug]||[]).length ? `<div style="max-width:860px;margin:0 auto;padding:0 1.25rem 2rem"><h2 style="font-size:1rem;font-weight:700;color:#0f172a;margin-bottom:1rem">Frequently Asked Questions</h2>${(PAGE_FAQS[req.params.slug]||[]).map(f=>"<div style=\"background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:1rem 1.25rem;margin-bottom:.65rem\"><div style=\"font-weight:700;font-size:.9rem;color:#0f172a;margin-bottom:.35rem\">" + f.q + "</div><div style=\"font-size:.85rem;color:#64748b\">" + f.a + "</div></div>").join("")}</div>` : ""}
 <footer>© ${new Date().getFullYear()} ${he(siteName)}. All rights reserved. | <a href="/">Browse All Jobs</a></footer>
 </body>
 </html>`;

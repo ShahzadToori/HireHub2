@@ -166,7 +166,9 @@ function injectSiteSchema() {
     name,
     url:         siteUrl,
     description: desc,
-    contactPoint: {
+    logo: { '@type': 'ImageObject', url: `${siteUrl}/JobOrbitFavicon.png` },
+          sameAs: ['https://linkedin.com/company/joborbit', 'https://instagram.com/joborbit'],
+          contactPoint: {
       '@type':      'ContactPoint',
       contactType:  'customer service',
       url:          `${siteUrl}/contact.html`
