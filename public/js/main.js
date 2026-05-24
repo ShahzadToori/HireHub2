@@ -569,13 +569,17 @@ function renderJobCard(job, isFeaturedSection = false) {
                      : isExpiring     ? '<span class="badge-urgency badge-expiring">⏰ Closing Soon</span>'
                      : isMaybeExpired ? '<span class="badge-urgency badge-expired">⚠ May Be Expired</span>'
                      : '';
+  const iqamaBadge = /transferable/i.test((job.title||"")+(job.description||"")) ? '<span class="card-visa-badge" style="background:rgba(16,185,129,.1);color:#059669;border-color:rgba(16,185,129,.3)"><i class="bi bi-file-earmark-check me-1"></i>Transferable Iqama</span>' : "";
+  const immediateBadge = /immediate/i.test((job.title||"")+(job.description||"")) ? '<span class="card-visa-badge" style="background:rgba(245,158,11,.1);color:#d97706;border-color:rgba(245,158,11,.3)"><i class="bi bi-lightning-fill me-1"></i>Immediate Joining</span>' : "";
 
   const badges = [
     isSponsored  ? '<span class="badge-sponsored">📌 Sponsored</span>' : '',
     isFeatured   ? '<span class="badge-featured">⭐ Featured</span>'   : '',
     urgencyBadge,
     `<span class="badge-category">${escHtml(job.category || '')}</span>`,
-    `<span class="badge-type">${escHtml(job.job_type || 'Full-time')}</span>`
+    `<span class="badge-type">${escHtml(job.job_type || 'Full-time')}</span>`,
+    iqamaBadge,
+    immediateBadge
   ].filter(Boolean).join('');
 
   // ── Salary badge ──────────────────────────────────────────
@@ -619,7 +623,7 @@ function renderJobCard(job, isFeaturedSection = false) {
       <button class="btn-report-job" onclick="reportJob('${job.id}','${escHtml(job.title).replace(/'/g,"\\'")}',event)" title="Report this listing" aria-label="Report job"><i class="bi bi-flag"></i></button>
       <div class="card-title">${escHtml(job.title)}</div>
       <div class="card-company"><i class="bi bi-building me-1"></i>${escHtml(job.company)}</div>
-      ${salaryHtml || visaHtml ? `<div class="card-highlights">${salaryHtml}${visaHtml}</div>` : ''}
+      ${salaryHtml || visaHtml ? `<div class="card-highlights">${salaryHtml}${visaHtml}</div>` : ""}
       <div class="card-meta">${locationHtml}</div>
       <p class="card-desc">${escHtml(job.description)}</p>
       <div class="card-footer-row">
@@ -662,7 +666,7 @@ function calcTrustScore(job) {
   if (score === 0) return null;
   if (score >= 70) return { level: 'high',   label: 'Transparent' };
   if (score >= 40) return { level: 'medium', label: 'Partial Info' };
-  return               { level: 'low',    label: 'Low Info' };
+  return               { level: 'low',    label: 'Basic Listing' };
 }
 
 async function loadCitiesSection() {
@@ -1605,6 +1609,7 @@ function toggleMoreFilters() {
 }
 
 function toggleQuickFilter(btn, key) {
+  // scroll after slight delay to let jobs load
   const active = btn.classList.toggle('active');
   state.filters[key] = active ? '1' : '';
   state.page = 1;
