@@ -23,7 +23,10 @@ const state = {
     sort:     'newest',
     salary:   '',   // Phase 1: salary range
     visa:     '',   // Phase 1: visa sponsorship
-    date:     ''    // Phase 1: days since posted
+    date:     "",   // Phase 1: days since posted
+    iqama:    "",   // Phase 2: transferable iqama
+    immediate:"",   // Phase 2: immediate joining
+    local:    ""    // Phase 2: local hiring
   }
 };
 
@@ -489,6 +492,9 @@ async function loadJobs() {
       salary:   state.filters.salary,
       visa:     state.filters.visa,
       date:     state.filters.date,
+      iqama:    state.filters.iqama,
+      immediate:state.filters.immediate,
+      local:    state.filters.local,
       page:     state.page,
       limit:    state.settings.jobs_per_page || 12
     });
@@ -1346,20 +1352,20 @@ function pagRange(cur, total) {
 function toggleClearBtn() {
   const hasFilter = state.filters.q || state.filters.location ||
                     state.filters.category || state.filters.type ||
-                    state.filters.salary || state.filters.visa || state.filters.date ||
+                    state.filters.salary || state.filters.visa || state.filters.date || state.filters.iqama || state.filters.immediate || state.filters.local ||
                     state.filters.sort !== 'newest';
   const btn = $('#clearFilters');
   btn.classList.toggle('d-none', !hasFilter);
   // Show active filter count
   const count = [state.filters.q, state.filters.location, state.filters.category,
-    state.filters.type, state.filters.salary, state.filters.visa, state.filters.date]
+    state.filters.type, state.filters.salary, state.filters.visa, state.filters.date, state.filters.iqama, state.filters.immediate, state.filters.local]
     .filter(Boolean).length;
   const countEl = document.getElementById('filterCount');
   if (countEl) countEl.textContent = count > 0 ? `(${count})` : '';
 }
 
 window.resetFilters = function() {
-  state.filters = { q: '', location: '', category: '', type: '', sort: 'newest', salary: '', visa: '', date: '' };
+  state.filters = { q: '', location: '', category: '', type: '', sort: 'newest', salary: '', visa: '', date: '', iqama: '', immediate: '', local: '' };
   state.page    = 1;
   $('#searchInput').value    = '';
   $('#locationInput').value  = '';
@@ -1372,6 +1378,7 @@ window.resetFilters = function() {
   if (sf) sf.value = '';
   if (vf) vf.value = '';
   if (df) df.value = '';
+  ['iqamaFilter','immediateFilter','localFilter'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('active'); });
   $('#categoryChips').value = '';
   toggleClearBtn();
   loadJobs();
@@ -1595,4 +1602,12 @@ function toggleMoreFilters() {
   btn.innerHTML = isHidden
     ? '<i class="bi bi-sliders me-1"></i> Less Filters'
     : '<i class="bi bi-sliders me-1"></i> More Filters';
+}
+
+function toggleQuickFilter(btn, key) {
+  const active = btn.classList.toggle('active');
+  state.filters[key] = active ? '1' : '';
+  state.page = 1;
+  loadJobs();
+  toggleClearBtn();
 }

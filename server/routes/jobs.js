@@ -70,6 +70,18 @@ router.get('/', async (req, res) => {
       }
     }
 
+    if (req.query.iqama === "1") {
+      where.push("(j.title LIKE ? OR j.description LIKE ?)");
+      params.push("%transferable%", "%transferable%");
+    }
+    if (req.query.immediate === "1") {
+      where.push("(j.title LIKE ? OR j.description LIKE ?)");
+      params.push("%immediate%", "%immediate joining%");
+    }
+    if (req.query.local === "1") {
+      where.push("(j.title LIKE ? OR j.description LIKE ?)");
+      params.push("%local hire%", "%local hiring%");
+    }
     const whereSql = where.length ? 'WHERE ' + where.join(' AND ') : '';
 
     const orderMap = {

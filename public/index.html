@@ -101,6 +101,7 @@
     .topic-card:hover{border-color:var(--primary);transform:translateY(-2px);box-shadow:0 4px 16px rgba(15,98,254,.12)}
     .topic-icon{font-size:1.5rem}
     .topic-name{font-size:.78rem;font-weight:600;color:var(--text-primary)}
+    .filter-pill.active{background:var(--primary);color:#fff;border-color:var(--primary)}
     @media(max-width:480px){.cities-grid{grid-template-columns:repeat(2,1fr)}}
     .city-card{background:var(--bg-card);border:1.5px solid var(--border);border-radius:14px;padding:1rem .75rem;text-align:center;cursor:pointer;transition:transform .18s,box-shadow .18s,border-color .18s;text-decoration:none!important;display:block}
     .city-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.1);border-color:var(--primary)}
@@ -305,6 +306,9 @@
               <option value="title">A–Z</option>
               <option value="salary_high">Salary: High to Low</option>
             </select>
+            <button type="button" class="filter-pill" id="iqamaFilter" onclick="toggleQuickFilter(this,'iqama')">📄 Transferable Iqama</button>
+            <button type="button" class="filter-pill" id="immediateFilter" onclick="toggleQuickFilter(this,'immediate')">⚡ Immediate Joining</button>
+            <button type="button" class="filter-pill" id="localFilter" onclick="toggleQuickFilter(this,'local')">🏠 Local Hiring</button>
             </div>
             <button type="button" class="btn-clear-filters d-none" id="clearFilters">
               <i class="bi bi-x-circle me-1"></i>Clear <span id="filterCount"></span>
