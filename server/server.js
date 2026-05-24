@@ -70,6 +70,7 @@ app.use(session({
 
 // ── Static files ──────────────────────────────────────────────
 app.use(htmlLayout);
+app.use("/", seoRoutes);
 app.use(blogSeoRoutes);
 app.use(blogRoutes);
 app.use(adminUsersRoutes);
@@ -80,7 +81,6 @@ const db = require('./db/connection');
 
 // ── SEO Routes (sitemap, RSS, SSR job pages) ──────────────────
 // MUST be registered BEFORE the /job/* catch-all below
-app.use('/', seoRoutes);
 
 // ── Public form schema (no auth – used by public modal) ────────
 app.get('/api/public/form-schema', async (req, res) => {

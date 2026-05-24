@@ -97,6 +97,10 @@
     .card-visa-badge{display:inline-flex;align-items:center;gap:.2rem;font-size:.72rem;font-weight:700;color:#6366f1;background:rgba(99,102,241,.09);border:1px solid rgba(99,102,241,.22);border-radius:100px;padding:.18rem .65rem}
     [data-theme="dark"] .card-visa-badge{color:#a5b4fc;background:rgba(99,102,241,.14)}
     .cities-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.75rem}
+    .topic-card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.4rem;background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:1rem .75rem;text-decoration:none;transition:all .2s;text-align:center}
+    .topic-card:hover{border-color:var(--primary);transform:translateY(-2px);box-shadow:0 4px 16px rgba(15,98,254,.12)}
+    .topic-icon{font-size:1.5rem}
+    .topic-name{font-size:.78rem;font-weight:600;color:var(--text-primary)}
     @media(max-width:480px){.cities-grid{grid-template-columns:repeat(2,1fr)}}
     .city-card{background:var(--bg-card);border:1.5px solid var(--border);border-radius:14px;padding:1rem .75rem;text-align:center;cursor:pointer;transition:transform .18s,box-shadow .18s,border-color .18s;text-decoration:none!important;display:block}
     .city-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.1);border-color:var(--primary)}
@@ -362,6 +366,32 @@
   </div>
 </section>
 
+
+<!-- ══════════════════════════════════════════════
+     BROWSE BY TOPIC
+════════════════════════════════════════════════ -->
+<section class="py-4" id="topics" aria-label="Browse by Topic">
+  <div class="container">
+    <div class="section-header mb-4">
+      <span class="section-tag">🏗️ Browse by</span>
+      <h2 class="section-title">Topic</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.75rem">
+      <a href="/aramco-jobs" class="topic-card"><span class="topic-icon">🛢️</span><span class="topic-name">Aramco Jobs</span></a>
+      <a href="/hse-jobs" class="topic-card"><span class="topic-icon">🦺</span><span class="topic-name">HSE Jobs</span></a>
+      <a href="/qc-jobs" class="topic-card"><span class="topic-icon">🔍</span><span class="topic-name">QC Inspector</span></a>
+      <a href="/wpr-jobs" class="topic-card"><span class="topic-icon">📋</span><span class="topic-name">WPR Jobs</span></a>
+      <a href="/shutdown-jobs" class="topic-card"><span class="topic-icon">🔧</span><span class="topic-name">Shutdown Jobs</span></a>
+      <a href="/neom-jobs" class="topic-card"><span class="topic-icon">🏙️</span><span class="topic-name">NEOM Jobs</span></a>
+      <a href="/oil-gas-jobs" class="topic-card"><span class="topic-icon">⚙️</span><span class="topic-name">Oil & Gas</span></a>
+      <a href="/jubail-jobs" class="topic-card"><span class="topic-icon">🏭</span><span class="topic-name">Jubail Jobs</span></a>
+      <a href="/dammam-jobs" class="topic-card"><span class="topic-icon">📍</span><span class="topic-name">Dammam Jobs</span></a>
+      <a href="/riyadh-jobs" class="topic-card"><span class="topic-icon">🌆</span><span class="topic-name">Riyadh Jobs</span></a>
+      <a href="/transferable-iqama-jobs" class="topic-card"><span class="topic-icon">📄</span><span class="topic-name">Transferable Iqama</span></a>
+      <a href="/mep-jobs" class="topic-card"><span class="topic-icon">⚡</span><span class="topic-name">MEP Jobs</span></a>
+    </div>
+  </div>
+</section>
 <!-- ══════════════════════════════════════════════
      JOBS BY CITY
 ════════════════════════════════════════════════ -->
