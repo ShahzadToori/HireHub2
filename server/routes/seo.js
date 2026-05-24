@@ -584,7 +584,7 @@ const LANDING_PAGES = {
     h1: 'Aramco Jobs in Saudi Arabia',
     desc: 'Browse latest Saudi Aramco job vacancies. HSE, QC, engineers, supervisors, WPR jobs for Aramco projects. Apply directly via WhatsApp.',
     keywords: 'aramco jobs, saudi aramco jobs, aramco careers, aramco project jobs, aramco wpr jobs',
-    search: ['aramco', 'saudi aramco']
+    search: ['aramco', 'saudi aramco'], exclude: ['non aramco', 'non-aramco']
   },
   'hse-jobs': {
     title: 'HSE Jobs in Saudi Arabia 2026 | JobOrbit',
@@ -714,12 +714,15 @@ router.get('/:slug(aramco-jobs|hse-jobs|qc-jobs|wpr-jobs|shutdown-jobs|neom-jobs
     // Build search query for all terms
     const orClauses = page.search.map(() => 'j.title LIKE ? OR j.description LIKE ?').join(' OR ');
     const params = [];
+    const excludeClauses = (page.exclude||[]).map(() => "j.title NOT LIKE ? AND j.title NOT LIKE ?").join(" AND ");
+    const excludeSql = excludeClauses ? "AND " + excludeClauses : "";
+    (page.exclude||[]).forEach(t => { params.push(`%${t}%`, `%${t}%`); });
     page.search.forEach(t => { params.push(`%${t}%`, `%${t}%`); });
 
     const [jobs] = await db.query(
       `SELECT j.id, j.title, j.company, j.location, j.job_type, j.slug, j.created_at, c.name AS category
          FROM jobs j JOIN categories c ON j.category_id = c.id
-        WHERE j.status = 'active' AND (${orClauses})
+        WHERE j.status = 'active' AND (${orClauses}) ${excludeSql}
         ORDER BY j.created_at DESC LIMIT 30`,
       params
     );
