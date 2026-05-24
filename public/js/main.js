@@ -594,6 +594,7 @@ function renderJobCard(job, isFeaturedSection = false) {
 
   // ── City flag ─────────────────────────────────────────────
   const cityFlag   = getCityFlag(job.location);
+  const salaryMeta = job.salary ? `<span class="meta-item"><i class="bi bi-cash-stack"></i>${escHtml(job.salary)}</span>` : "";
   const locationHtml = `<span class="meta-item"><i class="bi bi-geo-alt"></i>${cityFlag}${escHtml(job.location)}</span>`;
 
   // ── Contact icons ─────────────────────────────────────────
@@ -623,8 +624,8 @@ function renderJobCard(job, isFeaturedSection = false) {
       <button class="btn-report-job" onclick="reportJob('${job.id}','${escHtml(job.title).replace(/'/g,"\\'")}',event)" title="Report this listing" aria-label="Report job"><i class="bi bi-flag"></i></button>
       <div class="card-title">${escHtml(job.title)}</div>
       <div class="card-company"><i class="bi bi-building me-1"></i>${escHtml(job.company)}</div>
-      ${salaryHtml || visaHtml ? `<div class="card-highlights">${salaryHtml}${visaHtml}</div>` : ""}
-      <div class="card-meta">${locationHtml}</div>
+      ${visaHtml ? `<div class="card-highlights">${visaHtml}</div>` : ""}
+      <div class="card-meta">${locationHtml}${salaryMeta}</div>
       <p class="card-desc">${escHtml(job.description)}</p>
       <div class="card-footer-row">
         <span class="card-date"><i class="bi bi-clock me-1"></i>${timeAgo(job.created_at)}</span>

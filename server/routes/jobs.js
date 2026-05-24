@@ -242,7 +242,7 @@ router.post('/submit', async (req, res) => {
   try {
     const {
       title, company, location, job_type = 'Full-time',
-      description, phone, whatsapp, email, category_id, map_link
+      description, phone, whatsapp, email, category_id, map_link, salary
     } = req.body;
 
     // Basic validation
@@ -274,17 +274,18 @@ router.post('/submit', async (req, res) => {
 
     await db.query(
       `INSERT INTO jobs
-         (title, company, location, job_type, description, phone, whatsapp, email,
+         (title, company, location, job_type, description, phone, whatsapp, email, salary,
           category_id, slug, status, featured, sponsored, created_at, map_link)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 0, 0, NOW(), ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 0, 0, NOW(), ?)`,
       [
         title.trim(), company.trim(), location.trim(), job_type,
         description.trim(),
         phone    ? phone.trim()    : null,
         whatsapp ? whatsapp.trim() : null,
         email    ? email.trim()    : null,
+        salary   ? salary.trim()   : null,
         catId, slug,
-        map_link ? map_link.trim() : null
+        map_link ? map_link.trim() : null,
       ]
     );
 

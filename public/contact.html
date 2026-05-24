@@ -234,6 +234,15 @@
                   placeholder="Describe the role, responsibilities, requirements, salary range, and any other details…"
                   required maxlength="8000" rows="8"></textarea>
                 <div class="field-hint"><span id="jDescCount">0</span> / 8000 characters</div>
+              <div class="mb-4 mt-3">
+                <label class="field-label" for="jSalary">Salary / Rate <span class="field-hint" style="font-weight:400">(optional)</span></label>
+                <div class="field-wrap">
+                  <i class="bi bi-cash-stack field-icon"></i>
+                  <input type="text" class="field-input" id="jSalary" name="salary"
+                    placeholder="e.g. SAR 5,000/month, SAR 150/day, Negotiable, Basic + OT">
+                </div>
+                <div class="field-hint">Write any format — monthly, daily, hourly, or negotiable</div>
+              </div>
               </div>
 
               <p class="field-label mb-2">Contact Methods <span class="req">*</span> <small class="text-muted fw-normal">(at least one)</small></p>
@@ -574,7 +583,7 @@ const mapLink = mapLinkInput.value.trim() || 'https://default-map-link.com';
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({ title, company, location, job_type, description: desc,
-                                phone, whatsapp, email, category_id: catId, map_link: mapLink })
+                                phone, whatsapp, email, category_id: catId, map_link: mapLink, salary: document.getElementById("jSalary")?.value.trim() || null })
     });
     const data = await res.json();
 

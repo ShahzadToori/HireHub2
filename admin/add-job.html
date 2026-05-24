@@ -135,6 +135,11 @@
     <input type="url" class="form-control-custom" name="apply_link" placeholder="https://company.com/apply">
     <small class="text-muted">If provided, an "Apply Link" button will appear on the job page.</small>
   </div>
+              <div class="p-3">
+                <label class="form-label-custom">Salary / Rate</label>
+                <input type="text" class="form-control-custom" name="salary" placeholder="e.g. SAR 5,000/month, SAR 150/day, Negotiable, Basic + OT">
+                <small class="text-muted">Write any format — monthly, daily, hourly, or negotiable</small>
+              </div>
 </div>
           <div class="admin-card mt-3" style="background:rgba(15,98,254,.04);border-color:rgba(15,98,254,.15)">
             <div class="p-3" style="font-size:.8rem;color:var(--text-muted)">
@@ -381,7 +386,7 @@ async function loadJobData() {
       title:'title',company:'company',location:'location',
       category_id:'category_id',job_type:'job_type',description:'description',
       phone:'phone',whatsapp:'whatsapp',email:'email',map_link:'map_link',
-      apply_link: 'apply_link',
+      apply_link: 'apply_link', salary: 'salary',
       status:'status',featured_until:'featured_until'
     };
 
@@ -451,6 +456,7 @@ async function handleSubmit(e) {
     email:          getVal(form,'email'),
     map_link:       getVal(form,'map_link'),
     apply_link:      getVal(form,'apply_link'),
+    salary:         getVal(form,'salary'),
     status:         getVal(form,'status'),
     featured:       form.querySelector('[name="featured"]')?.checked ? 1 : 0,
     sponsored:      form.querySelector('[name="sponsored"]')?.checked ? 1 : 0,
