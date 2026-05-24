@@ -716,8 +716,8 @@ router.get('/:slug(aramco-jobs|hse-jobs|qc-jobs|wpr-jobs|shutdown-jobs|neom-jobs
     const params = [];
     const excludeClauses = (page.exclude||[]).map(() => "j.title NOT LIKE ? AND j.title NOT LIKE ?").join(" AND ");
     const excludeSql = excludeClauses ? "AND " + excludeClauses : "";
-    (page.exclude||[]).forEach(t => { params.push(`%${t}%`, `%${t}%`); });
     page.search.forEach(t => { params.push(`%${t}%`, `%${t}%`); });
+    (page.exclude||[]).forEach(t => { params.push(`%${t}%`, `%${t}%`); });
 
     const [jobs] = await db.query(
       `SELECT j.id, j.title, j.company, j.location, j.job_type, j.slug, j.created_at, c.name AS category
