@@ -98,6 +98,80 @@ router.get('/sitemap.xml', async (req, res) => {
     <priority>0.6</priority>
     <lastmod>${today}</lastmod>
   </url>
+  </url>
+
+  <!-- ── SEO Landing Pages ── -->
+  <url>
+    <loc>${siteUrl}/aramco-jobs</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <lastmod>${today}</lastmod>
+  </url>
+  <url>
+    <loc>${siteUrl}/hse-jobs</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <lastmod>${today}</lastmod>
+  </url>
+  <url>
+    <loc>${siteUrl}/qc-jobs</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <lastmod>${today}</lastmod>
+  </url>
+  <url>
+    <loc>${siteUrl}/wpr-jobs</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <lastmod>${today}</lastmod>
+  </url>
+  <url>
+    <loc>${siteUrl}/shutdown-jobs</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <lastmod>${today}</lastmod>
+  </url>
+  <url>
+    <loc>${siteUrl}/neom-jobs</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <lastmod>${today}</lastmod>
+  </url>
+  <url>
+    <loc>${siteUrl}/oil-gas-jobs</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <lastmod>${today}</lastmod>
+  </url>
+  <url>
+    <loc>${siteUrl}/jubail-jobs</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <lastmod>${today}</lastmod>
+  </url>
+  <url>
+    <loc>${siteUrl}/dammam-jobs</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <lastmod>${today}</lastmod>
+  </url>
+  <url>
+    <loc>${siteUrl}/riyadh-jobs</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <lastmod>${today}</lastmod>
+  </url>
+  <url>
+    <loc>${siteUrl}/transferable-iqama-jobs</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <lastmod>${today}</lastmod>
+  </url>
+  <url>
+    <loc>${siteUrl}/mep-jobs</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <lastmod>${today}</lastmod>
 
   <!-- ── Category Filter Pages ── -->
 ${cats.map(c => `  <url>
@@ -500,3 +574,248 @@ const contactBtns = [
 });
 
 module.exports = router;
+
+/* ══════════════════════════════════════════════════════════════
+   SEO LANDING PAGES  /aramco-jobs, /hse-jobs, etc.
+══════════════════════════════════════════════════════════════ */
+const LANDING_PAGES = {
+  'aramco-jobs': {
+    title: 'Aramco Jobs in Saudi Arabia 2026 | JobOrbit',
+    h1: 'Aramco Jobs in Saudi Arabia',
+    desc: 'Browse latest Saudi Aramco job vacancies. HSE, QC, engineers, supervisors, WPR jobs for Aramco projects. Apply directly via WhatsApp.',
+    keywords: 'aramco jobs, saudi aramco jobs, aramco careers, aramco project jobs, aramco wpr jobs',
+    search: ['aramco', 'saudi aramco']
+  },
+  'hse-jobs': {
+    title: 'HSE Jobs in Saudi Arabia 2026 | JobOrbit',
+    h1: 'HSE Jobs in Saudi Arabia & Gulf',
+    desc: 'Latest HSE Officer, HSE Supervisor, Safety Officer jobs in Saudi Arabia. Jubail, Riyadh, Dammam. Apply directly with recruiters.',
+    keywords: 'HSE jobs saudi arabia, safety officer jobs, HSE officer jobs jubail, safety jobs gulf',
+    search: ['hse', 'safety officer', 'safety supervisor', 'safety engineer', 'fire watcher']
+  },
+  'qc-jobs': {
+    title: 'QC Inspector Jobs in Saudi Arabia 2026 | JobOrbit',
+    h1: 'QC Inspector Jobs in Saudi Arabia',
+    desc: 'Browse QC Inspector, QA/QC Engineer, Quality Control jobs in Saudi Arabia. Jubail, Yanbu, Dammam. Direct contact with recruiters.',
+    keywords: 'QC inspector jobs saudi arabia, QA QC jobs, quality control jobs jubail, QC engineer jobs',
+    search: ['qc inspector', 'qa/qc', 'quality control', 'quality inspector', 'qc supervisor']
+  },
+  'wpr-jobs': {
+    title: 'WPR Jobs in Saudi Arabia 2026 | JobOrbit',
+    h1: 'Work Permit Receiver (WPR) Jobs in Saudi Arabia',
+    desc: 'Latest WPR jobs in Saudi Arabia. Work Permit Receiver vacancies in Jubail, Riyadh, Dammam. Aramco WPR, non-Aramco WPR jobs.',
+    keywords: 'WPR jobs, work permit receiver jobs, wpr jobs jubail, aramco wpr jobs, non aramco wpr jobs',
+    search: ['wpr', 'work permit receiver', 'permit receiver']
+  },
+  'shutdown-jobs': {
+    title: 'Shutdown Jobs in Saudi Arabia 2026 | JobOrbit',
+    h1: 'Shutdown & Turnaround Jobs in Saudi Arabia',
+    desc: 'Latest shutdown and turnaround jobs in Jubail, Yanbu, Ras Tanura. Short-term project jobs for skilled workers. Apply directly.',
+    keywords: 'shutdown jobs saudi arabia, turnaround jobs jubail, shutdown jobs yanbu, refinery shutdown jobs',
+    search: ['shutdown', 'turnaround', 'tat jobs', 'maintenance shutdown']
+  },
+  'neom-jobs': {
+    title: 'NEOM Jobs 2026 | JobOrbit',
+    h1: 'NEOM Project Jobs in Saudi Arabia',
+    desc: 'Browse latest NEOM jobs 2026. Engineers, construction, HSE, supervisors for NEOM giga projects. Apply directly with recruiters.',
+    keywords: 'NEOM jobs 2026, NEOM careers, NEOM project jobs, jobs in NEOM saudi arabia',
+    search: ['neom', 'the line', 'neom project']
+  },
+  'oil-gas-jobs': {
+    title: 'Oil & Gas Jobs in Saudi Arabia 2026 | JobOrbit',
+    h1: 'Oil & Gas Jobs in Saudi Arabia & Gulf',
+    desc: 'Latest oil and gas jobs in Saudi Arabia. Aramco, SABIC, YASREF projects. Engineers, technicians, operators. Apply directly.',
+    keywords: 'oil gas jobs saudi arabia, petroleum jobs, refinery jobs saudi, oil field jobs gulf',
+    search: ['oil', 'gas', 'petroleum', 'refinery', 'upstream', 'downstream', 'pipeline']
+  },
+  'jubail-jobs': {
+    title: 'Jobs in Jubail 2026 | JobOrbit',
+    h1: 'Jobs in Jubail Industrial City',
+    desc: 'Latest job vacancies in Jubail Industrial City. Construction, HSE, QC, welders, riggers, supervisors. Direct contact with recruiters.',
+    keywords: 'jobs in jubail, jubail industrial city jobs, jubail vacancies, jobs jubail expatriates',
+    search: ['jubail']
+  },
+  'dammam-jobs': {
+    title: 'Jobs in Dammam 2026 | JobOrbit',
+    h1: 'Jobs in Dammam, Saudi Arabia',
+    desc: 'Latest job vacancies in Dammam. Construction, industrial, engineering jobs. Direct contact with recruiters via WhatsApp.',
+    keywords: 'jobs in dammam, dammam vacancies, urgent jobs dammam, dammam saudi jobs 2026',
+    search: ['dammam']
+  },
+  'riyadh-jobs': {
+    title: 'Jobs in Riyadh 2026 | JobOrbit',
+    h1: 'Jobs in Riyadh, Saudi Arabia',
+    desc: 'Latest job vacancies in Riyadh 2026. Engineering, construction, HSE, technical jobs. Direct contact with recruiters.',
+    keywords: 'jobs in riyadh, riyadh vacancies, riyadh jobs 2026, jobs riyadh saudi arabia',
+    search: ['riyadh']
+  },
+  'transferable-iqama-jobs': {
+    title: 'Transferable Iqama Jobs in Saudi Arabia 2026 | JobOrbit',
+    h1: 'Transferable Iqama Jobs in Saudi Arabia',
+    desc: 'Jobs for candidates with transferable iqama in Saudi Arabia. Immediate joining, local hiring. Jubail, Riyadh, Dammam.',
+    keywords: 'transferable iqama jobs, iqama transfer jobs saudi, local hiring saudi arabia, immediate joining jobs',
+    search: ['transferable', 'iqama transfer', 'local hire', 'immediate joining']
+  },
+  'mep-jobs': {
+    title: 'MEP Jobs in Saudi Arabia 2026 | JobOrbit',
+    h1: 'MEP Jobs in Saudi Arabia & Gulf',
+    desc: 'Latest MEP jobs in Saudi Arabia. Mechanical, Electrical, Plumbing engineers and technicians. Riyadh, Jeddah, Dammam.',
+    keywords: 'MEP jobs saudi arabia, mechanical electrical plumbing jobs, MEP engineer jobs, MEP technician jobs',
+    search: ['mep', 'mechanical electrical', 'plumbing', 'hvac', 'electrical technician']
+  }
+};
+
+router.get('/:slug(aramco-jobs|hse-jobs|qc-jobs|wpr-jobs|shutdown-jobs|neom-jobs|oil-gas-jobs|jubail-jobs|dammam-jobs|riyadh-jobs|transferable-iqama-jobs|mep-jobs)', async (req, res) => {
+  try {
+    const page = LANDING_PAGES[req.params.slug];
+    if (!page) return res.status(404).send('Not found');
+
+    const siteUrl  = await getSiteUrl();
+    const siteName = await getSiteName();
+    const canonical = `${siteUrl}/${req.params.slug}`;
+
+    // Build search query for all terms
+    const orClauses = page.search.map(() => 'j.title LIKE ? OR j.description LIKE ?').join(' OR ');
+    const params = [];
+    page.search.forEach(t => { params.push(`%${t}%`, `%${t}%`); });
+
+    const [jobs] = await db.query(
+      `SELECT j.id, j.title, j.company, j.location, j.job_type, j.slug, j.created_at, c.name AS category
+         FROM jobs j JOIN categories c ON j.category_id = c.id
+        WHERE j.status = 'active' AND (${orClauses})
+        ORDER BY j.created_at DESC LIMIT 30`,
+      params
+    );
+
+    const jobListHtml = jobs.length === 0
+      ? '<p style="color:#64748b;text-align:center;padding:2rem">No jobs found currently. Check back daily — we update jobs every 24 hours.</p>'
+      : jobs.map(j => `
+        <a href="${siteUrl}/job/${xe(j.slug)}" class="job-card">
+          <div class="job-title">${he(j.title)}</div>
+          <div class="job-meta">
+            <span>🏢 ${he(j.company)}</span>
+            <span>📍 ${he(j.location)}</span>
+            <span>💼 ${he(j.job_type || 'Full-time')}</span>
+          </div>
+          <div class="job-cat">${he(j.category)}</div>
+        </a>`).join('');
+
+    const schema = {
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      name: page.title,
+      description: page.desc,
+      url: canonical,
+      publisher: { '@type': 'Organization', name: siteName, url: siteUrl }
+    };
+
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${he(page.title)}</title>
+  <meta name="description" content="${he(page.desc)}">
+  <meta name="keywords" content="${he(page.keywords)}">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="${he(canonical)}">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="${he(page.title)}">
+  <meta property="og:description" content="${he(page.desc)}">
+  <meta property="og:url" content="${he(canonical)}">
+  <meta property="og:site_name" content="${he(siteName)}">
+  <meta property="og:image" content="${he(siteUrl)}/JobOrbitFavicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="${he(page.title)}">
+  <meta name="twitter:description" content="${he(page.desc)}">
+  <script type="application/ld+json">${JSON.stringify(schema)}</script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f8f9fa;color:#161616;line-height:1.65}
+    a{color:#0f62fe;text-decoration:none}
+    nav{background:#fff;border-bottom:1px solid #e5e7eb;padding:.85rem 1.25rem;display:flex;align-items:center;gap:.75rem;position:sticky;top:0;z-index:100}
+    nav a{font-weight:700;color:#0f62fe;font-size:1rem}
+    .wrap{max-width:860px;margin:0 auto;padding:2rem 1.25rem}
+    .hero{background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 100%);color:#fff;padding:3rem 1.25rem;text-align:center;margin-bottom:2rem}
+    .hero h1{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:800;margin-bottom:.75rem}
+    .hero p{font-size:1rem;color:rgba(255,255,255,.75);max-width:560px;margin:0 auto 1.5rem}
+    .hero-stats{display:flex;justify-content:center;gap:1.5rem;flex-wrap:wrap}
+    .stat{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:10px;padding:.5rem 1.25rem;font-size:.85rem}
+    .stat strong{display:block;font-size:1.3rem;font-weight:800}
+    .bc{font-size:.82rem;color:#6b7280;margin-bottom:1.5rem;display:flex;flex-wrap:wrap;gap:.3rem}
+    .bc a{color:#0f62fe}
+    .jobs-grid{display:flex;flex-direction:column;gap:.85rem;margin-bottom:2rem}
+    .job-card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:1.1rem 1.25rem;display:block;transition:border-color .15s,box-shadow .15s}
+    .job-card:hover{border-color:#0f62fe;box-shadow:0 4px 16px rgba(15,98,254,.1)}
+    .job-title{font-weight:700;font-size:.95rem;color:#0f172a;margin-bottom:.5rem}
+    .job-meta{display:flex;flex-wrap:wrap;gap:.5rem;font-size:.78rem;color:#64748b;margin-bottom:.35rem}
+    .job-cat{display:inline-block;background:#e8f0fe;color:#1a56db;border-radius:100px;padding:.15rem .65rem;font-size:.72rem;font-weight:600}
+    .cta-box{background:#0f62fe;color:#fff;border-radius:14px;padding:1.75rem;text-align:center;margin:2rem 0}
+    .cta-box h3{font-size:1.1rem;font-weight:700;margin-bottom:.5rem}
+    .cta-box p{font-size:.88rem;opacity:.85;margin-bottom:1rem}
+    .cta-btn{display:inline-block;background:#fff;color:#0f62fe;font-weight:700;padding:.65rem 1.75rem;border-radius:9px;font-size:.9rem}
+    .related{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.65rem;margin-top:1.5rem}
+    .rel-link{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:.75rem 1rem;font-size:.85rem;font-weight:600;color:#0f62fe;display:block;text-align:center}
+    .rel-link:hover{background:#e8f0fe}
+    footer{margin-top:3rem;padding:1.5rem;text-align:center;font-size:.8rem;color:#9ca3af;border-top:1px solid #e5e7eb}
+    @media(max-width:600px){.hero{padding:2rem 1rem}.stat{padding:.4rem 1rem}}
+  </style>
+</head>
+<body>
+<nav>
+  <a href="/">${he(siteName)}</a>
+  <span style="color:#9ca3af;font-size:.85rem">/ ${he(page.h1)}</span>
+</nav>
+
+<div class="hero">
+  <h1>${he(page.h1)}</h1>
+  <p>${he(page.desc)}</p>
+  <div class="hero-stats">
+    <div class="stat"><strong>${jobs.length}+</strong>Jobs Found</div>
+    <div class="stat"><strong>Daily</strong>Updated</div>
+    <div class="stat"><strong>Direct</strong>Apply</div>
+  </div>
+</div>
+
+<div class="wrap">
+  <nav class="bc" aria-label="Breadcrumb">
+    <a href="/">Home</a> › <a href="/">Jobs</a> › <span>${he(page.h1)}</span>
+  </nav>
+
+  <div class="jobs-grid">${jobListHtml}</div>
+
+  <div class="cta-box">
+    <h3>🔔 Get Daily Job Alerts</h3>
+    <p>New ${he(page.h1)} posted every day. Get them delivered to your inbox free.</p>
+    <a href="/" class="cta-btn">Browse All Jobs →</a>
+  </div>
+
+  <h2 style="font-size:1rem;font-weight:700;color:#0f172a;margin-bottom:1rem">Browse Related Job Categories</h2>
+  <div class="related">
+    <a href="${siteUrl}/aramco-jobs" class="rel-link">Aramco Jobs</a>
+    <a href="${siteUrl}/hse-jobs" class="rel-link">HSE Jobs</a>
+    <a href="${siteUrl}/qc-jobs" class="rel-link">QC Inspector Jobs</a>
+    <a href="${siteUrl}/wpr-jobs" class="rel-link">WPR Jobs</a>
+    <a href="${siteUrl}/shutdown-jobs" class="rel-link">Shutdown Jobs</a>
+    <a href="${siteUrl}/jubail-jobs" class="rel-link">Jubail Jobs</a>
+    <a href="${siteUrl}/dammam-jobs" class="rel-link">Dammam Jobs</a>
+    <a href="${siteUrl}/riyadh-jobs" class="rel-link">Riyadh Jobs</a>
+    <a href="${siteUrl}/transferable-iqama-jobs" class="rel-link">Transferable Iqama</a>
+    <a href="${siteUrl}/oil-gas-jobs" class="rel-link">Oil & Gas Jobs</a>
+    <a href="${siteUrl}/neom-jobs" class="rel-link">NEOM Jobs</a>
+    <a href="${siteUrl}/mep-jobs" class="rel-link">MEP Jobs</a>
+  </div>
+</div>
+
+<footer>© ${new Date().getFullYear()} ${he(siteName)}. All rights reserved. | <a href="/">Browse All Jobs</a></footer>
+</body>
+</html>`;
+
+    res.set('Content-Type', 'text/html; charset=utf-8');
+    res.set('Cache-Control', 'public, max-age=3600');
+    res.send(html);
+  } catch (err) {
+    console.error('Landing page error:', err);
+    res.status(500).send('Server error');
+  }
+});
