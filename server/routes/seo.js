@@ -98,7 +98,6 @@ router.get('/sitemap.xml', async (req, res) => {
     <priority>0.6</priority>
     <lastmod>${today}</lastmod>
   </url>
-  </url>
 
   <!-- ── SEO Landing Pages ── -->
   <url>
