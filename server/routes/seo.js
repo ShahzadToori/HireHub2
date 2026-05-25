@@ -171,6 +171,7 @@ router.get('/sitemap.xml', async (req, res) => {
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
     <lastmod>${today}</lastmod>
+  </url>
 
   <!-- ── Category Filter Pages ── -->
 ${cats.map(c => `  <url>
