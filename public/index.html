@@ -382,28 +382,6 @@
 <!-- ══════════════════════════════════════════════
      BROWSE BY TOPIC
 ════════════════════════════════════════════════ -->
-<section class="py-4" id="topics" aria-label="Browse by Topic">
-  <div class="container">
-    <div class="section-header mb-4">
-      <span class="section-tag">🏗️ Browse by</span>
-      <h2 class="section-title">Topic</h2>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.75rem">
-      <a href="/aramco-jobs" class="topic-card"><span class="topic-icon">🛢️</span><span class="topic-name">Aramco Jobs</span></a>
-      <a href="/hse-jobs" class="topic-card"><span class="topic-icon">🦺</span><span class="topic-name">HSE Jobs</span></a>
-      <a href="/qc-jobs" class="topic-card"><span class="topic-icon">🔍</span><span class="topic-name">QC Inspector</span></a>
-      <a href="/wpr-jobs" class="topic-card"><span class="topic-icon">📋</span><span class="topic-name">WPR Jobs</span></a>
-      <a href="/shutdown-jobs" class="topic-card"><span class="topic-icon">🔧</span><span class="topic-name">Shutdown Jobs</span></a>
-      <a href="/neom-jobs" class="topic-card"><span class="topic-icon">🏙️</span><span class="topic-name">NEOM Jobs</span></a>
-      <a href="/oil-gas-jobs" class="topic-card"><span class="topic-icon">⚙️</span><span class="topic-name">Oil & Gas</span></a>
-      <a href="/jubail-jobs" class="topic-card"><span class="topic-icon">🏭</span><span class="topic-name">Jubail Jobs</span></a>
-      <a href="/dammam-jobs" class="topic-card"><span class="topic-icon">📍</span><span class="topic-name">Dammam Jobs</span></a>
-      <a href="/riyadh-jobs" class="topic-card"><span class="topic-icon">🌆</span><span class="topic-name">Riyadh Jobs</span></a>
-      <a href="/transferable-iqama-jobs" class="topic-card"><span class="topic-icon">📄</span><span class="topic-name">Transferable Iqama</span></a>
-      <a href="/mep-jobs" class="topic-card"><span class="topic-icon">⚡</span><span class="topic-name">MEP Jobs</span></a>
-    </div>
-  </div>
-</section>
 <!-- ══════════════════════════════════════════════
      JOBS BY CITY
 ════════════════════════════════════════════════ -->
@@ -429,7 +407,7 @@
       <h2 class="section-title">Hiring Trends</h2>
     </div>
     <div class="row g-4">
-      <div class="col-lg-8">
+      <div class="col-lg-8 d-none">
         <div class="sidebar-widget">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="widget-title mb-0">Monthly Job Postings</h5>
@@ -438,7 +416,7 @@
           <canvas id="hiringTrendsChart" style="height:220px;max-height:220px"></canvas>
         </div>
       </div>
-      <div class="col-lg-4">
+      <div class="col-lg-12">
         <div class="sidebar-widget">
           <h5 class="widget-title">Top Categories This Month</h5>
           <div id="topCatsWidget"><!-- injected by JS --></div>
@@ -473,7 +451,7 @@
     <div class="row g-4">
 
       <!-- Job Grid -->
-      <div class="col-lg-8">
+      <div class="col-lg-8 d-none">
         <div class="d-flex align-items-center justify-content-between mb-3">
           <p class="results-info mb-0" id="resultsInfo" aria-live="polite">Loading jobs…</p>
           <div class="d-flex align-items-center gap-2">
@@ -507,7 +485,7 @@
       </div>
 
       <!-- Sidebar -->
-      <div class="col-lg-4">
+      <div class="col-lg-12">
         <!-- Email Job Alerts Widget -->
         <div class="sidebar-widget mb-4">
           <div class="d-flex align-items-center gap-2 mb-2">
