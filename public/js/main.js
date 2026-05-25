@@ -170,7 +170,7 @@ function injectSiteSchema() {
     url:         siteUrl,
     description: desc,
     logo: { '@type': 'ImageObject', url: `${siteUrl}/JobOrbitFavicon.png` },
-          sameAs: ['https://linkedin.com/company/joborbit', 'https://instagram.com/joborbit'],
+          sameAs: ['https://linkedin.com/company/joborbit-gulf', 'https://www.facebook.com/profile.php?id=61576669636551', 'https://whatsapp.com/channel/0029Vb84k2k96H4JWs3NXe11'],
           contactPoint: {
       '@type':      'ContactPoint',
       contactType:  'customer service',
