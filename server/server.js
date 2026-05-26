@@ -69,7 +69,11 @@ app.use(session({
 }));
 
 // ── Static files ──────────────────────────────────────────────
-app.use(htmlLayout);
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api/')) return next();
+  return htmlLayout(req, res, next);
+});
+app.get('/manifest.json', (req, res) => res.status(404).json({}));
 app.use("/", seoRoutes);
 app.use(blogSeoRoutes);
 app.use(blogRoutes);
