@@ -1097,3 +1097,4 @@ img { max-width: 100%; }
 
 .footer-social { color: rgba(255,255,255,.5); font-size: 1.2rem; transition: color .2s; }
 .footer-social:hover { color: #fff; }
+#salaryFilter, #visaFilter, #iqamaFilter, #localFilter { display: none !important; }
