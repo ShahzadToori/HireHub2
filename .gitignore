@@ -11,3 +11,5 @@ temp_message.txt
 qr.png
 *.tmp
 .DS_Store
+channel-forwarder/.wwebjs_cache/
+public/uploads/blog/
