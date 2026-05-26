@@ -203,6 +203,25 @@ async function loadHeroImage(){
 const hashPage = parseInt(window.location.hash.replace('#page=','')) || 1;
 loadFeatured();loadCategories();
 loadHeroImage();loadArticles(hashPage);
+
+/* ── Theme toggle (required on every page that uses navbar.html) ── */
+function applyTheme(t, save=true) {
+  document.documentElement.setAttribute('data-theme', t);
+  document.documentElement.style.colorScheme = t;
+  const i = document.getElementById('themeIcon');
+  if (i) i.className = t === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+  if (save) localStorage.setItem('theme', t);
+}
+function toggleTheme() {
+  applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+}
+// Apply saved theme on load
+(function() {
+  const saved = localStorage.getItem('theme') || 'light';
+  applyTheme(saved, false);
+  const btn = document.getElementById('themeToggle');
+  if (btn) btn.addEventListener('click', toggleTheme);
+})();
 </script>
 </body>
 </html>

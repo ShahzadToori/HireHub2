@@ -497,5 +497,24 @@
 ═══════════════════════════════════════════════ -->
 <!-- FOOTER -->
 
+<script>
+(function(){
+  function applyTheme(t,save){
+    document.documentElement.setAttribute('data-theme',t);
+    document.documentElement.style.colorScheme=t;
+    var i=document.getElementById('themeIcon');
+    if(i)i.className=t==='dark'?'bi bi-sun-fill':'bi bi-moon-fill';
+    if(save!==false)localStorage.setItem('theme',t);
+  }
+  applyTheme(localStorage.getItem('theme')||'light',false);
+  document.addEventListener('DOMContentLoaded',function(){
+    var btn=document.getElementById('themeToggle');
+    if(btn)btn.addEventListener('click',function(){
+      applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');
+    });
+  });
+  window.toggleTheme=function(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');};
+})();
+</script>
 </body>
 </html>

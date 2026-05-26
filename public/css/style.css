@@ -1098,3 +1098,34 @@ img { max-width: 100%; }
 .footer-social { color: rgba(255,255,255,.5); font-size: 1.2rem; transition: color .2s; }
 .footer-social:hover { color: #fff; }
 #salaryFilter, #visaFilter, #iqamaFilter, #localFilter { display: none !important; }
+
+/* ═══════════════════════════════════════════════════════════════
+   DARK THEME — Fix invisible text
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Blog card excerpt was using --text-muted (#6e7681) which is
+   too dark against --bg-card (#161b22) in dark mode */
+[data-theme="dark"] .blog-card-excerpt {
+  color: #94a3b8 !important;
+}
+[data-theme="dark"] .blog-card-meta {
+  color: #8b949e !important;
+  border-top-color: var(--border) !important;
+}
+[data-theme="dark"] .blog-card-title {
+  color: #e6edf3 !important;
+}
+[data-theme="dark"] .blog-card {
+  background: var(--bg-card) !important;
+  border-color: var(--border) !important;
+}
+
+/* Featured blog post text on home */
+[data-theme="dark"] #featured-excerpt {
+  color: #94a3b8 !important;
+}
+.some-class { color: red; }
+.navbar-toggler { color: var(--text-primary) !important; border-color: var(--border) !important; }
+.navbar-toggler .bi-list { color: var(--text-primary) !important; }
+[data-theme="dark"] .navbar-toggler { background: rgba(255,255,255,.06); }
+[data-theme="dark"] .navbar-toggler .bi-list { color: #e6edf3 !important; }

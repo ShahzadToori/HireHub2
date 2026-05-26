@@ -1414,7 +1414,10 @@ function debounce(fn, ms = 350) {
    EVENT LISTENERS
 ══════════════════════════════════════════════════════════════ */
 function bindEvents() {
-  $('#themeToggle').addEventListener('click', toggleTheme);
+  // Safe null check — navbar may not be in DOM yet on some pages
+  const themeBtn = document.getElementById('themeToggle');
+  if (themeBtn) themeBtn.addEventListener('click', toggleTheme);
+  else document.querySelectorAll('.theme-toggle').forEach(btn => btn.addEventListener('click', toggleTheme));
 
   // Close share dropdown when clicking outside
   document.addEventListener('click', (e) => {

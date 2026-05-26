@@ -25,3 +25,39 @@
     </div>
   </div>
 </nav>
+<script>
+// Self-contained theme toggle — works on every page without main.js
+(function() {
+  function applyTheme(t, save) {
+    document.documentElement.setAttribute('data-theme', t);
+    document.documentElement.style.colorScheme = t;
+    var i = document.getElementById('themeIcon');
+    if (i) i.className = t === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+    var mi = document.getElementById('mbnThemeIcon');
+    if (mi) mi.className = t === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+    if (save !== false) localStorage.setItem('theme', t);
+  }
+  // Apply saved theme immediately
+  applyTheme(localStorage.getItem('theme') || 'light', false);
+  // Attach button click — wait for DOM to be ready
+  function attachBtn() {
+    var btn = document.getElementById('themeToggle');
+    if (btn && !btn._themeAttached) {
+      btn._themeAttached = true;
+      btn.addEventListener('click', function() {
+        applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+      });
+    }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', attachBtn);
+  } else {
+    attachBtn();
+  }
+  // Expose globally so main.js and other pages can also call it
+  window.applyTheme = applyTheme;
+  window.toggleTheme = function() {
+    applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  };
+})();
+</script>
