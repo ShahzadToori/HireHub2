@@ -427,7 +427,7 @@ const contactBtns = [
     var ua = navigator.userAgent;
     var isBot = /googlebot|bingbot|yandex|baidu|duckduck|twitterbot|facebookexternalhit|linkedinbot|slackbot|whatsapp|crawler|spider|bot/i.test(ua);
     if (!isBot && window.location.hash !== '#ssr') {
-      window.location.replace('/job/${job.slug}');
+      // redirect removed — SSR page shown directly
     }
   </script>
 
