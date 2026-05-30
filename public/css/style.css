@@ -1129,3 +1129,7 @@ img { max-width: 100%; }
 .navbar-toggler .bi-list { color: var(--text-primary) !important; }
 [data-theme="dark"] .navbar-toggler { background: rgba(255,255,255,.06); }
 [data-theme="dark"] .navbar-toggler .bi-list { color: #e6edf3 !important; }
+
+
+
+[data-theme="dark"] #site-logo { filter: brightness(10) saturate(0.8); }
