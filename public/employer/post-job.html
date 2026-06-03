@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Post a Job — JobOrbit Employer</title>
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="icon" href="/JobOrbitFavicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/employer/employer.css">
+  <style>
+  .sc-chip{display:inline-flex;align-items:center;gap:.3rem;padding:.35rem .75rem;border-radius:20px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-secondary);font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:500;cursor:pointer;transition:all .15s;min-height:36px}
+  .sc-chip.active{border-color:var(--primary);background:rgba(15,98,254,.08);color:var(--primary);font-weight:600}
+  .sc-field{animation:scIn .18s ease}
+  @keyframes scIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+  </style>
+  <style>
+  .sc-chip{display:inline-flex;align-items:center;gap:.3rem;padding:.35rem .75rem;border-radius:20px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-secondary);font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:500;cursor:pointer;transition:all .15s;min-height:36px}
+  .sc-chip.active{border-color:var(--primary);background:rgba(15,98,254,.08);color:var(--primary);font-weight:600}
+  .sc-field{animation:scIn .18s ease}
+  @keyframes scIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+  .cnt-picker{position:relative}
+  .cnt-dropdown{position:absolute;top:calc(100% + 3px);left:0;right:0;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:2000;max-height:210px;overflow-y:auto;display:none}
+  .cnt-dropdown.show{display:block}
+  .cnt-option{padding:.48rem .75rem;cursor:pointer;font-size:.83rem;color:var(--text-primary)}
+  .cnt-option:hover{background:var(--surface)}
+  .cnt-option strong{color:var(--primary);font-weight:700}
+  .cnt-chips{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.4rem}
+  .cnt-chip{display:inline-flex;align-items:center;gap:.3rem;padding:.18rem .5rem;background:rgba(15,98,254,.1);color:var(--primary);border-radius:20px;font-size:.77rem;font-weight:600}
+  .cnt-chip button{background:none;border:none;color:var(--primary);cursor:pointer;padding:0;font-size:.85rem;line-height:1;margin-left:.1rem}
+  </style>
+</head>
+<body><script>
+(function(){
+  function applyTheme(t,save){
+    document.documentElement.setAttribute('data-theme',t);
+    document.documentElement.style.colorScheme=t;
+    var i=document.getElementById('themeIcon');
+    if(i)i.className=t==='dark'?'bi bi-sun-fill':'bi bi-moon-fill';
+    if(save!==false)localStorage.setItem('theme',t);
+  }
+  applyTheme(localStorage.getItem('theme')||'light',false);
+  document.addEventListener('DOMContentLoaded',function(){
+    var btn=document.getElementById('themeToggle');
+    if(btn)btn.addEventListener('click',function(){
+      applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');
+    });
+  });
+  window.toggleTheme=function(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');};
+})();
+</script>
+<nav class="ep-navbar">
+  <div class="ep-nav-inner">
+    <a href="/employer/dashboard.html" class="ep-nav-brand">
+      <img src="/uploads/logo-1772305890056.svg" alt="JobOrbit" style="height:32px;filter:brightness(10)">
+      <span>Employer Portal</span>
+    </a>
+    <div class="ep-nav-links">
+      <a href="/employer/dashboard.html" class="ep-nav-link "><i class="bi bi-grid-fill"></i><span>Dashboard</span></a>
+      <a href="/employer/jobs.html"      class="ep-nav-link "><i class="bi bi-briefcase-fill"></i><span>My Jobs</span></a>
+      <a href="/employer/post-job.html"  class="ep-nav-link ep-nav-active"><i class="bi bi-plus-circle-fill"></i><span>Post Job</span></a>
+      <a href="/employer/applications.html" class="ep-nav-link "><i class="bi bi-inbox-fill"></i><span>Applications</span></a>
+    </div>
+    <div class="ep-nav-right">
+      <button class="ep-icon-btn" id="themeToggle"><i class="bi bi-moon-fill" id="themeIcon"></i></button>
+      <div class="ep-user-menu" id="epUserMenu">
+        <button class="ep-user-btn" onclick="toggleUserMenu()">
+          <div class="ep-avatar" id="epAvatar">E</div>
+          <span id="epCompanyName">Loading...</span>
+          <i class="bi bi-chevron-down" style="font-size:.7rem"></i>
+        </button>
+        <div class="ep-user-dropdown" id="epUserDropdown">
+          <a href="/employer/profile.html"><i class="bi bi-person-gear me-2"></i>Profile</a>
+          <a href="/" target="_blank"><i class="bi bi-box-arrow-up-right me-2"></i>View Site</a>
+          <div class="ep-dropdown-divider"></div>
+          <a href="#" onclick="logout()"><i class="bi bi-box-arrow-left me-2"></i>Logout</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+<div class="ep-mobile-nav">
+  <a href="/employer/dashboard.html" class="ep-mob-link "><i class="bi bi-grid-fill"></i><span>Home</span></a>
+  <a href="/employer/jobs.html" class="ep-mob-link "><i class="bi bi-briefcase-fill"></i><span>Jobs</span></a>
+  <a href="/employer/post-job.html" class="ep-mob-link active"><i class="bi bi-plus-circle-fill"></i><span>Post</span></a>
+  <a href="/employer/applications.html" class="ep-mob-link "><i class="bi bi-inbox-fill"></i><span>Inbox</span></a>
+</div>
+<div class="ep-page">
+  <div class="ep-page-header">
+    <div>
+      <h1 class="ep-page-title">Post a Job</h1>
+      <p class="ep-page-sub">Fill in the details. Your job goes live instantly.</p>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-8">
+
+      <!-- Templates bar -->
+      <div class="ep-card mb-4" id="templatesSection">
+        <div class="ep-card-header">
+          <h2 class="ep-card-title">Use a Template</h2>
+          <button class="ep-btn-outline ep-btn-sm" onclick="saveTemplate()"><i class="bi bi-save me-1"></i>Save as Template</button>
+        </div>
+        <div id="templatesList" class="ep-templates-wrap">
+          <div class="ep-loading">Loading templates...</div>
+        </div>
+      </div>
+
+      <!-- Job form -->
+      <div class="ep-card">
+        <h2 class="ep-card-title mb-3">Job Details</h2>
+        <div class="row g-3">
+          <div class="col-12">
+            <div class="ep-field">
+              <label class="ep-label">Job Title <span class="text-danger">*</span></label>
+              <input type="text" class="ep-input" id="jTitle" placeholder="e.g. Welder (Aramco Approved), Safety Officer, Nurse">
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="ep-field">
+              <label class="ep-label">Category</label>
+              <select class="ep-input" id="jCategory">
+                <option value="">Select category...</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="ep-field">
+              <label class="ep-label">Job Type</label>
+              <select class="ep-input" id="jType">
+                <option>Full-time</option>
+                <option>Part-time</option>
+                <option>Contract</option>
+                <option>Temporary</option>
+                <option>Freelance</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="ep-field">
+              <label class="ep-label">Location <span class="text-danger">*</span></label>
+              <input type="text" class="ep-input" id="jLocation" placeholder="e.g. Jubail, Riyadh, Dammam">
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <div class="ep-field">
+              <label class="ep-label">Positions</label>
+              <input type="number" class="ep-input" id="jPositions" value="1" min="1" max="999">
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <div class="ep-field">
+              <label class="ep-label">Expires After</label>
+              <div style="display:flex;gap:.4rem">
+                <input type="number" class="ep-input" id="jExpiryNum" value="30" min="1" max="365" style="flex:1;min-width:0">
+                <select class="ep-input" id="jExpiryUnit" style="width:auto;flex-shrink:0">
+                  <option value="hours">Hours</option>
+                  <option value="days" selected>Days</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="ep-field">
+              <label class="ep-label">Salary / Compensation</label>
+              <input type="text" class="ep-input" id="jSalary" placeholder="e.g. SAR 5,000–8,000 / month, Negotiable, After TS">
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="ep-field">
+              <label class="ep-label">Job Description <span class="text-danger">*</span></label>
+              <textarea class="ep-input" id="jDesc" rows="6" placeholder="Describe the role, responsibilities, and what you offer. Be specific — detailed posts get 3x more qualified applications."></textarea>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="ep-field">
+              <label class="ep-label">Requirements</label>
+              <textarea class="ep-input" id="jReqs" rows="4" placeholder="List specific requirements:&#10;• Aramco approval required&#10;• Valid iqama (transferable)&#10;• 3+ years experience&#10;• CSWIP 3.1 / ASNT Level II"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <hr style="border-color:var(--border);margin:1.5rem 0">
+        <h3 class="ep-section-sub">Contact Information</h3>
+        <div class="row g-3">
+          <div class="col-sm-4">
+            <div class="ep-field">
+              <label class="ep-label">Phone</label>
+              <input type="tel" class="ep-input" id="jPhone" placeholder="+966 5XX XXX XXX">
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="ep-field">
+              <label class="ep-label">WhatsApp</label>
+              <input type="tel" class="ep-input" id="jWhatsApp" placeholder="+966 5XX XXX XXX">
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="ep-field">
+              <label class="ep-label">Email</label>
+              <input type="email" class="ep-input" id="jEmail" placeholder="hr@company.com">
+            </div>
+          </div>
+        </div>
+
+        <hr style="border-color:var(--border);margin:1.5rem 0">
+        <div class="ep-screening-toggle" onclick="toggleScreening()">
+          <div>
+            <div style="font-weight:700;font-size:.9rem;color:var(--text-primary)">
+              <i class="bi bi-funnel-fill me-2" style="color:var(--primary)"></i>Pre-Screening Filters
+            </div>
+            <div style="font-size:.78rem;color:var(--text-muted)">Only show applications that match your criteria</div>
+          </div>
+          <i class="bi bi-chevron-down" id="screeningChevron"></i>
+        </div>
+        <div id="screeningSection" style="display:none;padding-top:1rem">
+          <p style="font-size:.73rem;color:var(--text-muted);margin-bottom:.5rem">Tap to enable a filter. Leave all off to accept any candidate.</p>
+          <div style="display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.75rem">
+            <button type="button" class="sc-chip" id="tgNat"   onclick="toggleFilter('nat')"  ><i class="bi bi-globe2"></i> Nationality</button>
+            <button type="button" class="sc-chip" id="tgIqama" onclick="toggleFilter('iqama')"><i class="bi bi-card-text"></i> Iqama Type</button>
+            <button type="button" class="sc-chip" id="tgExp"   onclick="toggleFilter('exp')"  ><i class="bi bi-briefcase"></i> Experience</button>
+            <button type="button" class="sc-chip" id="tgCerts" onclick="toggleFilter('certs')"><i class="bi bi-patch-check"></i> Certifications</button>
+            <button type="button" class="sc-chip" id="tgIqamaNum" onclick="toggleFilter('iqamaNum')"><i class="bi bi-hash"></i> Iqama No.</button>
+          </div>
+          <div class="row g-3">
+            <div class="col-sm-6 sc-field" id="fNat" style="display:none">
+              <div class="ep-field"><label class="ep-label">Accepted Nationalities</label>
+                <div class="cnt-picker" id="scNatWrapper">
+                  <input type="text" class="ep-input" id="scNatSearch" placeholder="Search nationalities..." oninput="filterCnt('scNat',this.value)" onfocus="showCntDd('scNat')" autocomplete="off">
+                  <div class="cnt-dropdown" id="scNatDd"></div>
+                  <div class="cnt-chips" id="scNatChips"></div>
+                  <input type="hidden" id="scNat">
+                </div></div>
+            </div>
+            <div class="col-sm-6 sc-field" id="fIqama" style="display:none">
+              <div class="ep-field"><label class="ep-label">Iqama Type Required</label>
+                <select class="ep-input" id="scIqama"><option value="">Any status welcome</option><option value="transferable">Transferable iqama only</option><option value="local">Local transfer or visit visa</option></select></div>
+            </div>
+            <div class="col-sm-6 sc-field" id="fExp" style="display:none">
+              <div class="ep-field"><label class="ep-label">Minimum Experience (years)</label>
+                <input type="number" class="ep-input" id="scExp" value="0" min="0" max="30"></div>
+            </div>
+            <div class="col-sm-6 sc-field" id="fCerts" style="display:none">
+              <div class="ep-field"><label class="ep-label">Required Certifications</label>
+                <input type="text" class="ep-input" id="scCerts" placeholder="e.g. Aramco Approval, CSWIP, PMP"></div>
+            </div>
+          </div>
+
+          <!-- Custom Questions -->
+          <div style="margin-top:1rem">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.65rem">
+              <div>
+                <div style="font-size:.82rem;font-weight:700;color:var(--text-primary)">Custom Screening Questions</div>
+                <div style="font-size:.73rem;color:var(--text-muted)">Candidates must answer these before applying</div>
+              </div>
+              <button class="ep-btn-outline ep-btn-sm" onclick="addCustomQuestion()">
+                <i class="bi bi-plus-circle me-1"></i>Add Question
+              </button>
+            </div>
+            <div id="customQsList">
+              <p style="font-size:.78rem;color:var(--text-muted);margin:0">No custom questions yet.</p>
+            </div>
+          </div>
+        </div>
+
+        <div id="postMsg" class="ep-msg d-none mt-3"></div>
+
+        <div style="display:flex;gap:.75rem;margin-top:1.5rem;flex-wrap:wrap">
+          <button class="ep-btn-primary" style="flex:1;min-width:180px" onclick="submitJob()">
+            <i class="bi bi-rocket-takeoff-fill me-2"></i>Post Job Now
+          </button>
+          <button class="ep-btn-outline" onclick="previewJob()">
+            <i class="bi bi-eye me-2"></i>Preview
+          </button>
+          <button class="ep-btn-outline" onclick="clearForm()">
+            <i class="bi bi-x-circle me-2"></i>Clear
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar tips -->
+    <div class="col-lg-4">
+      <div class="ep-card ep-tips-card" style="position:sticky;top:80px">
+        <h3 class="ep-card-title mb-3"><i class="bi bi-lightbulb-fill me-2" style="color:#d97706"></i>Tips for Better Results</h3>
+        <div class="ep-tip"><i class="bi bi-check-circle-fill"></i>Mention Aramco approval if required — saves filtering time</div>
+        <div class="ep-tip"><i class="bi bi-check-circle-fill"></i>State whether iqama transfer is acceptable</div>
+        <div class="ep-tip"><i class="bi bi-check-circle-fill"></i>Include salary range — gets 3x more applications</div>
+        <div class="ep-tip"><i class="bi bi-check-circle-fill"></i>Add WhatsApp number — Gulf workers prefer it</div>
+        <div class="ep-tip"><i class="bi bi-check-circle-fill"></i>List number of positions needed</div>
+        <div class="ep-tip"><i class="bi bi-check-circle-fill"></i>Mention accommodation if provided</div>
+        <hr style="border-color:var(--border)">
+        <div class="ep-share-preview">
+          <div style="font-size:.78rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.75rem">Share Message Preview</div>
+          <div id="sharePreview" class="ep-share-msg">Fill in job details to see share message...</div>
+          <button class="ep-btn-outline ep-btn-sm w-100 mt-2" onclick="copyShareMsg()"><i class="bi bi-whatsapp me-1" style="color:#25d366"></i>Copy for WhatsApp</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+
+const API = {
+  async get(url) {
+    const r = await fetch(url, { credentials: 'include' });
+    return r.json();
+  },
+  async post(url, data) {
+    const r = await fetch(url, { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+    return r.json();
+  },
+  async put(url, data) {
+    const r = await fetch(url, { method: 'PUT', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+    return r.json();
+  },
+  async del(url) {
+    const r = await fetch(url, { method: 'DELETE', credentials: 'include' });
+    return r.json();
+  }
+};
+
+async function checkAuth() {
+  try {
+    const d = await API.get('/api/employer/me');
+    if (!d.success) { window.location.href = '/employer/'; return null; }
+    const n = document.getElementById('epCompanyName');
+    const a = document.getElementById('epAvatar');
+    if (n) n.textContent = d.employer.company_name;
+    if (a) a.textContent = d.employer.company_name.charAt(0).toUpperCase();
+    return d;
+  } catch(e) { window.location.href = '/employer/'; return null; }
+}
+
+async function logout() {
+  await API.post('/api/employer/logout', {});
+  window.location.href = '/employer/';
+}
+
+function toggleUserMenu() {
+  document.getElementById('epUserDropdown')?.classList.toggle('show');
+}
+document.addEventListener('click', e => {
+  const menu = document.getElementById('epUserMenu');
+  if (menu && !menu.contains(e.target)) {
+    document.getElementById('epUserDropdown')?.classList.remove('show');
+  }
+});
+
+function showToast(msg, type='success') {
+  const t = document.createElement('div');
+  t.className = 'ep-toast ep-toast-' + type;
+  t.innerHTML = '<i class="bi bi-' + (type==='success'?'check-circle-fill':'exclamation-circle-fill') + ' me-2"></i>' + msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.classList.add('show'), 10);
+  setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3500);
+}
+
+function timeAgo(date) {
+  const d = new Date(date), now = new Date();
+  const diff = Math.floor((now - d) / 1000);
+  if (diff < 60) return 'just now';
+  if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+  return Math.floor(diff/86400) + 'd ago';
+}
+
+let categories = [];
+let templates = [];
+
+/* ── Screening filter toggles ───────────────────────── */
+const scActive = { nat:false, iqama:false, exp:false, certs:false, iqamaNum:false };
+const scMap    = { nat:['tgNat','fNat'], iqama:['tgIqama','fIqama'], exp:['tgExp','fExp'], certs:['tgCerts','fCerts'], iqamaNum:['tgIqamaNum',''] };
+function toggleFilter(key, force) {
+  scActive[key] = force !== undefined ? force : !scActive[key];
+  document.getElementById(scMap[key][0])?.classList.toggle('active', scActive[key]);
+  const f = document.getElementById(scMap[key][1]);
+  if (f) f.style.display = scActive[key] ? '' : 'none';
+}
+
+/* ── Custom Screening Questions ─────────────────────────────── */
+let customQuestions = [];
+
+function addCustomQuestion(existingText) {
+  const id = Date.now();
+  customQuestions.push({ id, text: existingText || '', type: 'text' });
+  renderCustomQuestions();
+  // Focus the new input
+  setTimeout(() => {
+    const inp = document.getElementById('cq-' + id);
+    if (inp) inp.focus();
+  }, 50);
+}
+
+function removeCustomQuestion(id) {
+  customQuestions = customQuestions.filter(q => q.id !== id);
+  renderCustomQuestions();
+}
+
+function updateCustomQuestion(id, val) {
+  const q = customQuestions.find(q => q.id === id);
+  if (q) q.text = val;
+}
+
+function updateQuestionType(id, type) {
+  const q = customQuestions.find(q => q.id === id);
+  if (q) q.type = type;
+}
+
+function renderCustomQuestions() {
+  const wrap = document.getElementById('customQsList');
+  if (!customQuestions.length) {
+    wrap.innerHTML = '<p style="font-size:.78rem;color:var(--text-muted);margin:0">No custom questions yet. Click "Add Question" to add one.</p>';
+    return;
+  }
+  wrap.innerHTML = customQuestions.map((q, i) => `
+    <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem">
+      <span style="font-size:.75rem;color:var(--text-muted);flex-shrink:0;font-weight:700">Q${i+1}</span>
+      <input type="text" class="ep-input" id="cq-${q.id}"
+        value="${q.text.replace(/"/g,'&quot;')}"
+        placeholder="e.g. Do you have a valid driving license?"
+        oninput="updateCustomQuestion(${q.id}, this.value)"
+        style="flex:1">
+      <select class="ep-input" style="width:auto;flex-shrink:0;padding:.55rem .6rem;font-size:.78rem"
+        onchange="updateQuestionType(${q.id}, this.value)">
+        <option value="text" ${q.type==='text'?'selected':''}>Text answer</option>
+        <option value="yesno" ${q.type==='yesno'?'selected':''}>Yes / No</option>
+      </select>
+      <button class="ep-btn-outline ep-btn-sm ep-btn-danger" onclick="removeCustomQuestion(${q.id})" style="flex-shrink:0;padding:.4rem .6rem">
+        <i class="bi bi-trash"></i>
+      </button>
+    </div>`).join('');
+}
+
+function getCustomQuestions() {
+  // Only return questions that have text
+  return customQuestions
+    .filter(q => q.text.trim())
+    .map(q => ({ text: q.text.trim(), type: q.type }));
+}
+
+function loadCustomQuestions(list) {
+  if (!list || !list.length) return;
+  customQuestions = list.map(q => ({ id: Date.now() + Math.random(), text: q.text, type: q.type || 'text' }));
+  renderCustomQuestions();
+}
+
+async function init() {
+  await checkAuth();
+  await loadCategories();
+  await loadTemplates();
+  bindLivePreview();
+
+  // Check if editing an existing job
+  const params = new URLSearchParams(window.location.search);
+  const editId = params.get('edit');
+  if (editId) {
+    await loadJobForEdit(editId);
+  }
+
+  if (window.location.hash === '#templates') {
+    document.getElementById('templatesSection').scrollIntoView({ behavior: 'smooth' });
+  }
+}
+
+async function loadJobForEdit(id) {
+  try {
+    const d = await API.get('/api/employer/jobs');
+    const job = (d.jobs || []).find(j => j.id == id);
+    if (!job) { showToast('Job not found', 'error'); return; }
+
+    // Store edit ID globally
+    window._editJobId = id;
+
+    // Fill form fields
+    document.getElementById('jTitle').value    = job.title       || '';
+    document.getElementById('jLocation').value = job.location    || '';
+    document.getElementById('jType').value     = job.job_type    || 'Full-time';
+    document.getElementById('jSalary').value   = job.salary      || '';
+    document.getElementById('jDesc').value     = job.description || '';
+    document.getElementById('jReqs').value     = job.requirements|| '';
+    document.getElementById('jPositions').value= job.positions   || 1;
+    document.getElementById('jPhone').value    = job.phone       || '';
+    document.getElementById('jWhatsApp').value = job.whatsapp    || '';
+    document.getElementById('jEmail').value    = job.email       || '';
+
+    // Load expiry — calculate remaining time from now
+    if (job.expires_at) {
+      const diff = new Date(job.expires_at) - new Date();
+      if (diff > 0) {
+        const hours = Math.round(diff / 3600000);
+        if (hours < 24) {
+          document.getElementById('jExpiryNum').value  = hours;
+          document.getElementById('jExpiryUnit').value = 'hours';
+        } else {
+          document.getElementById('jExpiryNum').value  = Math.round(hours / 24);
+          document.getElementById('jExpiryUnit').value = 'days';
+        }
+      }
+    }
+
+    // Set category
+    if (job.category_id) {
+      document.getElementById('jCategory').value = job.category_id;
+    }
+
+    // Update page title and button
+    document.querySelector('.ep-page-title').textContent = 'Edit Job';
+    document.querySelector('.ep-page-sub').textContent   = 'Update your job listing details.';
+    const btn = document.querySelector('[onclick="submitJob()"]');
+    if (btn) btn.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Update Job';
+
+    updateSharePreview();
+    showToast('Job loaded for editing', 'success');
+
+    // Restore screening chips from saved data
+    if (job.screening) {
+      const sc = typeof job.screening === 'string' ? JSON.parse(job.screening) : job.screening;
+      if (sc.nationalities)  { toggleFilter('nat',true);   initCntPicker('scNat', sc.nationalities); }
+      if (sc.iqama_types)    { toggleFilter('iqama',true); document.getElementById('scIqama').value = sc.iqama_types; }
+      if (sc.min_experience) { toggleFilter('exp',true);   document.getElementById('scExp').value   = sc.min_experience; }
+      if (sc.required_certs) { toggleFilter('certs',true); document.getElementById('scCerts').value = sc.required_certs; }
+      if (sc.require_iqama_number) { toggleFilter('iqamaNum',true); }
+      if (sc.nationalities||sc.iqama_types||sc.min_experience||sc.required_certs) {
+        const s=document.getElementById('screeningSection');
+        if(s)s.style.display='block';
+        const ch=document.getElementById('screeningChevron');
+        if(ch)ch.className='bi bi-chevron-up';
+      }
+    }
+
+    // Load custom questions if any
+    if (job.screening && job.screening.custom_questions) {
+      try {
+        const qs = typeof job.screening.custom_questions === 'string'
+          ? JSON.parse(job.screening.custom_questions)
+          : job.screening.custom_questions;
+        loadCustomQuestions(qs);
+      } catch(e) {}
+    }
+  } catch(e) {
+    showToast('Failed to load job', 'error');
+  }
+}
+
+async function loadCategories() {
+  const d = await API.get('/api/jobs/categories');
+  categories = d.categories || [];
+  const sel = document.getElementById('jCategory');
+  categories.forEach(c => {
+    const o = document.createElement('option');
+    o.value = c.id;
+    o.textContent = c.name;
+    sel.appendChild(o);
+  });
+}
+
+async function loadTemplates() {
+  const d = await API.get('/api/employer/templates');
+  templates = d.templates || [];
+  const wrap = document.getElementById('templatesList');
+  if (!templates.length) {
+    wrap.innerHTML = '<p style="font-size:.82rem;color:var(--text-muted);margin:0">No templates yet. Post a job then save it as template.</p>';
+    return;
+  }
+  wrap.innerHTML = templates.map(t => `
+    <div class="ep-template-chip" onclick="loadTemplate(${t.id})">
+      <i class="bi bi-file-earmark-text me-1"></i>${t.name}
+      <button onclick="event.stopPropagation();deleteTemplate(${t.id})" style="background:none;border:none;color:inherit;padding:0;margin-left:.35rem;opacity:.6;cursor:pointer">×</button>
+    </div>`).join('');
+}
+
+function loadTemplate(id) {
+  const t = templates.find(x => x.id === id);
+  if (!t) return;
+  if (t.title)       document.getElementById('jTitle').value    = t.title;
+  if (t.location)    document.getElementById('jLocation').value = t.location;
+  if (t.job_type)    document.getElementById('jType').value     = t.job_type;
+  if (t.salary)      document.getElementById('jSalary').value   = t.salary;
+  if (t.description) document.getElementById('jDesc').value     = t.description;
+  if (t.requirements) document.getElementById('jReqs').value    = t.requirements;
+  if (t.category_id) document.getElementById('jCategory').value = t.category_id;
+  updateSharePreview();
+  showToast('Template loaded', 'success');
+}
+
+async function deleteTemplate(id) {
+  if (!confirm('Delete this template?')) return;
+  await API.del('/api/employer/templates/' + id);
+  await loadTemplates();
+  showToast('Template deleted');
+}
+
+async function saveTemplate() {
+  const name = prompt('Template name (e.g. "Welder Aramco Jubail"):');
+  if (!name) return;
+  const d = await API.post('/api/employer/templates', {
+    name,
+    title:        document.getElementById('jTitle').value,
+    category_id:  document.getElementById('jCategory').value || null,
+    location:     document.getElementById('jLocation').value,
+    job_type:     document.getElementById('jType').value,
+    description:  document.getElementById('jDesc').value,
+    salary:       document.getElementById('jSalary').value,
+    requirements: document.getElementById('jReqs').value
+  });
+  if (d.success) { showToast('Template saved!'); await loadTemplates(); }
+  else showToast(d.message, 'error');
+}
+
+function toggleScreening() {
+  const s = document.getElementById('screeningSection');
+  const c = document.getElementById('screeningChevron');
+  const open = s.style.display === 'none';
+  s.style.display = open ? 'block' : 'none';
+  c.className = open ? 'bi bi-chevron-up' : 'bi bi-chevron-down';
+}
+
+function bindLivePreview() {
+  ['jTitle','jLocation','jSalary','jDesc','jWhatsApp','jPhone'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', updateSharePreview);
+  });
+}
+
+function updateSharePreview() {
+  const title    = document.getElementById('jTitle').value.trim();
+  const location = document.getElementById('jLocation').value.trim();
+  const salary   = document.getElementById('jSalary').value.trim();
+  const wa       = document.getElementById('jWhatsApp').value.trim() || document.getElementById('jPhone').value.trim();
+  if (!title) return;
+  const msg = `🔵 *JOB VACANCY*\n\n*${title}*\n📍 ${location||'Location TBC'}\n${salary?'💰 '+salary+'\n':''}\n📱 Contact: ${wa||'See post'}\n\n👉 Full details: joborbit.org\n\n_Posted via JobOrbit.org_`;
+  document.getElementById('sharePreview').textContent = msg.replace(/\n/g, '\n');
+}
+
+function copyShareMsg() {
+  const title    = document.getElementById('jTitle').value.trim() || 'Job Vacancy';
+  const location = document.getElementById('jLocation').value.trim();
+  const salary   = document.getElementById('jSalary').value.trim();
+  const wa       = document.getElementById('jWhatsApp').value.trim() || document.getElementById('jPhone').value.trim();
+  const msg = `🔵 *JOB VACANCY*\n\n*${title}*\n📍 ${location||''}\n${salary?'💰 '+salary+'\n':''}\n📱 Contact: ${wa||''}\n\n👉 Full details: joborbit.org\n\n_Posted via JobOrbit.org_`;
+  navigator.clipboard.writeText(msg.replace(/\n/g, '\n')).then(() => showToast('Copied to clipboard!'));
+}
+
+function clearForm() {
+  ['jTitle','jLocation','jSalary','jDesc','jReqs','jPhone','jWhatsApp','jEmail'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('jCategory').value = '';
+  document.getElementById('jPositions').value = 1;
+}
+
+function previewJob() {
+  const title = document.getElementById('jTitle').value.trim();
+  const loc   = document.getElementById('jLocation').value.trim();
+  const desc  = document.getElementById('jDesc').value.trim();
+  if (!title) { showToast('Enter a job title first', 'error'); return; }
+  alert(`PREVIEW\n\nTitle: ${title}\nLocation: ${loc}\n\n${desc.substring(0,200)}...`);
+}
+
+async function submitJob() {
+  const msg = document.getElementById('postMsg');
+  const btn = event.target;
+  const title = document.getElementById('jTitle').value.trim();
+  const loc   = document.getElementById('jLocation').value.trim();
+  const desc  = document.getElementById('jDesc').value.trim();
+
+  if (!title) { showMsg(msg, 'Job title is required', 'error'); return; }
+  if (!loc)   { showMsg(msg, 'Location is required', 'error'); return; }
+  if (!desc)  { showMsg(msg, 'Job description is required', 'error'); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Posting...';
+
+  const screening = {
+    nationalities:  scActive.nat   ? document.getElementById('scNat').value.trim()   || null : null,
+    iqama_types:    scActive.iqama ? document.getElementById('scIqama').value         || null : null,
+    min_experience: scActive.exp   ? parseInt(document.getElementById('scExp').value) || 0   : null,
+    required_certs: scActive.certs ? document.getElementById('scCerts').value.trim()  || null : null,
+    require_iqama_number: scActive.iqamaNum,
+    custom_questions: getCustomQuestions()
+  };
+
+  const data = {
+    title, location: loc, description: desc,
+    category_id:  document.getElementById('jCategory').value || null,
+    job_type:     document.getElementById('jType').value,
+    salary:       document.getElementById('jSalary').value.trim(),
+    requirements: document.getElementById('jReqs').value.trim(),
+    positions:    parseInt(document.getElementById('jPositions').value) || 1,
+    phone:        document.getElementById('jPhone').value.trim(),
+    whatsapp:     document.getElementById('jWhatsApp').value.trim(),
+    email:        document.getElementById('jEmail').value.trim(),
+    expires_days: (function() {
+      var num  = parseFloat(document.getElementById('jExpiryNum').value) || 30;
+      var unit = document.getElementById('jExpiryUnit').value;
+      // Always convert to hours for the backend
+      return unit === 'hours' ? (num / 24) : num;
+    })(),
+    screening
+  };
+
+  try {
+    let d;
+    if (window._editJobId) {
+      // Update existing job
+      d = await API.put('/api/employer/jobs/' + window._editJobId, data);
+      if (d.success) {
+        showToast('Job updated successfully!');
+        setTimeout(() => window.location.href = '/employer/jobs.html', 1000);
+      } else {
+        showMsg(msg, d.message || 'Failed to update job', 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Update Job';
+      }
+    } else {
+      // Post new job
+      d = await API.post('/api/employer/jobs', data);
+      if (d.success) {
+        showToast('Job posted successfully!');
+        setTimeout(() => window.location.href = '/employer/jobs.html', 1000);
+      } else {
+        showMsg(msg, d.message || 'Failed to post job', 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-rocket-takeoff-fill me-2"></i>Post Job Now';
+      }
+    }
+  } catch(e) {
+    showMsg(msg, 'Network error', 'error');
+    btn.disabled = false;
+    btn.innerHTML = window._editJobId
+      ? '<i class="bi bi-check-circle-fill me-2"></i>Update Job'
+      : '<i class="bi bi-rocket-takeoff-fill me-2"></i>Post Job Now';
+  }
+}
+
+function showMsg(el, text, type) {
+  el.className = 'ep-msg ep-msg-' + type;
+  el.textContent = text;
+  el.classList.remove('d-none');
+}
+
+init();
+
+/* Inactivity timer */
+(function() {
+  var WARN = 25*60*1000, LOGOUT = 30*60*1000;
+  var warnT, logoutT, shown = false;
+  function reset() {
+    clearTimeout(warnT); clearTimeout(logoutT);
+    if (shown) hide();
+    warnT = setTimeout(warn, WARN);
+    logoutT = setTimeout(auto, LOGOUT);
+  }
+  function warn() {
+    shown = true;
+    var el = document.getElementById('inactWarn');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'inactWarn';
+      el.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';
+      el.innerHTML = '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:2rem;max-width:380px;width:100%;text-align:center"><div style=\"font-size:2rem;margin-bottom:.5rem\">⏰</div><h3 style=\"font-family:Syne,sans-serif;font-weight:800;color:var(--text-primary);margin-bottom:.5rem\">Still there?</h3><p style=\"color:var(--text-secondary);font-size:.9rem\">You\'ll be logged out in <strong id=\"inactCD\">5:00</strong></p><div style=\"display:flex;gap:.75rem;justify-content:center;margin-top:1.25rem\"><button class=\"ep-btn-primary\" onclick=\"keepIn()\">Keep me logged in</button><button class=\"ep-btn-outline\" onclick=\"logoutNow()\">Logout</button></div></div>';
+      document.body.appendChild(el);
+      var s = 300;
+      var ci = setInterval(function(){ s--; var e=document.getElementById('inactCD'); if(e) e.textContent=Math.floor(s/60)+':'+(s%60<10?'0':'')+s%60; if(s<=0) clearInterval(ci); }, 1000);
+    }
+    el.style.display = 'flex';
+  }
+  function hide() { shown=false; var el=document.getElementById('inactWarn'); if(el) el.style.display='none'; }
+  function auto() { fetch('/api/employer/logout',{method:'POST',credentials:'include'}); window.location.href='/employer/?reason=timeout'; }
+  window.keepIn = function(){ hide(); reset(); fetch('/api/employer/me',{credentials:'include'}); };
+  window.logoutNow = async function(){ await fetch('/api/employer/logout',{method:'POST',credentials:'include'}); window.location.href='/employer/'; };
+  ['mousedown','keypress','scroll','touchstart','click'].forEach(function(e){ document.addEventListener(e,reset,{passive:true}); });
+  reset();
+})();
+</script>
+<script src="/js/countries.js"></script>
+<script>document.addEventListener("DOMContentLoaded",()=>initCntPicker("scNat",""));</script>
+<script src="/employer/feedback-widget.js"></script>
+</body></html>

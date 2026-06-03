@@ -385,12 +385,14 @@ if (job.whatsapp) {
   whatsappUrl = `https://wa.me/${clean}?text=${encodeURIComponent(msg)}`;
 }
 const applyLinkBtn = job.apply_link ? `<a href="${he(job.apply_link)}" class="cbtn cbtn-applylink" target="_blank"><i>🔗</i> Apply Link</a>` : '';
+const applyNowBtn  = job.employer_id ? `<button class="cbtn cbtn-applynow" onclick="openSeoApply()"><i>📩</i> Apply Now</button>` : '';
 const contactBtns = [
   job.phone    ? `<a href="tel:${he(job.phone)}"    class="cbtn cbtn-phone"><i>📞</i> ${he(job.phone)}</a>` : '',
   job.whatsapp ? `<a href="${whatsappUrl}" class="cbtn cbtn-wa" target="_blank"><i>💬</i> WhatsApp</a>` : '',
   job.email    ? `<a href="mailto:${he(job.email)}" class="cbtn cbtn-email"><i>✉️</i> ${he(job.email)}</a>` : '',
   job.map_link ? `<a href="${he(job.map_link)}"     class="cbtn cbtn-map" target="_blank"><i>📍</i> View Location</a>` : '',
-  applyLinkBtn
+  applyLinkBtn,
+  applyNowBtn
 ].filter(Boolean).join('\n          ');
 
     // ── Full SSR HTML ──────────────────────────────────────────
@@ -468,6 +470,24 @@ const contactBtns = [
     .cbtn-map{background:#fff3e0;color:#c84b00;border:1px solid #ffcc80}
     .cbtn-applylink{background:#e8f0fe;color:#1a56db;border:1px solid #c7d7fb}
 .cbtn-applylink:hover{background:#1a56db;color:#fff}
+    .cbtn-applynow{background:#0f62fe;color:#fff;border:none;cursor:pointer;font-family:inherit}
+    .cbtn-applynow:hover{background:#0353e9}
+    /* Apply modal */
+    .seo-apply-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;padding:1rem}
+    .seo-apply-overlay.open{display:flex}
+    .seo-apply-modal{background:#fff;border-radius:18px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+    .seo-apply-header{padding:1.25rem 1.5rem;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between}
+    .seo-apply-header h3{margin:0;font-size:1.05rem;font-weight:800;color:#161616}
+    .seo-apply-body{padding:1.25rem 1.5rem}
+    .seo-field{margin-bottom:.85rem}
+    .seo-label{display:block;font-size:.78rem;font-weight:700;color:#6b7280;margin-bottom:.3rem}
+    .seo-input{width:100%;padding:.6rem .85rem;border:1.5px solid #e5e7eb;border-radius:9px;font-size:.9rem;outline:none;box-sizing:border-box}
+    .seo-input:focus{border-color:#0f62fe}
+    .seo-row{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+    .seo-apply-footer{padding:1rem 1.5rem;border-top:1px solid #e5e7eb;display:flex;gap:.5rem;justify-content:flex-end}
+    .seo-btn-primary{background:#0f62fe;color:#fff;border:none;padding:.65rem 1.25rem;border-radius:9px;font-weight:700;cursor:pointer;font-size:.88rem}
+    .seo-btn-secondary{background:#f1f3f4;color:#374151;border:none;padding:.65rem 1.25rem;border-radius:9px;font-weight:600;cursor:pointer;font-size:.88rem}
+    .seo-msg{padding:.65rem 1rem;border-radius:8px;font-size:.83rem;margin-bottom:.75rem}
     .back{display:inline-flex;align-items:center;gap:.3rem;color:#0f62fe;font-size:.88rem;margin-bottom:1.5rem}
     .back:hover{text-decoration:underline}
     footer{margin-top:3rem;padding:1.5rem 1.25rem;text-align:center;font-size:.8rem;color:#9ca3af;border-top:1px solid #e5e7eb}
@@ -559,6 +579,175 @@ const contactBtns = [
       .then(() => console.log('View counted'))
       .catch(e => console.error('View count error', e));
   })();
+</script>
+
+<!-- Apply Now Modal -->
+<div class="seo-apply-overlay" id="seoApplyOverlay">
+  <div class="seo-apply-modal">
+    <div class="seo-apply-header">
+      <div>
+        <h3>Apply for this Job</h3>
+        <p style="margin:.2rem 0 0;font-size:.78rem;color:#6b7280">${he(job.title)} — ${he(job.company)}</p>
+      </div>
+      <button onclick="closeSeoApply()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:#6b7280">✕</button>
+    </div>
+    <div class="seo-apply-body">
+      <div id="seoApplyMsg"></div>
+      <div id="seoScreeningWrap" style="display:none;margin-bottom:1rem">
+        <div style="font-size:.75rem;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.65rem">Pre-Screening Questions</div>
+        <div id="seoScreeningFields"></div>
+        <hr style="border-color:#e5e7eb;margin:.75rem 0">
+      </div>
+      <div class="seo-field">
+        <label class="seo-label">Full Name *</label>
+        <input type="text" class="seo-input" id="seoName" placeholder="Your full name">
+      </div>
+      <div class="seo-row">
+        <div class="seo-field">
+          <label class="seo-label">Phone</label>
+          <input type="tel" class="seo-input" id="seoPhone" placeholder="+966 5XX XXX XXX">
+        </div>
+        <div class="seo-field">
+          <label class="seo-label">WhatsApp</label>
+          <input type="tel" class="seo-input" id="seoWA" placeholder="+966 5XX XXX XXX">
+        </div>
+      </div>
+      <div class="seo-field">
+        <label class="seo-label">Email (for confirmation)</label>
+        <input type="email" class="seo-input" id="seoEmail" placeholder="your@email.com">
+      </div>
+      <div class="seo-row">
+        <div class="seo-field">
+          <label class="seo-label">Nationality</label>
+          <input type="text" class="seo-input" id="seoNat" placeholder="e.g. Pakistani">
+        </div>
+        <div class="seo-field">
+          <label class="seo-label">Iqama Status</label>
+          <select class="seo-input" id="seoIqama">
+            <option value="">Select...</option>
+            <option>Transferable</option>
+            <option>Non-transferable</option>
+            <option>Visit visa</option>
+            <option>Outside Saudi</option>
+            <option>Saudi National</option>
+          </select>
+        </div>
+      </div>
+      <div class="seo-row">
+        <div class="seo-field">
+          <label class="seo-label">Experience (years)</label>
+          <input type="number" class="seo-input" id="seoExp" placeholder="0" min="0">
+        </div>
+        <div class="seo-field">
+          <label class="seo-label">Has Required Cert?</label>
+          <select class="seo-input" id="seoCert">
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+          </select>
+        </div>
+      </div>
+      <div class="seo-field">
+        <label class="seo-label">Cover Note (optional)</label>
+        <textarea class="seo-input" id="seoCover" rows="3" placeholder="Briefly introduce yourself..."></textarea>
+      </div>
+    </div>
+    <div class="seo-apply-footer">
+      <button class="seo-btn-secondary" onclick="closeSeoApply()">Cancel</button>
+      <button class="seo-btn-primary" id="seoSubmitBtn" onclick="submitSeoApplication()">📩 Submit Application</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var SEO_JOB_ID = ${job.id};
+
+async function openSeoApply() {
+  document.getElementById('seoApplyMsg').innerHTML = '';
+  document.getElementById('seoSubmitBtn').disabled = false;
+  document.getElementById('seoSubmitBtn').textContent = '📩 Submit Application';
+  // Load screening questions
+  try {
+    var resp = await fetch('/api/employer/screening/' + SEO_JOB_ID);
+    var data = await resp.json();
+    var wrap   = document.getElementById('seoScreeningWrap');
+    var fields = document.getElementById('seoScreeningFields');
+    if (data.success && data.questions && data.questions.length) {
+      fields.innerHTML = data.questions.map(function(q, i) {
+        return '<div style="margin-bottom:.65rem"><label style="font-size:.82rem;font-weight:600;color:#161616;display:block;margin-bottom:.25rem">' + (i+1) + '. ' + q.text + '</label>'
+          + (q.type === 'yesno'
+            ? '<select class="seo-input screening-ans" data-q="'+i+'"><option value="">Select...</option><option value="yes">Yes</option><option value="no">No</option></select>'
+            : '<input type="text" class="seo-input screening-ans" data-q="'+i+'" placeholder="Your answer...">')
+          + '</div>';
+      }).join('');
+      wrap.style.display = 'block';
+    } else {
+      wrap.style.display = 'none';
+    }
+  } catch(e) {}
+  document.getElementById('seoApplyOverlay').classList.add('open');
+}
+
+function closeSeoApply() {
+  document.getElementById('seoApplyOverlay').classList.remove('open');
+}
+
+async function submitSeoApplication() {
+  var name  = document.getElementById('seoName').value.trim();
+  var phone = document.getElementById('seoPhone').value.trim();
+  var wa    = document.getElementById('seoWA').value.trim();
+  var msgEl = document.getElementById('seoApplyMsg');
+
+  if (!name)         { showSeoMsg('Full name is required', 'error'); return; }
+  if (!phone && !wa) { showSeoMsg('Phone or WhatsApp is required', 'error'); return; }
+
+  var answers = [];
+  document.querySelectorAll('.screening-ans').forEach(function(el) {
+    answers.push({ q: parseInt(el.dataset.q), answer: el.value.trim() });
+  });
+
+  var btn = document.getElementById('seoSubmitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+
+  try {
+    var resp = await fetch('/api/employer/apply/' + SEO_JOB_ID, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        full_name:         name,
+        email:             document.getElementById('seoEmail').value.trim() || null,
+        phone:             phone || null,
+        whatsapp:          wa    || null,
+        nationality:       document.getElementById('seoNat').value.trim()   || null,
+        iqama_status:      document.getElementById('seoIqama').value        || null,
+        experience_years:  parseInt(document.getElementById('seoExp').value)|| null,
+        has_certificate:   document.getElementById('seoCert').value === '1' ? 1 : 0,
+        cover_note:        document.getElementById('seoCover').value.trim() || null,
+        screening_answers: answers
+      })
+    });
+    var result = await resp.json();
+    if (result.success) {
+      showSeoMsg('✅ Application submitted! The employer will contact you.', 'success');
+      btn.textContent = '✅ Submitted';
+    } else {
+      showSeoMsg(result.message || 'Failed to submit.', 'error');
+      btn.disabled = false;
+      btn.textContent = '📩 Submit Application';
+    }
+  } catch(e) {
+    showSeoMsg('Network error. Please try again.', 'error');
+    btn.disabled = false;
+    btn.textContent = '📩 Submit Application';
+  }
+}
+
+function showSeoMsg(text, type) {
+  var el = document.getElementById('seoApplyMsg');
+  el.innerHTML = '<div class="seo-msg" style="background:'
+    + (type==='success' ? 'rgba(16,185,129,.1);color:#059669;border:1px solid rgba(16,185,129,.2)' : 'rgba(239,68,68,.08);color:#dc2626;border:1px solid rgba(239,68,68,.2)')
+    + '">' + text + '</div>';
+}
 </script>
 
 </body>

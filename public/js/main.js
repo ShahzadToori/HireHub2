@@ -866,6 +866,18 @@ if (job.apply_link && job.apply_link.trim() !== '') {
 } else {
     applyBtn.classList.add('d-none');
 }
+
+  // Show "Apply Now" button only for employer-posted jobs
+  const applyNowBtn = $('#modalApplyBtn');
+  if (applyNowBtn) {
+    if (job.employer_id && job.status === 'active') {
+      applyNowBtn.classList.remove('d-none');
+      applyNowBtn.dataset.jobId = job.id;
+      applyNowBtn.dataset.jobTitle = job.title;
+    } else {
+      applyNowBtn.classList.add('d-none');
+    }
+  }
   // Update title for context (won't change canonical)
   document.title = `${job.title} at ${job.company} | ${state.settings.site_name || 'HireHub'}`;
 
@@ -1620,4 +1632,141 @@ function toggleQuickFilter(btn, key) {
   state.page = 1;
   loadJobs();
   toggleClearBtn();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CANDIDATE APPLICATION FORM
+══════════════════════════════════════════════════════════════ */
+window.openApplyForm = async function() {
+  const btn = document.getElementById('modalApplyBtn');
+  if (!btn) return;
+  const jobId    = btn.dataset.jobId;
+  const jobTitle = btn.dataset.jobTitle;
+
+  // Reset form
+  ['applyName','applyPhone','applyWhatsApp','applyEmail','applyNationality','applyCoverNote'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('applyExp').value   = '';
+  document.getElementById('applyCert').value  = '0';
+  document.getElementById('applyIqama').value = '';
+  const msgEl = document.getElementById('applyMsg');
+  if (msgEl) { msgEl.className = 'd-none'; msgEl.textContent = ''; }
+
+  const titleEl = document.getElementById('applyJobTitle');
+  if (titleEl) titleEl.textContent = jobTitle || '';
+
+  document.getElementById('applyModal').dataset.jobId = jobId;
+
+  // Load screening questions
+  try {
+    const resp = await fetch('/api/employer/screening/' + jobId);
+    const data = await resp.json();
+    const wrap   = document.getElementById('applyScreeningWrap');
+    const fields = document.getElementById('applyScreeningFields');
+    if (data.success && data.questions && data.questions.length) {
+      fields.innerHTML = data.questions.map((q, i) => `
+        <div style="margin-bottom:.75rem">
+          <label style="font-size:.83rem;font-weight:600;color:var(--text-primary);display:block;margin-bottom:.3rem">${i+1}. ${q.text}</label>
+          ${q.type === 'yesno'
+            ? `<select class="form-select screening-answer" data-q="${i}" style="border-radius:9px;border:1.5px solid var(--border);background:var(--bg-card);color:var(--text-primary)"><option value="">Select...</option><option value="yes">Yes</option><option value="no">No</option></select>`
+            : `<input type="text" class="form-control screening-answer" data-q="${i}" placeholder="Your answer..." style="border-radius:9px;border:1.5px solid var(--border);background:var(--bg-card);color:var(--text-primary)">`
+          }
+        </div>`).join('');
+      wrap.classList.remove('d-none');
+    } else {
+      wrap.classList.add('d-none');
+      if (fields) fields.innerHTML = '';
+    }
+    // Show/hide standard fields based on employer's active filters
+    const fl = data.filters || {};
+    const g  = id => document.getElementById(id);
+    const sN = !!fl.nationalities, sI = !!fl.iqama_types,
+          sE = !!fl.min_experience, sC = !!fl.required_certs;
+    if(g('applyColNat'))      g('applyColNat').style.display      = sN ? '' : 'none';
+    if(g('applyColIqama'))    g('applyColIqama').style.display    = sI ? '' : 'none';
+    if(g('applyColExp'))      g('applyColExp').style.display      = sE ? '' : 'none';
+    if(g('applyColCert'))     g('applyColCert').style.display     = sC ? '' : 'none';
+    if(g('applyRowNatIqama')) g('applyRowNatIqama').style.display = (sN||sI) ? '' : 'none';
+    if(g('applyRowExpCert'))  g('applyRowExpCert').style.display  = (sE||sC) ? '' : 'none';
+    const sIqamaNum=!!fl.require_iqama_number;
+    if(g('applyRowIqamaNum')) g('applyRowIqamaNum').style.display=sIqamaNum?'':'none';
+  } catch(e) {
+    document.getElementById('applyScreeningWrap').classList.add('d-none');
+    // Hide all standard fields if screening check fails
+    ['applyRowNatIqama','applyRowExpCert'].forEach(id=>{
+      const el=document.getElementById(id); if(el)el.style.display='none';
+    });
+  }
+
+  const jobModalEl = document.getElementById('jobModal');
+  if (jobModalEl) bootstrap.Modal.getInstance(jobModalEl)?.hide();
+  setTimeout(() => { new bootstrap.Modal(document.getElementById('applyModal')).show(); }, 300);
+};
+
+window.submitApplication = async function() {
+  const modal  = document.getElementById('applyModal');
+  const jobId  = modal?.dataset.jobId;
+  const subBtn = document.getElementById('applySubmitBtn');
+
+  const name  = document.getElementById('applyName').value.trim();
+  const phone = document.getElementById('applyPhone').value.trim();
+  const wa    = document.getElementById('applyWhatsApp').value.trim();
+
+  if (!name)         { showApplyMsg('Full name is required', 'error'); return; }
+  if (!phone && !wa) { showApplyMsg('Phone or WhatsApp is required', 'error'); return; }
+
+  const screeningAnswers = [];
+  document.querySelectorAll('.screening-answer').forEach(el => {
+    screeningAnswers.push({ q: parseInt(el.dataset.q), answer: el.value.trim() });
+  });
+
+  const data = {
+    full_name:         name,
+    email:             document.getElementById('applyEmail').value.trim() || null,
+    phone:             phone || null,
+    whatsapp:          wa    || null,
+    nationality:       document.getElementById('applyNationality').value.trim() || null,
+    iqama_status:      document.getElementById('applyIqama').value || null,
+    experience_years:  parseInt(document.getElementById('applyExp').value) || null,
+    has_certificate:   document.getElementById('applyCert').value === '1' ? 1 : 0,
+    iqama_number:      document.getElementById('applyIqamaNum')?.value.trim() || null,
+    cover_note:        document.getElementById('applyCoverNote').value.trim() || null,
+    screening_answers: screeningAnswers
+  };
+
+  subBtn.disabled = true;
+  subBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Submitting...';
+
+  try {
+    const resp   = await fetch('/api/employer/apply/' + jobId, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    const result = await resp.json();
+    if (result.success) {
+      showApplyMsg('✅ Application submitted! The employer will contact you.', 'success');
+      subBtn.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Submitted';
+    } else {
+      showApplyMsg(result.message || 'Failed to submit. Please try again.', 'error');
+      subBtn.disabled = false;
+      subBtn.innerHTML = '<i class="bi bi-send-fill me-2"></i>Submit Application';
+    }
+  } catch(e) {
+    showApplyMsg('Network error. Please try again.', 'error');
+    subBtn.disabled = false;
+    subBtn.innerHTML = '<i class="bi bi-send-fill me-2"></i>Submit Application';
+  }
+};
+
+function showApplyMsg(text, type) {
+  const el = document.getElementById('applyMsg');
+  if (!el) return;
+  el.style.cssText = 'padding:.7rem 1rem;border-radius:9px;font-size:.85rem;margin-bottom:.75rem;background:'
+    + (type==='success' ? 'rgba(16,185,129,.1);color:#059669;border:1px solid rgba(16,185,129,.2)' : 'rgba(239,68,68,.08);color:#dc2626;border:1px solid rgba(239,68,68,.2)');
+  el.textContent = text;
+  el.classList.remove('d-none');
+  el.scrollIntoView({ behavior:'smooth', block:'nearest' });
 }

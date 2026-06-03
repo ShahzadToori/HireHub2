@@ -653,4 +653,31 @@ if (!slug) {
     totalRows: results.length
   });
 });
+
+// ── Employer Feedback ─────────────────────────────────────────
+router.get('/feedback', async (req, res) => {
+  try {
+    const { status, rating } = req.query;
+    let where = 'WHERE 1=1';
+    const params = [];
+    if (status) { where += ' AND status=?'; params.push(status); }
+    if (rating) { where += ' AND rating=?'; params.push(parseInt(rating)); }
+    const [rows] = await db.query(
+      `SELECT * FROM employer_feedback ${where} ORDER BY created_at DESC LIMIT 200`,
+      params
+    );
+    res.json({ success: true, feedback: rows });
+  } catch(err) { console.error('[admin/feedback]', err); res.status(500).json({ success: false }); }
+});
+
+router.patch('/feedback/:id/status', async (req, res) => {
+  try {
+    const { status } = req.body;
+    if (!['new','read','resolved'].includes(status))
+      return res.status(400).json({ success: false, message: 'Invalid status' });
+    await db.query('UPDATE employer_feedback SET status=? WHERE id=?', [status, req.params.id]);
+    res.json({ success: true });
+  } catch(err) { res.status(500).json({ success: false }); }
+});
+
 module.exports = router;

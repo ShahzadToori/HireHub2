@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Data Grid — JobOrbit Employer</title>
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="icon" href="/JobOrbitFavicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/employer/employer.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tabulator-tables@6.2.5/dist/css/tabulator.min.css">
+  <style>
+/* ── Type tabs ── */
+.dg-type-tabs{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.75rem}
+.dg-type-btn{display:flex;align-items:center;gap:.35rem;padding:.45rem .9rem;border:1px solid var(--border);border-radius:8px;background:var(--bg-card);color:var(--text-secondary);font-family:'DM Sans',sans-serif;font-size:.83rem;font-weight:500;cursor:pointer;transition:all .15s;min-height:40px;white-space:nowrap}
+.dg-type-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.dg-type-btn:hover:not(.active){background:var(--surface);color:var(--text-primary)}
+/* ── Toolbar ── */
+.dg-toolbar{display:flex;align-items:center;justify-content:space-between;gap:.5rem;flex-wrap:wrap;margin-bottom:.75rem;padding:.55rem .75rem;background:var(--bg-card);border:1px solid var(--border);border-radius:12px}
+.dg-tl,.dg-tr{display:flex;align-items:center;gap:.35rem;flex-wrap:wrap}
+.dg-search{width:140px;height:34px;font-size:.82rem!important;padding:.3rem .6rem!important}
+@media(max-width:520px){.dg-search{width:100px}}
+/* ── Save status ── */
+#saveStatus{font-size:.76rem;color:var(--text-muted);display:flex;align-items:center;gap:.3rem;min-width:70px}
+.sv-dot{width:7px;height:7px;border-radius:50%;display:inline-block;flex-shrink:0}
+.sv-saving{background:#f59e0b;animation:svp 1s infinite}
+.sv-saved{background:#22c55e}
+.sv-err{background:#dc2626}
+@keyframes svp{0%,100%{opacity:1}50%{opacity:.25}}
+/* ── Bulk bar ── */
+.dg-bulk{display:none;align-items:center;justify-content:space-between;gap:.5rem;flex-wrap:wrap;padding:.5rem .85rem;background:#dbeafe;border:1px solid #93c5fd;border-radius:10px;margin-bottom:.75rem;font-size:.82rem;color:#1d4ed8;font-weight:500}
+[data-theme=dark] .dg-bulk{background:#1e3a5f;border-color:#3b82f6;color:#93c5fd}
+.dg-bulk>div{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
+/* ── Grid wrapper ── */
+#dataGrid{border-radius:12px;overflow:hidden;border:1px solid var(--border);margin-bottom:1.5rem}
+/* ── Tabulator overrides ── */
+.tabulator{font-family:'DM Sans',sans-serif;font-size:.82rem;border:none;background:var(--bg-card)}
+.tabulator-header{background:var(--surface);border-bottom:2px solid var(--border)}
+.tabulator-header .tabulator-col{background:var(--surface);border-right:1px solid var(--border);color:var(--text-secondary);font-weight:600;font-size:.73rem;text-transform:uppercase;letter-spacing:.05em}
+.tabulator-header .tabulator-col:hover{background:var(--border)}
+.tabulator-row{background:var(--bg-card);border-bottom:1px solid var(--border);color:var(--text-primary)}
+.tabulator-row:nth-child(even){background:var(--surface)}
+.tabulator-row:hover{background:rgba(15,98,254,.05)!important}
+.tabulator-row.tabulator-selected{background:rgba(15,98,254,.1)!important}
+.tabulator-row.tabulator-selected:hover{background:rgba(15,98,254,.14)!important}
+.tabulator-cell{border-right:1px solid var(--border);padding:.42rem .65rem;color:var(--text-primary)}
+.tabulator-cell.tabulator-editing{border:2px solid var(--primary)!important;padding:0!important;background:var(--bg-card)!important}
+.tabulator-cell.tabulator-editing input,
+.tabulator-cell.tabulator-editing select,
+.tabulator-cell.tabulator-editing textarea{width:100%;height:100%;min-height:32px;border:none;background:var(--bg-card);color:var(--text-primary);font-family:'DM Sans',sans-serif;font-size:.82rem;padding:.4rem .65rem;outline:none;box-sizing:border-box}
+.tabulator-footer{background:var(--surface);border-top:1px solid var(--border)}
+.tabulator-footer .tabulator-page{background:var(--bg-card);border:1px solid var(--border);color:var(--text-primary);border-radius:5px;padding:.18rem .5rem;margin:0 .12rem;cursor:pointer}
+.tabulator-footer .tabulator-page.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.tabulator-footer .tabulator-page:hover:not(.active):not(.disabled){background:var(--surface)}
+.tabulator-placeholder-contents{color:var(--text-muted);font-size:.85rem}
+/* ── Cell badges ── */
+.dg-b{display:inline-block;padding:.17rem .48rem;border-radius:5px;font-size:.72rem;font-weight:600;text-transform:capitalize}
+.dg-b-active,.dg-b-hired{background:#dcfce7;color:#166534}
+.dg-b-closed,.dg-b-rejected{background:#f1f5f9;color:#475569}
+.dg-b-new{background:#dbeafe;color:#1e40af}
+.dg-b-shortlisted{background:#fef9c3;color:#854d0e}
+.dg-b-reviewed{background:#e0e7ff;color:#3730a3}
+[data-theme=dark] .dg-b-active,[data-theme=dark] .dg-b-hired{background:#14532d;color:#86efac}
+[data-theme=dark] .dg-b-closed,[data-theme=dark] .dg-b-rejected{background:#1e293b;color:#94a3b8}
+[data-theme=dark] .dg-b-new{background:#1e3a5f;color:#93c5fd}
+[data-theme=dark] .dg-b-shortlisted{background:#422006;color:#fcd34d}
+[data-theme=dark] .dg-b-reviewed{background:#1e1b4b;color:#a5b4fc}
+/* ── Dropdowns ── */
+.dg-dd{position:relative;display:inline-block}
+.dg-dd .ep-user-dropdown{right:0;left:auto;top:calc(100% + 4px);min-width:150px;display:none;padding:.3rem}
+.dg-dd .ep-user-dropdown.show{display:block}
+.dg-dd .ep-user-dropdown a{display:flex;align-items:center;gap:.5rem;padding:.4rem .65rem;border-radius:6px;font-size:.82rem;cursor:pointer;color:var(--text-primary);text-decoration:none;transition:background .1s;white-space:nowrap}
+.dg-dd .ep-user-dropdown a:hover{background:var(--surface)}
+/* ── Share modal ── */
+.ep-modal.dg-share{max-width:450px}
+.sh-f{margin-bottom:.9rem}
+.sh-f label{display:block;font-size:.82rem;font-weight:600;color:var(--text-secondary);margin-bottom:.3rem}
+.sh-priv{display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.sh-priv-btn{flex:1;padding:.5rem .4rem;background:transparent;border:none;color:var(--text-secondary);font-family:'DM Sans',sans-serif;font-size:.8rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.35rem;transition:all .15s;text-align:center}
+.sh-priv-btn.active{background:var(--primary);color:#fff}
+.sh-link{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.6rem .85rem;font-size:.77rem;word-break:break-all;color:var(--primary);margin-top:.75rem;display:none}
+.sh-link-inner{display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem}
+
+/* ── Column picker ── */
+.dg-col-wrap{position:relative}
+.dg-col-panel{position:absolute;top:calc(100% + 6px);left:0;right:auto;z-index:2000;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:.4rem .3rem;min-width:195px;max-width:calc(100vw - 2rem);box-shadow:0 8px 24px rgba(0,0,0,.14);display:none;max-height:70vh;overflow-y:auto}
+.dg-col-panel.show{display:block}
+.dg-col-item{display:flex;align-items:center;gap:.55rem;padding:.38rem .65rem;border-radius:7px;cursor:pointer;font-size:.81rem;color:var(--text-primary);user-select:none}
+.dg-col-item:hover{background:var(--surface)}
+.dg-col-item input[type=checkbox]{width:15px;height:15px;cursor:pointer;accent-color:var(--primary);flex-shrink:0}
+.dg-col-hdr{padding:.3rem .65rem .2rem;font-size:.7rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center}
+.dg-col-hdr button{font-size:.68rem;padding:0;background:none;border:none;color:var(--primary);cursor:pointer;font-weight:600}
+
+/* ── Filter bar ── */
+.dg-filter-bar{display:none;flex-wrap:wrap;gap:.4rem;margin-bottom:.75rem;padding:.5rem .75rem;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;align-items:center}
+.dg-flt{display:flex;align-items:center;gap:.3rem}
+.dg-flt label{font-size:.73rem;color:var(--text-muted);white-space:nowrap;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.dg-flt select{height:30px;font-size:.76rem;padding:.15rem .5rem;border-radius:7px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-primary);cursor:pointer;min-width:75px;max-width:140px}
+.dg-flt select.active{border-color:var(--primary);color:var(--primary);background:rgba(15,98,254,.07);font-weight:600}
+  </style>
+</head>
+<body>
+<script>
+(function(){
+  function applyTheme(t,save){
+    document.documentElement.setAttribute('data-theme',t);
+    document.documentElement.style.colorScheme=t;
+    var i=document.getElementById('themeIcon');
+    if(i)i.className=t==='dark'?'bi bi-sun-fill':'bi bi-moon-fill';
+    if(save!==false)localStorage.setItem('theme',t);
+  }
+  applyTheme(localStorage.getItem('theme')||'light',false);
+  document.addEventListener('DOMContentLoaded',function(){
+    var btn=document.getElementById('themeToggle');
+    if(btn)btn.addEventListener('click',function(){
+      applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');
+    });
+  });
+  window.toggleTheme=function(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');};
+})();
+</script>
+
+<!-- Navbar -->
+<nav class="ep-navbar">
+  <div class="ep-nav-inner">
+    <a href="/employer/dashboard.html" class="ep-nav-brand">
+      <img src="/uploads/logo-1772305890056.svg" alt="JobOrbit" style="height:32px;filter:brightness(10)">
+      <span>Employer Portal</span>
+    </a>
+    <div class="ep-nav-links">
+      <a href="/employer/dashboard.html" class="ep-nav-link"><i class="bi bi-grid-fill"></i><span>Dashboard</span></a>
+      <a href="/employer/jobs.html" class="ep-nav-link"><i class="bi bi-briefcase-fill"></i><span>My Jobs</span></a>
+      <a href="/employer/post-job.html" class="ep-nav-link"><i class="bi bi-plus-circle-fill"></i><span>Post Job</span></a>
+      <a href="/employer/applications.html" class="ep-nav-link"><i class="bi bi-inbox-fill"></i><span>Applications</span></a>
+    </div>
+    <div class="ep-nav-right">
+      <button class="ep-icon-btn" id="themeToggle"><i class="bi bi-moon-fill" id="themeIcon"></i></button>
+      <div class="ep-user-menu" id="epUserMenu">
+        <button class="ep-user-btn" onclick="toggleUserMenu()">
+          <div class="ep-avatar" id="epAvatar">E</div>
+          <span id="epCompanyName">Loading...</span>
+          <i class="bi bi-chevron-down" style="font-size:.7rem"></i>
+        </button>
+        <div class="ep-user-dropdown" id="epUserDropdown">
+          <a href="/employer/profile.html"><i class="bi bi-person-gear me-2"></i>Profile</a>
+          <a href="/" target="_blank"><i class="bi bi-box-arrow-up-right me-2"></i>View Site</a>
+          <div class="ep-dropdown-divider"></div>
+          <a href="#" onclick="logout()"><i class="bi bi-box-arrow-left me-2"></i>Logout</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile nav -->
+<div class="ep-mobile-nav">
+  <a href="/employer/dashboard.html" class="ep-mob-link"><i class="bi bi-grid-fill"></i><span>Home</span></a>
+  <a href="/employer/jobs.html" class="ep-mob-link"><i class="bi bi-briefcase-fill"></i><span>Jobs</span></a>
+  <a href="/employer/post-job.html" class="ep-mob-link"><i class="bi bi-plus-circle-fill"></i><span>Post</span></a>
+  <a href="/employer/applications.html" class="ep-mob-link"><i class="bi bi-inbox-fill"></i><span>Inbox</span></a>
+</div>
+
+<div class="ep-page">
+  <!-- Header -->
+  <div class="ep-page-header">
+    <div>
+      <h1 class="ep-page-title">Data Grid</h1>
+      <p class="ep-page-sub" id="dgSub">View and edit all your data in one place</p>
+    </div>
+  </div>
+
+  <!-- Type tabs -->
+  <div class="dg-type-tabs">
+    <button class="dg-type-btn active" data-type="jobs" onclick="switchType('jobs')">
+      <i class="bi bi-briefcase-fill"></i> Jobs
+    </button>
+    <button class="dg-type-btn" data-type="applications" onclick="switchType('applications')">
+      <i class="bi bi-inbox-fill"></i> Applications
+    </button>
+    <button class="dg-type-btn" data-type="candidates" onclick="switchType('candidates')">
+      <i class="bi bi-people-fill"></i> Candidates
+    </button>
+    <button class="dg-type-btn" data-type="templates" onclick="switchType('templates')">
+      <i class="bi bi-layout-text-window-reverse"></i> Templates
+    </button>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="dg-toolbar">
+    <div class="dg-tl">
+      <input type="text" class="ep-input dg-search" id="dgSearch" placeholder="Search..." oninput="filterGrid(this.value)">
+      <button class="ep-btn-outline ep-btn-sm" onclick="undoChange()" id="btnUndo" title="Undo (Ctrl+Z)" disabled>
+        <i class="bi bi-arrow-counterclockwise"></i>
+      </button>
+      <button class="ep-btn-outline ep-btn-sm" onclick="redoChange()" id="btnRedo" title="Redo (Ctrl+Y)" disabled>
+        <i class="bi bi-arrow-clockwise"></i>
+      </button>
+      <div id="saveStatus"></div>
+    </div>
+    <div class="dg-tr">
+      <div class="dg-col-wrap" id="colPickerWrap">
+        <button class="ep-btn-outline ep-btn-sm" onclick="toggleColPicker()" title="Choose columns">
+          <i class="bi bi-layout-three-columns me-1"></i>Columns
+        </button>
+        <div class="dg-col-panel" id="colPanel"></div>
+      </div>
+      <div class="dg-dd" id="exportDd">
+        <button class="ep-btn-outline ep-btn-sm" onclick="toggleExportDd()">
+          <i class="bi bi-download me-1"></i>Export<i class="bi bi-chevron-down ms-1" style="font-size:.62rem"></i>
+        </button>
+        <div class="ep-user-dropdown" id="exportMenu">
+          <a onclick="exportData('xlsx')"><i class="bi bi-file-earmark-excel-fill" style="color:#217346"></i>Excel (.xlsx)</a>
+          <a onclick="exportData('csv')"><i class="bi bi-filetype-csv" style="color:#0f62fe"></i>CSV</a>
+          <a onclick="exportData('pdf')"><i class="bi bi-file-pdf-fill" style="color:#e03e2d"></i>PDF</a>
+        </div>
+      </div>
+      <button class="ep-btn-primary ep-btn-sm" onclick="openShareModal()">
+        <i class="bi bi-share-fill me-1"></i>Share
+      </button>
+    </div>
+  </div>
+
+  <!-- Filter bar -->
+  <div class="dg-filter-bar" id="filterBar"></div>
+
+  <!-- Bulk action bar -->
+  <div class="dg-bulk" id="bulkBar">
+    <span id="selCount" style="font-weight:600">0 selected</span>
+    <div>
+      <select class="ep-input" id="bulkStatus" style="height:30px;font-size:.78rem;padding:.2rem .5rem;width:auto">
+        <option value="">Change status…</option>
+      </select>
+      <button class="ep-btn-outline ep-btn-sm" onclick="applyBulkStatus()">Apply</button>
+      <button class="ep-btn-outline ep-btn-sm" onclick="exportSelected()" title="Export selected rows">
+        <i class="bi bi-download"></i>
+      </button>
+      <button class="ep-btn-outline ep-btn-sm" onclick="clearSel()" title="Clear selection" style="padding:.3rem .55rem">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Grid -->
+  <div id="dataGrid"></div>
+</div>
+
+<!-- Share modal -->
+<div class="ep-modal-overlay" id="shareModal" onclick="if(event.target===this)closeShareModal()">
+  <div class="ep-modal dg-share">
+    <div class="ep-modal-header">
+      <h3 class="ep-modal-title"><i class="bi bi-share-fill me-2"></i>Share Data</h3>
+      <button class="ep-modal-close" onclick="closeShareModal()"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="ep-modal-body">
+      <div class="sh-f">
+        <label>Data</label>
+        <select class="ep-input" id="shType" onchange="onShTypeChange()">
+          <option value="jobs">Jobs</option>
+          <option value="applications">Applications</option>
+          <option value="candidates">Candidates</option>
+        </select>
+      </div>
+      <div class="sh-f" id="shStatusWrap">
+        <label>Filter by status <small style="color:var(--text-muted);font-weight:400">(optional)</small></label>
+        <select class="ep-input" id="shStatus">
+          <option value="">All</option>
+        </select>
+      </div>
+      <div class="sh-f">
+        <label>Link title <small style="color:var(--text-muted);font-weight:400">(optional)</small></label>
+        <input type="text" class="ep-input" id="shTitle" placeholder="e.g. Hired Candidates — June 2026">
+      </div>
+      <div class="sh-f">
+        <label>Expires after</label>
+        <select class="ep-input" id="shExpiry">
+          <option value="7">7 days</option>
+          <option value="30" selected>30 days</option>
+          <option value="90">90 days</option>
+        </select>
+      </div>
+      <div class="sh-f">
+        <label>Privacy</label>
+        <div class="sh-priv">
+          <button class="sh-priv-btn active" id="shPubBtn" onclick="setPrivacy('public')">
+            <i class="bi bi-globe2"></i> Public
+          </button>
+          <button class="sh-priv-btn" id="shPrvBtn" onclick="setPrivacy('private')">
+            <i class="bi bi-lock-fill"></i> Private (request access)
+          </button>
+        </div>
+      </div>
+      <div id="shPrvNote" style="display:none;font-size:.78rem;color:var(--text-muted);margin-bottom:.75rem;padding:.5rem .65rem;background:var(--surface);border-radius:7px">
+        <i class="bi bi-info-circle me-1"></i>Recipients must submit a request. You approve it before they can view.
+      </div>
+      <button class="ep-btn-primary w-100" id="shGenBtn" onclick="generateLink()">
+        <i class="bi bi-link-45deg me-1"></i>Generate Link
+      </button>
+      <div class="sh-link" id="shLinkBox">
+        <div class="sh-link-inner">
+          <span id="shLinkText" style="flex:1;color:var(--primary)"></span>
+          <button class="ep-btn-outline ep-btn-sm" onclick="copyLink()" style="flex-shrink:0;margin-top:-.1rem">
+            <i class="bi bi-copy"></i>
+          </button>
+        </div>
+        <p style="margin:.5rem 0 0;font-size:.73rem;color:var(--text-muted)">
+          <i class="bi bi-check-circle-fill me-1" style="color:#22c55e"></i>Link generated — share it with anyone
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tabulator-tables@6.2.5/dist/js/tabulator.min.js"></script>
+<script>
+
+/* ══ API ══ */
+const API = {
+  async get(u){const r=await fetch(u,{credentials:'include'});return r.json()},
+  async post(u,d){const r=await fetch(u,{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});return r.json()},
+  async patch(u,d){const r=await fetch(u,{method:'PATCH',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});return r.json()}
+};
+
+/* ══ Auth ══ */
+async function checkAuth(){
+  try{
+    const d=await API.get('/api/employer/me');
+    if(!d.success){window.location.href='/employer/';return null}
+    const n=document.getElementById('epCompanyName'),a=document.getElementById('epAvatar');
+    if(n)n.textContent=d.employer.company_name;
+    if(a)a.textContent=d.employer.company_name.charAt(0).toUpperCase();
+    return d;
+  }catch(e){window.location.href='/employer/';return null}
+}
+async function logout(){await API.post('/api/employer/logout',{});window.location.href='/employer/'}
+function toggleUserMenu(){document.getElementById('epUserDropdown')?.classList.toggle('show')}
+document.addEventListener('click',e=>{
+  if(!document.getElementById('epUserMenu')?.contains(e.target))
+    document.getElementById('epUserDropdown')?.classList.remove('show');
+  if(!document.getElementById('exportDd')?.contains(e.target))
+    document.getElementById('exportMenu')?.classList.remove('show');
+  if(!document.getElementById('colPickerWrap')?.contains(e.target))
+    document.getElementById('colPanel')?.classList.remove('show');
+});
+
+function showToast(msg,type='success'){
+  const t=document.createElement('div');
+  t.className='ep-toast ep-toast-'+type;
+  t.innerHTML='<i class="bi bi-'+(type==='success'?'check-circle-fill':'exclamation-circle-fill')+' me-2"></i>'+msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.classList.add('show'),10);
+  setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),300)},3500);
+}
+
+/* ══ State ══ */
+let currentType='jobs';
+let table=null;
+const allData={jobs:[],applications:[],candidates:[],templates:[]};
+const undoStack=[];
+const redoStack=[];
+const MAX_UNDO=50;
+const pendingSaves=new Map();
+let sharePrivacy='public';
+
+/* ══ Formatters ══ */
+function fmtBadge(cell){const v=cell.getValue()||'';return`<span class="dg-b dg-b-${v}">${v||'—'}</span>`}
+function fmtDate(cell){const v=cell.getValue();if(!v)return'<span style="color:var(--text-muted)">—</span>';return new Date(v).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'2-digit'})}
+function fmtPhone(cell){const v=cell.getValue();if(!v)return'<span style="color:var(--text-muted)">—</span>';return`<a href="tel:${v}" style="color:var(--primary)">${v}</a>`}
+function fmtWa(cell){const v=cell.getValue();if(!v)return'<span style="color:var(--text-muted)">—</span>';return`<a href="https://wa.me/${(v||'').replace(/\D/g,'')}" target="_blank" style="color:#25d366">${v}</a>`}
+function fmtExpiry(cell){const v=cell.getValue();if(!v)return'<span style="color:var(--text-muted)">No expiry</span>';const diff=new Date(v)-new Date();const days=Math.floor(diff/86400000);const c=diff<0?'#dc2626':days<3?'#d97706':'#059669';return`<span style="color:${c}">${diff<0?'Expired':days+'d left'}</span>`}
+function fmtApps(cell){const v=cell.getValue()||0;const id=cell.getRow().getData().id;return`<a href="/employer/applications.html?job_id=${id}" style="color:var(--primary);font-weight:600">${v}</a>`}
+function fmtNull(cell){return cell.getValue()||'<span style="color:var(--text-muted)">—</span>'}
+
+/* Native select editor — fixes Android touch dismiss bug */
+function nativeSelectEditor(cell,onRendered,success,cancel,editorParams){
+  const sel=document.createElement('select');
+  (editorParams.values||[]).forEach(v=>{
+    const o=document.createElement('option');
+    o.value=v;o.textContent=v.charAt(0).toUpperCase()+v.slice(1);
+    if(v===cell.getValue())o.selected=true;
+    sel.appendChild(o);
+  });
+  sel.style.cssText='width:100%;height:100%;border:none;background:var(--bg-card);color:var(--text-primary);font-family:DM Sans,sans-serif;font-size:.82rem;cursor:pointer;outline:none;';
+  let _done=false;
+  sel.addEventListener('change',()=>{_done=true;success(sel.value);});
+  sel.addEventListener('blur',()=>{if(!_done)cancel();});
+  onRendered(()=>sel.focus());
+  return sel;
+}
+
+/* ══ Column defs ══ */
+const SEL={formatter:'rowSelection',titleFormatter:'rowSelection',hozAlign:'center',headerSort:false,width:36,cellClick:(e,c)=>c.getRow().toggleSelect()};
+const NUM={title:'#',formatter:'rownum',hozAlign:'center',width:42,headerSort:false};
+const JT=['Full-time','Part-time','Contract','Temporary'];
+const AS=['new','reviewed','shortlisted','rejected','hired'];
+const JS=['active','closed'];
+
+function getColumns(type){
+  if(type==='jobs')return[
+    SEL,NUM,
+    {title:'Job Title',field:'title',minWidth:200,editor:'input',sorter:'string',responsive:0},
+    {title:'Location',field:'location',minWidth:120,editor:'input',responsive:1},
+    {title:'Type',field:'job_type',minWidth:105,editable:false,formatter:fmtNull,responsive:2,cellClick:(e,cell)=>openPicker(cell,JT)},
+    {title:'Salary',field:'salary',minWidth:115,editor:'input',formatter:fmtNull,responsive:2},
+    {title:'Status',field:'status',minWidth:90,editable:false,formatter:fmtBadge,responsive:0,cellClick:(e,cell)=>openPicker(cell,JS)},
+    {title:'Views',field:'views',minWidth:62,hozAlign:'center',sorter:'number',editable:false,responsive:3},
+    {title:'Apps',field:'application_count',minWidth:62,hozAlign:'center',sorter:'number',editable:false,formatter:fmtApps,responsive:1},
+    {title:'Expires',field:'expires_at',minWidth:105,editable:false,formatter:fmtExpiry,responsive:2},
+    {title:'Posted',field:'created_at',minWidth:100,sorter:'date',editable:false,formatter:fmtDate,responsive:3}
+  ];
+  if(type==='applications')return[
+    SEL,NUM,
+    {title:'Candidate',field:'full_name',minWidth:150,editable:false,sorter:'string',responsive:0},
+    {title:'Job',field:'job_title',minWidth:150,editable:false,sorter:'string',responsive:1},
+    {title:'Status',field:'status',minWidth:100,editable:false,formatter:fmtBadge,responsive:0,cellClick:(e,cell)=>openPicker(cell,AS)},
+    {title:'Nationality',field:'nationality',minWidth:110,editable:false,formatter:fmtNull,responsive:2},
+    {title:'Iqama',field:'iqama_status',minWidth:115,editable:false,formatter:fmtNull,responsive:2},
+    {title:'Exp',field:'experience_years',minWidth:60,hozAlign:'center',editable:false,sorter:'number',formatter:c=>c.getValue()!=null?c.getValue()+'yr':'—',responsive:3},
+    {title:'Phone',field:'phone',minWidth:120,editable:false,formatter:fmtPhone,responsive:2},
+    {title:'WhatsApp',field:'whatsapp',minWidth:120,editable:false,formatter:fmtWa,responsive:3},
+    {title:'Iqama No.',field:'iqama_number',minWidth:110,editable:false,formatter:fmtNull,responsive:2},
+    {title:'Cover Note',field:'cover_note',minWidth:180,editable:false,formatter:c=>{const v=c.getValue();if(!v)return'<span style="color:var(--text-muted)">—</span>';return'<span title="'+v.replace(/"/g,'&quot;')+'">'+v.substring(0,60)+(v.length>60?'…':'')+'</span>';},responsive:1},
+    {title:'Notes',field:'employer_notes',minWidth:180,editor:'textarea',formatter:c=>c.getValue()||'<em style="color:var(--text-muted)">Add note…</em>',responsive:2},
+    {title:'Applied',field:'created_at',minWidth:95,editable:false,sorter:'date',formatter:fmtDate,responsive:3}
+  ];
+  if(type==='candidates')return[
+    SEL,NUM,
+    {title:'Name',field:'full_name',minWidth:155,editable:false,sorter:'string',responsive:0},
+    {title:'Nationality',field:'nationality',minWidth:110,editable:false,formatter:fmtNull,responsive:1},
+    {title:'Iqama',field:'iqama_status',minWidth:115,editable:false,formatter:fmtNull,responsive:2},
+    {title:'Exp',field:'experience_years',minWidth:60,hozAlign:'center',editable:false,sorter:'number',formatter:c=>c.getValue()!=null?c.getValue()+'yr':'—',responsive:3},
+    {title:'Phone',field:'phone',minWidth:120,editable:false,formatter:fmtPhone,responsive:1},
+    {title:'WhatsApp',field:'whatsapp',minWidth:120,editable:false,formatter:fmtWa,responsive:2},
+    {title:'Cert',field:'has_certificate',minWidth:52,hozAlign:'center',editable:false,formatter:c=>c.getValue()?'✅':'—',responsive:3},
+    {title:'Applied',field:'jobs_applied',minWidth:60,hozAlign:'center',editable:false,sorter:'number',responsive:2},
+    {title:'Last Applied',field:'last_applied',minWidth:100,editable:false,sorter:'date',formatter:fmtDate,responsive:2}
+  ];
+  if(type==='templates')return[
+    SEL,NUM,
+    {title:'Template Name',field:'name',minWidth:165,editor:'input',sorter:'string',responsive:0},
+    {title:'Job Title',field:'title',minWidth:175,editor:'input',responsive:0},
+    {title:'Location',field:'location',minWidth:115,editor:'input',formatter:fmtNull,responsive:1},
+    {title:'Type',field:'job_type',minWidth:105,editable:false,formatter:fmtNull,responsive:2,cellClick:(e,cell)=>openPicker(cell,JT)},
+    {title:'Salary',field:'salary',minWidth:110,editor:'input',formatter:fmtNull,responsive:2},
+    {title:'Created',field:'created_at',minWidth:95,editable:false,sorter:'date',formatter:fmtDate,responsive:3}
+  ];
+  return[];
+}
+
+/* ══ Init ══ */
+async function init(){
+  await checkAuth();
+  const p=new URLSearchParams(location.search);
+  const type=p.get('type')||'jobs';
+  await switchType(type);
+}
+
+/* ══ Switch type ══ */
+async function switchType(type){
+  currentType=type;
+  document.querySelectorAll('.dg-type-btn').forEach(b=>b.classList.toggle('active',b.dataset.type===type));
+  const subs={
+    jobs:'Click any editable cell to edit inline • Ctrl+Z to undo',
+    applications:'Manage all candidate applications • edit status and notes inline',
+    candidates:'Unique candidates aggregated from all applications (read-only)',
+    templates:'Saved job templates • edit inline'
+  };
+  document.getElementById('dgSub').textContent=subs[type]||'';
+  document.getElementById('dgSearch').value='';
+  updateBulkOptions(type);
+  await loadData(type);
+  buildGrid(type);
+  buildFilterBar(type);
+  setTimeout(function(){var h=[];try{h=JSON.parse(localStorage.getItem('dg-hide-'+currentType)||'[]')}catch(e){}h.forEach(function(fd){try{if(table)table.hideColumn(fd)}catch(e){}});},300);
+}
+
+/* ══ Load data ══ */
+async function loadData(type){
+  document.getElementById('dataGrid').innerHTML='<div style="padding:2.5rem;text-align:center;color:var(--text-muted)"><span class="ep-loading" style="margin:0 auto;display:block"></span><p style="margin-top:.75rem;font-size:.85rem">Loading…</p></div>';
+  try{
+    const map={jobs:['/api/employer/jobs','jobs'],applications:['/api/employer/applications','applications'],candidates:['/api/employer/grid/candidates','candidates'],templates:['/api/employer/templates','templates']};
+    const [url,key]=map[type];
+    const d=await API.get(url);
+    allData[type]=d[key]||[];
+  }catch(e){allData[type]=[];showToast('Failed to load data','error')}
+}
+
+/* ══ Build grid ══ */
+function buildGrid(type){
+  if(table){table.destroy();table=null}
+  document.getElementById('dataGrid').innerHTML='';
+  if(!allData[type].length){
+    document.getElementById('dataGrid').innerHTML='<div class="ep-empty" style="padding:3rem"><i class="bi bi-table" style="font-size:2rem"></i><p>No data found</p></div>';
+    return;
+  }
+  // For applications: flatten screening_answers into dynamic columns
+  let gridData = allData[type];
+  let dynCols = [];
+  if(type==='applications' && gridData.length){
+    const toKey = q=>'sq_'+q.replace(/[^a-z0-9]/gi,'_').toLowerCase();
+    const qMap = new Map();
+    gridData.forEach(app=>{
+      try{
+        const sq = typeof app.screening_answers==='string' ? JSON.parse(app.screening_answers) : app.screening_answers;
+        if(Array.isArray(sq)) sq.forEach(a=>{ if(a.q && !qMap.has(a.q)) qMap.set(a.q, toKey(a.q)); });
+      }catch(e){}
+    });
+    gridData = gridData.map(app=>{
+      const row = Object.assign({}, app);
+      try{
+        const sq = typeof app.screening_answers==='string' ? JSON.parse(app.screening_answers) : app.screening_answers;
+        if(Array.isArray(sq)) sq.forEach(a=>{ if(a.q) row[toKey(a.q)] = a.a; });
+      }catch(e){}
+      return row;
+    });
+    qMap.forEach((fieldKey, qText)=>{
+      dynCols.push({title:qText, field:fieldKey, editable:false, formatter:fmtNull, minWidth:120, responsive:2});
+    });
+  }
+
+  // Inject dynamic cols before Notes and Applied (last 2 cols for applications)
+  let tableCols = getColumns(type);
+  if(dynCols.length) tableCols = [...tableCols.slice(0,-2), ...dynCols, ...tableCols.slice(-2)];
+
+  table=new Tabulator('#dataGrid',{
+    data:gridData,
+    columns:(()=>{const h=JSON.parse(localStorage.getItem('dg-hide-'+type)||'[]');return tableCols.map(col=>h.includes(col.field)?{...col,visible:false}:col);})(),
+    layout:'fitColumns',
+    index:'id',
+    pagination:true,
+    paginationSize:25,
+    paginationSizeSelector:[15,25,50,100],
+    selectableRows:true,
+    clipboard:true,
+    height:'65vh',
+    columnVisibilityChanged:(col,visible)=>{
+      const field=col.getDefinition().field;
+      if(!field)return;
+      let h=JSON.parse(localStorage.getItem('dg-hide-'+type)||'[]');
+      if(!visible){if(!h.includes(field))h.push(field);}else{h=h.filter(x=>x!==field);}
+      localStorage.setItem('dg-hide-'+type,JSON.stringify(h));
+    },
+    rowSelectionChanged:(data,rows)=>{
+      const n=rows.length;
+      document.getElementById('bulkBar').style.display=n?'flex':'none';
+      document.getElementById('selCount').textContent=n+' selected';
+    },
+    cellEdited:cell=>{
+      const row=cell.getRow().getData();
+      const field=cell.getField();
+      const oldVal=cell.getOldValue();
+      const newVal=cell.getValue();
+      if(oldVal===newVal)return;
+      recordChange(type,row.id,field,oldVal,newVal);
+      debouncedSave(type,row.id,field,newVal);
+    }
+  });
+}
+
+/* ══ Filter ══ */
+const SEARCH_FIELDS={
+  jobs:['title','location','job_type','salary','status'],
+  applications:['full_name','job_title','status','nationality','iqama_status','employer_notes'],
+  candidates:['full_name','nationality','iqama_status'],
+  templates:['name','title','location','job_type','salary']
+};
+function filterGrid(q){applyAllFilters();}
+
+/* ══ Undo / Redo ══ */
+function recordChange(type,id,field,oldVal,newVal){
+  undoStack.push({type,id,field,oldVal,newVal});
+  if(undoStack.length>MAX_UNDO)undoStack.shift();
+  redoStack.length=0;
+  updateUndoBtns();
+}
+async function undoChange(){
+  if(!undoStack.length)return;
+  const c=undoStack.pop();
+  redoStack.push(c);
+  if(table&&currentType===c.type)table.updateData([{id:c.id,[c.field]:c.oldVal}]);
+  const row=allData[c.type]?.find(r=>r.id===c.id);
+  if(row)row[c.field]=c.oldVal;
+  await saveField(c.type,c.id,c.field,c.oldVal);
+  updateUndoBtns();
+}
+async function redoChange(){
+  if(!redoStack.length)return;
+  const c=redoStack.pop();
+  undoStack.push(c);
+  if(table&&currentType===c.type)table.updateData([{id:c.id,[c.field]:c.newVal}]);
+  const row=allData[c.type]?.find(r=>r.id===c.id);
+  if(row)row[c.field]=c.newVal;
+  await saveField(c.type,c.id,c.field,c.newVal);
+  updateUndoBtns();
+}
+function updateUndoBtns(){
+  document.getElementById('btnUndo').disabled=!undoStack.length;
+  document.getElementById('btnRedo').disabled=!redoStack.length;
+}
+
+/* ══ Save ══ */
+function debouncedSave(type,id,field,value){
+  const key=`${type}-${id}-${field}`;
+  clearTimeout(pendingSaves.get(key));
+  setSS('saving');
+  pendingSaves.set(key,setTimeout(async()=>{
+    await saveField(type,id,field,value);
+    pendingSaves.delete(key);
+    if(!pendingSaves.size)setSS('saved');
+  },800));
+}
+async function saveField(type,id,field,value){
+  const urlMap={jobs:`/api/employer/grid/jobs/${id}`,applications:`/api/employer/grid/applications/${id}`,templates:`/api/employer/grid/templates/${id}`};
+  if(!urlMap[type])return;
+  try{
+    const d=await API.patch(urlMap[type],{[field]:value});
+    if(!d.success){showToast('Could not save: '+(d.message||'error'),'error');setSS('error')}
+  }catch(e){showToast('Save failed','error');setSS('error')}
+}
+function setSS(state){
+  const el=document.getElementById('saveStatus');
+  if(!el)return;
+  if(state==='saving')el.innerHTML='<span class="sv-dot sv-saving"></span>Saving…';
+  else if(state==='saved'){el.innerHTML='<span class="sv-dot sv-saved"></span>Saved';setTimeout(()=>{if(el)el.innerHTML=''},2500)}
+  else if(state==='error')el.innerHTML='<span class="sv-dot sv-err"></span>Error';
+}
+
+/* ══ Bulk actions ══ */
+function updateBulkOptions(type){
+  const sel=document.getElementById('bulkStatus');
+  sel.innerHTML='<option value="">Change status…</option>';
+  const opts={jobs:JS,applications:AS};
+  (opts[type]||[]).forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s.charAt(0).toUpperCase()+s.slice(1);sel.appendChild(o)});
+  document.getElementById('bulkBar').style.display='none';
+}
+async function applyBulkStatus(){
+  const status=document.getElementById('bulkStatus').value;
+  if(!status)return;
+  const rows=table?.getSelectedData()||[];
+  if(!rows.length)return;
+  await Promise.all(rows.map(r=>saveField(currentType,r.id,'status',status)));
+  table.updateData(rows.map(r=>({id:r.id,status})));
+  rows.forEach(r=>{const d=allData[currentType]?.find(x=>x.id===r.id);if(d)d.status=status});
+  showToast(`Updated ${rows.length} items to "${status}"`);
+  table.deselectRow();
+}
+function clearSel(){table?.deselectRow()}
+
+/* ══ Export ══ */
+function toggleExportDd(){document.getElementById('exportMenu')?.classList.toggle('show')}
+function exportData(fmt){
+  if(!table)return;
+  document.getElementById('exportMenu')?.classList.remove('show');
+  const name=`joborbit-${currentType}-${new Date().toISOString().slice(0,10)}`;
+  if(fmt==='csv')table.download('csv',name+'.csv');
+  else if(fmt==='xlsx')table.download('xlsx',name+'.xlsx',{sheetName:currentType.charAt(0).toUpperCase()+currentType.slice(1)});
+  else if(fmt==='pdf'){
+    table.download('pdf',name+'.pdf',{
+      jsPDF:{orientation:'landscape',unit:'mm',format:'a4'},
+      autoTable:{styles:{fontSize:7,cellPadding:2},headStyles:{fillColor:[15,98,254],textColor:255}}
+    });
+  }
+}
+function exportSelected(){
+  const rows=table?.getSelectedData()||[];
+  if(!rows.length){showToast('Select rows first','error');return}
+  // Build a mini worksheet from selected rows
+  if(typeof XLSX==='undefined'){showToast('Export library not loaded','error');return}
+  const ws=XLSX.utils.json_to_sheet(rows);
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Selected');
+  XLSX.writeFile(wb,`joborbit-${currentType}-selected-${new Date().toISOString().slice(0,10)}.xlsx`);
+}
+
+/* ══ Share modal ══ */
+function openShareModal(){
+  const sel=document.getElementById('shType');
+  if(sel)sel.value=currentType==='templates'?'jobs':currentType;
+  onShTypeChange();
+  setPrivacy('public');
+  document.getElementById('shTitle').value='';
+  document.getElementById('shLinkBox').style.display='none';
+  document.getElementById('shareModal').classList.add('show');
+}
+function closeShareModal(){document.getElementById('shareModal').classList.remove('show')}
+function setPrivacy(mode){
+  sharePrivacy=mode;
+  document.getElementById('shPubBtn').classList.toggle('active',mode==='public');
+  document.getElementById('shPrvBtn').classList.toggle('active',mode==='private');
+  document.getElementById('shPrvNote').style.display=mode==='private'?'block':'none';
+}
+function onShTypeChange(){
+  const type=document.getElementById('shType').value;
+  const sel=document.getElementById('shStatus');
+  sel.innerHTML='<option value="">All</option>';
+  if(type==='applications'){
+    AS.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s.charAt(0).toUpperCase()+s.slice(1);sel.appendChild(o)});
+  }
+  document.getElementById('shStatusWrap').style.display=type==='jobs'?'none':'block';
+}
+async function generateLink(){
+  const btn=document.getElementById('shGenBtn');
+  btn.disabled=true;btn.textContent='Generating…';
+  try{
+    const d=await API.post('/api/employer/share/create',{
+      data_type:document.getElementById('shType').value,
+      status_filter:document.getElementById('shStatus').value,
+      title:document.getElementById('shTitle').value.trim(),
+      expires_days:document.getElementById('shExpiry').value,
+      privacy:sharePrivacy
+    });
+    if(d.success){
+      document.getElementById('shLinkText').textContent=d.url;
+      document.getElementById('shLinkBox').style.display='block';
+    }else showToast(d.message||'Failed to generate link','error');
+  }finally{btn.disabled=false;btn.innerHTML='<i class="bi bi-link-45deg me-1"></i>Generate Link'}
+}
+function copyLink(){
+  const url=document.getElementById('shLinkText').textContent;
+  navigator.clipboard.writeText(url).then(()=>showToast('Link copied!'));
+}
+
+
+/* ══ Column picker ══ */
+function toggleColPicker(){
+  const panel=document.getElementById('colPanel');
+  if(!panel)return;
+  const willShow=!panel.classList.contains('show');
+  panel.classList.toggle('show',willShow);
+  if(willShow)renderColPicker();
+}
+
+function renderColPicker(){
+  const panel=document.getElementById('colPanel');
+  if(!panel||!table)return;
+  const cols=table.getColumns().filter(c=>c.getDefinition().field);
+  if(!cols.length){panel.innerHTML='<div class="dg-col-item" style="color:var(--text-muted)">No columns</div>';return}
+  panel.innerHTML=
+    '<div class="dg-col-hdr"><span>Columns</span><button onclick="resetColPrefs()">Reset</button></div>'+
+    cols.map(c=>{
+      const field=c.getDefinition().field;
+      const title=c.getDefinition().title||field;
+      const visible=c.isVisible();
+      return `<label class="dg-col-item">
+        <input type="checkbox" ${visible?'checked':''} onchange="toggleCol('${field}',this.checked)">
+        ${title}
+      </label>`;
+    }).join('');
+}
+
+function toggleCol(field,visible){
+  if(!table)return;
+  try{visible?table.showColumn(field):table.hideColumn(field)}catch(e){}  
+}
+
+function saveColPrefs(){
+  if(!table)return;
+  const prefs={};
+  table.getColumns().forEach(c=>{
+    const field=c.getDefinition().field;
+    if(field)prefs[field]=c.isVisible();
+  });
+  localStorage.setItem('dg-cols-'+currentType,JSON.stringify(prefs));
+}
+
+function loadColPrefs(type){
+  const saved=localStorage.getItem('dg-cols-'+type);
+  if(!saved||!table)return;
+  try{
+    const prefs=JSON.parse(saved);
+    setTimeout(()=>{
+      Object.entries(prefs).forEach(([field,visible])=>{
+        try{visible?table.showColumn(field):table.hideColumn(field)}catch(e){}
+      });
+    },80);
+  }catch(e){}
+}
+
+function resetColPrefs(){
+  localStorage.removeItem('dg-hide-'+currentType);
+  buildGrid(currentType);
+  document.getElementById('colPanel')?.classList.remove('show');
+  showToast('Columns reset to default');
+}
+
+
+/* ══ Filters ══ */
+const FILTER_FIELDS={
+  jobs:[{field:'status',label:'Status'},{field:'job_type',label:'Type'},{field:'location',label:'Location'}],
+  applications:[{field:'status',label:'Status'},{field:'job_title',label:'Job'},{field:'nationality',label:'Nationality'},{field:'iqama_status',label:'Iqama'}],
+  candidates:[{field:'nationality',label:'Nationality'},{field:'iqama_status',label:'Iqama'},{field:'has_certificate',label:'Certificate'}],
+  templates:[{field:'job_type',label:'Type'},{field:'location',label:'Location'}]
+};
+const activeFilters={};
+
+function buildFilterBar(type){
+  const bar=document.getElementById('filterBar');
+  if(!bar)return;
+  const flds=FILTER_FIELDS[type]||[];
+  const data=allData[type]||[];
+  if(!flds.length||!data.length){bar.style.display='none';bar.innerHTML='';return}
+  if(!activeFilters[type])activeFilters[type]={};
+  let html='';
+  flds.forEach(f=>{
+    let vals;
+    if(f.field==='has_certificate'){
+      vals=[{label:'Yes',val:'1'},{label:'No',val:'0'}];
+    }else{
+      const u=[...new Set(data.map(r=>r[f.field]).filter(v=>v!=null&&v!==''))].sort();
+      if(u.length<2)return;
+      vals=u.map(v=>({label:v,val:v}));
+    }
+    const saved=activeFilters[type][f.field]||'';
+    const opts=vals.map(v=>`<option value="${v.val}"${saved===String(v.val)?' selected':''}>${v.label}</option>`).join('');
+    html+=`<div class="dg-flt"><label>${f.label}</label><select id="flt_${f.field}" class="${saved?'active':''}" onchange="applyFilter('${f.field}',this.value)"><option value="">All</option>${opts}</select></div>`;
+  });
+  if(!html){bar.style.display='none';return}
+  const hasActive=Object.keys(activeFilters[type]).length>0;
+  html+=`<button class="ep-btn-outline ep-btn-sm" id="clearFiltersBtn" onclick="clearAllFilters()" style="${hasActive?'':'display:none'}"><i class="bi bi-x-circle me-1"></i>Clear</button>`;
+  bar.innerHTML=html;
+  bar.style.display='flex';
+}
+
+function applyFilter(field,value){
+  if(!activeFilters[currentType])activeFilters[currentType]={};
+  if(value!=='')activeFilters[currentType][field]=value;
+  else delete activeFilters[currentType][field];
+  const sel=document.getElementById('flt_'+field);
+  if(sel)sel.classList.toggle('active',value!=='');
+  const btn=document.getElementById('clearFiltersBtn');
+  if(btn)btn.style.display=Object.keys(activeFilters[currentType]).length?'':'none';
+  applyAllFilters();
+}
+
+function clearAllFilters(){
+  activeFilters[currentType]={};
+  document.querySelectorAll('[id^="flt_"]').forEach(s=>{s.value='';s.classList.remove('active');});
+  const btn=document.getElementById('clearFiltersBtn');
+  if(btn)btn.style.display='none';
+  document.getElementById('dgSearch').value='';
+  applyAllFilters();
+}
+
+function applyAllFilters(){
+  if(!table)return;
+  const flds=Object.entries(activeFilters[currentType]||{});
+  const q=document.getElementById('dgSearch').value.trim().toLowerCase();
+  const sFields=SEARCH_FIELDS[currentType]||[];
+  if(!flds.length&&!q){table.clearFilter();return}
+  table.setFilter(function(data){
+    for(const [field,val]of flds){
+      if(field==='has_certificate'){if(String(data[field])!==val)return false;}
+      else{if(String(data[field]??'')!==val)return false;}
+    }
+    if(q&&!sFields.some(f=>String(data[f]||'').toLowerCase().includes(q)))return false;
+    return true;
+  });
+}
+
+
+/* ══ Bottom sheet picker for select fields ══ */
+function openPicker(cell, values){
+  const current=cell.getValue();
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:flex-end';
+  const sheet=document.createElement('div');
+  sheet.style.cssText='background:var(--bg-card);border-radius:16px 16px 0 0;width:100%;padding:1rem 1rem 2rem;max-height:70vh;overflow-y:auto';
+  const title=document.createElement('p');
+  title.style.cssText='font-size:.73rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.75rem';
+  title.textContent='Select option';
+  sheet.appendChild(title);
+  values.forEach(v=>{
+    const active=v===String(current||'');
+    const btn=document.createElement('button');
+    btn.style.cssText='display:flex;align-items:center;gap:.6rem;width:100%;padding:.75rem 1rem;border:1px solid '+(active?'var(--primary)':'var(--border)')+';border-radius:10px;background:'+(active?'rgba(15,98,254,.08)':'transparent')+';color:'+(active?'var(--primary)':'var(--text-primary)')+';font-family:DM Sans,sans-serif;font-size:.88rem;font-weight:'+(active?'600':'400')+';text-align:left;cursor:pointer;margin-bottom:.45rem;text-transform:capitalize';
+    btn.innerHTML='<i class="bi '+(active?'bi-check-circle-fill':'bi-circle')+'" style="color:'+(active?'var(--primary)':'var(--text-muted)')+'"></i>'+v.charAt(0).toUpperCase()+v.slice(1);
+    btn.addEventListener('click',()=>{
+      overlay.remove();
+      if(v===String(current||''))return;
+      const row=cell.getRow().getData();
+      const field=cell.getField();
+      table.updateData([{id:row.id,[field]:v}]);
+      recordChange(currentType,row.id,field,current,v);
+      debouncedSave(currentType,row.id,field,v);
+    });
+    sheet.appendChild(btn);
+  });
+  const cancel=document.createElement('button');
+  cancel.style.cssText='display:block;width:100%;padding:.65rem;border:none;background:transparent;color:var(--text-muted);font-family:DM Sans,sans-serif;font-size:.85rem;cursor:pointer;margin-top:.25rem';
+  cancel.textContent='Cancel';
+  cancel.addEventListener('click',()=>overlay.remove());
+  sheet.appendChild(cancel);
+  overlay.addEventListener('click',e=>{if(e.target===overlay)overlay.remove();});
+  overlay.appendChild(sheet);
+  document.body.appendChild(overlay);
+}
+
+/* ══ Keyboard shortcuts ══ */
+document.addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&e.key==='z'){e.preventDefault();undoChange()}
+  if((e.ctrlKey||e.metaKey)&&(e.key==='y'||(e.shiftKey&&e.key==='Z'))){e.preventDefault();redoChange()}
+});
+
+init();
+
+/* ══ Inactivity timer ══ */
+(function(){
+  var WARN=25*60*1000,LOGOUT=30*60*1000;
+  var warnT,logoutT,shown=false;
+  function reset(){clearTimeout(warnT);clearTimeout(logoutT);if(shown)hide();warnT=setTimeout(warn,WARN);logoutT=setTimeout(auto,LOGOUT)}
+  function warn(){shown=true;var el=document.getElementById('inactWarn');if(!el){el=document.createElement('div');el.id='inactWarn';el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';el.innerHTML='<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:2rem;max-width:380px;width:100%;text-align:center"><div style="font-size:2rem;margin-bottom:.5rem">⏰</div><h3 style="font-family:Syne,sans-serif;font-weight:800;color:var(--text-primary);margin-bottom:.5rem">Still there?</h3><p style="color:var(--text-secondary);font-size:.9rem">You\'ll be logged out in <strong id="inactCD">5:00</strong></p><div style="display:flex;gap:.75rem;justify-content:center;margin-top:1.25rem"><button class="ep-btn-primary" onclick="keepIn()">Keep me logged in</button><button class="ep-btn-outline" onclick="logoutNow()">Logout</button></div></div>';document.body.appendChild(el);var s=300;var ci=setInterval(function(){s--;var e=document.getElementById('inactCD');if(e)e.textContent=Math.floor(s/60)+':'+(s%60<10?'0':'')+s%60;if(s<=0)clearInterval(ci)},1000)}el.style.display='flex'}
+  function hide(){shown=false;var el=document.getElementById('inactWarn');if(el)el.style.display='none'}
+  function auto(){fetch('/api/employer/logout',{method:'POST',credentials:'include'});window.location.href='/employer/?reason=timeout'}
+  window.keepIn=function(){hide();reset();fetch('/api/employer/me',{credentials:'include'})};
+  window.logoutNow=async function(){await fetch('/api/employer/logout',{method:'POST',credentials:'include'});window.location.href='/employer/'};
+  ['mousedown','keypress','scroll','touchstart','click'].forEach(function(e){document.addEventListener(e,reset,{passive:true})});
+  reset();
+})();
+
+function toggleCol(field,visible){
+  if(!table)return;
+  try{visible?table.showColumn(field):table.hideColumn(field)}catch(e){}
+  var key='dg-hide-'+currentType,h=[];
+  try{h=JSON.parse(localStorage.getItem(key)||'[]')}catch(e){}
+  if(!visible){if(!h.includes(field))h.push(field);}
+  else{h=h.filter(function(x){return x!==field;});}
+  localStorage.setItem(key,JSON.stringify(h));
+}
+</script>
+<script src="/employer/feedback-widget.js"></script>
+</body>
+</html>

@@ -50,7 +50,7 @@
   <link rel="icon" type="image/svg+xml" href="/JobOrbitFavicon.png"> 
 
   <!-- ══ PWA / Mobile App ══════════════════════════════════════ -->
-
+  <link rel="manifest" href="/manifest.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="JobOrbit">
@@ -225,6 +225,7 @@
     .top-cat-count{font-weight:700;color:var(--text-primary);font-size:.78rem}
   </style>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>.cnt-picker{position:relative}.cnt-dropdown{position:absolute;top:calc(100% + 3px);left:0;right:0;background:#fff;border:1px solid #dee2e6;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:2000;max-height:200px;overflow-y:auto;display:none}.cnt-dropdown.show{display:block}.cnt-option{padding:.45rem .75rem;cursor:pointer;font-size:.83rem;color:#212529}.cnt-option:hover{background:#f8f9fa}.cnt-option strong{color:#0f62fe;font-weight:700}</style>
 </head>
 <body>
 
@@ -581,6 +582,13 @@
   <i class="bi bi-box-arrow-up-right me-1"></i>Apply Link
 </a>
 
+            <!-- Apply via JobOrbit — only for employer-posted jobs -->
+            <button id="modalApplyBtn" class="btn btn-contact btn-apply d-none"
+              onclick="event.stopPropagation();openApplyForm()"
+              style="background:var(--primary);color:#fff;border:none">
+              <i class="bi bi-send-fill me-1"></i>Apply Now
+            </button>
+
             <!-- ── Share button ─────────────────────────────── -->
             <div class="share-wrap" id="modalShareWrap" onclick="event.stopPropagation()">
               <button class="btn btn-share" id="modalShareBtn" aria-label="Share this job" title="Share job">
@@ -694,5 +702,105 @@
 <!-- Bootstrap JS -->
 <!-- App JS -->
 <script src="/js/main.js"></script>
+<!-- ── Application Form Modal ──────────────────────────────── -->
+<div class="modal fade" id="applyModal" tabindex="-1" aria-labelledby="applyModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content" style="border-radius:18px;border:1px solid var(--border);background:var(--bg-card)">
+      <div class="modal-header" style="border-bottom:1px solid var(--border);padding:1.25rem 1.5rem">
+        <div>
+          <h5 class="modal-title" id="applyModalLabel" style="font-family:'Syne',sans-serif;font-weight:800;color:var(--text-primary);margin:0">Apply for this Job</h5>
+          <p id="applyJobTitle" style="font-size:.82rem;color:var(--text-muted);margin:.2rem 0 0"></p>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" style="padding:1.25rem 1.5rem">
+
+        <!-- Screening questions (shown if employer set them) -->
+        <div id="applyScreeningWrap" class="d-none" style="margin-bottom:1.25rem">
+          <div style="font-size:.8rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.75rem">
+            <i class="bi bi-funnel-fill me-1" style="color:var(--primary)"></i>Pre-Screening Questions
+          </div>
+          <div id="applyScreeningFields"></div>
+          <hr style="border-color:var(--border);margin:.75rem 0">
+        </div>
+
+        <!-- Personal info -->
+        <div class="mb-3">
+          <label class="form-label" style="font-size:.8rem;font-weight:700;color:var(--text-secondary)">Full Name <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="applyName" placeholder="Your full name" style="border-radius:10px;border:1.5px solid var(--border);background:var(--bg-card);color:var(--text-primary)">
+        </div>
+        <div class="row g-2 mb-3">
+          <div class="col-6">
+            <label class="form-label" style="font-size:.8rem;font-weight:700;color:var(--text-secondary)">Phone</label>
+            <input type="tel" class="form-control" id="applyPhone" placeholder="+966 5XX XXX XXX" style="border-radius:10px;border:1.5px solid var(--border);background:var(--bg-card);color:var(--text-primary)">
+          </div>
+          <div class="col-6">
+            <label class="form-label" style="font-size:.8rem;font-weight:700;color:var(--text-secondary)">WhatsApp</label>
+            <input type="tel" class="form-control" id="applyWhatsApp" placeholder="+966 5XX XXX XXX" style="border-radius:10px;border:1.5px solid var(--border);background:var(--bg-card);color:var(--text-primary)">
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" style="font-size:.8rem;font-weight:700;color:var(--text-secondary)">Email <span style="color:var(--text-muted)">(for confirmation)</span></label>
+          <input type="email" class="form-control" id="applyEmail" placeholder="your@email.com" style="border-radius:10px;border:1.5px solid var(--border);background:var(--bg-card);color:var(--text-primary)">
+        </div>
+        <div class="row g-2 mb-3" id="applyRowNatIqama">
+          <div class="col-6" id="applyColNat">
+            <label class="form-label" style="font-size:.8rem;font-weight:700;color:var(--text-secondary)">Nationality</label>
+            <div class="cnt-picker">
+            <input type="text" class="form-control" id="applyNatSearch" placeholder="Search nationality..." oninput="filterCntSingle('applyNat',this.value)" onfocus="filterCntSingle('applyNat',this.value)" autocomplete="off" style="border-radius:10px;border:1.5px solid var(--border);background:var(--bg-card);color:var(--text-primary)">
+            <div class="cnt-dropdown" id="applyNatDd"></div>
+            <input type="hidden" id="applyNationality">
+          </div>
+          </div>
+          <div class="col-6" id="applyColIqama">
+            <label class="form-label" style="font-size:.8rem;font-weight:700;color:var(--text-secondary)">Iqama Status</label>
+            <select class="form-select" id="applyIqama" style="border-radius:10px;border:1.5px solid var(--border);background:var(--bg-card);color:var(--text-primary)">
+              <option value="">Select...</option>
+              <option>Transferable</option>
+              <option>Non-transferable</option>
+              <option>Visit visa</option>
+              <option>Outside Saudi</option>
+              <option>Saudi National</option>
+            </select>
+          </div>
+        </div>
+        <div class="row g-2 mb-3" id="applyRowIqamaNum">
+          <div class="col-12">
+            <label class="form-label" style="font-size:.8rem;font-weight:700;color:var(--text-secondary)">Iqama Number</label>
+            <input type="text" class="form-control" id="applyIqamaNum" inputmode="numeric" placeholder="e.g. 2490123456" style="border-radius:10px;border:1.5px solid var(--border);background:var(--bg-card);color:var(--text-primary)">
+          </div>
+        </div>
+        <div class="row g-2 mb-3" id="applyRowExpCert">
+          <div class="col-6" id="applyColExp">
+            <label class="form-label" style="font-size:.8rem;font-weight:700;color:var(--text-secondary)">Experience (years)</label>
+            <input type="number" class="form-control" id="applyExp" placeholder="0" min="0" max="50" style="border-radius:10px;border:1.5px solid var(--border);background:var(--bg-card);color:var(--text-primary)">
+          </div>
+          <div class="col-6" id="applyColCert">
+            <label class="form-label" style="font-size:.8rem;font-weight:700;color:var(--text-secondary)">Has Required Cert?</label>
+            <select class="form-select" id="applyCert" style="border-radius:10px;border:1.5px solid var(--border);background:var(--bg-card);color:var(--text-primary)">
+              <option value="0">No</option>
+              <option value="1">Yes</option>
+            </select>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" style="font-size:.8rem;font-weight:700;color:var(--text-secondary)">Cover Note <span style="color:var(--text-muted)">(optional)</span></label>
+          <textarea class="form-control" id="applyCoverNote" rows="3" placeholder="Briefly introduce yourself and why you're a good fit..." style="border-radius:10px;border:1.5px solid var(--border);background:var(--bg-card);color:var(--text-primary)"></textarea>
+        </div>
+
+        <div id="applyMsg" class="d-none" style="padding:.7rem 1rem;border-radius:9px;font-size:.85rem;margin-bottom:.75rem"></div>
+      </div>
+      <div class="modal-footer" style="border-top:1px solid var(--border);padding:1rem 1.5rem">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" id="applySubmitBtn" class="btn" style="background:var(--primary);color:#fff;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700"
+          onclick="submitApplication()">
+          <i class="bi bi-send-fill me-2"></i>Submit Application
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/js/countries.js"></script>
 </body>
 </html>

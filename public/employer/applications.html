@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Applications — JobOrbit Employer</title>
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="icon" href="/JobOrbitFavicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/employer/employer.css">
+</head>
+<body><script>
+(function(){
+  function applyTheme(t,save){
+    document.documentElement.setAttribute('data-theme',t);
+    document.documentElement.style.colorScheme=t;
+    var i=document.getElementById('themeIcon');
+    if(i)i.className=t==='dark'?'bi bi-sun-fill':'bi bi-moon-fill';
+    if(save!==false)localStorage.setItem('theme',t);
+  }
+  applyTheme(localStorage.getItem('theme')||'light',false);
+  document.addEventListener('DOMContentLoaded',function(){
+    var btn=document.getElementById('themeToggle');
+    if(btn)btn.addEventListener('click',function(){
+      applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');
+    });
+  });
+  window.toggleTheme=function(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');};
+})();
+</script>
+<nav class="ep-navbar">
+  <div class="ep-nav-inner">
+    <a href="/employer/dashboard.html" class="ep-nav-brand">
+      <img src="/uploads/logo-1772305890056.svg" alt="JobOrbit" style="height:32px;filter:brightness(10)">
+      <span>Employer Portal</span>
+    </a>
+    <div class="ep-nav-links">
+      <a href="/employer/dashboard.html" class="ep-nav-link "><i class="bi bi-grid-fill"></i><span>Dashboard</span></a>
+      <a href="/employer/jobs.html"      class="ep-nav-link "><i class="bi bi-briefcase-fill"></i><span>My Jobs</span></a>
+      <a href="/employer/post-job.html"  class="ep-nav-link "><i class="bi bi-plus-circle-fill"></i><span>Post Job</span></a>
+      <a href="/employer/applications.html" class="ep-nav-link ep-nav-active"><i class="bi bi-inbox-fill"></i><span>Applications</span></a>
+    </div>
+    <div class="ep-nav-right">
+      <button class="ep-icon-btn" id="themeToggle"><i class="bi bi-moon-fill" id="themeIcon"></i></button>
+      <div class="ep-user-menu" id="epUserMenu">
+        <button class="ep-user-btn" onclick="toggleUserMenu()">
+          <div class="ep-avatar" id="epAvatar">E</div>
+          <span id="epCompanyName">Loading...</span>
+          <i class="bi bi-chevron-down" style="font-size:.7rem"></i>
+        </button>
+        <div class="ep-user-dropdown" id="epUserDropdown">
+          <a href="/employer/profile.html"><i class="bi bi-person-gear me-2"></i>Profile</a>
+          <a href="/" target="_blank"><i class="bi bi-box-arrow-up-right me-2"></i>View Site</a>
+          <div class="ep-dropdown-divider"></div>
+          <a href="#" onclick="logout()"><i class="bi bi-box-arrow-left me-2"></i>Logout</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+<div class="ep-mobile-nav">
+  <a href="/employer/dashboard.html" class="ep-mob-link "><i class="bi bi-grid-fill"></i><span>Home</span></a>
+  <a href="/employer/jobs.html" class="ep-mob-link "><i class="bi bi-briefcase-fill"></i><span>Jobs</span></a>
+  <a href="/employer/post-job.html" class="ep-mob-link "><i class="bi bi-plus-circle-fill"></i><span>Post</span></a>
+  <a href="/employer/applications.html" class="ep-mob-link active"><i class="bi bi-inbox-fill"></i><span>Inbox</span></a>
+</div>
+<div class="ep-page">
+  <div class="ep-page-header">
+    <div>
+      <h1 class="ep-page-title">Applications</h1>
+      <p class="ep-page-sub">Review and manage candidate applications</p>
+    </div>
+    <a href="/employer/data-grid.html?type=applications" class="ep-btn-outline">
+      <i class="bi bi-table me-1"></i>Table View
+    </a>
+  </div>
+
+  <div class="ep-filter-bar" style="flex-wrap:wrap;gap:.5rem">
+    <select class="ep-input" id="filterJob" style="width:auto;min-width:180px" onchange="loadApplications()">
+      <option value="">All Jobs</option>
+    </select>
+    <div class="ep-status-tabs">
+      <button class="ep-filter-btn active" onclick="filterStatus('',this)">All</button>
+      <button class="ep-filter-btn" onclick="filterStatus('new',this)">New</button>
+      <button class="ep-filter-btn" onclick="filterStatus('shortlisted',this)">Shortlisted</button>
+      <button class="ep-filter-btn" onclick="filterStatus('rejected',this)">Rejected</button>
+      <button class="ep-filter-btn" onclick="filterStatus('hired',this)">Hired</button>
+    </div>
+  </div>
+
+  <div id="appsList"><div class="ep-loading">Loading applications...</div></div>
+</div>
+
+<!-- Application detail modal -->
+<div class="ep-modal-overlay" id="appModal" onclick="if(event.target===this)closeModal()">
+  <div class="ep-modal">
+    <div class="ep-modal-header">
+      <h3 class="ep-modal-title" id="modalName">Candidate Details</h3>
+      <button class="ep-modal-close" onclick="closeModal()"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="ep-modal-body" id="modalBody"></div>
+    <div class="ep-modal-footer">
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+        <button class="ep-btn-outline ep-btn-sm" onclick="updateStatus('reviewed')">Mark Reviewed</button>
+        <button class="ep-btn-outline ep-btn-sm ep-btn-success" onclick="updateStatus('shortlisted')">Shortlist</button>
+        <button class="ep-btn-outline ep-btn-sm ep-btn-success" style="background:#059669;color:#fff;border-color:#059669" onclick="updateStatus('hired')">Mark Hired</button>
+        <button class="ep-btn-outline ep-btn-sm ep-btn-danger" onclick="updateStatus('rejected')">Reject</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+
+const API = {
+  async get(url) {
+    const r = await fetch(url, { credentials: 'include' });
+    return r.json();
+  },
+  async post(url, data) {
+    const r = await fetch(url, { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+    return r.json();
+  },
+  async put(url, data) {
+    const r = await fetch(url, { method: 'PUT', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+    return r.json();
+  },
+  async del(url) {
+    const r = await fetch(url, { method: 'DELETE', credentials: 'include' });
+    return r.json();
+  }
+};
+
+async function checkAuth() {
+  try {
+    const d = await API.get('/api/employer/me');
+    if (!d.success) { window.location.href = '/employer/'; return null; }
+    const n = document.getElementById('epCompanyName');
+    const a = document.getElementById('epAvatar');
+    if (n) n.textContent = d.employer.company_name;
+    if (a) a.textContent = d.employer.company_name.charAt(0).toUpperCase();
+    return d;
+  } catch(e) { window.location.href = '/employer/'; return null; }
+}
+
+async function logout() {
+  await API.post('/api/employer/logout', {});
+  window.location.href = '/employer/';
+}
+
+function toggleUserMenu() {
+  document.getElementById('epUserDropdown')?.classList.toggle('show');
+}
+document.addEventListener('click', e => {
+  const menu = document.getElementById('epUserMenu');
+  if (menu && !menu.contains(e.target)) {
+    document.getElementById('epUserDropdown')?.classList.remove('show');
+  }
+});
+
+function showToast(msg, type='success') {
+  const t = document.createElement('div');
+  t.className = 'ep-toast ep-toast-' + type;
+  t.innerHTML = '<i class="bi bi-' + (type==='success'?'check-circle-fill':'exclamation-circle-fill') + ' me-2"></i>' + msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.classList.add('show'), 10);
+  setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3500);
+}
+
+function timeAgo(date) {
+  const d = new Date(date), now = new Date();
+  const diff = Math.floor((now - d) / 1000);
+  if (diff < 60) return 'just now';
+  if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+  return Math.floor(diff/86400) + 'd ago';
+}
+
+let currentStatus = '';
+let currentApp = null;
+
+async function init() {
+  await checkAuth();
+
+  // Read URL params
+  const params = new URLSearchParams(window.location.search);
+  const jobId = params.get('job_id');
+  const status = params.get('status');
+
+  // Load job list for filter
+  const jd = await API.get('/api/employer/jobs');
+  const sel = document.getElementById('filterJob');
+  (jd.jobs || []).forEach(j => {
+    const o = document.createElement('option');
+    o.value = j.id;
+    o.textContent = j.title + (j.new_applications > 0 ? ' (' + j.new_applications + ' new)' : '');
+    if (jobId && j.id == jobId) o.selected = true;
+    sel.appendChild(o);
+  });
+
+  if (status) {
+    currentStatus = status;
+    document.querySelectorAll('.ep-filter-btn').forEach(b => {
+      b.classList.toggle('active', b.textContent.toLowerCase() === status || (status===''&&b.textContent==='All'));
+    });
+  }
+
+  await loadApplications();
+}
+
+async function loadApplications() {
+  const jobId = document.getElementById('filterJob').value;
+  let url = '/api/employer/applications?';
+  if (jobId) url += 'job_id=' + jobId + '&';
+  if (currentStatus) url += 'status=' + currentStatus;
+
+  document.getElementById('appsList').innerHTML = '<div class="ep-loading">Loading...</div>';
+  const d = await API.get(url);
+  const apps = d.applications || [];
+
+  if (!apps.length) {
+    document.getElementById('appsList').innerHTML = '<div class="ep-empty"><i class="bi bi-inbox"></i><p>No applications found</p></div>';
+    return;
+  }
+
+  document.getElementById('appsList').innerHTML = apps.map(a => `
+    <div class="ep-app-card" onclick="openApp(${a.id})">
+      <div class="ep-app-card-left">
+        <div class="ep-app-avatar-lg">${a.full_name.charAt(0).toUpperCase()}</div>
+        <div class="ep-app-card-info">
+          <div class="ep-app-card-name">${a.full_name}</div>
+          <div class="ep-app-card-meta">
+            <span class="ep-badge ep-badge-${statusColor(a.status)}">${a.status}</span>
+            ${a.nationality ? '<span><i class="bi bi-globe me-1"></i>' + a.nationality + '</span>' : ''}
+            ${a.iqama_status ? '<span><i class="bi bi-card-text me-1"></i>' + a.iqama_status + '</span>' : ''}
+            ${a.experience_years ? '<span><i class="bi bi-briefcase me-1"></i>' + a.experience_years + ' yrs exp</span>' : ''}
+          </div>
+          <div style="font-size:.75rem;color:var(--text-muted);margin-top:.2rem">
+            ${a.job_title} · ${timeAgo(a.created_at)}
+          </div>
+        </div>
+      </div>
+      <div class="ep-app-card-contacts">
+        ${a.whatsapp ? `<a href="https://wa.me/${a.whatsapp.replace(/\D/g,'')}" onclick="event.stopPropagation()" class="ep-contact-btn ep-wa-btn" target="_blank"><i class="bi bi-whatsapp"></i></a>` : ''}
+        ${a.phone ? `<a href="tel:${a.phone}" onclick="event.stopPropagation()" class="ep-contact-btn ep-phone-btn"><i class="bi bi-telephone-fill"></i></a>` : ''}
+      </div>
+    </div>`).join('');
+}
+
+function statusColor(s) {
+  return {new:'blue',reviewed:'yellow',shortlisted:'green',rejected:'gray',hired:'purple'}[s] || 'gray';
+}
+
+function filterStatus(status, btn) {
+  currentStatus = status;
+  document.querySelectorAll('.ep-filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  loadApplications();
+}
+
+let appsCache = {};
+async function openApp(id) {
+  // Fetch fresh
+  const d = await API.get('/api/employer/applications');
+  const app = (d.applications||[]).find(a => a.id === id);
+  if (!app) return;
+  currentApp = app;
+
+  document.getElementById('modalName').textContent = app.full_name;
+  document.getElementById('modalBody').innerHTML = `
+    <div class="ep-detail-grid">
+      <div class="ep-detail-item"><span class="ep-detail-label">Job</span><span class="ep-detail-val">${app.job_title}</span></div>
+      <div class="ep-detail-item"><span class="ep-detail-label">Status</span><span class="ep-badge ep-badge-${statusColor(app.status)}">${app.status}</span></div>
+      ${app.nationality ? `<div class="ep-detail-item"><span class="ep-detail-label">Nationality</span><span class="ep-detail-val">${app.nationality}</span></div>` : ''}
+      ${app.iqama_status ? `<div class="ep-detail-item"><span class="ep-detail-label">Iqama Status</span><span class="ep-detail-val">${app.iqama_status}</span></div>` : ''}
+      ${app.experience_years ? `<div class="ep-detail-item"><span class="ep-detail-label">Experience</span><span class="ep-detail-val">${app.experience_years} years</span></div>` : ''}
+      ${app.has_certificate ? `<div class="ep-detail-item"><span class="ep-detail-label">Certificate</span><span class="ep-badge ep-badge-green">Yes</span></div>` : ''}
+      ${app.phone ? `<div class="ep-detail-item"><span class="ep-detail-label">Phone</span><a href="tel:${app.phone}" class="ep-detail-val ep-link">${app.phone}</a></div>` : ''}
+      ${app.whatsapp ? `<div class="ep-detail-item"><span class="ep-detail-label">WhatsApp</span><a href="https://wa.me/${app.whatsapp.replace(/\D/g,'')}" target="_blank" class="ep-detail-val ep-link" style="color:#25d366">${app.whatsapp}</a></div>` : ''}
+      ${app.email ? `<div class="ep-detail-item"><span class="ep-detail-label">Email</span><a href="mailto:${app.email}" class="ep-detail-val ep-link">${app.email}</a></div>` : ''}
+      ${app.cover_note ? `<div class="ep-detail-item" style="grid-column:1/-1"><span class="ep-detail-label">Cover Note</span><p class="ep-detail-val" style="margin:0;white-space:pre-wrap">${app.cover_note}</p></div>` : ''}
+    </div>
+    <div class="ep-field mt-3">
+      <label class="ep-label">Private Notes</label>
+      <textarea class="ep-input" id="appNotes" rows="3" placeholder="Add private notes about this candidate...">${app.employer_notes||''}</textarea>
+    </div>`;
+
+  document.getElementById('appModal').classList.add('show');
+  // Mark as reviewed automatically
+  if (app.status === 'new') {
+    await API.put('/api/employer/applications/' + id, { status: 'reviewed', employer_notes: app.employer_notes });
+    loadApplications();
+  }
+}
+
+function closeModal() {
+  // Save notes before closing
+  if (currentApp) {
+    const notes = document.getElementById('appNotes')?.value;
+    if (notes !== undefined) {
+      API.put('/api/employer/applications/' + currentApp.id, { status: currentApp.status, employer_notes: notes });
+    }
+  }
+  document.getElementById('appModal').classList.remove('show');
+  currentApp = null;
+}
+
+async function updateStatus(status) {
+  if (!currentApp) return;
+  const notes = document.getElementById('appNotes')?.value || '';
+  const d = await API.put('/api/employer/applications/' + currentApp.id, { status, employer_notes: notes });
+  if (d.success) {
+    showToast('Status updated to ' + status);
+    currentApp.status = status;
+    closeModal();
+    await loadApplications();
+  }
+}
+
+init();
+
+/* Inactivity timer */
+(function() {
+  var WARN = 25*60*1000, LOGOUT = 30*60*1000;
+  var warnT, logoutT, shown = false;
+  function reset() {
+    clearTimeout(warnT); clearTimeout(logoutT);
+    if (shown) hide();
+    warnT = setTimeout(warn, WARN);
+    logoutT = setTimeout(auto, LOGOUT);
+  }
+  function warn() {
+    shown = true;
+    var el = document.getElementById('inactWarn');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'inactWarn';
+      el.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';
+      el.innerHTML = '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:2rem;max-width:380px;width:100%;text-align:center"><div style=\"font-size:2rem;margin-bottom:.5rem\">⏰</div><h3 style=\"font-family:Syne,sans-serif;font-weight:800;color:var(--text-primary);margin-bottom:.5rem\">Still there?</h3><p style=\"color:var(--text-secondary);font-size:.9rem\">You\'ll be logged out in <strong id=\"inactCD\">5:00</strong></p><div style=\"display:flex;gap:.75rem;justify-content:center;margin-top:1.25rem\"><button class=\"ep-btn-primary\" onclick=\"keepIn()\">Keep me logged in</button><button class=\"ep-btn-outline\" onclick=\"logoutNow()\">Logout</button></div></div>';
+      document.body.appendChild(el);
+      var s = 300;
+      var ci = setInterval(function(){ s--; var e=document.getElementById('inactCD'); if(e) e.textContent=Math.floor(s/60)+':'+(s%60<10?'0':'')+s%60; if(s<=0) clearInterval(ci); }, 1000);
+    }
+    el.style.display = 'flex';
+  }
+  function hide() { shown=false; var el=document.getElementById('inactWarn'); if(el) el.style.display='none'; }
+  function auto() { fetch('/api/employer/logout',{method:'POST',credentials:'include'}); window.location.href='/employer/?reason=timeout'; }
+  window.keepIn = function(){ hide(); reset(); fetch('/api/employer/me',{credentials:'include'}); };
+  window.logoutNow = async function(){ await fetch('/api/employer/logout',{method:'POST',credentials:'include'}); window.location.href='/employer/'; };
+  ['mousedown','keypress','scroll','touchstart','click'].forEach(function(e){ document.addEventListener(e,reset,{passive:true}); });
+  reset();
+})();
+</script>
+<script src="/employer/feedback-widget.js"></script>
+</body></html>

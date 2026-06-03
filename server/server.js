@@ -16,6 +16,7 @@ const seoRoutes      = require('./routes/seo');
 const { router: alertsRouter, scheduleAutoDigest } = require('./routes/alerts');
 const reviewsRouter  = require('./routes/reviews');
 const blacklistRouter = require('./routes/blacklist');
+const employerRouter  = require('./routes/employer');
 const htmlLayout = require('./middleware/htmlLayout');
 const blogRoutes    = require('./routes/blog');
 const blogSeoRoutes = require('./routes/blog-routes');
@@ -41,6 +42,7 @@ app.use('/api/', limiter);
 
 // ── Body parsing ──────────────────────────────────────────────
 app.use(express.json({ limit: '5mb' }));
+app.use(require('cookie-parser')());
 app.use(express.urlencoded({ extended: true, limit: '5mb' }));
 
 // ── Sessions ──────────────────────────────────────────────────
@@ -108,6 +110,7 @@ app.use('/api/contact',   contactRoutes);
 app.use('/api/alerts',    alertsRouter);
 app.use('/api/reviews',   reviewsRouter);
 app.use('/api/blacklist', blacklistRouter);
+app.use('/api/employer',  employerRouter);
 // Only load PDF on VPS where Puppeteer is installed
 if (process.env.PDF_ENABLED !== 'false') {
   const pdfRoute = require('./routes/pdf');

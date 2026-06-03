@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Dashboard — JobOrbit Employer</title>
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="icon" href="/JobOrbitFavicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/employer/employer.css">
+</head>
+<body><script>
+(function(){
+  function applyTheme(t,save){
+    document.documentElement.setAttribute('data-theme',t);
+    document.documentElement.style.colorScheme=t;
+    var i=document.getElementById('themeIcon');
+    if(i)i.className=t==='dark'?'bi bi-sun-fill':'bi bi-moon-fill';
+    if(save!==false)localStorage.setItem('theme',t);
+  }
+  applyTheme(localStorage.getItem('theme')||'light',false);
+  document.addEventListener('DOMContentLoaded',function(){
+    var btn=document.getElementById('themeToggle');
+    if(btn)btn.addEventListener('click',function(){
+      applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');
+    });
+  });
+  window.toggleTheme=function(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');};
+})();
+</script>
+<nav class="ep-navbar">
+  <div class="ep-nav-inner">
+    <a href="/employer/dashboard.html" class="ep-nav-brand">
+      <img src="/uploads/logo-1772305890056.svg" alt="JobOrbit" style="height:32px;filter:brightness(10)">
+      <span>Employer Portal</span>
+    </a>
+    <div class="ep-nav-links">
+      <a href="/employer/dashboard.html" class="ep-nav-link ep-nav-active"><i class="bi bi-grid-fill"></i><span>Dashboard</span></a>
+      <a href="/employer/jobs.html"      class="ep-nav-link "><i class="bi bi-briefcase-fill"></i><span>My Jobs</span></a>
+      <a href="/employer/post-job.html"  class="ep-nav-link "><i class="bi bi-plus-circle-fill"></i><span>Post Job</span></a>
+      <a href="/employer/applications.html" class="ep-nav-link "><i class="bi bi-inbox-fill"></i><span>Applications</span></a>
+    </div>
+    <div class="ep-nav-right">
+      <button class="ep-icon-btn" id="themeToggle"><i class="bi bi-moon-fill" id="themeIcon"></i></button>
+      <div class="ep-user-menu" id="epUserMenu">
+        <button class="ep-user-btn" onclick="toggleUserMenu()">
+          <div class="ep-avatar" id="epAvatar">E</div>
+          <span id="epCompanyName">Loading...</span>
+          <i class="bi bi-chevron-down" style="font-size:.7rem"></i>
+        </button>
+        <div class="ep-user-dropdown" id="epUserDropdown">
+          <a href="/employer/profile.html"><i class="bi bi-person-gear me-2"></i>Profile</a>
+          <a href="/" target="_blank"><i class="bi bi-box-arrow-up-right me-2"></i>View Site</a>
+          <div class="ep-dropdown-divider"></div>
+          <a href="#" onclick="logout()"><i class="bi bi-box-arrow-left me-2"></i>Logout</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+<div class="ep-mobile-nav">
+  <a href="/employer/dashboard.html" class="ep-mob-link active"><i class="bi bi-grid-fill"></i><span>Home</span></a>
+  <a href="/employer/jobs.html" class="ep-mob-link "><i class="bi bi-briefcase-fill"></i><span>Jobs</span></a>
+  <a href="/employer/post-job.html" class="ep-mob-link "><i class="bi bi-plus-circle-fill"></i><span>Post</span></a>
+  <a href="/employer/applications.html" class="ep-mob-link "><i class="bi bi-inbox-fill"></i><span>Inbox</span></a>
+</div>
+<div class="ep-page">
+  <div class="ep-page-header">
+    <div>
+      <h1 class="ep-page-title">Dashboard</h1>
+      <p class="ep-page-sub" id="dashGreeting">Welcome back</p>
+    </div>
+    <a href="/employer/post-job.html" class="ep-btn-primary"><i class="bi bi-plus-lg me-2"></i>Post a Job</a>
+  </div>
+
+  <!-- Stats -->
+  <div class="ep-stats-grid">
+    <div class="ep-stat-card">
+      <div class="ep-stat-icon" style="background:rgba(15,98,254,.1);color:var(--primary)"><i class="bi bi-briefcase-fill"></i></div>
+      <div>
+        <div class="ep-stat-num" id="statJobs">—</div>
+        <div class="ep-stat-label">Active Jobs</div>
+      </div>
+    </div>
+    <div class="ep-stat-card">
+      <div class="ep-stat-icon" style="background:rgba(16,185,129,.1);color:#059669"><i class="bi bi-people-fill"></i></div>
+      <div>
+        <div class="ep-stat-num" id="statApps">—</div>
+        <div class="ep-stat-label">Total Applications</div>
+      </div>
+    </div>
+    <div class="ep-stat-card" style="cursor:pointer" onclick="window.location.href='/employer/applications.html?status=new'">
+      <div class="ep-stat-icon" style="background:rgba(245,158,11,.1);color:#d97706"><i class="bi bi-bell-fill"></i></div>
+      <div>
+        <div class="ep-stat-num" id="statNew">—</div>
+        <div class="ep-stat-label">New Applications</div>
+      </div>
+    </div>
+    <div class="ep-stat-card">
+      <div class="ep-stat-icon" style="background:rgba(99,102,241,.1);color:#6366f1"><i class="bi bi-eye-fill"></i></div>
+      <div>
+        <div class="ep-stat-num" id="statViews">—</div>
+        <div class="ep-stat-label">Total Views</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4 mt-1">
+    <!-- Recent Jobs -->
+    <div class="col-lg-7">
+      <div class="ep-card">
+        <div class="ep-card-header">
+          <h2 class="ep-card-title">Recent Jobs</h2>
+          <a href="/employer/jobs.html" class="ep-link">View all <i class="bi bi-arrow-right"></i></a>
+        </div>
+        <div id="dashJobs"><div class="ep-loading">Loading...</div></div>
+      </div>
+    </div>
+
+    <!-- Quick actions + recent applications -->
+    <div class="col-lg-5">
+      <div class="ep-card mb-4">
+        <h2 class="ep-card-title mb-3">Quick Actions</h2>
+        <div class="ep-quick-actions">
+          <a href="/employer/post-job.html" class="ep-quick-btn">
+            <i class="bi bi-plus-circle-fill"></i>
+            <span>Post New Job</span>
+          </a>
+          <a href="/employer/applications.html" class="ep-quick-btn">
+            <i class="bi bi-inbox-fill"></i>
+            <span>View Applications</span>
+          </a>
+          <a href="/employer/post-job.html#templates" class="ep-quick-btn">
+            <i class="bi bi-file-earmark-text-fill"></i>
+            <span>Job Templates</span>
+          </a>
+          <a href="/employer/profile.html" class="ep-quick-btn">
+            <i class="bi bi-person-gear"></i>
+            <span>Edit Profile</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="ep-card">
+        <div class="ep-card-header">
+          <h2 class="ep-card-title">New Applications</h2>
+          <a href="/employer/applications.html" class="ep-link">View all</a>
+        </div>
+        <div id="dashApps"><div class="ep-loading">Loading...</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+
+const API = {
+  async get(url) {
+    const r = await fetch(url, { credentials: 'include' });
+    return r.json();
+  },
+  async post(url, data) {
+    const r = await fetch(url, { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+    return r.json();
+  },
+  async put(url, data) {
+    const r = await fetch(url, { method: 'PUT', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+    return r.json();
+  },
+  async del(url) {
+    const r = await fetch(url, { method: 'DELETE', credentials: 'include' });
+    return r.json();
+  }
+};
+
+async function checkAuth() {
+  try {
+    const d = await API.get('/api/employer/me');
+    if (!d.success) { window.location.href = '/employer/'; return null; }
+    const n = document.getElementById('epCompanyName');
+    const a = document.getElementById('epAvatar');
+    if (n) n.textContent = d.employer.company_name;
+    if (a) a.textContent = d.employer.company_name.charAt(0).toUpperCase();
+    return d;
+  } catch(e) { window.location.href = '/employer/'; return null; }
+}
+
+async function logout() {
+  await API.post('/api/employer/logout', {});
+  window.location.href = '/employer/';
+}
+
+function toggleUserMenu() {
+  document.getElementById('epUserDropdown')?.classList.toggle('show');
+}
+document.addEventListener('click', e => {
+  const menu = document.getElementById('epUserMenu');
+  if (menu && !menu.contains(e.target)) {
+    document.getElementById('epUserDropdown')?.classList.remove('show');
+  }
+});
+
+function showToast(msg, type='success') {
+  const t = document.createElement('div');
+  t.className = 'ep-toast ep-toast-' + type;
+  t.innerHTML = '<i class="bi bi-' + (type==='success'?'check-circle-fill':'exclamation-circle-fill') + ' me-2"></i>' + msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.classList.add('show'), 10);
+  setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3500);
+}
+
+function timeAgo(date) {
+  const d = new Date(date), now = new Date();
+  const diff = Math.floor((now - d) / 1000);
+  if (diff < 60) return 'just now';
+  if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+  return Math.floor(diff/86400) + 'd ago';
+}
+
+async function init() {
+  const d = await checkAuth();
+  if (!d) return;
+
+  document.getElementById('dashGreeting').textContent = 'Welcome back, ' + d.employer.contact_name + ' 👋';
+  document.getElementById('statJobs').textContent = d.stats.total_jobs;
+  document.getElementById('statApps').textContent = d.stats.total_applications;
+  document.getElementById('statNew').textContent  = d.stats.new_applications;
+
+  // Load jobs
+  const jd = await API.get('/api/employer/jobs');
+  const jobs = (jd.jobs || []).slice(0, 5);
+  const totalViews = (jd.jobs || []).reduce((a, j) => a + (j.views || 0), 0);
+  document.getElementById('statViews').textContent = totalViews.toLocaleString();
+
+  const dashJobs = document.getElementById('dashJobs');
+  if (!jobs.length) {
+    dashJobs.innerHTML = '<div class="ep-empty"><i class="bi bi-briefcase"></i><p>No jobs yet. <a href="/employer/post-job.html">Post your first job →</a></p></div>';
+  } else {
+    dashJobs.innerHTML = jobs.map(j => `
+      <div class="ep-job-row">
+        <div class="ep-job-row-info">
+          <div class="ep-job-row-title">${j.title}</div>
+          <div class="ep-job-row-meta">${j.location} · ${timeAgo(j.created_at)}</div>
+        </div>
+        <div class="ep-job-row-right">
+          <span class="ep-badge ep-badge-${j.status==='active'?'green':'gray'}">${j.status}</span>
+          <span class="ep-apps-count" onclick="window.location.href='/employer/applications.html?job_id=${j.id}'" title="Applications">
+            <i class="bi bi-people"></i> ${j.application_count || 0}
+            ${j.new_applications > 0 ? `<span class="ep-new-dot">${j.new_applications}</span>` : ''}
+          </span>
+        </div>
+      </div>`).join('');
+  }
+
+  // Load new applications
+  const ad = await API.get('/api/employer/applications?status=new');
+  const apps = (ad.applications || []).slice(0, 5);
+  const dashApps = document.getElementById('dashApps');
+  if (!apps.length) {
+    dashApps.innerHTML = '<div class="ep-empty"><i class="bi bi-inbox"></i><p>No new applications</p></div>';
+  } else {
+    dashApps.innerHTML = apps.map(a => `
+      <div class="ep-app-row" onclick="window.location.href='/employer/applications.html?job_id=${a.job_id}'">
+        <div class="ep-app-avatar">${a.full_name.charAt(0).toUpperCase()}</div>
+        <div class="ep-app-info">
+          <div class="ep-app-name">${a.full_name}</div>
+          <div class="ep-app-meta">${a.job_title} · ${timeAgo(a.created_at)}</div>
+        </div>
+        <span class="ep-badge ep-badge-blue">New</span>
+      </div>`).join('');
+  }
+}
+init();
+
+/* Inactivity timer */
+(function() {
+  var WARN = 25*60*1000, LOGOUT = 30*60*1000;
+  var warnT, logoutT, shown = false;
+  function reset() {
+    clearTimeout(warnT); clearTimeout(logoutT);
+    if (shown) hide();
+    warnT = setTimeout(warn, WARN);
+    logoutT = setTimeout(auto, LOGOUT);
+  }
+  function warn() {
+    shown = true;
+    var el = document.getElementById('inactWarn');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'inactWarn';
+      el.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';
+      el.innerHTML = '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:2rem;max-width:380px;width:100%;text-align:center"><div style=\"font-size:2rem;margin-bottom:.5rem\">⏰</div><h3 style=\"font-family:Syne,sans-serif;font-weight:800;color:var(--text-primary);margin-bottom:.5rem\">Still there?</h3><p style=\"color:var(--text-secondary);font-size:.9rem\">You\'ll be logged out in <strong id=\"inactCD\">5:00</strong></p><div style=\"display:flex;gap:.75rem;justify-content:center;margin-top:1.25rem\"><button class=\"ep-btn-primary\" onclick=\"keepIn()\">Keep me logged in</button><button class=\"ep-btn-outline\" onclick=\"logoutNow()\">Logout</button></div></div>';
+      document.body.appendChild(el);
+      var s = 300;
+      var ci = setInterval(function(){ s--; var e=document.getElementById('inactCD'); if(e) e.textContent=Math.floor(s/60)+':'+(s%60<10?'0':'')+s%60; if(s<=0) clearInterval(ci); }, 1000);
+    }
+    el.style.display = 'flex';
+  }
+  function hide() { shown=false; var el=document.getElementById('inactWarn'); if(el) el.style.display='none'; }
+  function auto() { fetch('/api/employer/logout',{method:'POST',credentials:'include'}); window.location.href='/employer/?reason=timeout'; }
+  window.keepIn = function(){ hide(); reset(); fetch('/api/employer/me',{credentials:'include'}); };
+  window.logoutNow = async function(){ await fetch('/api/employer/logout',{method:'POST',credentials:'include'}); window.location.href='/employer/'; };
+  ['mousedown','keypress','scroll','touchstart','click'].forEach(function(e){ document.addEventListener(e,reset,{passive:true}); });
+  reset();
+})();
+</script>
+<script src="/employer/feedback-widget.js"></script>
+</body></html>
