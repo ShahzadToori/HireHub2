@@ -296,6 +296,42 @@ router.post('/submit', async (req, res) => {
   }
 });
 
+
+// GET /api/jobs/batch/:batchId  – public requirement share page data
+router.get('/batch/:batchId', async (req, res) => {
+  try {
+    const { batchId } = req.params;
+    if (!batchId || batchId.length < 8)
+      return res.status(400).json({ success: false, message: 'Invalid batch ID' });
+
+    const [jobs] = await db.query(
+      `SELECT j.id, j.title, j.company, j.location, j.job_type, j.positions,
+              j.phone, j.whatsapp, j.email, j.salary, j.description, j.requirements,
+              j.slug, j.created_at, j.expires_at, j.employer_id, j.status,
+              c.name AS category
+         FROM jobs j
+         LEFT JOIN categories c ON j.category_id = c.id
+        WHERE j.batch_id = ? AND j.status = 'active'
+        ORDER BY j.title ASC`,
+      [batchId]
+    );
+    if (!jobs.length)
+      return res.status(404).json({ success: false, message: 'Requirement not found or expired' });
+
+    const [[employer]] = await db.query(
+      `SELECT company_name, logo_url, city, sector FROM employers WHERE id = ?`,
+      [jobs[0].employer_id]
+    );
+
+    const totalPositions = jobs.reduce((s, j) => s + (parseInt(j.positions) || 1), 0);
+
+    res.json({ success: true, jobs, employer: employer || null, totalPositions });
+  } catch (err) {
+    console.error('[batch]', err);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
 // GET /api/jobs/:slug  – single job detail
 router.get('/:slug', async (req, res) => {
   try {

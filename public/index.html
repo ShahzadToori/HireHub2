@@ -499,6 +499,12 @@
           </button>
         </div>
 
+        <!-- Saved Jobs -->
+        <div class="sidebar-widget mb-4 d-none" id="savedJobsWrap">
+          <h5 class="widget-title"><i class="bi bi-bookmark-fill me-2"></i>Saved Jobs</h5>
+          <ul class="list-unstyled mb-0" id="savedJobsList"></ul>
+        </div>
+
         <!-- Recently Viewed -->
         <div class="sidebar-widget mb-4 d-none" id="recentlyViewedWrap">
           <h5 class="widget-title"><i class="bi bi-clock-history me-2"></i>Recently Viewed</h5>
@@ -554,6 +560,12 @@
           <i class="bi bi-file-text me-2"></i>Job Description
         </div>
         <div class="modal-job-desc" id="modalDescription"></div>
+        <div id="modalRequirementsWrap" class="d-none">
+          <div class="modal-desc-label" style="margin-top:1.25rem">
+            <i class="bi bi-list-check me-2"></i>Requirements
+          </div>
+          <div class="modal-job-desc" id="modalRequirements"></div>
+        </div>
         <div id="modalExtraFields" class="d-none"></div>
       </div>
 
@@ -587,6 +599,13 @@
               onclick="event.stopPropagation();openApplyForm()"
               style="background:var(--primary);color:#fff;border:none">
               <i class="bi bi-send-fill me-1"></i>Apply Now
+            </button>
+
+            <!-- Save / Bookmark -->
+            <button type="button" class="btn-modal-save" id="modalSaveBtn"
+              onclick="event.stopPropagation();toggleSaveJobById(state.currentModalJob && state.currentModalJob.id)"
+              aria-label="Save this job" title="Save job">
+              <i class="bi bi-bookmark me-1"></i><span class="btn-save-label">Save</span>
             </button>
 
             <!-- ── Share button ─────────────────────────────── -->
@@ -689,7 +708,7 @@
     <i class="bi bi-envelope-fill"></i>
     <span>Alerts</span>
   </button>
-  <a href="/contact.html" class="mbn-item">
+  <a href="/employer/" class="mbn-item">
     <i class="bi bi-plus-circle-fill"></i>
     <span>Post Job</span>
   </a>

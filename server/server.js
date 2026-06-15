@@ -76,6 +76,9 @@ app.use((req, res, next) => {
   return htmlLayout(req, res, next);
 });
 app.get('/manifest.json', (req, res) => res.status(404).json({}));
+
+// Old "Post a Job" contact-form flow is replaced by the employer self-serve portal
+app.get('/contact.html', (req, res) => res.redirect(301, '/employer/'));
 app.use("/", seoRoutes);
 app.use(blogSeoRoutes);
 app.use(blogRoutes);
@@ -122,6 +125,16 @@ app.get('/admin/*', (req, res) => {
   res.sendFile(path.join(__dirname, '../admin/index.html'));
 });
 
+// Requirement share pages
+app.get('/requirement/:batchId', (req, res) => {
+  try {
+    const html = require('fs').readFileSync(
+      require('path').join(__dirname, '../public/requirement.html'), 'utf8'
+    );
+    res.send(htmlLayout.inject(html));
+  } catch(e) { res.status(500).send('Page not found'); }
+});
+
 // NOTE: /job/* is handled by seoRoutes (SSR for bots).
 // If seoRoutes calls next() (job not found), it falls through here → 404
 //app.get('*', (req, res) => {
@@ -153,4 +166,28 @@ app.listen(PORT, () => {
 
   // Start email alert auto-digest (runs every 24h)
   scheduleAutoDigest();
+
+  // Daily CV cleanup — delete CVs older than 30 days
+  const _cvClean = async () => {
+    try {
+      const db = require('./db/connection');
+      const fs = require('fs');
+      const path = require('path');
+      const [expired] = await db.query(
+        'SELECT id, cv_url FROM job_applications WHERE cv_url IS NOT NULL AND cv_uploaded_at < DATE_SUB(NOW(), INTERVAL 30 DAY)'
+      );
+      for (const a of expired) {
+        try {
+          const fp = path.join(__dirname, '../public', a.cv_url);
+          if (fs.existsSync(fp)) fs.unlinkSync(fp);
+        } catch(e) {}
+      }
+      if (expired.length) {
+        await db.query('UPDATE job_applications SET cv_url=NULL, cv_uploaded_at=NULL WHERE cv_url IS NOT NULL AND cv_uploaded_at < DATE_SUB(NOW(), INTERVAL 30 DAY)');
+        console.log('[CV cleanup] Deleted', expired.length, 'expired CVs');
+      }
+    } catch(e) { console.error('[CV cleanup]', e.message); }
+  };
+  _cvClean(); // run on startup to catch any missed
+  setInterval(_cvClean, 24 * 60 * 60 * 1000);
 });

@@ -143,6 +143,10 @@
             <i class="bi bi-person-gear"></i>
             <span>Edit Profile</span>
           </a>
+          <a href="/employer/data-grid.html" class="ep-quick-btn">
+            <i class="bi bi-table"></i>
+            <span>Data Grid</span>
+          </a>
         </div>
       </div>
 
@@ -152,6 +156,23 @@
           <a href="/employer/applications.html" class="ep-link">View all</a>
         </div>
         <div id="dashApps"><div class="ep-loading">Loading...</div></div>
+      </div>
+
+      <!-- Share Access Requests -->
+      <div class="ep-card" id="shareReqCard" style="display:none">
+        <div class="ep-card-header">
+          <h2 class="ep-card-title"><i class="bi bi-lock-fill me-2" style="color:var(--primary)"></i>Access Requests</h2>
+          <span id="dashReqBadge" style="font-size:.72rem;font-weight:700;padding:.15rem .55rem;border-radius:20px;background:rgba(220,38,38,.1);color:#dc2626"></span>
+        </div>
+        <!-- Pending -->
+        <div id="dashReqPending"></div>
+        <!-- Toggle for approved/denied -->
+        <div id="dashReqHistoryWrap" style="display:none;margin-top:.5rem">
+          <button onclick="toggleReqHistory()" id="dashReqHistoryBtn" style="width:100%;padding:.45rem;border:none;background:var(--surface);border-radius:8px;font-size:.77rem;color:var(--text-muted);cursor:pointer;font-family:'DM Sans',sans-serif">
+            <i class="bi bi-chevron-down me-1"></i>Show approved/denied
+          </button>
+          <div id="dashReqHistory" style="display:none;margin-top:.35rem"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -186,12 +207,22 @@ async function checkAuth() {
     const n = document.getElementById('epCompanyName');
     const a = document.getElementById('epAvatar');
     if (n) n.textContent = d.employer.company_name;
-    if (a) a.textContent = d.employer.company_name.charAt(0).toUpperCase();
+    if (a) {
+      if (d.employer.logo_url) {
+        a.innerHTML = `<img src="${d.employer.logo_url}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block;">`;
+        a.style.padding = '0';
+        a.style.overflow = 'hidden';
+        a.style.background = 'transparent';
+      } else {
+        a.textContent = d.employer.company_name.charAt(0).toUpperCase();
+      }
+    }
     return d;
   } catch(e) { window.location.href = '/employer/'; return null; }
 }
 
 async function logout() {
+  if (!confirm('Are you sure you want to log out?')) return;
   await API.post('/api/employer/logout', {});
   window.location.href = '/employer/';
 }
@@ -222,6 +253,75 @@ function timeAgo(date) {
   if (diff < 3600) return Math.floor(diff/60) + 'm ago';
   if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
   return Math.floor(diff/86400) + 'd ago';
+}
+
+
+function renderDashReqs(requests) {
+  if (!requests.length) return;
+  const card = document.getElementById('shareReqCard');
+  const badge = document.getElementById('dashReqBadge');
+  const pendingEl = document.getElementById('dashReqPending');
+  const histWrap = document.getElementById('dashReqHistoryWrap');
+  const histEl = document.getElementById('dashReqHistory');
+  if (card) card.style.display = '';
+  const pending = requests.filter(r=>r.status==='pending');
+  const rest = requests.filter(r=>r.status!=='pending');
+  if (badge) {
+    badge.textContent = pending.length ? pending.length+' pending' : 'all reviewed ✓';
+    badge.style.background = pending.length ? 'rgba(220,38,38,.1)' : 'rgba(5,150,105,.1)';
+    badge.style.color = pending.length ? '#dc2626' : '#059669';
+  }
+  const rowHtml = (r, showActions) => `
+    <div class="ep-app-row" id="dreq-${r.id}">
+      <div class="ep-app-avatar" style="background:${r.status==='pending'?'rgba(99,102,241,.1)':r.status==='approved'?'rgba(5,150,105,.1)':'rgba(220,38,38,.1)'};color:${r.status==='pending'?'#4f46e5':r.status==='approved'?'#059669':'#dc2626'}">${(r.requester_name||'?').charAt(0).toUpperCase()}</div>
+      <div class="ep-app-info">
+        <div class="ep-app-name">${r.requester_name||'Unknown'}</div>
+        <div class="ep-app-meta">${r.requester_email} · ${r.title||r.data_type}</div>
+      </div>
+      <div style="display:flex;gap:.3rem;flex-shrink:0;align-items:center">
+        ${r.status==='pending'
+          ? `<button class="ep-btn-outline ep-btn-sm" style="color:#059669;border-color:#059669;padding:.3rem .55rem" onclick="dashApproveReq(${r.id},'approve')" title="Approve"><i class="bi bi-check-lg"></i></button>
+             <button class="ep-btn-outline ep-btn-sm ep-btn-danger" style="padding:.3rem .55rem" onclick="dashApproveReq(${r.id},'deny')" title="Deny"><i class="bi bi-x-lg"></i></button>`
+          : r.status==='approved'
+          ? `<span style="font-size:.7rem;color:#059669;font-weight:700">Approved</span>
+             <button class="ep-btn-outline ep-btn-sm ep-btn-danger" style="padding:.25rem .45rem;font-size:.65rem" onclick="dashApproveReq(${r.id},'deny')" title="Revoke"><i class="bi bi-lock-fill"></i></button>`
+          : `<span style="font-size:.7rem;color:#dc2626;font-weight:700">Denied</span>
+             <button class="ep-btn-outline ep-btn-sm" style="padding:.25rem .45rem;font-size:.65rem;color:#059669;border-color:#059669" onclick="dashApproveReq(${r.id},'approve')" title="Re-grant"><i class="bi bi-unlock-fill"></i></button>`
+        }
+      </div>
+    </div>`;
+  if (pendingEl) {
+    pendingEl.innerHTML = pending.length
+      ? pending.map(r=>rowHtml(r,true)).join('')
+      : '<div style="padding:.65rem .75rem;font-size:.8rem;color:#059669"><i class="bi bi-check-circle-fill me-1"></i>No pending requests</div>';
+  }
+  if (histWrap) histWrap.style.display = rest.length ? '' : 'none';
+  if (histEl) histEl.innerHTML = rest.map(r=>rowHtml(r,true)).join('');
+}
+
+function toggleReqHistory() {
+  const h = document.getElementById('dashReqHistory');
+  const btn = document.getElementById('dashReqHistoryBtn');
+  const open = h.style.display !== 'none';
+  h.style.display = open ? 'none' : '';
+  btn.innerHTML = open
+    ? '<i class="bi bi-chevron-down me-1"></i>Show approved/denied'
+    : '<i class="bi bi-chevron-up me-1"></i>Hide';
+}
+
+async function dashApproveReq(id, action) {
+  try {
+    const r = await fetch('/api/employer/share/requests/'+id,{
+      method:'PUT',credentials:'include',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action})
+    }).then(r=>r.json());
+    if (r.success) {
+      showToast(action==='approve'?'✅ Approved — email sent':action==='deny'?'Access revoked':'Done');
+      const rd = await fetch('/api/employer/share/requests',{credentials:'include'}).then(r=>r.json());
+      if (rd.success) renderDashReqs(rd.requests||[]);
+    }
+  } catch(e) {}
 }
 
 async function init() {
@@ -258,6 +358,12 @@ async function init() {
         </div>
       </div>`).join('');
   }
+
+  // Load share access requests
+  try {
+    const rd = await API.get('/api/employer/share/requests');
+    renderDashReqs(rd.requests||[]);
+  } catch(e) {}
 
   // Load new applications
   const ad = await API.get('/api/employer/applications?status=new');

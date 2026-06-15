@@ -33,6 +33,31 @@
   .cnt-chips{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.4rem}
   .cnt-chip{display:inline-flex;align-items:center;gap:.3rem;padding:.18rem .5rem;background:rgba(15,98,254,.1);color:var(--primary);border-radius:20px;font-size:.77rem;font-weight:600}
   .cnt-chip button{background:none;border:none;color:var(--primary);cursor:pointer;padding:0;font-size:.85rem;line-height:1;margin-left:.1rem}
+
+.post-tab-btn{display:inline-flex;align-items:center;gap:.35rem;padding:.5rem 1.1rem;border:1.5px solid var(--border);border-radius:10px;background:var(--bg-card);color:var(--text-secondary);font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:500;cursor:pointer;transition:all .15s;min-height:42px}
+.post-tab-btn.active{background:var(--primary);color:#fff;border-color:var(--primary);font-weight:600}
+.bulk-hdr{display:grid;grid-template-columns:26px 1fr 54px 1fr 1fr 34px;gap:.4rem;padding:.2rem 0 .5rem;font-size:.7rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;border-bottom:2px solid var(--border);margin-bottom:.2rem}
+.bulk-hdr.show-cat{grid-template-columns:26px 1fr 54px 1fr 1fr 1fr 34px}
+.bulk-row{display:grid;grid-template-columns:26px 1fr 54px 1fr 1fr 34px;gap:.4rem;align-items:center;padding:.35rem 0;border-bottom:1px solid var(--border);animation:scIn .15s ease}
+.bulk-row.show-cat{grid-template-columns:26px 1fr 54px 1fr 1fr 1fr 34px}
+.bulk-row:last-child{border-bottom:none}
+.bulk-rn{font-size:.73rem;color:var(--text-muted);text-align:center;font-weight:700}
+.bulk-ci{display:none}
+.bulk-row.show-cat .bulk-ci{display:block}
+.bulk-del{width:32px;height:32px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.78rem;transition:all .12s;flex-shrink:0;padding:0}
+.bulk-del:hover{background:#fee2e2;color:#dc2626;border-color:#fca5a5}
+@media(max-width:576px){
+  .bulk-hdr{display:none}
+  .bulk-row,.bulk-row.show-cat{grid-template-columns:1fr 56px 32px;grid-template-rows:auto auto auto;gap:.3rem}
+  .bulk-rn{display:none}
+  .bulk-ti{grid-column:1;grid-row:1}
+  .bulk-pi{grid-column:2;grid-row:1}
+  .bulk-del{grid-column:3;grid-row:1}
+  .bulk-si{grid-column:1;grid-row:2}
+  .bulk-ni{grid-column:2/span 2;grid-row:2}
+  .bulk-ci{display:none!important;grid-column:1/span 3;grid-row:3}
+  .bulk-row.show-cat .bulk-ci{display:block!important}
+}
   </style>
 </head>
 <body><script>
@@ -98,6 +123,17 @@
     </div>
   </div>
 
+  <!-- Post mode tabs -->
+  <div id="postTabSwitcher" style="display:flex;gap:.5rem;margin-bottom:1.25rem">
+    <button class="post-tab-btn active" data-tab="single" onclick="switchPostTab('single')">
+      <i class="bi bi-pencil-square me-1"></i>Single Job
+    </button>
+    <button class="post-tab-btn" data-tab="bulk" onclick="switchPostTab('bulk')">
+      <i class="bi bi-grid-3x3-gap-fill me-1"></i>Bulk Post
+    </button>
+  </div>
+
+  <div id="tabSingle">
   <div class="row g-4">
     <div class="col-lg-8">
 
@@ -124,7 +160,7 @@
           </div>
           <div class="col-sm-6">
             <div class="ep-field">
-              <label class="ep-label">Category</label>
+              <label class="ep-label">Category <span class="text-danger">*</span></label>
               <select class="ep-input" id="jCategory">
                 <option value="">Select category...</option>
               </select>
@@ -191,20 +227,50 @@
         <div class="row g-3">
           <div class="col-sm-4">
             <div class="ep-field">
-              <label class="ep-label">Phone</label>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:.3rem">
+                <label class="ep-label" style="margin:0">Phone</label>
+                <label style="display:flex;align-items:center;gap:.3rem;font-size:.7rem;color:var(--text-muted);cursor:pointer;font-weight:600;white-space:nowrap">
+                  <input type="checkbox" id="jPhoneShow" checked onchange="toggleContactField('jPhone')" style="accent-color:var(--primary);width:14px;height:14px;cursor:pointer;margin:0">
+                  Show on listing
+                </label>
+              </div>
               <input type="tel" class="ep-input" id="jPhone" placeholder="+966 5XX XXX XXX">
             </div>
           </div>
           <div class="col-sm-4">
             <div class="ep-field">
-              <label class="ep-label">WhatsApp</label>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:.3rem">
+                <label class="ep-label" style="margin:0">WhatsApp</label>
+                <label style="display:flex;align-items:center;gap:.3rem;font-size:.7rem;color:var(--text-muted);cursor:pointer;font-weight:600;white-space:nowrap">
+                  <input type="checkbox" id="jWhatsAppShow" checked onchange="toggleContactField('jWhatsApp')" style="accent-color:var(--primary);width:14px;height:14px;cursor:pointer;margin:0">
+                  Show on listing
+                </label>
+              </div>
               <input type="tel" class="ep-input" id="jWhatsApp" placeholder="+966 5XX XXX XXX">
             </div>
           </div>
           <div class="col-sm-4">
             <div class="ep-field">
-              <label class="ep-label">Email</label>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:.3rem">
+                <label class="ep-label" style="margin:0">Email</label>
+                <label style="display:flex;align-items:center;gap:.3rem;font-size:.7rem;color:var(--text-muted);cursor:pointer;font-weight:600;white-space:nowrap">
+                  <input type="checkbox" id="jEmailShow" checked onchange="toggleContactField('jEmail')" style="accent-color:var(--primary);width:14px;height:14px;cursor:pointer;margin:0">
+                  Show on listing
+                </label>
+              </div>
               <input type="email" class="ep-input" id="jEmail" placeholder="hr@company.com">
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="ep-field">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:.3rem">
+                <label class="ep-label" style="margin:0">Office Map Link <span style="color:var(--text-muted);font-weight:400">(optional)</span></label>
+                <label style="display:flex;align-items:center;gap:.3rem;font-size:.7rem;color:var(--text-muted);cursor:pointer;font-weight:600;white-space:nowrap">
+                  <input type="checkbox" id="jMapLinkShow" checked onchange="toggleContactField('jMapLink')" style="accent-color:var(--primary);width:14px;height:14px;cursor:pointer;margin:0">
+                  Show on listing
+                </label>
+              </div>
+              <input type="url" class="ep-input" id="jMapLink" placeholder="Paste Google Maps link — candidates can find your office">
             </div>
           </div>
         </div>
@@ -227,6 +293,12 @@
             <button type="button" class="sc-chip" id="tgExp"   onclick="toggleFilter('exp')"  ><i class="bi bi-briefcase"></i> Experience</button>
             <button type="button" class="sc-chip" id="tgCerts" onclick="toggleFilter('certs')"><i class="bi bi-patch-check"></i> Certifications</button>
             <button type="button" class="sc-chip" id="tgIqamaNum" onclick="toggleFilter('iqamaNum')"><i class="bi bi-hash"></i> Iqama No.</button>
+          </div>
+          <div class="form-check form-switch" style="margin-top:.6rem">
+            <input class="form-check-input" type="checkbox" role="switch" id="jRequireCv" onchange="updateSharePreview()">
+            <label class="form-check-label" style="font-size:.82rem;color:var(--text-primary)" for="jRequireCv">
+              Require CV upload <span style="font-size:.72rem;color:var(--text-muted)">(PDF, max 5MB)</span>
+            </label>
           </div>
           <div class="row g-3">
             <div class="col-sm-6 sc-field" id="fNat" style="display:none">
@@ -288,19 +360,283 @@
     <!-- Sidebar tips -->
     <div class="col-lg-4">
       <div class="ep-card ep-tips-card" style="position:sticky;top:80px">
-        <h3 class="ep-card-title mb-3"><i class="bi bi-lightbulb-fill me-2" style="color:#d97706"></i>Tips for Better Results</h3>
-        <div class="ep-tip"><i class="bi bi-check-circle-fill"></i>Mention Aramco approval if required — saves filtering time</div>
-        <div class="ep-tip"><i class="bi bi-check-circle-fill"></i>State whether iqama transfer is acceptable</div>
-        <div class="ep-tip"><i class="bi bi-check-circle-fill"></i>Include salary range — gets 3x more applications</div>
-        <div class="ep-tip"><i class="bi bi-check-circle-fill"></i>Add WhatsApp number — Gulf workers prefer it</div>
-        <div class="ep-tip"><i class="bi bi-check-circle-fill"></i>List number of positions needed</div>
-        <div class="ep-tip"><i class="bi bi-check-circle-fill"></i>Mention accommodation if provided</div>
-        <hr style="border-color:var(--border)">
-        <div class="ep-share-preview">
-          <div style="font-size:.78rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.75rem">Share Message Preview</div>
-          <div id="sharePreview" class="ep-share-msg">Fill in job details to see share message...</div>
-          <button class="ep-btn-outline ep-btn-sm w-100 mt-2" onclick="copyShareMsg()"><i class="bi bi-whatsapp me-1" style="color:#25d366"></i>Copy for WhatsApp</button>
+        <!-- Share Preview — top of sidebar for easy access -->
+        <div style="font-size:.8rem;font-weight:700;color:var(--text-secondary);display:flex;align-items:center;gap:.4rem;margin-bottom:.6rem">
+          <i class="bi bi-whatsapp" style="color:#25d366"></i>WhatsApp Preview
         </div>
+        <textarea id="sharePreview" class="ep-input" rows="9" style="font-size:.76rem;font-family:monospace;line-height:1.6;resize:vertical;background:var(--surface);border-radius:10px;padding:.6rem .7rem">Fill in job details to see preview...</textarea>
+        <div style="display:flex;gap:.4rem;margin-top:.5rem">
+          <button class="ep-btn-outline ep-btn-sm" style="flex:1" onclick="updateSharePreview()"><i class="bi bi-arrow-clockwise me-1"></i>Refresh</button>
+          <button class="ep-btn-outline ep-btn-sm" style="flex:2;color:#25d366;border-color:#25d366" onclick="copyShareMsg()"><i class="bi bi-whatsapp me-1"></i>Copy</button>
+        </div>
+        <p style="font-size:.68rem;color:var(--text-muted);margin:.35rem 0 .75rem;text-align:center"><i class="bi bi-info-circle me-1"></i>Paste the job link after posting</p>
+        <hr style="border-color:var(--border);margin:.25rem 0 .6rem">
+        <!-- Tips — collapsible to save space -->
+        <button onclick="toggleTips()" style="width:100%;background:none;border:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-size:.8rem;font-weight:700;color:var(--text-secondary);padding:0;font-family:'DM Sans',sans-serif">
+          <span><i class="bi bi-lightbulb-fill me-2" style="color:#d97706"></i>Tips for Better Results</span>
+          <i class="bi bi-chevron-down" id="tipsChevron"></i>
+        </button>
+        <div id="tipsBody" style="display:none;margin-top:.6rem">
+          <div class="ep-tip"><i class="bi bi-check-circle-fill"></i>Mention Aramco approval if required — saves filtering time</div>
+          <div class="ep-tip"><i class="bi bi-check-circle-fill"></i>State whether iqama transfer is acceptable</div>
+          <div class="ep-tip"><i class="bi bi-check-circle-fill"></i>Include salary range — gets 3x more applications</div>
+          <div class="ep-tip"><i class="bi bi-check-circle-fill"></i>Add WhatsApp number — Gulf workers prefer it</div>
+          <div class="ep-tip"><i class="bi bi-check-circle-fill"></i>List number of positions needed</div>
+          <div class="ep-tip"><i class="bi bi-check-circle-fill"></i>Mention accommodation if provided</div>
+        </div>
+      </div>
+    </div><!-- /col-lg-4 -->
+  </div><!-- /row -->
+</div><!-- /tabSingle -->
+
+<!-- ══ BULK POST TAB ══════════════════════════════════════════════ -->
+<div id="tabBulk" style="display:none">
+  <div class="row g-4">
+    <div class="col-lg-8">
+
+      <!-- Common fields card -->
+      <div class="ep-card mb-3">
+        <h2 class="ep-card-title mb-1">Common Details</h2>
+        <p style="font-size:.78rem;color:var(--text-muted);margin-bottom:1rem">Applied to all jobs in this batch</p>
+        <div class="row g-3">
+
+          <!-- Location + Job Type -->
+          <div class="col-sm-6">
+            <div class="ep-field"><label class="ep-label">Location <span class="text-danger">*</span></label>
+              <input type="text" class="ep-input" id="bLoc" placeholder="e.g. Jubail, Riyadh, Dammam"></div>
+          </div>
+          <div class="col-sm-6">
+            <div class="ep-field"><label class="ep-label">Job Type</label>
+              <select class="ep-input" id="bJobType">
+                <option>Full-time</option><option>Part-time</option>
+                <option selected>Contract</option><option>Freelance</option>
+              </select></div>
+          </div>
+
+          <!-- Category toggle -->
+          <div class="col-12">
+            <div class="ep-field">
+              <label class="ep-label" style="margin-bottom:.4rem">Category <span class="text-danger">*</span></label>
+              <div style="display:flex;gap:.4rem;margin-bottom:.5rem;flex-wrap:wrap">
+                <button type="button" class="sc-chip active" id="bCatBtnCommon" onclick="setBulkCatMode('common')"><i class="bi bi-collection"></i> Same for all</button>
+                <button type="button" class="sc-chip" id="bCatBtnIndiv" onclick="setBulkCatMode('individual')"><i class="bi bi-list-ul"></i> Per job</button>
+              </div>
+              <div id="bCatCommonWrap">
+                <select class="ep-input" id="bCat"><option value="">Select category...</option></select>
+              </div>
+              <p id="bCatIndivNote" style="display:none;font-size:.73rem;color:var(--text-muted);margin:.3rem 0 0"><i class="bi bi-info-circle me-1"></i>Category column appears in each row below</p>
+            </div>
+          </div>
+
+          <!-- Contact -->
+          <div class="col-sm-4">
+            <div class="ep-field">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:.3rem">
+                <label class="ep-label" style="margin:0">Phone</label>
+                <label style="display:flex;align-items:center;gap:.3rem;font-size:.7rem;color:var(--text-muted);cursor:pointer;font-weight:600;white-space:nowrap">
+                  <input type="checkbox" id="bPhoneShow" checked onchange="toggleContactField('bPhone')" style="accent-color:var(--primary);width:14px;height:14px;cursor:pointer;margin:0">
+                  Show on listing
+                </label>
+              </div>
+              <input type="tel" class="ep-input" id="bPhone" placeholder="+966...">
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="ep-field">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:.3rem">
+                <label class="ep-label" style="margin:0">WhatsApp</label>
+                <label style="display:flex;align-items:center;gap:.3rem;font-size:.7rem;color:var(--text-muted);cursor:pointer;font-weight:600;white-space:nowrap">
+                  <input type="checkbox" id="bWaShow" checked onchange="toggleContactField('bWa')" style="accent-color:var(--primary);width:14px;height:14px;cursor:pointer;margin:0">
+                  Show on listing
+                </label>
+              </div>
+              <input type="tel" class="ep-input" id="bWa" placeholder="+966...">
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="ep-field">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:.3rem">
+                <label class="ep-label" style="margin:0">Email</label>
+                <label style="display:flex;align-items:center;gap:.3rem;font-size:.7rem;color:var(--text-muted);cursor:pointer;font-weight:600;white-space:nowrap">
+                  <input type="checkbox" id="bEmailShow" checked onchange="toggleContactField('bEmail')" style="accent-color:var(--primary);width:14px;height:14px;cursor:pointer;margin:0">
+                  Show on listing
+                </label>
+              </div>
+              <input type="email" class="ep-input" id="bEmail" placeholder="hr@company.com">
+            </div>
+          </div>
+
+          <!-- Map + Reference -->
+          <div class="col-sm-6">
+            <div class="ep-field">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:.3rem">
+                <label class="ep-label" style="margin:0">Office Map Link</label>
+                <label style="display:flex;align-items:center;gap:.3rem;font-size:.7rem;color:var(--text-muted);cursor:pointer;font-weight:600;white-space:nowrap">
+                  <input type="checkbox" id="bMapLinkShow" checked onchange="toggleContactField('bMapLink')" style="accent-color:var(--primary);width:14px;height:14px;cursor:pointer;margin:0">
+                  Show on listing
+                </label>
+              </div>
+              <input type="url" class="ep-input" id="bMapLink" placeholder="Paste Google Maps link...">
+              <p style="font-size:.71rem;color:var(--text-muted);margin:.2rem 0 0"><i class="bi bi-geo-alt me-1"></i>Auto-filled from your profile</p>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="ep-field"><label class="ep-label">Reference Link <span style="color:var(--text-muted);font-weight:400">(optional)</span></label>
+              <input type="url" class="ep-input" id="bApplyLink" placeholder="Any reference URL..."></div>
+          </div>
+
+          <!-- Expiry -->
+          <div class="col-sm-6">
+            <div class="ep-field"><label class="ep-label">Expires After</label>
+              <div style="display:flex;gap:.4rem">
+                <input type="number" class="ep-input" id="bExpNum" value="30" min="1" max="365" style="flex:1;min-width:0">
+                <select class="ep-input" id="bExpUnit" style="width:auto">
+                  <option value="hours">Hours</option><option value="days" selected>Days</option>
+                </select>
+              </div></div>
+          </div>
+
+          <!-- Description + Requirements -->
+          <div class="col-12">
+            <div class="ep-field"><label class="ep-label">Description <span style="color:var(--text-muted);font-weight:400">(optional)</span></label>
+              <textarea class="ep-input" id="bDesc" rows="3" placeholder="General info about this requirement..."></textarea></div>
+          </div>
+          <div class="col-12">
+            <div class="ep-field"><label class="ep-label">Requirements <span style="color:var(--text-muted);font-weight:400">(optional)</span></label>
+              <textarea class="ep-input" id="bReqs" rows="3" placeholder="Common requirements for all positions:&#10;• Valid iqama transferable&#10;• Aramco approved&#10;• Accommodation provided"></textarea></div>
+          </div>
+        </div>
+
+        <!-- Bulk Pre-Screening -->
+        <div style="margin-top:1.1rem">
+          <div class="ep-screening-toggle" onclick="toggleBulkScreening()">
+            <div>
+              <div style="font-weight:700;font-size:.9rem;color:var(--text-primary)">
+                <i class="bi bi-funnel-fill me-2" style="color:var(--primary)"></i>Pre-Screening Filters
+              </div>
+              <div style="font-size:.78rem;color:var(--text-muted)">Applied to all jobs in this batch</div>
+            </div>
+            <i class="bi bi-chevron-down" id="bScreeningChevron"></i>
+          </div>
+          <div id="bScreeningSection" style="display:none;padding-top:1rem">
+            <p style="font-size:.73rem;color:var(--text-muted);margin-bottom:.5rem">Tap to enable. Leave off to accept any candidate.</p>
+            <div style="display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.75rem">
+              <button type="button" class="sc-chip" id="btgNat"      onclick="bToggleFilter('nat')"     ><i class="bi bi-globe2"></i> Nationality</button>
+              <button type="button" class="sc-chip" id="btgIqama"    onclick="bToggleFilter('iqama')"   ><i class="bi bi-card-text"></i> Iqama Type</button>
+              <button type="button" class="sc-chip" id="btgExp"      onclick="bToggleFilter('exp')"     ><i class="bi bi-briefcase"></i> Experience</button>
+              <button type="button" class="sc-chip" id="btgCerts"    onclick="bToggleFilter('certs')"   ><i class="bi bi-patch-check"></i> Certifications</button>
+              <button type="button" class="sc-chip" id="btgIqamaNum" onclick="bToggleFilter('iqamaNum')"><i class="bi bi-hash"></i> Iqama No.</button>
+            </div>
+            <div class="form-check form-switch" style="margin-top:.6rem">
+              <input class="form-check-input" type="checkbox" role="switch" id="bRequireCv">
+              <label class="form-check-label" style="font-size:.82rem;color:var(--text-primary)" for="bRequireCv">
+                Require CV upload <span style="font-size:.72rem;color:var(--text-muted)">(PDF, max 5MB) — applies to all jobs in this batch</span>
+              </label>
+            </div>
+            <div class="row g-3">
+              <div class="col-sm-6 sc-field" id="bfNat" style="display:none">
+                <div class="ep-field"><label class="ep-label">Accepted Nationalities</label>
+                  <div class="cnt-picker">
+                    <input type="text" class="ep-input" id="bscNatSearch" placeholder="Search nationalities..." oninput="filterCnt('bscNat',this.value)" onfocus="showCntDd('bscNat')" autocomplete="off">
+                    <div class="cnt-dropdown" id="bscNatDd"></div>
+                    <div class="cnt-chips" id="bscNatChips"></div>
+                    <input type="hidden" id="bscNat">
+                  </div></div>
+              </div>
+              <div class="col-sm-6 sc-field" id="bfIqama" style="display:none">
+                <div class="ep-field"><label class="ep-label">Iqama Type Required</label>
+                  <select class="ep-input" id="bscIqama"><option value="">Any status</option><option value="transferable">Transferable only</option><option value="local">Local transfer or visit visa</option></select></div>
+              </div>
+              <div class="col-sm-6 sc-field" id="bfExp" style="display:none">
+                <div class="ep-field"><label class="ep-label">Min. Experience (years)</label>
+                  <input type="number" class="ep-input" id="bscExp" value="0" min="0" max="30"></div>
+              </div>
+              <div class="col-sm-6 sc-field" id="bfCerts" style="display:none">
+                <div class="ep-field"><label class="ep-label">Required Certifications</label>
+                  <input type="text" class="ep-input" id="bscCerts" placeholder="e.g. Aramco Approval, CSWIP"></div>
+              </div>
+            </div>
+
+            <!-- Bulk Custom Questions -->
+            <div style="margin-top:1rem">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.65rem">
+                <div>
+                  <div style="font-size:.82rem;font-weight:700;color:var(--text-primary)">Custom Screening Questions</div>
+                  <div style="font-size:.73rem;color:var(--text-muted)">Candidates must answer before applying</div>
+                </div>
+                <button class="ep-btn-outline ep-btn-sm" onclick="bAddCustomQuestion()">
+                  <i class="bi bi-plus-circle me-1"></i>Add Question
+                </button>
+              </div>
+              <div id="bCustomQsList">
+                <p style="font-size:.78rem;color:var(--text-muted);margin:0">No custom questions yet.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Job rows card -->
+      <div class="ep-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;flex-wrap:wrap;gap:.5rem">
+          <h2 class="ep-card-title" style="margin:0">
+            Job Positions
+            <span id="bCount" style="background:var(--primary);color:#fff;font-size:.72rem;padding:.1rem .5rem;border-radius:20px;font-weight:700;margin-left:.4rem;vertical-align:middle">0</span>
+          </h2>
+          <button class="ep-btn-outline ep-btn-sm" onclick="bAddRow()"><i class="bi bi-plus-lg me-1"></i>Add Row</button>
+        </div>
+        <div class="bulk-hdr" id="bulkHdr">
+          <span></span><span>Job Title *</span><span>Qty</span><span>Salary</span><span>Note</span><span></span>
+        </div>
+        <div id="bulkRows"></div>
+        <div style="margin-top:1.25rem">
+          <button class="ep-btn-primary w-100" id="bPostBtn" onclick="bSubmit()">
+            <i class="bi bi-rocket-takeoff-fill me-2"></i>Post All <span id="bPostCount">0</span> Jobs Now
+          </button>
+          <div id="bProgress" style="display:none;margin-top:.75rem">
+            <div style="background:var(--border);border-radius:4px;height:6px;overflow:hidden">
+              <div id="bBar" style="height:100%;background:var(--primary);width:0%;transition:width .3s"></div>
+            </div>
+            <p id="bProgText" style="font-size:.78rem;color:var(--text-muted);margin:.4rem 0 0;text-align:center"></p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="col-lg-4">
+      <div class="ep-card">
+        <h3 style="font-size:.9rem;font-weight:700;color:var(--text-primary);margin-bottom:.75rem">💡 Bulk Post Tips</h3>
+        <ul style="font-size:.82rem;color:var(--text-secondary);padding-left:1.2rem;line-height:2.1;margin:0">
+          <li>Set common details once above</li>
+          <li>One row = one job type</li>
+          <li>Salary is per position (free text)</li>
+          <li><strong>Enter</strong> on Qty → Salary → Note → next row</li>
+          <li>Use "Per job" category when positions differ</li>
+          <li>Rows with empty title are skipped</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ════════════════════════════════════════════════════════════ -->
+
+</div><!-- /ep-page -->
+
+<style>[data-theme="dark"] #previewModal .btn-close { filter: invert(1); }</style>
+<!-- Job Preview Modal -->
+<div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content" style="background:var(--bg-card);color:var(--text-primary);border-radius:16px;border:1px solid var(--border)">
+      <div class="modal-header" style="border-bottom:1px solid var(--border)">
+        <h5 class="modal-title" style="font-family:'Syne',sans-serif;font-weight:800;color:var(--text-primary)">
+          <i class="bi bi-eye me-2"></i>Job Preview
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="previewBody" style="max-height:65vh;overflow-y:auto"></div>
+      <div class="modal-footer" style="border-top:1px solid var(--border);justify-content:space-between">
+        <p style="font-size:.78rem;color:var(--text-muted);margin:0"><i class="bi bi-info-circle me-1"></i>This is roughly how candidates will see your job.</p>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
       </div>
     </div>
   </div>
@@ -308,6 +644,19 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+
+
+/* ── Unsaved changes warning ── */
+let isDirty = false;
+document.addEventListener('input', e => {
+  if (e.target.matches('input, textarea, select') && e.target.type !== 'file') isDirty = true;
+}, true);
+document.addEventListener('change', e => {
+  if (e.target.matches('input, textarea, select') && e.target.type !== 'file') isDirty = true;
+}, true);
+window.addEventListener('beforeunload', e => {
+  if (isDirty) { e.preventDefault(); e.returnValue = ''; }
+});
 
 const API = {
   async get(url) {
@@ -335,12 +684,22 @@ async function checkAuth() {
     const n = document.getElementById('epCompanyName');
     const a = document.getElementById('epAvatar');
     if (n) n.textContent = d.employer.company_name;
-    if (a) a.textContent = d.employer.company_name.charAt(0).toUpperCase();
+    if (a) {
+      if (d.employer.logo_url) {
+        a.innerHTML = `<img src="${d.employer.logo_url}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block;">`;
+        a.style.padding = '0';
+        a.style.overflow = 'hidden';
+        a.style.background = 'transparent';
+      } else {
+        a.textContent = d.employer.company_name.charAt(0).toUpperCase();
+      }
+    }
     return d;
   } catch(e) { window.location.href = '/employer/'; return null; }
 }
 
 async function logout() {
+  if (!confirm('Are you sure you want to log out?')) return;
   await API.post('/api/employer/logout', {});
   window.location.href = '/employer/';
 }
@@ -373,6 +732,28 @@ function timeAgo(date) {
   return Math.floor(diff/86400) + 'd ago';
 }
 
+function toggleContactField(fieldId) {
+  const show  = document.getElementById(fieldId + 'Show');
+  const input = document.getElementById(fieldId);
+  if (!show || !input) return;
+  input.disabled = !show.checked;
+  input.style.opacity = show.checked ? '1' : '.45';
+}
+
+function contactFieldValue(fieldId) {
+  const show = document.getElementById(fieldId + 'Show');
+  if (show && !show.checked) return null;
+  const v = document.getElementById(fieldId)?.value.trim();
+  return v || null;
+}
+
+function setContactToggle(fieldId, value) {
+  const cb = document.getElementById(fieldId + 'Show');
+  if (!cb) return;
+  cb.checked = !!value;
+  toggleContactField(fieldId);
+}
+
 let categories = [];
 let templates = [];
 
@@ -380,6 +761,7 @@ let templates = [];
 const scActive = { nat:false, iqama:false, exp:false, certs:false, iqamaNum:false };
 const scMap    = { nat:['tgNat','fNat'], iqama:['tgIqama','fIqama'], exp:['tgExp','fExp'], certs:['tgCerts','fCerts'], iqamaNum:['tgIqamaNum',''] };
 function toggleFilter(key, force) {
+  isDirty = true;
   scActive[key] = force !== undefined ? force : !scActive[key];
   document.getElementById(scMap[key][0])?.classList.toggle('active', scActive[key]);
   const f = document.getElementById(scMap[key][1]);
@@ -390,6 +772,7 @@ function toggleFilter(key, force) {
 let customQuestions = [];
 
 function addCustomQuestion(existingText) {
+  isDirty = true;
   const id = Date.now();
   customQuestions.push({ id, text: existingText || '', type: 'text' });
   renderCustomQuestions();
@@ -454,7 +837,16 @@ function loadCustomQuestions(list) {
 }
 
 async function init() {
-  await checkAuth();
+  const d = await checkAuth();
+  if (d?.employer) {
+    const e = d.employer;
+    if (e.phone    ) document.getElementById('jPhone')?.setAttribute('value', e.phone);
+    if (e.whatsapp ) document.getElementById('jWhatsApp')?.setAttribute('value', e.whatsapp);
+    if (e.map_link ) document.getElementById('jMapLink')?.setAttribute('value', e.map_link);
+    if (e.email    ) document.getElementById('jEmail')?.setAttribute('value', e.email);
+    // Store on window so bPrefillContact can use them even before DOM values are set
+    window._empProfile = e;
+  }
   await loadCategories();
   await loadTemplates();
   bindLivePreview();
@@ -464,6 +856,15 @@ async function init() {
   const editId = params.get('edit');
   if (editId) {
     await loadJobForEdit(editId);
+  }
+
+  const editBatchId = params.get('editBatch');
+  if (editBatchId) {
+    switchPostTab('bulk');
+    document.getElementById('postTabSwitcher')?.classList.add('d-none');
+    document.querySelector('.ep-page-title').textContent = 'Edit Requirement Batch';
+    document.querySelector('.ep-page-sub').textContent   = 'Update shared details and positions for this batch.';
+    await bLoadBatchForEdit(editBatchId);
   }
 
   if (window.location.hash === '#templates') {
@@ -491,6 +892,11 @@ async function loadJobForEdit(id) {
     document.getElementById('jPhone').value    = job.phone       || '';
     document.getElementById('jWhatsApp').value = job.whatsapp    || '';
     document.getElementById('jEmail').value    = job.email       || '';
+    if (document.getElementById('jMapLink')) document.getElementById('jMapLink').value = job.map_link || '';
+    setContactToggle('jPhone', job.phone);
+    setContactToggle('jWhatsApp', job.whatsapp);
+    setContactToggle('jEmail', job.email);
+    setContactToggle('jMapLink', job.map_link);
 
     // Load expiry — calculate remaining time from now
     if (job.expires_at) {
@@ -529,6 +935,7 @@ async function loadJobForEdit(id) {
       if (sc.min_experience) { toggleFilter('exp',true);   document.getElementById('scExp').value   = sc.min_experience; }
       if (sc.required_certs) { toggleFilter('certs',true); document.getElementById('scCerts').value = sc.required_certs; }
       if (sc.require_iqama_number) { toggleFilter('iqamaNum',true); }
+    if (job.require_cv && document.getElementById('jRequireCv')) document.getElementById('jRequireCv').checked = true;
       if (sc.nationalities||sc.iqama_types||sc.min_experience||sc.required_certs) {
         const s=document.getElementById('screeningSection');
         if(s)s.style.display='block';
@@ -624,6 +1031,14 @@ function toggleScreening() {
   c.className = open ? 'bi bi-chevron-up' : 'bi bi-chevron-down';
 }
 
+function toggleTips() {
+  const b = document.getElementById('tipsBody');
+  const ch = document.getElementById('tipsChevron');
+  const open = b.style.display === 'none';
+  b.style.display = open ? 'block' : 'none';
+  ch.className = open ? 'bi bi-chevron-up' : 'bi bi-chevron-down';
+}
+
 function bindLivePreview() {
   ['jTitle','jLocation','jSalary','jDesc','jWhatsApp','jPhone'].forEach(id => {
     const el = document.getElementById(id);
@@ -631,30 +1046,70 @@ function bindLivePreview() {
   });
 }
 
+function applyWaTemplate(template, vars) {
+  const shortDesc = (vars.description||'').length > 200
+    ? vars.description.substring(0,200).trim()+'...'
+    : (vars.description||'');
+  return template
+    .replace(/\{company\}/g,     vars.company     || '')
+    .replace(/\{title\}/g,       vars.title       || '')
+    .replace(/\{location\}/g,    vars.location    || '')
+    .replace(/\{type\}/g,        vars.type        || '')
+    .replace(/\{salary\}/g,      vars.salary      || '')
+    .replace(/\{description\}/g, shortDesc)
+    .replace(/\{phone\}/g,       vars.phone       || '')
+    .replace(/\{whatsapp\}/g,    vars.whatsapp    || '')
+    .replace(/\{link\}/g,        vars.link        || '[paste job link here]')
+    .replace(/\{positions\}/g,   vars.positions   || '')
+    .replace(/\{titles\}/g,      vars.titles      || '');
+}
+
+const WA_DEFAULT_SINGLE = `🔵 *JOB VACANCY*
+*{company}*
+
+📋 *{title}*
+📍 {location}
+💼 {type}
+💰 {salary}
+
+{description}
+
+📞 {phone}
+💬 WhatsApp: {whatsapp}
+
+🔗 View & apply: {link}
+
+_Posted via JobOrbit.org_`;
+
 function updateSharePreview() {
   const title    = document.getElementById('jTitle').value.trim();
   const location = document.getElementById('jLocation').value.trim();
   const salary   = document.getElementById('jSalary').value.trim();
-  const wa       = document.getElementById('jWhatsApp').value.trim() || document.getElementById('jPhone').value.trim();
+  const jobType  = document.getElementById('jType').value.trim();
+  const desc     = document.getElementById('jDesc').value.trim();
+  const wa       = document.getElementById('jWhatsApp').value.trim();
+  const phone    = document.getElementById('jPhone').value.trim();
+  const company  = window._empProfile?.company_name || '';
   if (!title) return;
-  const msg = `🔵 *JOB VACANCY*\n\n*${title}*\n📍 ${location||'Location TBC'}\n${salary?'💰 '+salary+'\n':''}\n📱 Contact: ${wa||'See post'}\n\n👉 Full details: joborbit.org\n\n_Posted via JobOrbit.org_`;
-  document.getElementById('sharePreview').textContent = msg.replace(/\n/g, '\n');
+  const template = window._empProfile?.wa_template_single || WA_DEFAULT_SINGLE;
+  const msg = applyWaTemplate(template, {company,title,location,type:jobType,salary,description:desc,phone,whatsapp:wa});
+  // Remove empty lines from skipped placeholders
+  const clean = msg.replace(/^[ \t]*\n/gm,'').replace(/\n{3,}/g,'\n\n').trim();
+  document.getElementById('sharePreview').value = clean;
 }
 
 function copyShareMsg() {
-  const title    = document.getElementById('jTitle').value.trim() || 'Job Vacancy';
-  const location = document.getElementById('jLocation').value.trim();
-  const salary   = document.getElementById('jSalary').value.trim();
-  const wa       = document.getElementById('jWhatsApp').value.trim() || document.getElementById('jPhone').value.trim();
-  const msg = `🔵 *JOB VACANCY*\n\n*${title}*\n📍 ${location||''}\n${salary?'💰 '+salary+'\n':''}\n📱 Contact: ${wa||''}\n\n👉 Full details: joborbit.org\n\n_Posted via JobOrbit.org_`;
-  navigator.clipboard.writeText(msg.replace(/\n/g, '\n')).then(() => showToast('Copied to clipboard!'));
+  const msg = document.getElementById('sharePreview').value;
+  if (!msg || msg.startsWith('Fill in')) { showToast('Fill in job details first', 'error'); return; }
+  navigator.clipboard.writeText(msg).then(() => showToast('✅ Copied to clipboard!'));
 }
 
 function clearForm() {
-  ['jTitle','jLocation','jSalary','jDesc','jReqs','jPhone','jWhatsApp','jEmail'].forEach(id => {
+  ['jTitle','jLocation','jSalary','jDesc','jReqs','jPhone','jWhatsApp','jEmail','jMapLink'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
+  ['jPhone','jWhatsApp','jEmail','jMapLink'].forEach(id => setContactToggle(id, true));
   document.getElementById('jCategory').value = '';
   document.getElementById('jPositions').value = 1;
 }
@@ -663,8 +1118,36 @@ function previewJob() {
   const title = document.getElementById('jTitle').value.trim();
   const loc   = document.getElementById('jLocation').value.trim();
   const desc  = document.getElementById('jDesc').value.trim();
+  const reqs  = document.getElementById('jReqs').value.trim();
   if (!title) { showToast('Enter a job title first', 'error'); return; }
-  alert(`PREVIEW\n\nTitle: ${title}\nLocation: ${loc}\n\n${desc.substring(0,200)}...`);
+
+  const company   = document.getElementById('epCompanyName')?.textContent.trim() || '';
+  const jobType   = document.getElementById('jType').value;
+  const salary    = document.getElementById('jSalary').value.trim();
+  const positions = document.getElementById('jPositions').value || 1;
+  const catSel    = document.getElementById('jCategory');
+  const category  = catSel.options[catSel.selectedIndex]?.text || '';
+  const requireCv = document.getElementById('jRequireCv')?.checked;
+
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const badge = (txt, extra='') => `<span style="display:inline-block;background:var(--surface);color:var(--text-secondary);border-radius:20px;padding:.3rem .8rem;font-size:.78rem;font-weight:600;margin:0 .35rem .35rem 0${extra}">${txt}</span>`;
+
+  document.getElementById('previewBody').innerHTML = `
+    <h4 style="font-family:'Syne',sans-serif;font-weight:800;margin-bottom:.2rem;color:var(--text-primary)">${esc(title)}</h4>
+    <div style="color:var(--text-secondary);font-size:.9rem;margin-bottom:.85rem"><i class="bi bi-building me-1"></i>${esc(company)} &nbsp;·&nbsp; <i class="bi bi-geo-alt me-1"></i>${esc(loc)}</div>
+    <div style="margin-bottom:1.1rem">
+      ${badge(esc(jobType))}
+      ${category ? badge(esc(category)) : ''}
+      ${salary ? badge('💰 ' + esc(salary)) : ''}
+      ${badge('👥 ' + positions + ' position' + (positions == 1 ? '' : 's'))}
+      ${requireCv ? badge('📄 CV Required', ';background:rgba(220,38,38,.1);color:#dc2626') : ''}
+    </div>
+    <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:.4rem">Description</div>
+    <div style="white-space:pre-wrap;font-size:.92rem;line-height:1.6;color:var(--text-primary);margin-bottom:${reqs ? '1.1rem' : '0'}">${desc ? esc(desc) : '<span style="color:var(--text-muted)">No description yet</span>'}</div>
+    ${reqs ? `<div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:.4rem">Requirements</div>
+    <div style="white-space:pre-wrap;font-size:.92rem;line-height:1.6;color:var(--text-primary)">${esc(reqs)}</div>` : ''}
+  `;
+  new bootstrap.Modal(document.getElementById('previewModal')).show();
 }
 
 async function submitJob() {
@@ -677,6 +1160,7 @@ async function submitJob() {
   if (!title) { showMsg(msg, 'Job title is required', 'error'); return; }
   if (!loc)   { showMsg(msg, 'Location is required', 'error'); return; }
   if (!desc)  { showMsg(msg, 'Job description is required', 'error'); return; }
+  if (!document.getElementById('jCategory').value) { showMsg(msg, 'Please select a category', 'error'); return; }
 
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Posting...';
@@ -689,6 +1173,7 @@ async function submitJob() {
     require_iqama_number: scActive.iqamaNum,
     custom_questions: getCustomQuestions()
   };
+  const require_cv = document.getElementById('jRequireCv')?.checked ? 1 : 0;
 
   const data = {
     title, location: loc, description: desc,
@@ -697,16 +1182,18 @@ async function submitJob() {
     salary:       document.getElementById('jSalary').value.trim(),
     requirements: document.getElementById('jReqs').value.trim(),
     positions:    parseInt(document.getElementById('jPositions').value) || 1,
-    phone:        document.getElementById('jPhone').value.trim(),
-    whatsapp:     document.getElementById('jWhatsApp').value.trim(),
-    email:        document.getElementById('jEmail').value.trim(),
+    phone:        contactFieldValue('jPhone'),
+    whatsapp:     contactFieldValue('jWhatsApp'),
+    email:        contactFieldValue('jEmail'),
+    map_link:     contactFieldValue('jMapLink'),
     expires_days: (function() {
       var num  = parseFloat(document.getElementById('jExpiryNum').value) || 30;
       var unit = document.getElementById('jExpiryUnit').value;
       // Always convert to hours for the backend
       return unit === 'hours' ? (num / 24) : num;
     })(),
-    screening
+    screening,
+    require_cv
   };
 
   try {
@@ -715,6 +1202,7 @@ async function submitJob() {
       // Update existing job
       d = await API.put('/api/employer/jobs/' + window._editJobId, data);
       if (d.success) {
+        isDirty = false;
         showToast('Job updated successfully!');
         setTimeout(() => window.location.href = '/employer/jobs.html', 1000);
       } else {
@@ -726,6 +1214,7 @@ async function submitJob() {
       // Post new job
       d = await API.post('/api/employer/jobs', data);
       if (d.success) {
+        isDirty = false;
         showToast('Job posted successfully!');
         setTimeout(() => window.location.href = '/employer/jobs.html', 1000);
       } else {
@@ -743,10 +1232,479 @@ async function submitJob() {
   }
 }
 
+function markDirty(){ isDirty = true; }
+
 function showMsg(el, text, type) {
   el.className = 'ep-msg ep-msg-' + type;
   el.textContent = text;
   el.classList.remove('d-none');
+}
+
+
+/* ══ BULK POST ════════════════════════════════════════════════ */
+let bRowId = 0;
+let bulkCatMode = 'common';
+const bScActive = { nat:false, iqama:false, exp:false, certs:false, iqamaNum:false };
+const bScMap    = { nat:['btgNat','bfNat'], iqama:['btgIqama','bfIqama'], exp:['btgExp','bfExp'], certs:['btgCerts','bfCerts'], iqamaNum:['btgIqamaNum',''] };
+
+function switchPostTab(tab) {
+  document.getElementById('tabSingle').style.display = tab === 'single' ? '' : 'none';
+  document.getElementById('tabBulk').style.display   = tab === 'bulk'   ? '' : 'none';
+  document.querySelectorAll('.post-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  if (tab === 'bulk') {
+    bSyncCategories();
+    bPrefillContact();
+    if (!document.querySelectorAll('.bulk-row').length) { bAddRow(); bAddRow(); bAddRow(); }
+  }
+}
+
+function setBulkCatMode(mode) {
+  bulkCatMode = mode;
+  document.getElementById('bCatBtnCommon').classList.toggle('active', mode === 'common');
+  document.getElementById('bCatBtnIndiv').classList.toggle('active', mode === 'individual');
+  document.getElementById('bCatCommonWrap').style.display  = mode === 'common'     ? '' : 'none';
+  document.getElementById('bCatIndivNote').style.display   = mode === 'individual' ? '' : 'none';
+  const hdr = document.getElementById('bulkHdr');
+  if (mode === 'individual') {
+    hdr.classList.add('show-cat');
+    hdr.innerHTML = '<span></span><span>Job Title *</span><span>Qty</span><span>Salary</span><span>Category</span><span>Note</span><span></span>';
+  } else {
+    hdr.classList.remove('show-cat');
+    hdr.innerHTML = '<span></span><span>Job Title *</span><span>Qty</span><span>Salary</span><span>Note</span><span></span>';
+  }
+  document.querySelectorAll('.bulk-row').forEach(r => r.classList.toggle('show-cat', mode === 'individual'));
+}
+
+function toggleBulkScreening() {
+  const s = document.getElementById('bScreeningSection');
+  const ch = document.getElementById('bScreeningChevron');
+  const open = s.style.display === 'none' || s.style.display === '';
+  s.style.display = open ? 'block' : 'none';
+  ch.style.transform = open ? 'rotate(180deg)' : '';
+}
+
+const WA_DEFAULT_BULK = `🔵 *URGENT REQUIREMENT*
+*{company}*
+
+📍 {location}
+👥 {positions} Positions Available
+
+📋 *Open Positions:*
+{titles}
+
+{description}
+
+📞 {phone}
+💬 WhatsApp: {whatsapp}
+
+🔗 View & apply: {link}
+
+_Posted via JobOrbit.org_`;
+
+function updateBulkSharePreview() {
+  const location = document.getElementById('bLocation')?.value.trim() || '';
+  const desc     = document.getElementById('bDesc')?.value.trim() || '';
+  const phone    = document.getElementById('bPhone')?.value.trim() || '';
+  const wa       = document.getElementById('bWhatsApp')?.value.trim() || '';
+  const company  = window._empProfile?.company_name || '';
+  const rows     = document.querySelectorAll('.bulk-row');
+  const total    = [...rows].reduce((s,r)=>{ const p=parseInt(r.querySelector('.b-pos')?.value)||1; return s+p; }, 0);
+  const titles   = [...rows].map(r=>r.querySelector('.b-title')?.value?.trim()).filter(Boolean);
+  const bTemplate = window._empProfile?.wa_template_bulk || WA_DEFAULT_BULK;
+  const bMsg = applyWaTemplate(bTemplate, {
+    company, location, description: desc, phone, whatsapp: wa,
+    positions: String(total), titles: titles.map(t=>'• '+t).join('\n'),
+    link: '[paste requirement link here]'
+  });
+  const bClean = bMsg.replace(/^[ \t]*\n/gm,'').replace(/\n{3,}/g,'\n\n').trim();
+  const el = document.getElementById('bSharePreview');
+  if (el) el.value = bClean;
+}
+function copyBulkShareMsg() {
+  const msg = document.getElementById('bSharePreview')?.value;
+  if (!msg || msg.startsWith('Fill')) { showToast('Fill in fields first', 'error'); return; }
+  navigator.clipboard.writeText(msg).then(() => showToast('✅ Copied!'));
+}
+
+function bToggleFilter(key, force) {
+  isDirty = true;
+  bScActive[key] = force !== undefined ? force : !bScActive[key];
+  document.getElementById(bScMap[key][0])?.classList.toggle('active', bScActive[key]);
+  const f = document.getElementById(bScMap[key][1]);
+  if (f) f.style.display = bScActive[key] ? '' : 'none';
+}
+
+/* Bulk custom questions */
+let bulkCustomQuestions = [];
+
+function bAddCustomQuestion(existingText) {
+  const id = Date.now();
+  bulkCustomQuestions.push({ id, text: existingText || '', type: 'text' });
+  bRenderCustomQuestions();
+  setTimeout(() => document.getElementById('bcq-' + id)?.focus(), 50);
+}
+
+function bRemoveCustomQuestion(id) {
+  bulkCustomQuestions = bulkCustomQuestions.filter(q => q.id !== id);
+  bRenderCustomQuestions();
+}
+
+function bUpdateCustomQuestion(id, val) {
+  const q = bulkCustomQuestions.find(q => q.id === id);
+  if (q) q.text = val;
+}
+
+function bUpdateCustomQuestionType(id, val) {
+  const q = bulkCustomQuestions.find(q => q.id === id);
+  if (q) { q.type = val; bRenderCustomQuestions(); }
+}
+
+function bRenderCustomQuestions() {
+  const wrap = document.getElementById('bCustomQsList');
+  if (!bulkCustomQuestions.length) {
+    wrap.innerHTML = '<p style="font-size:.78rem;color:var(--text-muted);margin:0">No custom questions yet.</p>';
+    return;
+  }
+  wrap.innerHTML = bulkCustomQuestions.map((q, i) => `
+    <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem">
+      <span style="font-size:.75rem;color:var(--text-muted);flex-shrink:0;font-weight:700">Q${i+1}</span>
+      <input type="text" class="ep-input" id="bcq-${q.id}"
+        value="${q.text.replace(/"/g,'&quot;')}"
+        placeholder="e.g. Do you have Aramco approval?"
+        oninput="bUpdateCustomQuestion(${q.id}, this.value)"
+        style="flex:1">
+      <select class="ep-input" style="width:auto;flex-shrink:0;padding:.55rem .6rem;font-size:.78rem"
+        onchange="bUpdateCustomQuestionType(${q.id}, this.value)">
+        <option value="text" ${q.type==='text'?'selected':''}>Text answer</option>
+        <option value="yesno" ${q.type==='yesno'?'selected':''}>Yes / No</option>
+      </select>
+      <button class="ep-btn-outline ep-btn-sm ep-btn-danger" onclick="bRemoveCustomQuestion(${q.id})" style="flex-shrink:0;padding:.4rem .6rem">
+        <i class="bi bi-trash"></i>
+      </button>
+    </div>`).join('');
+}
+
+function bGetCustomQuestions() {
+  return bulkCustomQuestions.filter(q => q.text.trim()).map(q => ({ id: q.id, text: q.text.trim(), type: q.type || 'text' }));
+}
+
+function bSyncCategories() {
+  const src = document.getElementById('jCategory');
+  const dst = document.getElementById('bCat');
+  if (src && dst && dst.options.length <= 1) dst.innerHTML = src.innerHTML;
+}
+
+function bPrefillContact() {
+  const vals = {
+    bPhone:   document.getElementById('jPhone')?.value,
+    bWa:      document.getElementById('jWhatsApp')?.value,
+    bEmail:   document.getElementById('jEmail')?.value,
+    bMapLink: document.getElementById('jMapLink')?.value
+  };
+  Object.entries(vals).forEach(([id, val]) => {
+    const el = document.getElementById(id);
+    if (val && el && !el.value) el.value = val;
+  });
+}
+
+/* ══ Requirement Batch Editor ══ */
+function bSetCntChips(value) {
+  const chipsEl = document.getElementById('bscNatChips');
+  const hidden  = document.getElementById('bscNat');
+  if (!chipsEl || !hidden) return;
+  hidden.value = value || '';
+  const vals = (value || '').split(',').map(v => v.trim()).filter(Boolean);
+  chipsEl.innerHTML = vals.map(v => `<span class="cnt-chip">${v}<button onclick="bRemoveCntChip('${v.replace(/'/g, "\\'")}')">&times;</button></span>`).join('');
+}
+
+function bRemoveCntChip(val) {
+  const hidden = document.getElementById('bscNat');
+  if (!hidden) return;
+  const vals = (hidden.value || '').split(',').map(v => v.trim()).filter(v => v && v !== val);
+  bSetCntChips(vals.join(','));
+}
+
+async function bLoadBatchForEdit(batchId) {
+  try {
+    const d = await API.get('/api/employer/batch/' + batchId);
+    if (!d.success) { showToast(d.message || 'Batch not found', 'error'); return; }
+    window._editBatchId = batchId;
+
+    const c = d.common || {};
+    if (document.getElementById('bLoc'))       document.getElementById('bLoc').value = c.location || '';
+    if (document.getElementById('bJobType'))   document.getElementById('bJobType').value = c.job_type || 'Contract';
+    if (document.getElementById('bPhone'))     document.getElementById('bPhone').value = c.phone || '';
+    if (document.getElementById('bWa'))        document.getElementById('bWa').value = c.whatsapp || '';
+    if (document.getElementById('bEmail'))     document.getElementById('bEmail').value = c.email || '';
+    if (document.getElementById('bMapLink'))   document.getElementById('bMapLink').value = c.map_link || '';
+    setContactToggle('bPhone', c.phone);
+    setContactToggle('bWa', c.whatsapp);
+    setContactToggle('bEmail', c.email);
+    setContactToggle('bMapLink', c.map_link);
+    if (document.getElementById('bApplyLink')) document.getElementById('bApplyLink').value = c.apply_link || '';
+    if (document.getElementById('bDesc'))      document.getElementById('bDesc').value = c.description || '';
+    if (document.getElementById('bReqs'))      document.getElementById('bReqs').value = c.requirements || '';
+    if (document.getElementById('bRequireCv')) document.getElementById('bRequireCv').checked = !!c.require_cv;
+
+    // Each position keeps its own category in edit mode
+    setBulkCatMode('individual');
+
+    // Screening filters
+    const sc = d.screening;
+    if (sc) {
+      if (sc.nationalities)     { bToggleFilter('nat', true); bSetCntChips(sc.nationalities); }
+      if (sc.iqama_types)       { bToggleFilter('iqama', true); if (document.getElementById('bscIqama')) document.getElementById('bscIqama').value = sc.iqama_types; }
+      if (sc.min_experience)    { bToggleFilter('exp', true); if (document.getElementById('bscExp')) document.getElementById('bscExp').value = sc.min_experience; }
+      if (sc.required_certs)    { bToggleFilter('certs', true); if (document.getElementById('bscCerts')) document.getElementById('bscCerts').value = sc.required_certs; }
+      if (sc.require_iqama_number) bToggleFilter('iqamaNum', true);
+      (sc.custom_questions || []).forEach(q => bAddCustomQuestion(q.text));
+    }
+
+    // Job rows — replace default empty rows with the batch's actual positions
+    document.getElementById('bulkRows').innerHTML = '';
+    (d.jobs || []).forEach(job => {
+      bAddRow(false);
+      const rows = document.querySelectorAll('.bulk-row');
+      const row  = rows[rows.length - 1];
+      row.dataset.jobId = job.id;
+      const id = row.dataset.id;
+      document.getElementById('bt' + id).value = job.title || '';
+      document.getElementById('bp' + id).value = job.positions || 1;
+      document.getElementById('bs' + id).value = job.salary || '';
+      if (job.category_id && document.getElementById('bc' + id)) document.getElementById('bc' + id).value = job.category_id;
+    });
+    bUpdateCount();
+
+    const btn = document.getElementById('bPostBtn');
+    if (btn) btn.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Save Changes';
+  } catch (e) {
+    showToast('Failed to load requirement batch', 'error');
+  }
+}
+
+async function bSaveBatch() {
+  const loc = document.getElementById('bLoc').value.trim();
+  if (!loc) { showToast('Location is required', 'error'); return; }
+
+  const jobs = [...document.querySelectorAll('.bulk-row')].map(r => {
+    const id = r.dataset.id;
+    return {
+      id:          r.dataset.jobId ? parseInt(r.dataset.jobId) : null,
+      title:       document.getElementById('bt' + id)?.value.trim() || '',
+      positions:   parseInt(document.getElementById('bp' + id)?.value) || 1,
+      salary:      document.getElementById('bs' + id)?.value.trim() || '',
+      category_id: document.getElementById('bc' + id)?.value || null
+    };
+  }).filter(j => j.title);
+
+  if (!jobs.length) { showToast('Add at least one job title', 'error'); return; }
+  if (jobs.some(j => !j.category_id)) { showToast('Please select a category for every job row', 'error'); return; }
+
+  const screening = (bScActive.nat || bScActive.iqama || bScActive.exp || bScActive.certs || bScActive.iqamaNum) ? {
+    nationalities:        bScActive.nat      ? document.getElementById('bscNat')?.value   || '' : '',
+    iqama_types:          bScActive.iqama    ? document.getElementById('bscIqama')?.value || '' : '',
+    min_experience:       bScActive.exp      ? parseInt(document.getElementById('bscExp')?.value)   || 0 : null,
+    required_certs:       bScActive.certs    ? document.getElementById('bscCerts')?.value || '' : '',
+    require_iqama_number: bScActive.iqamaNum ? 1 : 0,
+    custom_questions:     bGetCustomQuestions()
+  } : null;
+
+  const common = {
+    location:    loc,
+    job_type:    document.getElementById('bJobType').value,
+    phone:       contactFieldValue('bPhone'),
+    whatsapp:    contactFieldValue('bWa'),
+    email:       contactFieldValue('bEmail'),
+    map_link:    contactFieldValue('bMapLink'),
+    apply_link:  document.getElementById('bApplyLink').value.trim()|| null,
+    description: document.getElementById('bDesc').value.trim()    || null,
+    requirements:document.getElementById('bReqs').value.trim()    || null,
+    require_cv:  document.getElementById('bRequireCv')?.checked ? 1 : 0
+  };
+
+  const btn = document.getElementById('bPostBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
+
+  try {
+    const d = await API.put('/api/employer/batch/' + window._editBatchId, { common, jobs, screening });
+    if (d.success) {
+      isDirty = false;
+      showToast('Requirement batch updated' + (d.closed ? ` (${d.closed} position${d.closed>1?'s':''} closed)` : ''), 'success');
+      setTimeout(() => { window.location.href = '/employer/jobs.html#requirements'; }, 800);
+    } else {
+      showToast(d.message || 'Failed to save changes', 'error');
+      btn.disabled = false;
+      btn.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Save Changes';
+    }
+  } catch (e) {
+    showToast('Network error. Please try again.', 'error');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Save Changes';
+  }
+}
+
+function bAddRow(focusNew = true) {
+  const id  = ++bRowId;
+  const num = document.querySelectorAll('.bulk-row').length + 1;
+  const catHtml = document.getElementById('bCat')?.innerHTML || '<option value="">Category...</option>';
+  const row = document.createElement('div');
+  row.className  = 'bulk-row' + (bulkCatMode === 'individual' ? ' show-cat' : '');
+  row.dataset.id = id;
+  row.innerHTML = `
+    <span class="bulk-rn">${num}</span>
+    <input type="text"   class="ep-input bulk-ti" id="bt${id}" placeholder="Job title..." oninput="bUpdateCount()" onkeydown="bKeyNav(event,${id},'t')">
+    <input type="number" class="ep-input bulk-pi" id="bp${id}" value="1" min="1" max="999" onkeydown="bKeyNav(event,${id},'p')">
+    <input type="text"   class="ep-input bulk-si" id="bs${id}" placeholder="e.g. 3000 SAR" onkeydown="bKeyNav(event,${id},'s')">
+    <select class="ep-input bulk-ci" id="bc${id}">${catHtml}</select>
+    <input type="text"   class="ep-input bulk-ni" id="bn${id}" placeholder="Note..." onkeydown="bKeyNav(event,${id},'n')">
+    <button class="bulk-del" onclick="bRemoveRow(${id})" title="Remove"><i class="bi bi-x-lg"></i></button>
+  `;
+  document.getElementById('bulkRows').appendChild(row);
+  if (focusNew) setTimeout(() => document.getElementById('bt' + id)?.focus(), 50);
+  bUpdateCount();
+}
+
+function bRemoveRow(id) {
+  document.querySelector(`.bulk-row[data-id="${id}"]`)?.remove();
+  document.querySelectorAll('.bulk-row').forEach((r, i) => r.querySelector('.bulk-rn').textContent = i + 1);
+  bUpdateCount();
+}
+
+function bKeyNav(e, id, field) {
+  if (e.key !== 'Enter') return;
+  e.preventDefault();
+  if (field === 't') { document.getElementById('bp' + id)?.focus(); return; }
+  if (field === 'p') { document.getElementById('bs' + id)?.focus(); return; }
+  if (field === 's') { document.getElementById('bn' + id)?.focus(); return; }
+  const rows = [...document.querySelectorAll('.bulk-row')];
+  const idx  = rows.findIndex(r => r.dataset.id == id);
+  if (idx < rows.length - 1) document.getElementById('bt' + rows[idx + 1].dataset.id)?.focus();
+  else bAddRow();
+}
+
+function bUpdateCount() {
+  const filled = [...document.querySelectorAll('.bulk-ti')].filter(i => i.value.trim()).length;
+  document.getElementById('bCount').textContent     = document.querySelectorAll('.bulk-row').length;
+  document.getElementById('bPostCount').textContent = filled;
+}
+
+async function bSubmit() {
+  if (window._editBatchId) return bSaveBatch();
+
+  const loc = document.getElementById('bLoc').value.trim();
+  if (!loc) { showToast('Location is required for all jobs', 'error'); return; }
+
+  if (bulkCatMode === 'common' && !document.getElementById('bCat').value) {
+    showToast('Please select a category', 'error');
+    return;
+  }
+
+  const jobs = [...document.querySelectorAll('.bulk-row')].map(r => {
+    const id = r.dataset.id;
+    return {
+      title:       document.getElementById('bt' + id)?.value.trim() || '',
+      positions:   parseInt(document.getElementById('bp' + id)?.value) || 1,
+      salary:      document.getElementById('bs' + id)?.value.trim() || '',
+      note:        document.getElementById('bn' + id)?.value.trim() || '',
+      category_id: bulkCatMode === 'individual' ? (document.getElementById('bc' + id)?.value || null) : null
+    };
+  }).filter(j => j.title);
+
+  if (!jobs.length) { showToast('Add at least one job title', 'error'); return; }
+
+  if (bulkCatMode === 'individual' && jobs.some(j => !j.category_id)) {
+    showToast('Please select a category for every job row', 'error');
+    return;
+  }
+
+  const screening = (bScActive.nat || bScActive.iqama || bScActive.exp || bScActive.certs || bScActive.iqamaNum) ? {
+    nationalities:        bScActive.nat      ? document.getElementById('bscNat')?.value   || '' : '',
+    iqama_types:          bScActive.iqama    ? document.getElementById('bscIqama')?.value || '' : '',
+    min_experience:       bScActive.exp      ? parseInt(document.getElementById('bscExp')?.value)   || 0 : null,
+    required_certs:       bScActive.certs    ? document.getElementById('bscCerts')?.value || '' : '',
+    require_iqama_number: bScActive.iqamaNum ? 1 : 0,
+    custom_questions:     bGetCustomQuestions()
+  } : null;
+
+  const common = {
+    location:    loc,
+    category_id: bulkCatMode === 'common' ? (document.getElementById('bCat').value || null) : null,
+    job_type:    document.getElementById('bJobType').value,
+    phone:       contactFieldValue('bPhone'),
+    whatsapp:    contactFieldValue('bWa'),
+    email:       contactFieldValue('bEmail'),
+    map_link:    contactFieldValue('bMapLink'),
+    apply_link:  document.getElementById('bApplyLink').value.trim()|| null,
+    description: document.getElementById('bDesc').value.trim()    || null,
+    requirements:document.getElementById('bReqs').value.trim()    || null,
+    require_cv:  document.getElementById('bRequireCv')?.checked ? 1 : 0,
+    expiry_num:  parseInt(document.getElementById('bExpNum').value) || 30,
+    expiry_unit: document.getElementById('bExpUnit').value,
+    screening
+  };
+
+  const btn = document.getElementById('bPostBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Posting...';
+  document.getElementById('bProgress').style.display = '';
+  document.getElementById('bBar').style.width = '0%';
+
+  try {
+    const d = await API.post('/api/employer/bulk-jobs', { jobs, common });
+    document.getElementById('bBar').style.width = '100%';
+    document.getElementById('bBar').style.background = '#22c55e';
+    if (d.success) {
+      isDirty = false;
+      const shareUrl = window.location.origin + '/requirement/' + d.batch_id;
+      document.getElementById('bProgText').innerHTML =
+        '✅ ' + d.created + ' jobs posted! <a href="' + shareUrl + '" target="_blank" style="color:var(--primary);font-weight:700">View Requirement Page →</a>';
+      // Show share link card
+      let shareCard = document.getElementById('bulkShareCard');
+      if (!shareCard) {
+        shareCard = document.createElement('div');
+        shareCard.id = 'bulkShareCard';
+        shareCard.style.cssText = 'background:rgba(15,98,254,.06);border:1.5px solid var(--primary);border-radius:12px;padding:1rem;margin-top:.75rem';
+        shareCard.innerHTML = '<p style="font-size:.78rem;font-weight:700;color:var(--primary);margin:0 0 .5rem">📤 Share this requirement</p>' +
+          '<div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">' +
+          '<input id="bulkShareUrl" style="flex:1;min-width:0;padding:.45rem .7rem;border:1px solid var(--border);border-radius:8px;font-size:.8rem;background:var(--bg-card);color:var(--text-primary)" readonly value="' + shareUrl + '">' +
+          '<button onclick="copyBulkLink()" style="padding:.45rem .85rem;border-radius:8px;background:var(--primary);color:#fff;border:none;font-size:.8rem;font-weight:600;cursor:pointer" id="copyBulkBtn">Copy</button>' +
+          '<a href="https://wa.me/?text=' + encodeURIComponent('Urgent Requirement — View all positions: ') + encodeURIComponent(shareUrl) + '" target="_blank" style="padding:.45rem .85rem;border-radius:8px;background:#25d366;color:#fff;text-decoration:none;font-size:.8rem;font-weight:600"><i class="bi bi-whatsapp me-1"></i>WhatsApp</a>' +
+          '</div>';
+        document.getElementById('bProgress').after(shareCard);
+      }
+      shareCard.style.display = '';
+      showToast(d.created + ' jobs posted!', 'success');
+      // Reset after 2s
+      setTimeout(() => {
+        document.getElementById('bulkRows').innerHTML = '';
+        bRowId = 0;
+        bAddRow(); bAddRow(); bAddRow();
+        document.getElementById('bProgress').style.display = 'none';
+        document.getElementById('bBar').style.width = '0%';
+        document.getElementById('bBar').style.background = 'var(--primary)';
+        bUpdateCount();
+      }, 2200);
+    } else {
+      document.getElementById('bProgText').textContent = '❌ ' + (d.message || 'Error posting jobs');
+      showToast(d.message || 'Failed', 'error');
+    }
+  } catch(err) {
+    showToast('Network error. Please try again.', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="bi bi-rocket-takeoff-fill me-2"></i>Post All <span id="bPostCount">0</span> Jobs Now';
+    bUpdateCount();
+  }
+}
+/* ════════════════════════════════════════════════════════════ */
+function copyBulkLink() {
+  const url = document.getElementById('bulkShareUrl')?.value;
+  if (!url) return;
+  navigator.clipboard.writeText(url).then(() => {
+    const btn = document.getElementById('copyBulkBtn');
+    if (btn) { btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy', 2000); }
+  });
 }
 
 init();
@@ -784,6 +1742,6 @@ init();
 })();
 </script>
 <script src="/js/countries.js"></script>
-<script>document.addEventListener("DOMContentLoaded",()=>initCntPicker("scNat",""));</script>
+<script>document.addEventListener("DOMContentLoaded",()=>{ initCntPicker("scNat",""); initCntPicker("bscNat",""); });</script>
 <script src="/employer/feedback-widget.js"></script>
 </body></html>

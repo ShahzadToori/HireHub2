@@ -33,6 +33,12 @@
   window.toggleTheme=function(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');};
 })();
 </script>
+<div class="ep-auth-mobile-header">
+  <a href="/">
+    <img src="/uploads/logo-1772305890056.svg" alt="JobOrbit" style="height:34px;filter:brightness(10)">
+  </a>
+  <p>Post jobs free and reach skilled workers across Saudi Arabia, UAE, Qatar &amp; Kuwait.</p>
+</div>
 <div class="ep-auth-page">
   <div class="ep-auth-left">
     <a href="/" class="ep-auth-logo">
@@ -75,9 +81,30 @@
           </label>
           <span style="font-size:.75rem;color:var(--text-muted)">30 days</span>
         </div>
+        <div style="text-align:right;margin-top:-.4rem;margin-bottom:.6rem">
+          <a href="#" onclick="showForgot();return false" style="font-size:.78rem;color:var(--primary);text-decoration:none">Forgot password?</a>
+        </div>
         <div id="loginMsg" class="ep-msg d-none"></div>
         <button class="ep-btn-primary w-100 mt-2" onclick="doLogin()">
           <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+        </button>
+      </div>
+
+      <!-- FORGOT PASSWORD -->
+      <div id="forgotForm" class="d-none">
+        <p style="font-size:.85rem;color:var(--text-secondary);margin-bottom:1rem">
+          Enter the email address associated with your account, and we'll send you a link to reset your password.
+        </p>
+        <div class="ep-field">
+          <label class="ep-label">Email Address</label>
+          <input type="email" class="ep-input" id="forgotEmail" placeholder="company@email.com" autocomplete="email">
+        </div>
+        <div id="forgotMsg" class="ep-msg d-none"></div>
+        <button class="ep-btn-primary w-100 mt-2" onclick="doForgotPassword()">
+          <i class="bi bi-envelope-fill me-2"></i>Send Reset Link
+        </button>
+        <button class="ep-btn-outline w-100 mt-2" onclick="backToLogin()">
+          <i class="bi bi-arrow-left me-2"></i>Back to Sign In
         </button>
       </div>
 
@@ -145,20 +172,16 @@
         <button class="ep-btn-primary w-100 mt-2" onclick="doRegister()">
           <i class="bi bi-person-plus-fill me-2"></i>Create Free Account
         </button>
+        <p style="font-size:.75rem;color:var(--text-muted);text-align:center;margin-top:1rem">
+          By creating an account you agree to our <a href="/terms.html" style="color:var(--primary)">Terms</a> and <a href="/privacy-policy.html" style="color:var(--primary)">Privacy Policy</a>.
+        </p>
       </div>
-
-      <p style="font-size:.75rem;color:var(--text-muted);text-align:center;margin-top:1rem">
-        By creating an account you agree to our <a href="/terms.html" style="color:var(--primary)">Terms</a> and <a href="/privacy-policy.html" style="color:var(--primary)">Privacy Policy</a>.
-      </p>
-    </div>
-
-    <div style="text-align:center;margin-top:1rem">
-      <button class="ep-icon-btn" id="themeToggle" style="margin:0 auto">
-        <i class="bi bi-moon-fill" id="themeIcon"></i>
-      </button>
     </div>
   </div>
 </div>
+<button class="ep-icon-btn ep-auth-theme-toggle" id="themeToggle">
+  <i class="bi bi-moon-fill" id="themeIcon"></i>
+</button>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
@@ -189,12 +212,22 @@ async function checkAuth() {
     const n = document.getElementById('epCompanyName');
     const a = document.getElementById('epAvatar');
     if (n) n.textContent = d.employer.company_name;
-    if (a) a.textContent = d.employer.company_name.charAt(0).toUpperCase();
+    if (a) {
+      if (d.employer.logo_url) {
+        a.innerHTML = `<img src="${d.employer.logo_url}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block;">`;
+        a.style.padding = '0';
+        a.style.overflow = 'hidden';
+        a.style.background = 'transparent';
+      } else {
+        a.textContent = d.employer.company_name.charAt(0).toUpperCase();
+      }
+    }
     return d;
   } catch(e) { window.location.href = '/employer/'; return null; }
 }
 
 async function logout() {
+  if (!confirm('Are you sure you want to log out?')) return;
   await API.post('/api/employer/logout', {});
   window.location.href = '/employer/';
 }
@@ -239,9 +272,45 @@ API.get('/api/employer/me').then(d => {
   if (d.success) window.location.href = '/employer/dashboard.html';
 }).catch(() => {});
 
+function showForgot() {
+  document.getElementById('loginForm').classList.add('d-none');
+  document.getElementById('registerForm').classList.add('d-none');
+  document.getElementById('forgotForm').classList.remove('d-none');
+  document.querySelectorAll('.ep-auth-tab').forEach(t => t.classList.remove('active'));
+}
+
+function backToLogin() {
+  document.getElementById('forgotForm').classList.add('d-none');
+  document.getElementById('forgotMsg').classList.add('d-none');
+  document.getElementById('forgotEmail').value = '';
+  showTab('login');
+}
+
+async function doForgotPassword() {
+  const email = document.getElementById('forgotEmail').value.trim();
+  const msg = document.getElementById('forgotMsg');
+  const btn = event.target;
+
+  if (!email) { showMsg(msg, 'Please enter your email address', 'error'); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Sending...';
+
+  try {
+    const d = await API.post('/api/employer/forgot-password', { email });
+    showMsg(msg, d.message || 'If an account exists, a reset link has been sent.', 'success');
+    btn.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Link Sent';
+  } catch(e) {
+    showMsg(msg, 'Network error. Please try again.', 'error');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="bi bi-envelope-fill me-2"></i>Send Reset Link';
+  }
+}
+
 function showTab(tab) {
   document.getElementById('loginForm').classList.toggle('d-none', tab !== 'login');
   document.getElementById('registerForm').classList.toggle('d-none', tab !== 'register');
+  document.getElementById('forgotForm').classList.add('d-none');
   document.querySelectorAll('.ep-auth-tab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='login')||(i===1&&tab==='register')));
 }
 

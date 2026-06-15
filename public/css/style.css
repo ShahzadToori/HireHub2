@@ -433,6 +433,9 @@ img { max-width: 100%; }
   color:      white;
   font-size:  .7rem;
   padding:    .2rem .6rem;
+  border-radius: 4px;
+  font-weight: 600;
+}
 .badge-verified {
   background: #059669;
   color: white;
@@ -441,9 +444,6 @@ img { max-width: 100%; }
   border-radius: 4px;
   font-weight: 600;
   letter-spacing: .3px;
-}
-  border-radius: 4px;
-  font-weight: 600;
 }
 .badge-category {
   background:  var(--surface);
@@ -462,6 +462,24 @@ img { max-width: 100%; }
   border-radius: 4px;
   font-weight: 600;
   border:      1px solid var(--primary);
+}
+
+.card-highlights {
+  display:   flex;
+  gap:       .4rem;
+  flex-wrap: wrap;
+  margin-bottom: .5rem;
+}
+.card-visa-badge {
+  display:     inline-flex;
+  align-items: center;
+  font-size:   .7rem;
+  padding:     .2rem .6rem;
+  border-radius: 4px;
+  font-weight: 600;
+  background:  rgba(16,185,129,.1);
+  color:       #059669;
+  border:      1px solid rgba(16,185,129,.3);
 }
 
 .card-title {
@@ -550,6 +568,11 @@ img { max-width: 100%; }
 .btn-contact-icon.map { color: #e65100; }
 .btn-contact-icon.map:hover { background: #e65100; color: white; border-color: #e65100; }
 
+.btn-save-icon { color: var(--text-secondary); }
+.btn-save-icon:hover { background: var(--surface); color: #f59e0b; border-color: #fde68a; }
+.btn-save-icon.saved { color: #f59e0b; background: rgba(245,158,11,.1); border-color: #fde68a; }
+.btn-save-icon.saved:hover { background: rgba(245,158,11,.18); }
+
 /* List view mode */
 .list-view .job-card {
   flex-direction: row;
@@ -596,6 +619,63 @@ img { max-width: 100%; }
   padding-bottom: .5rem;
   border-bottom: 1px solid var(--border);
 }
+
+.btn-modal-save {
+  border-radius: var(--radius-sm);
+  font-weight:   600;
+  font-size:     .85rem;
+  padding:       .5rem 1.1rem;
+  display:       inline-flex;
+  align-items:   center;
+  border:        1px solid var(--border);
+  background:    var(--bg-card);
+  color:         var(--text-secondary);
+  cursor:        pointer;
+  transition:    var(--transition);
+}
+.btn-modal-save:hover { border-color: #f59e0b; color: #f59e0b; }
+.btn-modal-save.saved { background: rgba(245,158,11,.1); border-color: #fde68a; color: #f59e0b; }
+
+/* Shared sidebar list items - Saved Jobs + Recently Viewed */
+.list-widget-item {
+  position:      relative;
+  padding:       .6rem 1.75rem .6rem 0;
+  border-bottom: 1px solid var(--border);
+  cursor:        pointer;
+  transition:    var(--transition);
+}
+.list-widget-item:last-child { border-bottom: none; }
+.list-widget-item:hover { background: var(--surface); }
+.list-widget-title {
+  font-size:     .85rem;
+  font-weight:   600;
+  color:         var(--text-primary);
+  margin-bottom: .15rem;
+  overflow:      hidden;
+  text-overflow: ellipsis;
+  white-space:   nowrap;
+}
+.list-widget-meta {
+  font-size: .75rem;
+  color:     var(--text-secondary);
+}
+.list-widget-remove {
+  position:        absolute;
+  top:             .5rem;
+  right:           0;
+  width:           22px;
+  height:          22px;
+  border:          none;
+  background:      transparent;
+  color:           var(--text-muted);
+  border-radius:   50%;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  cursor:          pointer;
+  font-size:       .7rem;
+}
+.list-widget-remove:hover { background: var(--border); color: var(--text-primary); }
 
 .category-list {
   list-style: none;

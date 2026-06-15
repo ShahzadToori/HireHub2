@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Shared Data — JobOrbit</title>
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="icon" href="/JobOrbitFavicon.png">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+  *{box-sizing:border-box}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);min-height:100vh;margin:0}
+
+  /* ── Top bar ── */
+  .sv-topbar{background:var(--bg-card);border-bottom:1px solid var(--border);padding:.65rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:.75rem;position:sticky;top:0;z-index:100}
+  .sv-brand{display:flex;align-items:center;gap:.4rem;text-decoration:none}
+  .sv-brand img{height:30px}
+  .sv-topbar-right{display:flex;align-items:center;gap:.4rem}
+  .sv-icon-btn{width:34px;height:34px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg-card);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);font-size:.85rem}
+  .sv-act-btn{height:34px;padding:0 .75rem;border-radius:8px;border:1.5px solid var(--border);background:var(--bg-card);color:var(--text-secondary);font-size:.78rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:.3rem;font-family:'DM Sans',sans-serif}
+  .sv-act-btn:hover{border-color:var(--primary);color:var(--primary)}
+
+  /* ── Page wrap ── */
+  .sv-wrap{max-width:960px;margin:0 auto;padding:1.25rem 1rem 4rem}
+
+  /* ── Hero card ── */
+  .sv-hero{background:var(--bg-card);border:1.5px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:1rem}
+  .sv-hero-band{height:5px;background:linear-gradient(90deg,#0f62fe,#6366f1)}
+  .sv-hero-body{padding:1.1rem 1.25rem}
+  .sv-hero-type{display:inline-flex;align-items:center;gap:.3rem;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:.2rem .55rem;border-radius:20px;margin-bottom:.5rem}
+  .sv-type-jobs{background:#dbeafe;color:#1e40af}
+  .sv-type-applications{background:#dcfce7;color:#166534}
+  .sv-type-candidates{background:#f3e8ff;color:#7e22ce}
+  .sv-hero-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.25rem;color:var(--text-primary);margin:0 0 .5rem}
+  .sv-hero-meta{display:flex;flex-wrap:wrap;gap:.35rem .85rem;font-size:.77rem;color:var(--text-muted)}
+  .sv-hero-meta span{display:flex;align-items:center;gap:.25rem}
+
+  /* ── Table card ── */
+  .sv-card{background:var(--bg-card);border:1.5px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:1rem}
+  .sv-toolbar{display:flex;align-items:center;justify-content:space-between;padding:.55rem .85rem;border-bottom:1px solid var(--border);gap:.5rem;flex-wrap:wrap}
+  .sv-count{font-size:.78rem;font-weight:600;color:var(--text-secondary)}
+  .sv-search{height:32px;width:175px;font-size:.78rem;padding:.2rem .65rem;border-radius:8px;border:1.5px solid var(--border);background:var(--bg-card);color:var(--text-primary);outline:none;font-family:'DM Sans',sans-serif}
+  .sv-search:focus{border-color:var(--primary)}
+  .sv-tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{width:100%;border-collapse:collapse;font-size:.8rem;min-width:500px}
+  thead th{background:var(--surface);color:var(--text-secondary);font-weight:700;font-size:.69rem;text-transform:uppercase;letter-spacing:.05em;padding:.55rem .85rem;text-align:left;border-bottom:2px solid var(--border);white-space:nowrap}
+  tbody tr{border-bottom:1px solid var(--border)}
+  tbody tr:last-child{border-bottom:none}
+  tbody tr:nth-child(even){background:rgba(0,0,0,.018)}
+  [data-theme=dark] tbody tr:nth-child(even){background:rgba(255,255,255,.03)}
+  tbody tr:hover{background:rgba(15,98,254,.04)!important}
+  tbody td{padding:.5rem .85rem;color:var(--text-primary);vertical-align:middle}
+  .td-title{font-weight:600;min-width:160px;max-width:220px;white-space:normal;word-break:break-word}
+  .td-nowrap{white-space:nowrap}
+  .td-muted{color:var(--text-muted)}
+
+  /* ── Badges ── */
+  .sv-b{display:inline-block;padding:.15rem .5rem;border-radius:6px;font-size:.7rem;font-weight:700;text-transform:capitalize;white-space:nowrap}
+  .sv-b-active,.sv-b-hired{background:#dcfce7;color:#166534}
+  .sv-b-closed,.sv-b-rejected{background:#f1f5f9;color:#475569}
+  .sv-b-new{background:#dbeafe;color:#1e40af}
+  .sv-b-shortlisted{background:#fef9c3;color:#854d0e}
+  .sv-b-reviewed{background:#e0e7ff;color:#3730a3}
+  [data-theme=dark] .sv-b-active,[data-theme=dark] .sv-b-hired{background:#14532d;color:#86efac}
+  [data-theme=dark] .sv-b-closed,[data-theme=dark] .sv-b-rejected{background:#1e293b;color:#94a3b8}
+  [data-theme=dark] .sv-b-new{background:#1e3a5f;color:#93c5fd}
+  [data-theme=dark] .sv-b-shortlisted{background:#422006;color:#fcd34d}
+  [data-theme=dark] .sv-b-reviewed{background:#1e1b4b;color:#a5b4fc}
+
+  /* ── States ── */
+  .sv-state{text-align:center;padding:4rem 1rem}
+  .sv-state i{font-size:2.5rem;display:block;margin-bottom:.75rem}
+  .sv-state h3{font-family:'Syne',sans-serif;font-weight:800;color:var(--text-primary);margin:0 0 .4rem}
+  .sv-state p{color:var(--text-secondary);font-size:.88rem;max-width:320px;margin:0 auto 1rem}
+
+  /* ── Access form ── */
+  .sv-access{background:var(--bg-card);border:1.5px solid var(--border);border-radius:16px;padding:2rem 1.5rem;max-width:400px;margin:2rem auto;text-align:center}
+  .sv-input{display:block;width:100%;padding:.55rem .75rem;border:1.5px solid var(--border);border-radius:9px;background:var(--bg-card);color:var(--text-primary);font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none;margin-bottom:.65rem;text-align:left}
+  .sv-input:focus{border-color:var(--primary)}
+  .sv-btn-primary{display:flex;align-items:center;justify-content:center;gap:.4rem;width:100%;padding:.65rem;border-radius:9px;border:none;background:var(--primary);color:#fff;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer}
+  .sv-btn-primary:hover{background:#0350da}
+
+  /* ── Footer ── */
+  .sv-footer{text-align:center;font-size:.74rem;color:var(--text-muted);padding:1.5rem 0 .5rem}
+
+  @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+  @media print{.sv-topbar,.sv-toolbar .sv-search{display:none}}
+  </style>
+</head>
+<body>
+<script>
+(function(){
+  function applyTheme(t,save){
+    document.documentElement.setAttribute('data-theme',t);
+    document.documentElement.style.colorScheme=t;
+    var i=document.getElementById('themeIcon');
+    if(i)i.className=t==='dark'?'bi bi-sun-fill':'bi bi-moon-fill';
+    if(save!==false)localStorage.setItem('theme',t);
+  }
+  applyTheme(localStorage.getItem('theme')||'light',false);
+  document.addEventListener('DOMContentLoaded',function(){
+    var btn=document.getElementById('themeToggle');
+    if(btn)btn.addEventListener('click',function(){
+      applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');
+    });
+  });
+})();
+</script>
+
+<!-- Top bar -->
+<div class="sv-topbar">
+  <a href="/" class="sv-brand">
+    <img src="/uploads/logo-1772305890056.svg" alt="JobOrbit">
+  </a>
+  <div class="sv-topbar-right">
+    <button class="sv-icon-btn" id="themeToggle" title="Toggle theme">
+      <i class="bi bi-moon-fill" id="themeIcon"></i>
+    </button>
+    <div id="exportBtns" style="display:none;display:flex;gap:.35rem">
+      <button class="sv-act-btn" onclick="exportCSV()">
+        <i class="bi bi-filetype-csv" style="color:#0f62fe"></i>CSV
+      </button>
+      <button class="sv-act-btn" onclick="window.print()">
+        <i class="bi bi-printer" style="color:#059669"></i>Print
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="sv-wrap">
+  <div id="svContent">
+    <div class="sv-state">
+      <i class="bi bi-arrow-repeat" style="color:var(--primary);animation:spin 1s linear infinite"></i>
+      <h3>Loading…</h3>
+      <p>Fetching shared data</p>
+    </div>
+  </div>
+  <div class="sv-footer">
+    Shared via <a href="/" style="color:var(--primary);font-weight:600;text-decoration:none">JobOrbit.org</a>
+    &nbsp;·&nbsp; Read-only view
+  </div>
+</div>
+
+<script>
+const TOKEN  = new URLSearchParams(location.search).get('token');
+const ACCESS = new URLSearchParams(location.search).get('access');
+let shareData = [], shareInfo = {};
+
+async function init() {
+  if (!TOKEN) { showError('Invalid link', 'No token in URL.'); return; }
+  try {
+    const url = `/api/employer/share/${TOKEN}` + (ACCESS ? `?access=${ACCESS}` : '');
+    const d   = await fetch(url).then(r => r.json());
+    if (!d.success) {
+      if (d.requiresAccess) { showAccessForm(); return; }
+      showError('Link unavailable', d.message || 'This link has expired or been removed.');
+      return;
+    }
+    shareInfo = d.share;
+    shareData = d.data || [];
+    document.getElementById('exportBtns').style.display = 'flex';
+    renderPage();
+  } catch(e) { showError('Failed to load', 'Network error — please try again.'); }
+}
+
+function renderPage() {
+  const typeMap = {
+    jobs:         { icon:'briefcase-fill',  cls:'sv-type-jobs',         label:'Jobs' },
+    applications: { icon:'inbox-fill',      cls:'sv-type-applications', label:'Applications' },
+    candidates:   { icon:'people-fill',     cls:'sv-type-candidates',   label:'Candidates' }
+  };
+  const tm = typeMap[shareInfo.data_type] || { icon:'table', cls:'', label:'Data' };
+  const title = shareInfo.title || ('Shared ' + tm.label);
+  document.title = title + ' — JobOrbit';
+
+  const created = new Date(shareInfo.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+  const visCols = shareInfo.visible_columns||[];
+  let cols = getColumns(shareInfo.data_type);
+  if(visCols.length) cols = cols.filter(c => visCols.includes(c.field));
+
+  document.getElementById('svContent').innerHTML = `
+    <div class="sv-hero">
+      <div class="sv-hero-band"></div>
+      <div class="sv-hero-body">
+        <div class="sv-hero-type ${tm.cls}"><i class="bi bi-${tm.icon}"></i>${tm.label}</div>
+        <h1 class="sv-hero-title">${esc(title)}</h1>
+        <div class="sv-hero-meta">
+          <span><i class="bi bi-calendar3"></i>Generated ${created}</span>
+          <span><i class="bi bi-table"></i>${shareData.length} records</span>
+          <span><i class="bi bi-${shareInfo.privacy==='private'?'lock-fill':'globe2'}" style="color:${shareInfo.privacy==='private'?'#d97706':'#059669'}"></i>${shareInfo.privacy==='private'?'Private link':'Public link'}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sv-card">
+      <div class="sv-toolbar">
+        <span class="sv-count" id="rowCount">${shareData.length} records</span>
+        <input type="text" class="sv-search" placeholder="Search…" oninput="searchTable(this.value)">
+      </div>
+      <div class="sv-tbl-wrap">
+        <table>
+          <thead><tr>${cols.map(c=>`<th>${c.label}</th>`).join('')}</tr></thead>
+          <tbody id="svBody">${renderRows(shareData, cols)}</tbody>
+        </table>
+        ${!shareData.length ? '<div style="padding:3rem;text-align:center;color:var(--text-muted)">No records found</div>' : ''}
+      </div>
+    </div>`;
+}
+
+function getColumns(type) {
+  if (type === 'jobs') return [
+    {field:'title',     label:'Job Title',   cls:'td-title'},
+    {field:'location',  label:'Location',    cls:'td-nowrap'},
+    {field:'salary',    label:'Salary',      cls:'td-nowrap'},
+    {field:'status',    label:'Status',      badge:true},
+    {field:'views',     label:'Views',       cls:'td-nowrap'},
+    {field:'created_at',label:'Posted',      date:true}
+  ];
+  if (type === 'applications') return [
+    {field:'full_name',        label:'Candidate',  cls:'td-nowrap'},
+    {field:'job_title',        label:'Job',        cls:'td-title'},
+    {field:'status',           label:'Status',     badge:true},
+    {field:'nationality',      label:'Nationality',cls:'td-nowrap'},
+    {field:'iqama_status',     label:'Iqama',      cls:'td-nowrap'},
+    {field:'iqama_number',     label:'Iqama No.',  cls:'td-nowrap'},
+    {field:'experience_years', label:'Exp (yrs)',  cls:'td-nowrap'},
+    {field:'has_certificate',  label:'Cert',       cert:true},
+    {field:'phone',            label:'Phone',      cls:'td-nowrap'},
+    {field:'whatsapp',         label:'WhatsApp',   cls:'td-nowrap'},
+    {field:'cover_note',       label:'Cover Note', cls:''},
+    {field:'employer_notes',   label:'Notes',      cls:''},
+    {field:'created_at',       label:'Applied',    date:true}
+  ];
+  if (type === 'candidates') return [
+    {field:'full_name',        label:'Name',       cls:'td-nowrap'},
+    {field:'nationality',      label:'Nationality',cls:'td-nowrap'},
+    {field:'iqama_status',     label:'Iqama',      cls:'td-nowrap'},
+    {field:'experience_years', label:'Exp (yrs)',  cls:'td-nowrap'},
+    {field:'has_certificate',  label:'Cert',       cert:true},
+    {field:'jobs_applied',     label:'Applied',    cls:'td-nowrap'},
+    {field:'last_applied',     label:'Last Applied',date:true}
+  ];
+  return [];
+}
+
+function renderRows(data, cols) {
+  if (!data.length) return '';
+  return data.map(row => `<tr>${cols.map(c => {
+    const v = row[c.field];
+    if (c.badge) return `<td><span class="sv-b sv-b-${v||''}">${v||'—'}</span></td>`;
+    if (c.date)  return `<td class="td-nowrap td-muted">${v ? new Date(v).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'2-digit'}) : '—'}</td>`;
+    if (c.cert)  return `<td style="text-align:center">${v ? '✅' : '<span class="td-muted">—</span>'}</td>`;
+    if (v == null || v === '') return `<td><span class="td-muted">—</span></td>`;
+    return `<td class="${c.cls||''}">${esc(String(v))}</td>`;
+  }).join('')}</tr>`).join('');
+}
+
+function searchTable(q) {
+  const lq = q.toLowerCase();
+  const cols = getColumns(shareInfo.data_type);
+  const filtered = !lq ? shareData : shareData.filter(row =>
+    cols.some(c => String(row[c.field]||'').toLowerCase().includes(lq))
+  );
+  document.getElementById('svBody').innerHTML = renderRows(filtered, cols);
+  document.getElementById('rowCount').textContent = filtered.length + ' records' + (lq ? ' (filtered)' : '');
+}
+
+function showError(title, msg) {
+  document.getElementById('svContent').innerHTML = `
+    <div class="sv-state">
+      <i class="bi bi-exclamation-circle" style="color:#dc2626"></i>
+      <h3>${esc(title)}</h3>
+      <p>${esc(msg)}</p>
+      <a href="/" style="color:var(--primary);font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:.35rem">
+        <i class="bi bi-arrow-left"></i>Back to JobOrbit
+      </a>
+    </div>`;
+}
+
+function showAccessForm() {
+  document.getElementById('svContent').innerHTML = `
+    <div class="sv-access">
+      <i class="bi bi-lock-fill" style="font-size:2rem;color:var(--primary);display:block;margin-bottom:.75rem"></i>
+      <h3 style="font-family:'Syne',sans-serif;font-weight:800;margin:0 0 .3rem">Private Link</h3>
+      <p style="font-size:.83rem;color:var(--text-muted);margin:0 0 1.25rem">Request access from the data owner</p>
+      <input class="sv-input" id="reqName" placeholder="Your name">
+      <input class="sv-input" id="reqEmail" placeholder="Your email *" type="email">
+      <button class="sv-btn-primary" onclick="requestAccess()"><i class="bi bi-send-fill"></i>Request Access</button>
+      <p id="reqMsg" style="font-size:.78rem;margin:.65rem 0 0;color:var(--text-muted)"></p>
+    </div>`;
+}
+
+async function requestAccess() {
+  const name  = document.getElementById('reqName')?.value.trim();
+  const email = document.getElementById('reqEmail')?.value.trim();
+  const msg   = document.getElementById('reqMsg');
+  if (!email) { if(msg) msg.textContent='Email is required'; return; }
+  if(msg) msg.textContent='Sending…';
+  try {
+    const d = await fetch('/api/employer/share/request',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({token:TOKEN, name, email})
+    }).then(r=>r.json());
+    if(msg) msg.textContent = d.success ? '✅ Request sent! You\'ll be notified when approved.' : (d.message||'Error');
+  } catch(e) { if(msg) msg.textContent='Network error'; }
+}
+
+function exportCSV() {
+  if (!shareData.length) return;
+  const cols = getColumns(shareInfo.data_type);
+  const header = cols.map(c=>c.label).join(',');
+  const rows = shareData.map(row =>
+    cols.map(c => {
+      const v = row[c.field];
+      if (v==null) return '';
+      const s = String(v);
+      return s.includes(',') || s.includes('"') || s.includes('\n') ? '"'+s.replace(/"/g,'""')+'"' : s;
+    }).join(',')
+  );
+  const blob = new Blob([[header,...rows].join('\n')], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'joborbit-'+(shareInfo.data_type||'data')+'-'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+}
+
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+init();
+</script>
+</body>
+</html>

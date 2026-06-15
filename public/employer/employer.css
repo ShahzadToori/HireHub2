@@ -226,6 +226,29 @@
 }
 .ep-auth-tab.active { background: var(--bg-card); color: var(--text-primary); box-shadow: 0 2px 8px rgba(0,0,0,.1); }
 
+/* ── Mobile auth header (hidden on desktop) ──────────────────── */
+.ep-auth-mobile-header { display: none; }
+.ep-auth-theme-toggle { position: fixed; top: .85rem; right: .85rem; z-index: 50; }
+@media(max-width:767px) {
+  .ep-auth-mobile-header {
+    display: block;
+    background: linear-gradient(135deg, #0d1117 0%, #0f2744 100%);
+    padding: 1.75rem 1.5rem 2.5rem;
+    text-align: center;
+  }
+  .ep-auth-mobile-header p {
+    color: rgba(255,255,255,.65);
+    font-size: .82rem;
+    line-height: 1.5;
+    margin: .85rem auto 0;
+    max-width: 320px;
+  }
+  .ep-auth-page { min-height: 0; }
+  .ep-auth-right { justify-content: flex-start; padding: 0 1.1rem 2rem; min-height: 0; }
+  .ep-auth-card { margin-top: -1.5rem; position: relative; z-index: 1; }
+  .ep-auth-tab { font-size: .78rem; padding: .6rem .3rem; white-space: nowrap; }
+}
+
 /* ── Page layout ─────────────────────────────────────────────── */
 .ep-page {
   max-width: 1280px;
@@ -777,3 +800,17 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* ⋯ Action menu */
+.ep-action-menu{position:relative;display:inline-block}
+.ep-action-menu-panel{position:absolute;right:0;top:calc(100% + 4px);background:var(--bg-card);border:1.5px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.14);z-index:500;min-width:165px;display:none;padding:.25rem}
+.ep-action-menu-panel.show{display:block}
+.ep-action-menu-item{display:flex;align-items:center;gap:.5rem;padding:.45rem .7rem;font-size:.82rem;color:var(--text-primary);cursor:pointer;border-radius:7px;white-space:nowrap}
+.ep-action-menu-item:hover{background:var(--surface)}
+.ep-action-menu-item.danger{color:#dc2626}
+/* Pagination */
+.ep-pagination{display:flex;align-items:center;justify-content:center;gap:.3rem;margin-top:1rem;flex-wrap:wrap}
+.ep-page-btn{min-width:34px;height:34px;padding:0 .4rem;border-radius:8px;border:1.5px solid var(--border);background:var(--bg-card);color:var(--text-secondary);cursor:pointer;font-size:.82rem;display:flex;align-items:center;justify-content:center;font-family:"DM Sans",sans-serif}
+.ep-page-btn.active{background:var(--primary);color:#fff;border-color:var(--primary);font-weight:700}
+.ep-page-btn:disabled{opacity:.4;cursor:not-allowed}
+.ep-page-info{font-size:.75rem;color:var(--text-muted);text-align:center;margin-top:.4rem}

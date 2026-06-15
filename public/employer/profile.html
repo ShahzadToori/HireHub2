@@ -13,6 +13,22 @@
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/employer/employer.css">
+  <style>
+  .logo-wrap{display:flex;align-items:center;gap:1.25rem;padding:1.1rem;background:var(--surface);border-radius:14px;margin-bottom:1.5rem}
+  .logo-img{width:72px;height:72px;border-radius:12px;object-fit:cover;border:2px solid var(--border);flex-shrink:0}
+  .logo-placeholder{width:72px;height:72px;border-radius:12px;background:var(--primary);color:#fff;font-family:'Syne',sans-serif;font-weight:800;font-size:1.8rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .logo-info{flex:1;min-width:0}
+  .logo-info h3{font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;color:var(--text-primary);margin:0 0 .2rem}
+  .logo-info p{font-size:.75rem;color:var(--text-muted);margin:0 0 .6rem}
+  .logo-upload-btn{display:inline-flex;align-items:center;gap:.3rem;padding:.38rem .85rem;border:1.5px solid var(--border);border-radius:8px;background:var(--bg-card);color:var(--text-secondary);font-size:.8rem;font-weight:600;cursor:pointer;transition:all .15s}
+  .logo-upload-btn:hover{border-color:var(--primary);color:var(--primary)}
+  .logo-upload-spinner{display:none}
+  .section-divider{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);padding:.25rem 0;margin:1rem 0 .75rem;border-bottom:1px solid var(--border)}
+  .map-hint{font-size:.73rem;color:var(--text-muted);margin-top:.3rem;display:flex;align-items:center;gap:.3rem}
+    .wa-ph{font-size:.72rem;padding:.15rem .4rem;border-radius:5px;background:rgba(15,98,254,.08);color:var(--primary);border:1px solid rgba(15,98,254,.2);cursor:pointer;user-select:none;font-family:monospace}
+  .wa-ph:hover{background:rgba(15,98,254,.15)}
+  .wa-ph:active{transform:scale(.95)}
+  </style>
 </head>
 <body><script>
 (function(){
@@ -40,10 +56,10 @@
       <span>Employer Portal</span>
     </a>
     <div class="ep-nav-links">
-      <a href="/employer/dashboard.html" class="ep-nav-link "><i class="bi bi-grid-fill"></i><span>Dashboard</span></a>
-      <a href="/employer/jobs.html"      class="ep-nav-link "><i class="bi bi-briefcase-fill"></i><span>My Jobs</span></a>
-      <a href="/employer/post-job.html"  class="ep-nav-link "><i class="bi bi-plus-circle-fill"></i><span>Post Job</span></a>
-      <a href="/employer/applications.html" class="ep-nav-link "><i class="bi bi-inbox-fill"></i><span>Applications</span></a>
+      <a href="/employer/dashboard.html" class="ep-nav-link"><i class="bi bi-grid-fill"></i><span>Dashboard</span></a>
+      <a href="/employer/jobs.html"      class="ep-nav-link"><i class="bi bi-briefcase-fill"></i><span>My Jobs</span></a>
+      <a href="/employer/post-job.html"  class="ep-nav-link"><i class="bi bi-plus-circle-fill"></i><span>Post Job</span></a>
+      <a href="/employer/applications.html" class="ep-nav-link"><i class="bi bi-inbox-fill"></i><span>Applications</span></a>
     </div>
     <div class="ep-nav-right">
       <button class="ep-icon-btn" id="themeToggle"><i class="bi bi-moon-fill" id="themeIcon"></i></button>
@@ -64,11 +80,12 @@
   </div>
 </nav>
 <div class="ep-mobile-nav">
-  <a href="/employer/dashboard.html" class="ep-mob-link "><i class="bi bi-grid-fill"></i><span>Home</span></a>
-  <a href="/employer/jobs.html" class="ep-mob-link "><i class="bi bi-briefcase-fill"></i><span>Jobs</span></a>
-  <a href="/employer/post-job.html" class="ep-mob-link "><i class="bi bi-plus-circle-fill"></i><span>Post</span></a>
-  <a href="/employer/applications.html" class="ep-mob-link "><i class="bi bi-inbox-fill"></i><span>Inbox</span></a>
+  <a href="/employer/dashboard.html" class="ep-mob-link"><i class="bi bi-grid-fill"></i><span>Home</span></a>
+  <a href="/employer/jobs.html" class="ep-mob-link"><i class="bi bi-briefcase-fill"></i><span>Jobs</span></a>
+  <a href="/employer/post-job.html" class="ep-mob-link"><i class="bi bi-plus-circle-fill"></i><span>Post</span></a>
+  <a href="/employer/applications.html" class="ep-mob-link"><i class="bi bi-inbox-fill"></i><span>Inbox</span></a>
 </div>
+
 <div class="ep-page">
   <div class="ep-page-header">
     <div>
@@ -76,23 +93,53 @@
       <p class="ep-page-sub">Update your company information</p>
     </div>
   </div>
+
   <div class="row g-4">
+    <!-- ── Left column ── -->
     <div class="col-lg-7">
       <div class="ep-card">
-        <h2 class="ep-card-title mb-3">Company Details</h2>
+
+        <!-- Logo upload -->
+        <div class="logo-wrap">
+          <div id="logoDisplay"></div>
+          <div class="logo-info">
+            <h3>Company Logo</h3>
+            <p>JPG, PNG or WebP · Max 2MB</p>
+            <label class="logo-upload-btn">
+              <i class="bi bi-upload"></i>
+              <span id="logoUploadTxt">Upload Logo</span>
+              <span class="logo-upload-spinner spinner-border spinner-border-sm" id="logoSpinner"></span>
+              <input type="file" id="logoFile" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="uploadLogo(this)">
+            </label>
+          </div>
+        </div>
+
+        <!-- Identity -->
+        <div class="section-divider">Company Identity</div>
         <div class="row g-3">
           <div class="col-12">
             <div class="ep-field">
-              <label class="ep-label">Company Name</label>
-              <input type="text" class="ep-input" id="pCompany">
+              <label class="ep-label">Company Name <span class="text-danger">*</span></label>
+              <input type="text" class="ep-input" id="pCompany" placeholder="Your company name">
             </div>
           </div>
           <div class="col-sm-6">
             <div class="ep-field">
               <label class="ep-label">Contact Person</label>
-              <input type="text" class="ep-input" id="pContact">
+              <input type="text" class="ep-input" id="pContact" placeholder="HR Manager name">
             </div>
           </div>
+          <div class="col-sm-6">
+            <div class="ep-field">
+              <label class="ep-label">CR Number</label>
+              <input type="text" class="ep-input" id="pCR" placeholder="Commercial Registration No.">
+            </div>
+          </div>
+        </div>
+
+        <!-- Business -->
+        <div class="section-divider">Business Details</div>
+        <div class="row g-3">
           <div class="col-sm-6">
             <div class="ep-field">
               <label class="ep-label">Sector</label>
@@ -100,6 +147,7 @@
                 <option value="">Select...</option>
                 <option>Construction</option>
                 <option>Oil & Gas</option>
+                <option>Industrial</option>
                 <option>Healthcare</option>
                 <option>Technology</option>
                 <option>Manufacturing</option>
@@ -112,41 +160,169 @@
           </div>
           <div class="col-sm-6">
             <div class="ep-field">
+              <label class="ep-label">Company Size</label>
+              <select class="ep-input" id="pSize">
+                <option value="">Select...</option>
+                <option value="1-10">1 – 10 employees</option>
+                <option value="11-50">11 – 50 employees</option>
+                <option value="51-200">51 – 200 employees</option>
+                <option value="201-500">201 – 500 employees</option>
+                <option value="500+">500+ employees</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="ep-field">
               <label class="ep-label">City</label>
-              <input type="text" class="ep-input" id="pCity">
+              <input type="text" class="ep-input" id="pCity" placeholder="e.g. Jubail, Riyadh">
             </div>
           </div>
           <div class="col-sm-6">
             <div class="ep-field">
-              <label class="ep-label">Phone</label>
-              <input type="tel" class="ep-input" id="pPhone">
-            </div>
-          </div>
-          <div class="col-sm-6">
-            <div class="ep-field">
-              <label class="ep-label">WhatsApp</label>
-              <input type="tel" class="ep-input" id="pWhatsApp">
+              <label class="ep-label">Founded Year</label>
+              <input type="number" class="ep-input" id="pFounded" placeholder="e.g. 2010" min="1900" max="2025">
             </div>
           </div>
           <div class="col-sm-6">
             <div class="ep-field">
               <label class="ep-label">Website</label>
-              <input type="url" class="ep-input" id="pWebsite" placeholder="https://...">
+              <input type="url" class="ep-input" id="pWebsite" placeholder="https://yourcompany.com">
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="ep-field">
+              <label class="ep-label">LinkedIn</label>
+              <input type="url" class="ep-input" id="pLinkedin" placeholder="https://linkedin.com/company/...">
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact & Location -->
+        <div class="section-divider">Contact & Location</div>
+        <div class="row g-3">
+          <div class="col-sm-6">
+            <div class="ep-field">
+              <label class="ep-label">Phone</label>
+              <input type="tel" class="ep-input" id="pPhone" placeholder="+966...">
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="ep-field">
+              <label class="ep-label">WhatsApp</label>
+              <input type="tel" class="ep-input" id="pWhatsApp" placeholder="+966...">
             </div>
           </div>
           <div class="col-12">
             <div class="ep-field">
-              <label class="ep-label">About Company</label>
-              <textarea class="ep-input" id="pAbout" rows="4" placeholder="Tell candidates about your company..."></textarea>
+              <label class="ep-label">Office Address</label>
+              <input type="text" class="ep-input" id="pAddress" placeholder="Street, District, City">
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="ep-field">
+              <label class="ep-label">Office Map Link</label>
+              <input type="url" class="ep-input" id="pMapLink" placeholder="Paste Google Maps link here...">
+              <p class="map-hint">
+                <i class="bi bi-info-circle"></i>
+                Open Google Maps → Share → Copy link. This auto-fills the map field when posting jobs.
+              </p>
             </div>
           </div>
         </div>
+
+        <!-- About -->
+        <div class="section-divider">About</div>
+        <div class="ep-field">
+          <label class="ep-label">About Company</label>
+          <textarea class="ep-input" id="pAbout" rows="4" placeholder="Tell candidates about your company, projects, and work culture..."></textarea>
+        </div>
+
+        <!-- WhatsApp Templates -->
+        <div class="section-divider" style="margin-top:1.5rem">WhatsApp Message Templates</div>
+        <p style="font-size:.78rem;color:var(--text-muted);margin-bottom:.65rem">
+          Write your own format once — it auto-fills when sharing jobs on WhatsApp.
+        </p>
+
+        <!-- How to use — collapsible -->
+        <div style="border:1.5px solid var(--border);border-radius:10px;margin-bottom:.85rem;overflow:hidden">
+          <button onclick="toggleHowTo()" style="width:100%;padding:.55rem .75rem;background:var(--surface);border:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:600;color:var(--text-secondary)">
+            <span><i class="bi bi-info-circle-fill me-2" style="color:var(--primary)"></i>How to use placeholders</span>
+            <i class="bi bi-chevron-down" id="howToChevron"></i>
+          </button>
+          <div id="howToBody" style="display:none;padding:.75rem;background:var(--bg-card)">
+            <p style="font-size:.78rem;color:var(--text-secondary);margin-bottom:.6rem">
+              Placeholders are words in <code style="font-size:.75rem;color:var(--primary)">{curly brackets}</code> that get replaced with real data when you share a job.
+            </p>
+            <div style="background:var(--surface);border-radius:8px;padding:.6rem .75rem;margin-bottom:.6rem">
+              <p style="font-size:.73rem;font-weight:700;color:var(--text-muted);margin-bottom:.3rem">AVAILABLE PLACEHOLDERS:</p>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:.2rem .5rem;font-size:.76rem">
+                <span><code style="color:var(--primary)">{company}</code> → Your company name</span>
+                <span><code style="color:var(--primary)">{title}</code> → Job title</span>
+                <span><code style="color:var(--primary)">{location}</code> → City/region</span>
+                <span><code style="color:var(--primary)">{type}</code> → Full-time, Contract…</span>
+                <span><code style="color:var(--primary)">{salary}</code> → Salary range</span>
+                <span><code style="color:var(--primary)">{description}</code> → Job description</span>
+                <span><code style="color:var(--primary)">{phone}</code> → Phone number</span>
+                <span><code style="color:var(--primary)">{whatsapp}</code> → WhatsApp number</span>
+                <span><code style="color:var(--primary)">{link}</code> → Job URL</span>
+                <span><code style="color:var(--primary)">{positions}</code> → Total openings (bulk)</span>
+                <span><code style="color:var(--primary)">{titles}</code> → Job list (bulk)</span>
+              </div>
+            </div>
+            <p style="font-size:.73rem;font-weight:700;color:var(--text-muted);margin-bottom:.3rem">EXAMPLE:</p>
+            <pre style="font-size:.72rem;background:var(--surface);border-radius:8px;padding:.55rem .75rem;margin:0;overflow-x:auto;color:var(--text-secondary);line-height:1.6">📋 *{title}*
+📍 {location} | 💰 {salary}
+
+🔗 {link}</pre>
+            <p style="font-size:.72rem;color:var(--text-muted);margin:.4rem 0 0">Unused placeholders (e.g. empty salary) are removed automatically.</p>
+          </div>
+        </div>
+
+        <!-- Placeholder chips -->
+        <div style="display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:.85rem">
+          <span style="font-size:.7rem;font-weight:700;color:var(--text-muted);width:100%;margin-bottom:.2rem">Tap placeholder to copy:</span>
+          <code onclick="copyPlaceholder(this)" class="wa-ph" title="Company name">{company}</code>
+          <code onclick="copyPlaceholder(this)" class="wa-ph" title="Job title">{title}</code>
+          <code onclick="copyPlaceholder(this)" class="wa-ph" title="Location">{location}</code>
+          <code onclick="copyPlaceholder(this)" class="wa-ph" title="Job type">{type}</code>
+          <code onclick="copyPlaceholder(this)" class="wa-ph" title="Salary">{salary}</code>
+          <code onclick="copyPlaceholder(this)" class="wa-ph" title="Description (200 chars)">{description}</code>
+          <code onclick="copyPlaceholder(this)" class="wa-ph" title="Phone number">{phone}</code>
+          <code onclick="copyPlaceholder(this)" class="wa-ph" title="WhatsApp number">{whatsapp}</code>
+          <code onclick="copyPlaceholder(this)" class="wa-ph" title="Job URL">{link}</code>
+          <code onclick="copyPlaceholder(this)" class="wa-ph" title="Total positions (bulk only)">{positions}</code>
+          <code onclick="copyPlaceholder(this)" class="wa-ph" title="Bullet job list (bulk only)">{titles}</code>
+        </div>
+
+        <!-- Single job template -->
+        <div class="ep-field">
+          <label class="ep-label"><i class="bi bi-briefcase-fill me-1"></i>Single Job Template</label>
+          <textarea class="ep-input" id="pWaSingle" rows="12" placeholder="Leave blank to use default format..." style="font-family:monospace;font-size:.78rem;line-height:1.6;resize:vertical"></textarea>
+          <div style="display:flex;justify-content:flex-end;margin-top:.3rem">
+            <button class="ep-btn-outline ep-btn-sm" onclick="previewTemplate('single')" style="font-size:.72rem"><i class="bi bi-eye me-1"></i>Preview sample</button>
+            <button class="ep-btn-outline ep-btn-sm" onclick="resetTemplate('single')" style="font-size:.72rem"><i class="bi bi-arrow-counterclockwise me-1"></i>Reset</button>
+          </div>
+        </div>
+
+        <!-- Bulk template -->
+        <div class="ep-field" style="margin-top:.75rem">
+          <label class="ep-label"><i class="bi bi-collection-fill me-1"></i>Bulk Requirements Template</label>
+          <p style="font-size:.72rem;color:var(--text-muted);margin-bottom:.35rem">Extra placeholders: <code style="font-size:.7rem">{positions}</code> (total count), <code style="font-size:.7rem">{titles}</code> (bullet list)</p>
+          <textarea class="ep-input" id="pWaBulk" rows="12" placeholder="Leave blank to use default format..." style="font-family:monospace;font-size:.78rem;line-height:1.6;resize:vertical"></textarea>
+          <div style="display:flex;justify-content:flex-end;margin-top:.3rem">
+            <button class="ep-btn-outline ep-btn-sm" onclick="previewTemplate('bulk')" style="font-size:.72rem"><i class="bi bi-eye me-1"></i>Preview sample</button>
+            <button class="ep-btn-outline ep-btn-sm" onclick="resetTemplate('bulk')" style="font-size:.72rem"><i class="bi bi-arrow-counterclockwise me-1"></i>Reset</button>
+          </div>
+        </div>
+
         <div id="profileMsg" class="ep-msg d-none mt-3"></div>
-        <button class="ep-btn-primary mt-3" onclick="saveProfile()">
+        <button class="ep-btn-primary mt-3 w-100" id="saveBtn" onclick="saveProfile()">
           <i class="bi bi-check-lg me-2"></i>Save Changes
         </button>
       </div>
     </div>
+
+    <!-- ── Right column ── -->
     <div class="col-lg-5">
       <div class="ep-card">
         <h2 class="ep-card-title mb-3">Account Info</h2>
@@ -159,9 +335,39 @@
           <input class="ep-input" id="pJoined" disabled style="opacity:.6">
         </div>
       </div>
+
       <div class="ep-card mt-4">
-        <h2 class="ep-card-title mb-1">Danger Zone</h2>
-        <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:1rem">These actions cannot be undone</p>
+        <h2 class="ep-card-title mb-3">Change Password</h2>
+        <div class="ep-field">
+          <label class="ep-label">Current Password</label>
+          <div class="ep-input-wrap">
+            <input type="password" class="ep-input" id="cpCurrent" placeholder="Current password" autocomplete="current-password">
+            <button class="ep-input-eye" onclick="togglePass('cpCurrent',this)"><i class="bi bi-eye"></i></button>
+          </div>
+        </div>
+        <div class="ep-field mt-3">
+          <label class="ep-label">New Password</label>
+          <div class="ep-input-wrap">
+            <input type="password" class="ep-input" id="cpNew" placeholder="Min 8 characters" autocomplete="new-password">
+            <button class="ep-input-eye" onclick="togglePass('cpNew',this)"><i class="bi bi-eye"></i></button>
+          </div>
+        </div>
+        <div class="ep-field mt-3">
+          <label class="ep-label">Confirm New Password</label>
+          <div class="ep-input-wrap">
+            <input type="password" class="ep-input" id="cpConfirm" placeholder="Re-enter new password" autocomplete="new-password">
+            <button class="ep-input-eye" onclick="togglePass('cpConfirm',this)"><i class="bi bi-eye"></i></button>
+          </div>
+        </div>
+        <div id="cpMsg" class="ep-msg d-none mt-2"></div>
+        <button class="ep-btn-primary mt-3 w-100" id="cpBtn" onclick="changePassword()">
+          <i class="bi bi-key-fill me-2"></i>Update Password
+        </button>
+      </div>
+
+      <div class="ep-card mt-4">
+        <h2 class="ep-card-title mb-1" style="color:#dc2626">Danger Zone</h2>
+        <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:1rem">This will end all active sessions</p>
         <button class="ep-btn-outline ep-btn-danger w-100" onclick="logout()">
           <i class="bi bi-box-arrow-left me-2"></i>Logout from All Devices
         </button>
@@ -169,54 +375,85 @@
     </div>
   </div>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-
 const API = {
-  async get(url) {
-    const r = await fetch(url, { credentials: 'include' });
-    return r.json();
-  },
-  async post(url, data) {
-    const r = await fetch(url, { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-    return r.json();
-  },
-  async put(url, data) {
-    const r = await fetch(url, { method: 'PUT', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-    return r.json();
-  },
-  async del(url) {
-    const r = await fetch(url, { method: 'DELETE', credentials: 'include' });
-    return r.json();
-  }
+  async get(url) { const r = await fetch(url,{credentials:'include'}); return r.json(); },
+  async post(url,data) { const r = await fetch(url,{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}); return r.json(); },
+  async put(url,data) { const r = await fetch(url,{method:'PUT',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}); return r.json(); },
+  async del(url) { const r = await fetch(url,{method:'DELETE',credentials:'include'}); return r.json(); }
 };
 
 async function checkAuth() {
   try {
     const d = await API.get('/api/employer/me');
-    if (!d.success) { window.location.href = '/employer/'; return null; }
-    const n = document.getElementById('epCompanyName');
-    const a = document.getElementById('epAvatar');
-    if (n) n.textContent = d.employer.company_name;
-    if (a) a.textContent = d.employer.company_name.charAt(0).toUpperCase();
+    if (!d.success) { window.location.href='/employer/'; return null; }
+    document.getElementById('epCompanyName').textContent = d.employer.company_name;
+    const _av = document.getElementById('epAvatar');
+    if (_av) {
+      if (d.employer.logo_url) {
+        _av.innerHTML = `<img src="${d.employer.logo_url}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block;">`;
+        _av.style.padding = '0'; _av.style.overflow = 'hidden'; _av.style.background = 'transparent';
+      } else { _av.textContent = d.employer.company_name.charAt(0).toUpperCase(); }
+    }
     return d;
-  } catch(e) { window.location.href = '/employer/'; return null; }
+  } catch(e) { window.location.href='/employer/'; return null; }
 }
 
 async function logout() {
-  await API.post('/api/employer/logout', {});
-  window.location.href = '/employer/';
+  if (!confirm('Are you sure you want to log out?')) return;
+  await API.post('/api/employer/logout',{});
+  window.location.href='/employer/';
 }
 
-function toggleUserMenu() {
-  document.getElementById('epUserDropdown')?.classList.toggle('show');
-}
+function toggleUserMenu() { document.getElementById('epUserDropdown')?.classList.toggle('show'); }
 document.addEventListener('click', e => {
-  const menu = document.getElementById('epUserMenu');
-  if (menu && !menu.contains(e.target)) {
-    document.getElementById('epUserDropdown')?.classList.remove('show');
-  }
+  const m = document.getElementById('epUserMenu');
+  if (m && !m.contains(e.target)) document.getElementById('epUserDropdown')?.classList.remove('show');
 });
+
+function togglePass(id, btn) {
+  const inp = document.getElementById(id);
+  const show = inp.type === 'password';
+  inp.type = show ? 'text' : 'password';
+  btn.innerHTML = show ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
+}
+
+function showMsg(el, text, type) {
+  el.className = 'ep-msg ep-msg-' + type;
+  el.textContent = text;
+  el.classList.remove('d-none');
+}
+
+async function changePassword() {
+  const current = document.getElementById('cpCurrent').value;
+  const next    = document.getElementById('cpNew').value;
+  const confirm = document.getElementById('cpConfirm').value;
+  const msg = document.getElementById('cpMsg');
+  const btn = document.getElementById('cpBtn');
+
+  if (!current)              { showMsg(msg, 'Current password is required', 'error'); return; }
+  if (!next || next.length < 8) { showMsg(msg, 'New password must be at least 8 characters', 'error'); return; }
+  if (next !== confirm)      { showMsg(msg, 'New passwords do not match', 'error'); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Updating...';
+  try {
+    const d = await API.put('/api/employer/change-password', { current_password: current, new_password: next });
+    if (d.success) {
+      showMsg(msg, 'Password updated successfully', 'success');
+      ['cpCurrent','cpNew','cpConfirm'].forEach(id => document.getElementById(id).value = '');
+    } else {
+      showMsg(msg, d.message || 'Failed to update password', 'error');
+    }
+  } catch (e) {
+    showMsg(msg, 'Network error. Please try again.', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="bi bi-key-fill me-2"></i>Update Password';
+  }
+}
 
 function showToast(msg, type='success') {
   const t = document.createElement('div');
@@ -227,83 +464,242 @@ function showToast(msg, type='success') {
   setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3500);
 }
 
-function timeAgo(date) {
-  const d = new Date(date), now = new Date();
-  const diff = Math.floor((now - d) / 1000);
-  if (diff < 60) return 'just now';
-  if (diff < 3600) return Math.floor(diff/60) + 'm ago';
-  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
-  return Math.floor(diff/86400) + 'd ago';
+function renderLogo(logoUrl, companyName) {
+  const wrap = document.getElementById('logoDisplay');
+  if (logoUrl) {
+    wrap.innerHTML = `<img src="${logoUrl}" class="logo-img" alt="Logo">`;
+  } else {
+    wrap.innerHTML = `<div class="logo-placeholder">${(companyName||'?').charAt(0).toUpperCase()}</div>`;
+  }
+}
+
+async function uploadLogo(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) { showToast('File too large. Max 2MB.', 'error'); return; }
+
+  const txt = document.getElementById('logoUploadTxt');
+  const spin = document.getElementById('logoSpinner');
+  txt.style.display = 'none'; spin.style.display = '';
+
+  const fd = new FormData();
+  fd.append('logo', file);
+  try {
+    const r = await fetch('/api/employer/upload-logo', { method:'POST', credentials:'include', body:fd });
+    const d = await r.json();
+    if (d.success) {
+      renderLogo(d.logo_url, document.getElementById('pCompany').value);
+      showToast('Logo updated!');
+    } else {
+      showToast(d.message || 'Upload failed', 'error');
+    }
+  } catch(e) { showToast('Upload failed', 'error'); }
+  txt.style.display = ''; spin.style.display = 'none';
+  input.value = '';
 }
 
 async function init() {
   const d = await checkAuth();
   if (!d) return;
   const e = d.employer;
-  document.getElementById('pCompany').value  = e.company_name || '';
-  document.getElementById('pContact').value  = e.contact_name || '';
-  document.getElementById('pCity').value     = e.city || '';
-  document.getElementById('pPhone').value    = e.phone || '';
-  document.getElementById('pWhatsApp').value = e.whatsapp || '';
-  document.getElementById('pWebsite').value  = e.website || '';
-  document.getElementById('pAbout').value    = e.about || '';
-  document.getElementById('pEmail').value    = e.email || '';
-  document.getElementById('pJoined').value   = new Date(e.created_at).toLocaleDateString();
-  if (e.sector) document.getElementById('pSector').value = e.sector;
+  renderLogo(e.logo_url, e.company_name);
+  document.getElementById('pCompany').value   = e.company_name   || '';
+  document.getElementById('pContact').value   = e.contact_name   || '';
+  document.getElementById('pCR').value        = e.cr_number      || '';
+  document.getElementById('pCity').value      = e.city           || '';
+  document.getElementById('pPhone').value     = e.phone          || '';
+  document.getElementById('pWhatsApp').value  = e.whatsapp       || '';
+  document.getElementById('pWebsite').value   = e.website        || '';
+  document.getElementById('pLinkedin').value  = e.linkedin_url   || '';
+  document.getElementById('pAddress').value   = e.address        || '';
+  document.getElementById('pMapLink').value   = e.map_link       || '';
+  document.getElementById('pAbout').value          = e.about             || '';
+  document.getElementById('pWaSingle').value      = e.wa_template_single || '';
+  document.getElementById('pWaBulk').value        = e.wa_template_bulk   || '';
+  document.getElementById('pFounded').value   = e.founded_year   || '';
+  document.getElementById('pEmail').value     = e.email          || '';
+  document.getElementById('pJoined').value    = new Date(e.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+  if (e.sector)       document.getElementById('pSector').value = e.sector;
+  if (e.company_size) document.getElementById('pSize').value   = e.company_size;
+}
+
+function toggleHowTo() {
+  const b = document.getElementById('howToBody');
+  const ch = document.getElementById('howToChevron');
+  const open = b.style.display === 'none';
+  b.style.display = open ? 'block' : 'none';
+  ch.className = open ? 'bi bi-chevron-up' : 'bi bi-chevron-down';
+}
+
+const SAMPLE_SINGLE = {
+  company:'Orbit Contracting', title:'Welding QC Inspector (Aramco Approved)',
+  location:'Eastern Region, KSA', type:'Contract', salary:'SAR 8,000/month',
+  description:'Urgently required Welding QC Inspector with valid Aramco approval and CSWIP 3.1 certification for ongoing SATORP project.',
+  phone:'0535707283', whatsapp:'0535707283', link:'joborbit.org/job/welding-qc-inspector-1'
+};
+const SAMPLE_BULK = {
+  ...SAMPLE_SINGLE,
+  positions:'5',
+  titles:'• Welding QC Inspector — 3 openings\n• Welding QC Supervisor — 2 openings'
+};
+
+function previewTemplate(type) {
+  const el = document.getElementById(type === 'single' ? 'pWaSingle' : 'pWaBulk');
+  const templateText = el.value.trim() || (type === 'single' ? DEFAULT_SINGLE : DEFAULT_BULK);
+  const sample = type === 'single' ? SAMPLE_SINGLE : SAMPLE_BULK;
+  let preview = templateText;
+  Object.entries(sample).forEach(([k,v]) => {
+    preview = preview.replace(new RegExp('\\{'+k+'\\}','g'), v||'');
+  });
+  preview = preview.replace(/^[ \t]*\n/gm,'').replace(/\n{3,}/g,'\n\n').trim();
+
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';
+
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg-card);border-radius:16px;padding:1.25rem;max-width:420px;width:100%;max-height:80vh;overflow-y:auto';
+
+  const hdr = document.createElement('div');
+  hdr.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem';
+  hdr.innerHTML = '<span style="font-weight:700;color:var(--text-primary);font-size:.9rem">Sample Preview</span>';
+
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = '✕';
+  closeBtn.style.cssText = 'background:none;border:none;font-size:1.1rem;cursor:pointer;color:var(--text-muted)';
+  closeBtn.onclick = () => overlay.remove();
+  hdr.appendChild(closeBtn);
+
+  const pre = document.createElement('pre');
+  pre.style.cssText = 'white-space:pre-wrap;font-size:.8rem;background:var(--surface);padding:.85rem;border-radius:10px;color:var(--text-primary);line-height:1.7;margin:0;font-family:"DM Sans",sans-serif';
+  pre.textContent = preview;
+
+  const note = document.createElement('p');
+  note.style.cssText = 'font-size:.7rem;color:var(--text-muted);margin:.6rem 0 0;text-align:center';
+  note.textContent = 'This is how your message will look with sample data';
+
+  box.appendChild(hdr);
+  box.appendChild(pre);
+  box.appendChild(note);
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', e => { if(e.target===overlay) overlay.remove(); });
+}
+
+
+/* ── Unsaved changes warning ── */
+let isDirty = false;
+document.addEventListener('input', e => {
+  if (e.target.matches('input, textarea, select') && e.target.type !== 'file') isDirty = true;
+}, true);
+document.addEventListener('change', e => {
+  if (e.target.matches('input, textarea, select') && e.target.type !== 'file') isDirty = true;
+}, true);
+window.addEventListener('beforeunload', e => {
+  if (isDirty) { e.preventDefault(); e.returnValue = ''; }
+});
+
+function copyPlaceholder(el) {
+  navigator.clipboard.writeText(el.textContent).then(() => {
+    const orig = el.style.background;
+    el.style.background = 'rgba(5,150,105,.15)';
+    el.style.color = '#059669';
+    setTimeout(() => { el.style.background = ''; el.style.color = ''; }, 800);
+  });
+}
+
+const DEFAULT_SINGLE = `🔵 *JOB VACANCY*
+*{company}*
+
+📋 *{title}*
+📍 {location}
+💼 {type}
+💰 {salary}
+
+{description}
+
+📞 {phone}
+💬 WhatsApp: {whatsapp}
+
+🔗 View & apply: {link}
+
+_Posted via JobOrbit.org_`;
+
+const DEFAULT_BULK = `🔵 *URGENT REQUIREMENT*
+*{company}*
+
+📍 {location}
+👥 {positions} Positions Available
+
+📋 *Open Positions:*
+{titles}
+
+{description}
+
+📞 {phone}
+💬 WhatsApp: {whatsapp}
+
+🔗 View & apply: {link}
+
+_Posted via JobOrbit.org_`;
+
+function resetTemplate(type) {
+  const el = document.getElementById(type === 'single' ? 'pWaSingle' : 'pWaBulk');
+  if (el) el.value = type === 'single' ? DEFAULT_SINGLE : DEFAULT_BULK;
+  isDirty = true;
+  showToast('Reset to default — save to apply');
 }
 
 async function saveProfile() {
-  const msg = document.getElementById('profileMsg');
-  const btn = event.target;
+  const btn = document.getElementById('saveBtn');
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
+
   const d = await API.put('/api/employer/profile', {
-    company_name:  document.getElementById('pCompany').value,
-    contact_name:  document.getElementById('pContact').value,
+    company_name:  document.getElementById('pCompany').value.trim(),
+    contact_name:  document.getElementById('pContact').value.trim(),
     sector:        document.getElementById('pSector').value,
-    city:          document.getElementById('pCity').value,
-    phone:         document.getElementById('pPhone').value,
-    whatsapp:      document.getElementById('pWhatsApp').value,
-    website:       document.getElementById('pWebsite').value,
-    about:         document.getElementById('pAbout').value,
+    company_size:  document.getElementById('pSize').value,
+    city:          document.getElementById('pCity').value.trim(),
+    founded_year:  document.getElementById('pFounded').value || null,
+    phone:         document.getElementById('pPhone').value.trim(),
+    whatsapp:      document.getElementById('pWhatsApp').value.trim(),
+    website:       document.getElementById('pWebsite').value.trim(),
+    linkedin_url:  document.getElementById('pLinkedin').value.trim(),
+    cr_number:     document.getElementById('pCR').value.trim(),
+    address:       document.getElementById('pAddress').value.trim(),
+    map_link:      document.getElementById('pMapLink').value.trim(),
+    about:            document.getElementById('pAbout').value.trim(),
+    wa_template_single: document.getElementById('pWaSingle').value.trim() || null,
+    wa_template_bulk:   document.getElementById('pWaBulk').value.trim()   || null,
   });
+
   btn.disabled = false;
   btn.innerHTML = '<i class="bi bi-check-lg me-2"></i>Save Changes';
-  if (d.success) showToast('Profile updated!');
-  else { msg.className='ep-msg ep-msg-error'; msg.textContent=d.message; msg.classList.remove('d-none'); }
+
+  if (d.success) {
+    isDirty = false;
+    showToast('Profile updated!');
+    document.getElementById('profileMsg').classList.add('d-none');
+  } else {
+    const msg = document.getElementById('profileMsg');
+    msg.className = 'ep-msg ep-msg-error';
+    msg.textContent = d.message || 'Failed to save';
+    msg.classList.remove('d-none');
+  }
 }
 
 init();
 
 /* Inactivity timer */
-(function() {
-  var WARN = 25*60*1000, LOGOUT = 30*60*1000;
-  var warnT, logoutT, shown = false;
-  function reset() {
-    clearTimeout(warnT); clearTimeout(logoutT);
-    if (shown) hide();
-    warnT = setTimeout(warn, WARN);
-    logoutT = setTimeout(auto, LOGOUT);
-  }
-  function warn() {
-    shown = true;
-    var el = document.getElementById('inactWarn');
-    if (!el) {
-      el = document.createElement('div');
-      el.id = 'inactWarn';
-      el.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';
-      el.innerHTML = '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:2rem;max-width:380px;width:100%;text-align:center"><div style=\"font-size:2rem;margin-bottom:.5rem\">⏰</div><h3 style=\"font-family:Syne,sans-serif;font-weight:800;color:var(--text-primary);margin-bottom:.5rem\">Still there?</h3><p style=\"color:var(--text-secondary);font-size:.9rem\">You\'ll be logged out in <strong id=\"inactCD\">5:00</strong></p><div style=\"display:flex;gap:.75rem;justify-content:center;margin-top:1.25rem\"><button class=\"ep-btn-primary\" onclick=\"keepIn()\">Keep me logged in</button><button class=\"ep-btn-outline\" onclick=\"logoutNow()\">Logout</button></div></div>';
-      document.body.appendChild(el);
-      var s = 300;
-      var ci = setInterval(function(){ s--; var e=document.getElementById('inactCD'); if(e) e.textContent=Math.floor(s/60)+':'+(s%60<10?'0':'')+s%60; if(s<=0) clearInterval(ci); }, 1000);
-    }
-    el.style.display = 'flex';
-  }
-  function hide() { shown=false; var el=document.getElementById('inactWarn'); if(el) el.style.display='none'; }
-  function auto() { fetch('/api/employer/logout',{method:'POST',credentials:'include'}); window.location.href='/employer/?reason=timeout'; }
-  window.keepIn = function(){ hide(); reset(); fetch('/api/employer/me',{credentials:'include'}); };
-  window.logoutNow = async function(){ await fetch('/api/employer/logout',{method:'POST',credentials:'include'}); window.location.href='/employer/'; };
-  ['mousedown','keypress','scroll','touchstart','click'].forEach(function(e){ document.addEventListener(e,reset,{passive:true}); });
+(function(){
+  var WARN=25*60*1000,LOGOUT=30*60*1000,warnT,logoutT,shown=false;
+  function reset(){clearTimeout(warnT);clearTimeout(logoutT);if(shown)hide();warnT=setTimeout(warn,WARN);logoutT=setTimeout(auto,LOGOUT);}
+  function warn(){shown=true;var el=document.getElementById('inactWarn');if(!el){el=document.createElement('div');el.id='inactWarn';el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';el.innerHTML='<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:2rem;max-width:380px;width:100%;text-align:center"><div style="font-size:2rem;margin-bottom:.5rem">⏰</div><h3 style="font-family:Syne,sans-serif;font-weight:800;color:var(--text-primary);margin-bottom:.5rem">Still there?</h3><p style="color:var(--text-secondary);font-size:.9rem">You\'ll be logged out in <strong id="inactCD">5:00</strong></p><div style="display:flex;gap:.75rem;justify-content:center;margin-top:1.25rem"><button class="ep-btn-primary" onclick="keepIn()">Keep me logged in</button><button class="ep-btn-outline" onclick="logoutNow()">Logout</button></div></div>';document.body.appendChild(el);var s=300;var ci=setInterval(function(){s--;var e=document.getElementById('inactCD');if(e)e.textContent=Math.floor(s/60)+':'+(s%60<10?'0':'')+s%60;if(s<=0)clearInterval(ci);},1000);}el.style.display='flex';}
+  function hide(){shown=false;var el=document.getElementById('inactWarn');if(el)el.style.display='none';}
+  function auto(){fetch('/api/employer/logout',{method:'POST',credentials:'include'});window.location.href='/employer/?reason=timeout';}
+  window.keepIn=function(){hide();reset();fetch('/api/employer/me',{credentials:'include'});};
+  window.logoutNow=async function(){await fetch('/api/employer/logout',{method:'POST',credentials:'include'});window.location.href='/employer/';};
+  ['mousedown','keypress','scroll','touchstart','click'].forEach(function(e){document.addEventListener(e,reset,{passive:true});});
   reset();
 })();
 </script>

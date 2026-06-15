@@ -31,6 +31,19 @@ function he(str) {                           // HTML-only escape (for href etc.)
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
 }
+function timeAgo(dateStr) {                  // "2d ago" / "3mo ago" etc.
+  const diffMs = Date.now() - new Date(dateStr).getTime();
+  const min = Math.floor(diffMs / 60000);
+  if (min < 1)   return 'just now';
+  if (min < 60)  return min + 'm ago';
+  const hr = Math.floor(min / 60);
+  if (hr < 24)   return hr + 'h ago';
+  const day = Math.floor(hr / 24);
+  if (day < 30)  return day + 'd ago';
+  const mo = Math.floor(day / 30);
+  if (mo < 12)   return mo + 'mo ago';
+  return Math.floor(mo / 12) + 'y ago';
+}
 
 async function getSetting(key, fallback = '') {
   try {
@@ -48,6 +61,10 @@ async function getSiteUrl() {
 
 async function getSiteName() {
   return getSetting('site_name', 'JobOrbit');
+}
+
+async function getLogoUrl() {
+  return getSetting('logo_url', '');
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -93,7 +110,7 @@ router.get('/sitemap.xml', async (req, res) => {
     <lastmod>${today}</lastmod>
   </url>
   <url>
-    <loc>${siteUrl}/contact.html</loc>
+    <loc>${siteUrl}/employer/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
     <lastmod>${today}</lastmod>
@@ -299,7 +316,7 @@ router.get('/job/:slug', async (req, res, next) => {
 
     // Phase 2: fetch similar jobs (same category, exclude current)
     const [simRows] = await db.query(
-      `SELECT j.title, j.company, j.location, j.slug, j.job_type, j.created_at
+      `SELECT j.title, j.company, j.location, j.slug, j.job_type, j.salary, j.created_at
          FROM jobs j
          JOIN categories c ON j.category_id = c.id
         WHERE j.category_id = ? AND j.slug != ? AND j.status = 'active'
@@ -309,6 +326,21 @@ router.get('/job/:slug', async (req, res, next) => {
     );
     const siteUrl  = await getSiteUrl();
     const siteName = await getSiteName();
+    const logoUrl  = await getLogoUrl();
+    const logoSrc  = logoUrl.startsWith('http') ? logoUrl : `${siteUrl}${logoUrl}`;
+
+    // Employer logo (for employer-posted jobs)
+    let employerLogo = '';
+    if (job.employer_id) {
+      try {
+        const [[emp]] = await db.query('SELECT logo_url FROM employers WHERE id = ?', [job.employer_id]);
+        if (emp && emp.logo_url) employerLogo = emp.logo_url;
+      } catch {}
+    }
+    const employerLogoSrc = employerLogo.startsWith('http') ? employerLogo : `${siteUrl}${employerLogo}`;
+    const companyInitial  = (job.company || '?').trim().charAt(0).toUpperCase() || '?';
+    const postedAgo       = timeAgo(job.created_at);
+    const salaryDisplay   = (job.salary || '').trim();
 
     // Parse salary from extra_fields
     let extra = {};
@@ -384,15 +416,13 @@ if (job.whatsapp) {
     `Hello, I am very interested in this position. Please find my details attached. Thank you.`;
   whatsappUrl = `https://wa.me/${clean}?text=${encodeURIComponent(msg)}`;
 }
-const applyLinkBtn = job.apply_link ? `<a href="${he(job.apply_link)}" class="cbtn cbtn-applylink" target="_blank"><i>🔗</i> Apply Link</a>` : '';
-const applyNowBtn  = job.employer_id ? `<button class="cbtn cbtn-applynow" onclick="openSeoApply()"><i>📩</i> Apply Now</button>` : '';
+const applyLinkBtn = job.apply_link ? `<a href="${he(job.apply_link)}" class="cbtn" target="_blank"><i>🔗</i> Apply Link</a>` : '';
 const contactBtns = [
-  job.phone    ? `<a href="tel:${he(job.phone)}"    class="cbtn cbtn-phone"><i>📞</i> ${he(job.phone)}</a>` : '',
-  job.whatsapp ? `<a href="${whatsappUrl}" class="cbtn cbtn-wa" target="_blank"><i>💬</i> WhatsApp</a>` : '',
-  job.email    ? `<a href="mailto:${he(job.email)}" class="cbtn cbtn-email"><i>✉️</i> ${he(job.email)}</a>` : '',
-  job.map_link ? `<a href="${he(job.map_link)}"     class="cbtn cbtn-map" target="_blank"><i>📍</i> View Location</a>` : '',
-  applyLinkBtn,
-  applyNowBtn
+  job.phone    ? `<a href="tel:${he(job.phone)}"    class="cbtn"><i>📞</i> ${he(job.phone)}</a>` : '',
+  job.whatsapp ? `<a href="${whatsappUrl}" class="cbtn" target="_blank"><i>💬</i> WhatsApp</a>` : '',
+  job.email    ? `<a href="mailto:${he(job.email)}" class="cbtn"><i>✉️</i> ${he(job.email)}</a>` : '',
+  job.map_link ? `<a href="${he(job.map_link)}"     class="cbtn" target="_blank"><i>📍</i> View Location</a>` : '',
+  applyLinkBtn
 ].filter(Boolean).join('\n          ');
 
     // ── Full SSR HTML ──────────────────────────────────────────
@@ -439,39 +469,65 @@ const contactBtns = [
     a{color:#0f62fe;text-decoration:none}
     a:hover{text-decoration:underline}
     .wrap{max-width:780px;margin:0 auto;padding:2rem 1.25rem}
-    nav{background:#fff;border-bottom:1px solid #e5e7eb;padding:.85rem 1.25rem;display:flex;align-items:center;gap:.75rem}
-    nav a{font-weight:600;color:#0f62fe;font-size:1rem}
-    nav span{color:#6b7280;font-size:.85rem}
+
+    .seo-header{height:64px;display:flex;align-items:center;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid #e5e7eb;position:sticky;top:0;z-index:100}
+    .seo-header-inner{max-width:780px;margin:0 auto;padding:0 1.25rem;width:100%;display:flex;align-items:center}
+    .seo-logo{height:36px;display:block}
+
     .bc{font-size:.82rem;color:#6b7280;margin-bottom:1.5rem;display:flex;flex-wrap:wrap;gap:.3rem;align-items:center}
     .bc a{color:#0f62fe}
     .bc span{color:#9ca3af}
+
+    .back{display:inline-flex;align-items:center;gap:.3rem;color:#0f62fe;font-size:.88rem;margin-bottom:1.5rem}
+    .back:hover{text-decoration:underline}
+
     .card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;overflow:hidden;margin-bottom:1.5rem;box-shadow:0 2px 12px rgba(0,0,0,.06)}
     .card-head{padding:1.75rem 2rem 1.5rem;border-bottom:1px solid #f1f3f4}
     .card-body{padding:1.75rem 2rem}
-    .badges{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.85rem}
+    .apply-section{background:#f8fafc;border-top:1px solid #f1f3f4}
+
+    .job-head{display:flex;gap:1rem;align-items:flex-start;margin-bottom:.85rem}
+    .company-avatar{width:54px;height:54px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.4rem;color:#fff;background:linear-gradient(135deg,#0f62fe,#1a56db);overflow:hidden}
+    .company-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+    .job-head-info{flex:1;min-width:0;padding-top:.1rem}
+    .company-name{font-size:.92rem;color:#475569;font-weight:600;margin-top:.25rem}
+
+    .badges{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.75rem}
     .badge{display:inline-block;padding:.22rem .7rem;border-radius:100px;font-size:.72rem;font-weight:600;letter-spacing:.3px}
     .b-cat{background:#e8f0fe;color:#1a56db}
     .b-type{background:transparent;color:#0f62fe;border:1px solid #0f62fe}
     .b-feat{background:#0f62fe;color:#fff}
     .b-spon{background:#ff6b35;color:#fff}
-    h1{font-size:clamp(1.4rem,3vw,1.9rem);font-weight:800;color:#0f172a;margin-bottom:.5rem;line-height:1.2}
-    .meta{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.85rem}
+    .b-visa{background:#dcfce7;color:#166534}
+    .b-cv{background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0}
+
+    h1{font-size:clamp(1.4rem,3vw,1.9rem);font-weight:800;color:#0f172a;margin-bottom:0;line-height:1.2}
+
+    .meta-grid{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1rem}
     .chip{display:inline-flex;align-items:center;gap:.3rem;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:100px;padding:.28rem .8rem;font-size:.8rem;color:#475569}
+    .chip-salary{background:#dcfce7;border-color:#bbf7d0;color:#166534;font-weight:700}
+
     .section-label{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#9ca3af;margin-bottom:.85rem;padding-bottom:.5rem;border-bottom:1px solid #f1f3f4}
     .desc{font-size:.95rem;line-height:1.85;color:#334155;white-space:pre-line}
-    .apply-head{font-size:1.05rem;font-weight:700;color:#0f172a;margin-bottom:.35rem}
-    .apply-sub{font-size:.875rem;color:#64748b;margin-bottom:1.1rem}
+
+    .apply-head{font-size:1.05rem;font-weight:700;color:#0f172a;margin-bottom:.6rem}
+    .apply-sub{font-size:.875rem;color:#64748b;margin-top:.6rem;margin-bottom:0}
+    .apply-cta{display:flex;align-items:center;justify-content:center;gap:.5rem;width:100%;background:#0f62fe;color:#fff;border:none;border-radius:10px;padding:.85rem 1.5rem;font-weight:700;font-size:.95rem;cursor:pointer;text-decoration:none;font-family:inherit;transition:background .15s}
+    .apply-cta:hover{background:#0353e9;text-decoration:none}
+    .apply-divider{display:flex;align-items:center;gap:.75rem;margin:1.25rem 0;font-size:.72rem;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em}
+    .apply-divider::before,.apply-divider::after{content:'';flex:1;height:1px;background:#e5e7eb}
+
     .contact-row{display:flex;flex-wrap:wrap;gap:.65rem}
-    .cbtn{display:inline-flex;align-items:center;gap:.4rem;padding:.6rem 1.25rem;border-radius:9px;font-weight:600;font-size:.875rem;text-decoration:none;transition:opacity .15s}
-    .cbtn:hover{opacity:.85;text-decoration:none}
-    .cbtn-phone{background:#dcfce7;color:#166534;border:1px solid #bbf7d0}
-    .cbtn-wa{background:#dcfce7;color:#15803d;border:1px solid #bbf7d0}
-    .cbtn-email{background:#e8f0fe;color:#1a56db;border:1px solid #c7d7fb}
-    .cbtn-map{background:#fff3e0;color:#c84b00;border:1px solid #ffcc80}
-    .cbtn-applylink{background:#e8f0fe;color:#1a56db;border:1px solid #c7d7fb}
-.cbtn-applylink:hover{background:#1a56db;color:#fff}
-    .cbtn-applynow{background:#0f62fe;color:#fff;border:none;cursor:pointer;font-family:inherit}
-    .cbtn-applynow:hover{background:#0353e9}
+    .cbtn{display:inline-flex;align-items:center;gap:.4rem;padding:.6rem 1.25rem;border-radius:9px;font-weight:600;font-size:.875rem;text-decoration:none;background:#fff;color:#334155;border:1.5px solid #e2e8f0;transition:border-color .15s,background .15s}
+    .cbtn:hover{border-color:#0f62fe;background:#f8faff;text-decoration:none}
+
+    .cnt-picker{position:relative}
+    .cnt-dropdown{position:absolute;top:calc(100% + 3px);left:0;right:0;background:#fff;border:1px solid #e5e7eb;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:2000;max-height:210px;overflow-y:auto;display:none}
+    .cnt-dropdown.show{display:block}
+    .cnt-option{padding:.48rem .75rem;cursor:pointer;font-size:.83rem;color:#161616}
+    .cnt-option:hover{background:#f9fafb}
+    .cnt-option strong{color:#0f62fe;font-weight:700}
+
     /* Apply modal */
     .seo-apply-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;padding:1rem}
     .seo-apply-overlay.open{display:flex}
@@ -488,19 +544,37 @@ const contactBtns = [
     .seo-btn-primary{background:#0f62fe;color:#fff;border:none;padding:.65rem 1.25rem;border-radius:9px;font-weight:700;cursor:pointer;font-size:.88rem}
     .seo-btn-secondary{background:#f1f3f4;color:#374151;border:none;padding:.65rem 1.25rem;border-radius:9px;font-weight:600;cursor:pointer;font-size:.88rem}
     .seo-msg{padding:.65rem 1rem;border-radius:8px;font-size:.83rem;margin-bottom:.75rem}
-    .back{display:inline-flex;align-items:center;gap:.3rem;color:#0f62fe;font-size:.88rem;margin-bottom:1.5rem}
-    .back:hover{text-decoration:underline}
+
+    /* Similar Jobs */
+    .sim-section{margin-top:2rem}
+    .sim-heading{font-size:1.05rem;font-weight:700;color:#0f172a;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid #e5e7eb}
+    .sim-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.85rem}
+    .sim-card{display:block;background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:1rem;text-decoration:none;transition:border-color .15s,box-shadow .15s}
+    .sim-card:hover{border-color:#0f62fe;box-shadow:0 4px 16px rgba(15,98,254,.08);text-decoration:none}
+    .sim-title{font-weight:700;font-size:.9rem;color:#0f172a;margin-bottom:.3rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .sim-company{font-size:.78rem;color:#64748b;margin-bottom:.3rem}
+    .sim-meta{display:flex;flex-wrap:wrap;gap:.4rem;font-size:.75rem;color:#94a3b8;margin-bottom:.3rem}
+    .sim-salary{font-size:.78rem;font-weight:700;color:#166534}
+
     footer{margin-top:3rem;padding:1.5rem 1.25rem;text-align:center;font-size:.8rem;color:#9ca3af;border-top:1px solid #e5e7eb}
-    @media(max-width:600px){.card-head,.card-body{padding:1.25rem}}
+
+    /* Mobile sticky apply bar */
+    .mobile-apply-bar{display:none}
+    @media(max-width:600px){
+      .card-head,.card-body{padding:1.25rem}
+      .wrap{padding-bottom:5.5rem}
+      .mobile-apply-bar{display:flex;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e5e7eb;padding:.65rem 1rem;box-shadow:0 -4px 16px rgba(0,0,0,.08);z-index:500}
+      .mobile-apply-bar .apply-cta{margin:0}
+    }
   </style>
 </head>
 <body>
 
-<nav>
-  <a href="/">${he(siteName)}</a>
-  <span>/</span>
-  <span>${he(job.category)}</span>
-</nav>
+<header class="seo-header">
+  <div class="seo-header-inner">
+    <a href="${siteUrl}/"><img src="${he(logoSrc)}" alt="${he(siteName)}" class="seo-logo"></a>
+  </div>
+</header>
 
 <div class="wrap">
   <a class="back" href="/">← All Jobs</a>
@@ -515,33 +589,49 @@ const contactBtns = [
 
   <div class="card">
     <div class="card-head">
+      <div class="job-head">
+        <div class="company-avatar">
+          ${employerLogo ? `<img src="${he(employerLogoSrc)}" alt="${he(job.company)}">` : he(companyInitial)}
+        </div>
+        <div class="job-head-info">
+          <h1>${he(job.title)}</h1>
+          <div class="company-name">${he(job.company) || 'Company name not provided'}</div>
+        </div>
+      </div>
       <div class="badges">
         ${job.featured  == 1 ? '<span class="badge b-feat">⭐ Featured</span>' : ''}
         ${job.sponsored == 1 ? '<span class="badge b-spon">Sponsored</span>' : ''}
         <span class="badge b-cat">${he(job.category)}</span>
         <span class="badge b-type">${he(job.job_type || 'Full-time')}</span>
+        ${job.visa_sponsored == 1 ? '<span class="badge b-visa">✈️ Visa Sponsored</span>' : ''}
+        ${job.require_cv == 1 ? '<span class="badge b-cv">📄 CV Required</span>' : ''}
       </div>
-      <h1>${he(job.title)}</h1>
-      <div class="meta">
-        <span class="chip">🏢 ${he(job.company)}</span>
+      <div class="meta-grid">
         <span class="chip">📍 ${he(job.location)}</span>
-        <span class="chip">💼 ${he(job.job_type || 'Full-time')}</span>
-        <span class="chip">🗓 Posted ${datePosted}</span>
+        ${salaryDisplay ? `<span class="chip chip-salary">💰 ${he(salaryDisplay)}</span>` : ''}
+        ${job.positions > 1 ? `<span class="chip">👥 ${job.positions} positions</span>` : ''}
+        <span class="chip">🗓 ${postedAgo}</span>
       </div>
     </div>
     <div class="card-body">
       <div class="section-label">Job Description</div>
       <div class="desc">${he(job.description)}</div>
+      ${job.requirements ? `<div class="section-label" style="margin-top:1.25rem">Requirements</div>
+      <div class="desc">${he(job.requirements)}</div>` : ''}
     </div>
-  </div>
-
-  <div class="card">
-    <div class="card-body">
-      <div class="apply-head">Apply Now</div>
-      <div class="apply-sub">Contact ${he(job.company)} directly — no middlemen.</div>
-      <div class="contact-row">
-        ${contactBtns || '<p style="color:#9ca3af;font-size:.88rem">No contact info provided.</p>'}
-      </div>
+    <div class="card-body apply-section">
+      <div class="apply-head">${job.employer_id ? 'Apply for this Job' : 'Apply Now'}</div>
+      ${job.employer_id ? `
+      <button class="apply-cta" onclick="openSeoApply()">📩 Apply Now</button>
+      <p class="apply-sub">${he(job.company) || 'The employer'} will review your application directly on ${he(siteName)}.</p>
+      ` : ''}
+      ${contactBtns ? `
+      ${job.employer_id
+        ? '<div class="apply-divider">Or contact directly</div>'
+        : `<p class="apply-sub" style="margin-top:0;margin-bottom:1.1rem">Contact ${he(job.company) || 'the employer'} directly — no middlemen.</p>`}
+      <div class="contact-row">${contactBtns}</div>
+      ` : ''}
+      ${(!job.employer_id && !contactBtns) ? '<p style="color:#9ca3af;font-size:.88rem">No contact info provided.</p>' : ''}
       <p style="margin-top:1.1rem;font-size:.78rem;color:#9ca3af">
         Or <a href="/">browse more jobs</a> on ${he(siteName)}
       </p>
@@ -550,16 +640,18 @@ const contactBtns = [
 
   <!-- Phase 2: Similar Jobs -->
   ${simRows.length > 0 ? `
-  <div style="margin-top:2rem">
-    <h2 style="font-size:1.05rem;font-weight:700;color:#0f172a;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid #e5e7eb">
-      Similar Jobs in ${he(job.category)}
-    </h2>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.85rem">
+  <div class="sim-section">
+    <h2 class="sim-heading">Similar Jobs in ${he(job.category)}</h2>
+    <div class="sim-grid">
       ${simRows.map(j => `
-      <a href="${siteUrl}/job/${xe(j.slug)}" style="display:block;background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:1rem;text-decoration:none;transition:border-color .15s">
-        <div style="font-family:-apple-system,sans-serif;font-weight:700;font-size:.9rem;color:#0f172a;margin-bottom:.3rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${he(j.title)}</div>
-        <div style="font-size:.78rem;color:#64748b;margin-bottom:.3rem">🏢 ${he(j.company)}</div>
-        <div style="font-size:.75rem;color:#94a3b8">📍 ${he(j.location)} · ${he(j.job_type || 'Full-time')}</div>
+      <a href="${siteUrl}/job/${xe(j.slug)}" class="sim-card">
+        <div class="sim-title">${he(j.title)}</div>
+        <div class="sim-company">🏢 ${he(j.company) || he(siteName)}</div>
+        <div class="sim-meta">
+          <span>📍 ${he(j.location)}</span>
+          <span>${he(j.job_type || 'Full-time')}</span>
+        </div>
+        ${j.salary ? `<div class="sim-salary">💰 ${he(j.salary)}</div>` : ''}
       </a>`).join('')}
     </div>
   </div>` : ''}
@@ -569,6 +661,17 @@ const contactBtns = [
     ⚑ <a href="/feedback.html" style="color:#9ca3af">Report this listing</a> if it appears fake, expired, or inappropriate.
   </p>
 </div>
+
+${(job.employer_id || job.whatsapp || job.phone || job.email) ? `
+<div class="mobile-apply-bar">
+  ${job.employer_id
+    ? `<button class="apply-cta" onclick="openSeoApply()">📩 Apply Now</button>`
+    : job.whatsapp
+      ? `<a href="${whatsappUrl}" target="_blank" class="apply-cta" style="background:#22c55e">💬 WhatsApp</a>`
+      : job.phone
+        ? `<a href="tel:${he(job.phone)}" class="apply-cta">📞 Call Now</a>`
+        : `<a href="mailto:${he(job.email)}" class="apply-cta">✉️ Email</a>`}
+</div>` : ''}
 
 <footer>© ${new Date().getFullYear()} ${he(siteName)}. All rights reserved.</footer>
 
@@ -616,12 +719,16 @@ const contactBtns = [
         <label class="seo-label">Email (for confirmation)</label>
         <input type="email" class="seo-input" id="seoEmail" placeholder="your@email.com">
       </div>
-      <div class="seo-row">
-        <div class="seo-field">
+      <div class="seo-row" id="seoRowNatIqama" style="display:none">
+        <div class="seo-field" id="seoColNat">
           <label class="seo-label">Nationality</label>
-          <input type="text" class="seo-input" id="seoNat" placeholder="e.g. Pakistani">
+          <div class="cnt-picker">
+            <input type="text" class="seo-input" id="seoNatSearch" placeholder="Search nationality..." oninput="filterCntSingle('seoNat',this.value)" onfocus="filterCntSingle('seoNat',this.value)" autocomplete="off">
+            <div class="cnt-dropdown" id="seoNatDd"></div>
+            <input type="hidden" id="seoNat">
+          </div>
         </div>
-        <div class="seo-field">
+        <div class="seo-field" id="seoColIqama">
           <label class="seo-label">Iqama Status</label>
           <select class="seo-input" id="seoIqama">
             <option value="">Select...</option>
@@ -633,12 +740,12 @@ const contactBtns = [
           </select>
         </div>
       </div>
-      <div class="seo-row">
-        <div class="seo-field">
+      <div class="seo-row" id="seoRowExpCert" style="display:none">
+        <div class="seo-field" id="seoColExp">
           <label class="seo-label">Experience (years)</label>
           <input type="number" class="seo-input" id="seoExp" placeholder="0" min="0">
         </div>
-        <div class="seo-field">
+        <div class="seo-field" id="seoColCert">
           <label class="seo-label">Has Required Cert?</label>
           <select class="seo-input" id="seoCert">
             <option value="0">No</option>
@@ -646,9 +753,20 @@ const contactBtns = [
           </select>
         </div>
       </div>
+      <div id="seoRowIqamaNum" style="display:none">
+        <div class="seo-field">
+          <label class="seo-label">Iqama Number</label>
+          <input type="text" class="seo-input" id="seoIqamaNum" inputmode="numeric" placeholder="e.g. 2490123456">
+        </div>
+      </div>
       <div class="seo-field">
         <label class="seo-label">Cover Note (optional)</label>
         <textarea class="seo-input" id="seoCover" rows="3" placeholder="Briefly introduce yourself..."></textarea>
+      </div>
+      <div id="seoCvRow" style="display:none" class="seo-field">
+        <label class="seo-label" id="seoCvLabel">CV / Resume (PDF)</label>
+        <input type="file" id="seoCvFile" accept=".pdf" class="seo-input" style="cursor:pointer;padding:.45rem .65rem">
+        <div style="font-size:.71rem;color:#6b7280;margin-top:.2rem">PDF only · Max 5MB</div>
       </div>
     </div>
     <div class="seo-apply-footer">
@@ -662,29 +780,55 @@ const contactBtns = [
 var SEO_JOB_ID = ${job.id};
 
 async function openSeoApply() {
-  document.getElementById('seoApplyMsg').innerHTML = '';
-  document.getElementById('seoSubmitBtn').disabled = false;
-  document.getElementById('seoSubmitBtn').textContent = '📩 Submit Application';
-  // Load screening questions
+  var g = function(id){ return document.getElementById(id); };
+  g('seoApplyMsg').innerHTML = '';
+  g('seoSubmitBtn').disabled = false;
+  g('seoSubmitBtn').textContent = '📩 Submit Application';
+  var ns=g('seoNatSearch'); if(ns) ns.value='';
+  var nh=g('seoNat'); if(nh) nh.value='';
+
+  // Reset — hide all optional fields first
+  ['seoRowNatIqama','seoRowExpCert','seoRowIqamaNum'].forEach(function(id){
+    var el=g(id); if(el) el.style.display='none';
+  });
+  g('seoScreeningWrap').style.display='none';
+  if(g('seoScreeningFields')) g('seoScreeningFields').innerHTML='';
+
+  // Load screening and show only what employer enabled
   try {
     var resp = await fetch('/api/employer/screening/' + SEO_JOB_ID);
     var data = await resp.json();
-    var wrap   = document.getElementById('seoScreeningWrap');
-    var fields = document.getElementById('seoScreeningFields');
-    if (data.success && data.questions && data.questions.length) {
-      fields.innerHTML = data.questions.map(function(q, i) {
-        return '<div style="margin-bottom:.65rem"><label style="font-size:.82rem;font-weight:600;color:#161616;display:block;margin-bottom:.25rem">' + (i+1) + '. ' + q.text + '</label>'
-          + (q.type === 'yesno'
-            ? '<select class="seo-input screening-ans" data-q="'+i+'"><option value="">Select...</option><option value="yes">Yes</option><option value="no">No</option></select>'
-            : '<input type="text" class="seo-input screening-ans" data-q="'+i+'" placeholder="Your answer...">')
-          + '</div>';
-      }).join('');
-      wrap.style.display = 'block';
-    } else {
-      wrap.style.display = 'none';
+    if (data.success) {
+      var fl = data.filters || {};
+      var sN = !!fl.nationalities, sI = !!fl.iqama_types;
+      var sE = fl.min_experience > 0, sC = !!fl.required_certs;
+      if(g('seoColNat'))       g('seoColNat').style.display       = sN ? '' : 'none';
+      if(g('seoColIqama'))     g('seoColIqama').style.display     = sI ? '' : 'none';
+      if(g('seoRowNatIqama'))  g('seoRowNatIqama').style.display  = (sN||sI) ? '' : 'none';
+      if(g('seoColExp'))       g('seoColExp').style.display       = sE ? '' : 'none';
+      if(g('seoColCert'))      g('seoColCert').style.display      = sC ? '' : 'none';
+      if(g('seoRowExpCert'))   g('seoRowExpCert').style.display   = (sE||sC) ? '' : 'none';
+      if(g('seoRowIqamaNum')) g('seoRowIqamaNum').style.display = fl.require_iqama_number ? '' : 'none';
+      var requireCv = data.require_cv || 0;
+      var cvRow = g('seoCvRow'); var cvLabel = g('seoCvLabel');
+      if (cvRow) { cvRow.style.display = ''; cvRow.dataset = cvRow.dataset||{}; cvRow.setAttribute('data-required', requireCv?'1':'0'); }
+      if (cvLabel) cvLabel.innerHTML = requireCv
+        ? 'CV / Resume (PDF) <span style="color:#dc2626">*</span>'
+        : 'CV / Resume (PDF) <span style="font-size:.71rem;color:#6b7280">(optional)</span>';
+      if (data.questions && data.questions.length) {
+        var fields = g('seoScreeningFields');
+        fields.innerHTML = data.questions.map(function(q, i) {
+          return '<div style="margin-bottom:.65rem"><label style="font-size:.82rem;font-weight:600;color:#161616;display:block;margin-bottom:.25rem">' + (i+1) + '. ' + q.text + '</label>'
+            + (q.type === 'yesno'
+              ? '<select class="seo-input screening-ans" data-q="'+i+'"><option value="">Select...</option><option value="yes">Yes</option><option value="no">No</option></select>'
+              : '<input type="text" class="seo-input screening-ans" data-q="'+i+'" placeholder="Your answer...">')
+            + '</div>';
+        }).join('');
+        g('seoScreeningWrap').style.display = 'block';
+      }
     }
   } catch(e) {}
-  document.getElementById('seoApplyOverlay').classList.add('open');
+  g('seoApplyOverlay').classList.add('open');
 }
 
 function closeSeoApply() {
@@ -700,6 +844,12 @@ async function submitSeoApplication() {
   if (!name)         { showSeoMsg('Full name is required', 'error'); return; }
   if (!phone && !wa) { showSeoMsg('Phone or WhatsApp is required', 'error'); return; }
 
+  var email = document.getElementById('seoEmail').value.trim();
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showSeoMsg('Please enter a valid email address', 'error');
+    return;
+  }
+
   var answers = [];
   document.querySelectorAll('.screening-ans').forEach(function(el) {
     answers.push({ q: parseInt(el.dataset.q), answer: el.value.trim() });
@@ -709,22 +859,29 @@ async function submitSeoApplication() {
   btn.disabled = true;
   btn.textContent = 'Submitting...';
 
+  var cvFile = document.getElementById('seoCvFile') ? document.getElementById('seoCvFile').files[0] : null;
+  var cvRequired = document.getElementById('seoCvRow') && document.getElementById('seoCvRow').getAttribute('data-required') === '1';
+  if (cvRequired && !cvFile) { showSeoMsg('Please upload your CV (PDF, max 5MB)', 'error'); return; }
+  if (cvFile && cvFile.size > 5*1024*1024) { showSeoMsg('CV too large — max 5MB', 'error'); return; }
+
+  var fd = new FormData();
+  fd.append('full_name',        name);
+  fd.append('email',            document.getElementById('seoEmail').value.trim() || '');
+  fd.append('phone',            phone || '');
+  fd.append('whatsapp',         wa || '');
+  fd.append('nationality',      document.getElementById('seoNat').value.trim() || '');
+  fd.append('iqama_status',     document.getElementById('seoIqama').value || '');
+  fd.append('experience_years', document.getElementById('seoExp').value || '');
+  fd.append('has_certificate',  document.getElementById('seoCert').value === '1' ? '1' : '0');
+  fd.append('iqama_number',     document.getElementById('seoIqamaNum') ? document.getElementById('seoIqamaNum').value.trim() : '');
+  fd.append('cover_note',       document.getElementById('seoCover').value.trim() || '');
+  fd.append('screening_answers', JSON.stringify(answers));
+  if (cvFile) fd.append('cv', cvFile);
+
   try {
     var resp = await fetch('/api/employer/apply/' + SEO_JOB_ID, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        full_name:         name,
-        email:             document.getElementById('seoEmail').value.trim() || null,
-        phone:             phone || null,
-        whatsapp:          wa    || null,
-        nationality:       document.getElementById('seoNat').value.trim()   || null,
-        iqama_status:      document.getElementById('seoIqama').value        || null,
-        experience_years:  parseInt(document.getElementById('seoExp').value)|| null,
-        has_certificate:   document.getElementById('seoCert').value === '1' ? 1 : 0,
-        cover_note:        document.getElementById('seoCover').value.trim() || null,
-        screening_answers: answers
-      })
+      body: fd
     });
     var result = await resp.json();
     if (result.success) {
@@ -749,6 +906,7 @@ function showSeoMsg(text, type) {
     + '">' + text + '</div>';
 }
 </script>
+<script src="/js/countries.js"></script>
 
 </body>
 </html>`;

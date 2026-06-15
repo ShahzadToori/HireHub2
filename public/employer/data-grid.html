@@ -97,11 +97,25 @@
 .dg-col-hdr button{font-size:.68rem;padding:0;background:none;border:none;color:var(--primary);cursor:pointer;font-weight:600}
 
 /* ── Filter bar ── */
-.dg-filter-bar{display:none;flex-wrap:wrap;gap:.4rem;margin-bottom:.75rem;padding:.5rem .75rem;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;align-items:center}
-.dg-flt{display:flex;align-items:center;gap:.3rem}
-.dg-flt label{font-size:.73rem;color:var(--text-muted);white-space:nowrap;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
-.dg-flt select{height:30px;font-size:.76rem;padding:.15rem .5rem;border-radius:7px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-primary);cursor:pointer;min-width:75px;max-width:140px}
+.dg-filter-bar{display:none;flex-direction:column;gap:.45rem;margin-bottom:.75rem;padding:.65rem .85rem;background:var(--bg-card);border:1.5px solid var(--border);border-radius:12px}
+.dg-filter-hdr{display:flex;align-items:center;justify-content:space-between;padding-bottom:.4rem;border-bottom:1px solid var(--border)}
+.dg-filter-grid{display:grid;grid-template-columns:1fr 1fr;gap:.4rem .65rem}
+.dg-flt{display:flex;flex-direction:column;gap:.2rem}
+.dg-flt label{font-size:.68rem;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.dg-flt select{height:32px;font-size:.79rem;padding:.2rem .45rem;border-radius:8px;border:1.5px solid var(--border);background:var(--bg-card);color:var(--text-primary);cursor:pointer;width:100%}
 .dg-flt select.active{border-color:var(--primary);color:var(--primary);background:rgba(15,98,254,.07);font-weight:600}
+.dg-dd-wrap{position:relative}
+.dg-dd-btn{display:flex;align-items:center;justify-content:space-between;gap:.3rem;width:100%;height:32px;padding:.2rem .55rem;border-radius:8px;border:1.5px solid var(--border);background:var(--bg-card);color:var(--text-primary);font-size:.79rem;cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif}
+.dg-dd-btn.active{border-color:var(--primary);color:var(--primary);background:rgba(15,98,254,.07);font-weight:600}
+.dg-dd-btn span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.dg-dd-panel{position:absolute;top:calc(100% + 4px);left:0;z-index:3000;background:var(--bg-card);border:1.5px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.15);display:none;min-width:190px;max-width:280px}
+.dg-dd-panel.show{display:block}
+.dg-dd-search{width:100%;padding:.4rem .65rem;border:none;border-bottom:1px solid var(--border);font-size:.8rem;background:var(--bg-card);color:var(--text-primary);outline:none;border-radius:10px 10px 0 0;font-family:'DM Sans',sans-serif}
+.dg-dd-opts{max-height:200px;overflow-y:auto;padding:.25rem}
+.dg-dd-opt{display:flex;align-items:center;gap:.5rem;padding:.38rem .55rem;border-radius:6px;cursor:pointer;font-size:.8rem;color:var(--text-primary);user-select:none}
+.dg-dd-opt:hover{background:var(--surface)}
+.dg-dd-opt input{accent-color:var(--primary);width:14px;height:14px;cursor:pointer;flex-shrink:0}
+.dg-dd-foot{padding:.3rem .5rem;border-top:1px solid var(--border)}
   </style>
 </head>
 <body>
@@ -265,6 +279,7 @@
           <option value="candidates">Candidates</option>
         </select>
       </div>
+      <div class="sh-f" id="shFilterNote" style="display:none;font-size:.78rem;padding:.5rem .65rem;background:rgba(15,98,254,.07);border-radius:8px;color:var(--primary);border:1px solid rgba(15,98,254,.2)"></div>
       <div class="sh-f" id="shStatusWrap">
         <label>Filter by status <small style="color:var(--text-muted);font-weight:400">(optional)</small></label>
         <select class="ep-input" id="shStatus">
@@ -327,6 +342,8 @@
 const API = {
   async get(u){const r=await fetch(u,{credentials:'include'});return r.json()},
   async post(u,d){const r=await fetch(u,{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});return r.json()},
+  async patch(u,d){const r=await fetch(u,{method:'PATCH',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});return r.json()},
+  async put(u,d){const r=await fetch(u,{method:'PUT',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});return r.json()},
   async patch(u,d){const r=await fetch(u,{method:'PATCH',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});return r.json()}
 };
 
@@ -337,11 +354,16 @@ async function checkAuth(){
     if(!d.success){window.location.href='/employer/';return null}
     const n=document.getElementById('epCompanyName'),a=document.getElementById('epAvatar');
     if(n)n.textContent=d.employer.company_name;
-    if(a)a.textContent=d.employer.company_name.charAt(0).toUpperCase();
+    if(a){
+      if(d.employer.logo_url){
+        a.innerHTML=`<img src="${d.employer.logo_url}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block;">`;
+        a.style.padding='0';a.style.overflow='hidden';a.style.background='transparent';
+      }else{a.textContent=d.employer.company_name.charAt(0).toUpperCase();}
+    }
     return d;
   }catch(e){window.location.href='/employer/';return null}
 }
-async function logout(){await API.post('/api/employer/logout',{});window.location.href='/employer/'}
+async function logout(){if(!confirm('Are you sure you want to log out?'))return;await API.post('/api/employer/logout',{});window.location.href='/employer/'}
 function toggleUserMenu(){document.getElementById('epUserDropdown')?.classList.toggle('show')}
 document.addEventListener('click',e=>{
   if(!document.getElementById('epUserMenu')?.contains(e.target))
@@ -350,6 +372,8 @@ document.addEventListener('click',e=>{
     document.getElementById('exportMenu')?.classList.remove('show');
   if(!document.getElementById('colPickerWrap')?.contains(e.target))
     document.getElementById('colPanel')?.classList.remove('show');
+  if(!e.target.closest('.dg-dd-wrap'))
+    document.querySelectorAll('.dg-dd-panel.show').forEach(p=>p.classList.remove('show'));
 });
 
 function showToast(msg,type='success'){
@@ -407,29 +431,31 @@ const JS=['active','closed'];
 function getColumns(type){
   if(type==='jobs')return[
     SEL,NUM,
-    {title:'Job Title',field:'title',minWidth:200,editor:'input',sorter:'string',responsive:0},
+    {title:'Job Title',field:'title',minWidth:200,editor:'input',sorter:'string',responsive:0,headerTooltip:'Click cell to edit title inline'},
     {title:'Location',field:'location',minWidth:120,editor:'input',responsive:1},
     {title:'Type',field:'job_type',minWidth:105,editable:false,formatter:fmtNull,responsive:2,cellClick:(e,cell)=>openPicker(cell,JT)},
     {title:'Salary',field:'salary',minWidth:115,editor:'input',formatter:fmtNull,responsive:2},
-    {title:'Status',field:'status',minWidth:90,editable:false,formatter:fmtBadge,responsive:0,cellClick:(e,cell)=>openPicker(cell,JS)},
+    {title:'Status',field:'status',minWidth:90,editable:false,formatter:fmtBadge,responsive:0,cellClick:(e,cell)=>openPicker(cell,JS),headerTooltip:'active = live on site | closed = removed from listings — tap cell to change'},
     {title:'Views',field:'views',minWidth:62,hozAlign:'center',sorter:'number',editable:false,responsive:3},
-    {title:'Apps',field:'application_count',minWidth:62,hozAlign:'center',sorter:'number',editable:false,formatter:fmtApps,responsive:1},
-    {title:'Expires',field:'expires_at',minWidth:105,editable:false,formatter:fmtExpiry,responsive:2},
+    {title:'Apps',field:'application_count',minWidth:62,hozAlign:'center',sorter:'number',editable:false,formatter:fmtApps,responsive:1,headerTooltip:'Total applications received — click number to open inbox'},
+    {title:'Expires',field:'expires_at',minWidth:105,editable:false,formatter:fmtExpiry,responsive:2,headerTooltip:'Time left before job is automatically removed from listings'},
     {title:'Posted',field:'created_at',minWidth:100,sorter:'date',editable:false,formatter:fmtDate,responsive:3}
   ];
   if(type==='applications')return[
     SEL,NUM,
     {title:'Candidate',field:'full_name',minWidth:150,editable:false,sorter:'string',responsive:0},
     {title:'Job',field:'job_title',minWidth:150,editable:false,sorter:'string',responsive:1},
-    {title:'Status',field:'status',minWidth:100,editable:false,formatter:fmtBadge,responsive:0,cellClick:(e,cell)=>openPicker(cell,AS)},
+    {title:'Status',field:'status',minWidth:100,editable:false,formatter:fmtBadge,responsive:0,cellClick:(e,cell)=>openPicker(cell,AS),headerTooltip:'new → reviewed → shortlisted → hired/rejected — tap cell to change'},
+    {title:'Source',field:'batch_id',minWidth:75,editable:false,hozAlign:'center',formatter:c=>c.getValue()?'<span class="dg-b" style="background:rgba(99,102,241,.1);color:#4f46e5">Batch</span>':'<span class="dg-b" style="background:rgba(15,98,254,.08);color:#1d4ed8">Single</span>',responsive:2,headerTooltip:'Single = posted individually | Batch = posted via bulk requirement page'},
     {title:'Nationality',field:'nationality',minWidth:110,editable:false,formatter:fmtNull,responsive:2},
     {title:'Iqama',field:'iqama_status',minWidth:115,editable:false,formatter:fmtNull,responsive:2},
     {title:'Exp',field:'experience_years',minWidth:60,hozAlign:'center',editable:false,sorter:'number',formatter:c=>c.getValue()!=null?c.getValue()+'yr':'—',responsive:3},
     {title:'Phone',field:'phone',minWidth:120,editable:false,formatter:fmtPhone,responsive:2},
     {title:'WhatsApp',field:'whatsapp',minWidth:120,editable:false,formatter:fmtWa,responsive:3},
     {title:'Iqama No.',field:'iqama_number',minWidth:110,editable:false,formatter:fmtNull,responsive:2},
+    {title:'CV',field:'cv_url',minWidth:55,hozAlign:'center',editable:false,formatter:c=>{const v=c.getValue();return v?'<a href="'+v+'" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="View CV"><i class="bi bi-file-earmark-pdf-fill" style="color:#dc2626;font-size:1.05rem"></i></a>':'<span style="color:var(--text-muted)">—</span>';},responsive:1},
     {title:'Cover Note',field:'cover_note',minWidth:180,editable:false,formatter:c=>{const v=c.getValue();if(!v)return'<span style="color:var(--text-muted)">—</span>';return'<span title="'+v.replace(/"/g,'&quot;')+'">'+v.substring(0,60)+(v.length>60?'…':'')+'</span>';},responsive:1},
-    {title:'Notes',field:'employer_notes',minWidth:180,editor:'textarea',formatter:c=>c.getValue()||'<em style="color:var(--text-muted)">Add note…</em>',responsive:2},
+    {title:'Notes',field:'employer_notes',minWidth:180,editor:'textarea',formatter:c=>c.getValue()||'<em style="color:var(--text-muted)">Add note…</em>',responsive:2,headerTooltip:'Private notes — only visible to you. Click cell to edit'},
     {title:'Applied',field:'created_at',minWidth:95,editable:false,sorter:'date',formatter:fmtDate,responsive:3}
   ];
   if(type==='candidates')return[
@@ -440,8 +466,10 @@ function getColumns(type){
     {title:'Exp',field:'experience_years',minWidth:60,hozAlign:'center',editable:false,sorter:'number',formatter:c=>c.getValue()!=null?c.getValue()+'yr':'—',responsive:3},
     {title:'Phone',field:'phone',minWidth:120,editable:false,formatter:fmtPhone,responsive:1},
     {title:'WhatsApp',field:'whatsapp',minWidth:120,editable:false,formatter:fmtWa,responsive:2},
-    {title:'Cert',field:'has_certificate',minWidth:52,hozAlign:'center',editable:false,formatter:c=>c.getValue()?'✅':'—',responsive:3},
-    {title:'Applied',field:'jobs_applied',minWidth:60,hozAlign:'center',editable:false,sorter:'number',responsive:2},
+    {title:'Iqama No.',field:'iqama_number',minWidth:110,editable:false,formatter:fmtNull,responsive:3},
+    {title:'Cert',field:'has_certificate',minWidth:52,hozAlign:'center',editable:false,formatter:c=>c.getValue()?'✅':'—',responsive:3,headerTooltip:'Has required certificate — ✅ means candidate confirmed yes'},
+    {title:'Jobs Applied',field:'jobs_applied',minWidth:60,hozAlign:'center',editable:false,sorter:'number',responsive:2},
+    {title:'Applied For',field:'jobs_list',minWidth:200,editable:false,formatter:c=>{const v=c.getValue();if(!v)return'<span style="color:var(--text-muted)">—</span>';return`<span title="${v}">${v.substring(0,55)}${v.length>55?'…':''}</span>`;},responsive:1,headerTooltip:'All job positions this candidate has applied for'},
     {title:'Last Applied',field:'last_applied',minWidth:100,editable:false,sorter:'date',formatter:fmtDate,responsive:2}
   ];
   if(type==='templates')return[
@@ -459,6 +487,7 @@ function getColumns(type){
 /* ══ Init ══ */
 async function init(){
   await checkAuth();
+  loadShareRequests(); // load pending badge on startup
   const p=new URLSearchParams(location.search);
   const type=p.get('type')||'jobs';
   await switchType(type);
@@ -481,6 +510,9 @@ async function switchType(type){
   buildGrid(type);
   buildFilterBar(type);
   setTimeout(function(){var h=[];try{h=JSON.parse(localStorage.getItem('dg-hide-'+currentType)||'[]')}catch(e){}h.forEach(function(fd){try{if(table)table.hideColumn(fd)}catch(e){}});},300);
+  const _cnt=allData[type]?.length||0;
+  const _base={jobs:'editable • Ctrl+Z undo',applications:'edit status and notes inline',candidates:'aggregated from all applications',templates:'edit inline'}[type]||'';
+  document.getElementById('dgSub').textContent=_cnt+' records — '+_base;
 }
 
 /* ══ Load data ══ */
@@ -689,6 +721,19 @@ function openShareModal(){
   setPrivacy('public');
   document.getElementById('shTitle').value='';
   document.getElementById('shLinkBox').style.display='none';
+
+  // Pre-populate status filter from active ddState
+  const activeState=ddState[currentType]||{};
+  const statusVals=activeState['status'];
+  const shStatus=document.getElementById('shStatus');
+  if(statusVals&&statusVals.size===1&&shStatus){
+    shStatus.value=[...statusVals][0];
+  }
+
+  // Show filter info note
+  updateShareFilterNote(sel ? sel.value : currentType);
+
+  loadShareRequests();
   document.getElementById('shareModal').classList.add('show');
 }
 function closeShareModal(){document.getElementById('shareModal').classList.remove('show')}
@@ -698,6 +743,27 @@ function setPrivacy(mode){
   document.getElementById('shPrvBtn').classList.toggle('active',mode==='private');
   document.getElementById('shPrvNote').style.display=mode==='private'?'block':'none';
 }
+function getVisibleColumns(type){
+  const hidden=JSON.parse(localStorage.getItem('dg-hide-'+type)||'[]');
+  return getColumns(type).filter(c=>c.field&&!hidden.includes(c.field)).map(c=>c.field);
+}
+
+function updateShareFilterNote(type){
+  const noteEl=document.getElementById('shFilterNote');
+  if(!noteEl)return;
+  const activeState=ddState[type]||{};
+  const hasFilters=Object.values(activeState).some(s=>s.size>0);
+  if(!hasFilters){ noteEl.style.display='none'; return; }
+  const visible = (type===currentType&&table) ? table.getData('active').length : (allData[type]?.length||0);
+  const total = allData[type]?.length||0;
+  let msg=`<i class="bi bi-funnel-fill me-1"></i><strong>${visible}</strong> of ${total} records currently filtered.`;
+  if(type==='candidates'){
+    msg+=' Note: filters are not applied to shared Candidates links — the link will show all candidates.';
+  }
+  noteEl.innerHTML=msg;
+  noteEl.style.display='block';
+}
+
 function onShTypeChange(){
   const type=document.getElementById('shType').value;
   const sel=document.getElementById('shStatus');
@@ -706,14 +772,23 @@ function onShTypeChange(){
     AS.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s.charAt(0).toUpperCase()+s.slice(1);sel.appendChild(o)});
   }
   document.getElementById('shStatusWrap').style.display=type==='jobs'?'none':'block';
+  updateShareFilterNote(type);
 }
 async function generateLink(){
   const btn=document.getElementById('shGenBtn');
   btn.disabled=true;btn.textContent='Generating…';
   try{
+    const _type=document.getElementById('shType').value;
+    const _activeFilters={};
+    Object.entries(ddState[_type]||{}).forEach(([field,vals])=>{
+      if(vals.size>0) _activeFilters[field]=[...vals];
+    });
+    const _visCols=getVisibleColumns(_type);
     const d=await API.post('/api/employer/share/create',{
-      data_type:document.getElementById('shType').value,
+      data_type:_type,
       status_filter:document.getElementById('shStatus').value,
+      active_filters:_activeFilters,
+      visible_columns:_visCols,
       title:document.getElementById('shTitle').value.trim(),
       expires_days:document.getElementById('shExpiry').value,
       privacy:sharePrivacy
@@ -727,6 +802,47 @@ async function generateLink(){
 function copyLink(){
   const url=document.getElementById('shLinkText').textContent;
   navigator.clipboard.writeText(url).then(()=>showToast('Link copied!'));
+}
+
+/* ══ Share access requests ══ */
+async function loadShareRequests(){
+  try{
+    const d=await API.get('/api/employer/share/requests');
+    if(!d.success)return;
+    const pending=d.requests.filter(r=>r.status==='pending');
+    // Update badge
+    // Render panel in modal
+    const panel=document.getElementById('shRequestsPanel');
+    const list=document.getElementById('shRequestsList');
+    const cnt=document.getElementById('shReqCount');
+    if(!panel||!list)return;
+    if(!d.requests.length){panel.style.display='none';return;}
+    panel.style.display='block';
+    if(cnt)cnt.textContent=d.requests.length+' total · '+pending.length+' pending';
+    list.innerHTML=d.requests.map(r=>`
+      <div style="padding:.55rem .75rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.5rem;flex-wrap:wrap" id="sreq-${r.id}">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:.8rem;font-weight:600;color:var(--text-primary)">${r.requester_name||'Unknown'}</div>
+          <div style="font-size:.72rem;color:var(--text-muted)">${r.requester_email} · ${new Date(r.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</div>
+          <div style="font-size:.7rem;color:var(--text-muted)">${r.title||r.data_type}</div>
+        </div>
+        ${r.status==='pending'
+          ?`<button class="ep-btn-outline ep-btn-sm" style="color:#059669;border-color:#059669;font-size:.72rem" onclick="handleReq(${r.id},'approve')"><i class="bi bi-check-lg"></i>Approve</button>
+            <button class="ep-btn-outline ep-btn-sm ep-btn-danger" style="font-size:.72rem" onclick="handleReq(${r.id},'deny')"><i class="bi bi-x-lg"></i>Deny</button>`
+          :`<span style="font-size:.7rem;font-weight:700;color:${r.status==='approved'?'#059669':'#dc2626'};text-transform:capitalize">${r.status}</span>`
+        }
+      </div>`).join('');
+  }catch(e){}
+}
+
+async function handleReq(id,action){
+  const row=document.getElementById('sreq-'+id);
+  if(row)row.style.opacity='.5';
+  try{
+    const d=await API.put('/api/employer/share/requests/'+id,{action});
+    if(d.success){showToast(action==='approve'?'✅ Approved — email sent':'Request denied');loadShareRequests();}
+    else{showToast(d.message||'Failed','error');if(row)row.style.opacity='1';}
+  }catch(e){showToast('Error','error');if(row)row.style.opacity='1';}
 }
 
 
@@ -757,34 +873,6 @@ function renderColPicker(){
     }).join('');
 }
 
-function toggleCol(field,visible){
-  if(!table)return;
-  try{visible?table.showColumn(field):table.hideColumn(field)}catch(e){}  
-}
-
-function saveColPrefs(){
-  if(!table)return;
-  const prefs={};
-  table.getColumns().forEach(c=>{
-    const field=c.getDefinition().field;
-    if(field)prefs[field]=c.isVisible();
-  });
-  localStorage.setItem('dg-cols-'+currentType,JSON.stringify(prefs));
-}
-
-function loadColPrefs(type){
-  const saved=localStorage.getItem('dg-cols-'+type);
-  if(!saved||!table)return;
-  try{
-    const prefs=JSON.parse(saved);
-    setTimeout(()=>{
-      Object.entries(prefs).forEach(([field,visible])=>{
-        try{visible?table.showColumn(field):table.hideColumn(field)}catch(e){}
-      });
-    },80);
-  }catch(e){}
-}
-
 function resetColPrefs(){
   localStorage.removeItem('dg-hide-'+currentType);
   buildGrid(currentType);
@@ -797,10 +885,11 @@ function resetColPrefs(){
 const FILTER_FIELDS={
   jobs:[{field:'status',label:'Status'},{field:'job_type',label:'Type'},{field:'location',label:'Location'}],
   applications:[{field:'status',label:'Status'},{field:'job_title',label:'Job'},{field:'nationality',label:'Nationality'},{field:'iqama_status',label:'Iqama'}],
-  candidates:[{field:'nationality',label:'Nationality'},{field:'iqama_status',label:'Iqama'},{field:'has_certificate',label:'Certificate'}],
+  candidates:[{field:'jobs_list',label:'Job',contains:true},{field:'nationality',label:'Nationality'},{field:'iqama_status',label:'Iqama'},{field:'has_certificate',label:'Certificate'}],
   templates:[{field:'job_type',label:'Type'},{field:'location',label:'Location'}]
 };
-const activeFilters={};
+/* ══ Filter state — multi-select ══ */
+const ddState={}; // { type: { field: Set(selectedValues) } }
 
 function buildFilterBar(type){
   const bar=document.getElementById('filterBar');
@@ -808,58 +897,112 @@ function buildFilterBar(type){
   const flds=FILTER_FIELDS[type]||[];
   const data=allData[type]||[];
   if(!flds.length||!data.length){bar.style.display='none';bar.innerHTML='';return}
-  if(!activeFilters[type])activeFilters[type]={};
+  if(!ddState[type])ddState[type]={};
   let html='';
   flds.forEach(f=>{
     let vals;
     if(f.field==='has_certificate'){
-      vals=[{label:'Yes',val:'1'},{label:'No',val:'0'}];
+      vals=[{label:'Yes ✅',val:'1'},{label:'No',val:'0'}];
+    }else if(f.contains){
+      // preserve insertion order (recent first)
+      const seen=new Set();const ordered=[];
+      data.forEach(r=>{ if(r[f.field]) r[f.field].split(' | ').forEach(t=>{const tr=t.trim();if(tr&&!seen.has(tr)){seen.add(tr);ordered.push(tr);}});});
+      vals=ordered.map(v=>({label:v.length>45?v.substring(0,45)+'…':v,val:v}));
+      if(!vals.length)return;
     }else{
-      const u=[...new Set(data.map(r=>r[f.field]).filter(v=>v!=null&&v!==''))].sort();
-      if(u.length<2)return;
-      vals=u.map(v=>({label:v,val:v}));
+      // preserve insertion order (recent first) for job_title; sort alpha for others
+      const seen=new Set();const ordered=[];
+      data.forEach(r=>{const v=r[f.field];if(v!=null&&v!==''&&!seen.has(v)){seen.add(v);ordered.push(v);}});
+      if(f.field==='job_title'){vals=ordered.map(v=>({label:v,val:v}));}
+      else{vals=[...seen].sort().map(v=>({label:v,val:v}));}
+      if(!vals.length)return;
     }
-    const saved=activeFilters[type][f.field]||'';
-    const opts=vals.map(v=>`<option value="${v.val}"${saved===String(v.val)?' selected':''}>${v.label}</option>`).join('');
-    html+=`<div class="dg-flt"><label>${f.label}</label><select id="flt_${f.field}" class="${saved?'active':''}" onchange="applyFilter('${f.field}',this.value)"><option value="">All</option>${opts}</select></div>`;
+    const sel=ddState[type][f.field]||new Set();
+    const lbl=sel.size===0?'All':sel.size===1?[...sel][0]:sel.size+' selected';
+    const optsHtml=vals.map((v,vi)=>{
+      const dv=String(v.val).replace(/"/g,'&quot;');
+      return `<label class="dg-dd-opt"><input type="checkbox" data-val="${dv}" ${sel.has(String(v.val))?'checked':''} onchange="toggleDdOpt('${f.field}',this.dataset.val,this.checked)"><span>${v.label}</span></label>`;
+    }).join('');
+    html+=`<div class="dg-flt"><label>${f.label}</label><div class="dg-dd-wrap"><button class="dg-dd-btn ${sel.size?'active':''}" id="ddf-${f.field}-btn" onclick="toggleDdPanel('${f.field}')"><span id="ddf-${f.field}-lbl">${lbl}</span><i class="bi bi-chevron-down" style="font-size:.58rem;flex-shrink:0"></i></button><div class="dg-dd-panel" id="ddf-${f.field}-panel"><input type="text" class="dg-dd-search" placeholder="Search ${f.label.toLowerCase()}..." oninput="filterDdOpts('${f.field}',this.value)"><div class="dg-dd-opts" id="ddf-${f.field}-opts">${optsHtml}</div>${sel.size?`<div class="dg-dd-foot"><button class="ep-btn-outline ep-btn-sm" style="width:100%;font-size:.72rem" onclick="clearDdField('${f.field}')"><i class="bi bi-x me-1"></i>Clear ${f.label}</button></div>`:''}</div></div></div>`;
   });
   if(!html){bar.style.display='none';return}
-  const hasActive=Object.keys(activeFilters[type]).length>0;
-  html+=`<button class="ep-btn-outline ep-btn-sm" id="clearFiltersBtn" onclick="clearAllFilters()" style="${hasActive?'':'display:none'}"><i class="bi bi-x-circle me-1"></i>Clear</button>`;
-  bar.innerHTML=html;
+  const total=Object.values(ddState[type]||{}).reduce((s,v)=>s+v.size,0);
+  const hdr=`<div class="dg-filter-hdr"><span style="font-size:.75rem;font-weight:700;color:var(--text-secondary);display:flex;align-items:center;gap:.35rem"><i class="bi bi-funnel-fill" style="color:var(--primary)"></i>Filters${total>0?` <span style="color:var(--primary);font-weight:800">(${total} active)</span>`:''}</span><button class="ep-btn-outline ep-btn-sm" id="clearFiltersBtn" onclick="clearAllFilters()" style="${total?'':'display:none'}"><i class="bi bi-x-circle me-1"></i>Clear All</button></div>`;
+  bar.innerHTML=hdr+'<div class="dg-filter-grid">'+html+'</div>';
   bar.style.display='flex';
 }
 
-function applyFilter(field,value){
-  if(!activeFilters[currentType])activeFilters[currentType]={};
-  if(value!=='')activeFilters[currentType][field]=value;
-  else delete activeFilters[currentType][field];
-  const sel=document.getElementById('flt_'+field);
-  if(sel)sel.classList.toggle('active',value!=='');
-  const btn=document.getElementById('clearFiltersBtn');
-  if(btn)btn.style.display=Object.keys(activeFilters[currentType]).length?'':'none';
+function toggleDdPanel(field){
+  const panel=document.getElementById('ddf-'+field+'-panel');
+  const wasOpen=panel?.classList.contains('show');
+  document.querySelectorAll('.dg-dd-panel.show').forEach(p=>p.classList.remove('show'));
+  if(!wasOpen&&panel)panel.classList.add('show');
+}
+
+function filterDdOpts(field,q){
+  const lq=q.toLowerCase();
+  document.querySelectorAll('#ddf-'+field+'-opts .dg-dd-opt').forEach(opt=>{
+    opt.style.display=(opt.querySelector('span')?.textContent||'').toLowerCase().includes(lq)?'':'none';
+  });
+}
+
+function toggleDdOpt(field,val,checked){
+  if(!ddState[currentType])ddState[currentType]={};
+  if(!ddState[currentType][field])ddState[currentType][field]=new Set();
+  const s=ddState[currentType][field];
+  if(checked)s.add(String(val));else s.delete(String(val));
+  // update button label
+  const lbl=document.getElementById('ddf-'+field+'-lbl');
+  const btn=document.getElementById('ddf-'+field+'-btn');
+  if(lbl)lbl.textContent=s.size===0?'All':s.size===1?[...s][0]:s.size+' selected';
+  if(btn)btn.classList.toggle('active',s.size>0);
+  // update clear button in panel footer
+  const panel=document.getElementById('ddf-'+field+'-panel');
+  if(panel){
+    let foot=panel.querySelector('.dg-dd-foot');
+    if(s.size>0&&!foot){foot=document.createElement('div');foot.className='dg-dd-foot';foot.innerHTML=`<button class="ep-btn-outline ep-btn-sm" style="width:100%;font-size:.72rem" onclick="clearDdField('${field}')"><i class="bi bi-x me-1"></i>Clear filter</button>`;panel.appendChild(foot);}
+    else if(s.size===0&&foot)foot.remove();
+  }
+  // update header count
+  const total=Object.values(ddState[currentType]||{}).reduce((s,v)=>s+v.size,0);
+  const hdrSpan=document.querySelector('.dg-filter-hdr span');
+  if(hdrSpan)hdrSpan.innerHTML=`<i class="bi bi-funnel-fill" style="color:var(--primary)"></i>Filters${total>0?` <span style="color:var(--primary);font-weight:800">(${total} active)</span>`:''}`;
+  const clrBtn=document.getElementById('clearFiltersBtn');
+  if(clrBtn)clrBtn.style.display=total?'':'none';
+  applyAllFilters();
+}
+
+function clearDdField(field){
+  if(ddState[currentType]?.[field])ddState[currentType][field].clear();
+  document.querySelectorAll('#ddf-'+field+'-opts input').forEach(cb=>cb.checked=false);
+  const lbl=document.getElementById('ddf-'+field+'-lbl');
+  const btn=document.getElementById('ddf-'+field+'-btn');
+  if(lbl)lbl.textContent='All';if(btn)btn.classList.remove('active');
+  document.querySelector('#ddf-'+field+'-panel .dg-dd-foot')?.remove();
   applyAllFilters();
 }
 
 function clearAllFilters(){
-  activeFilters[currentType]={};
-  document.querySelectorAll('[id^="flt_"]').forEach(s=>{s.value='';s.classList.remove('active');});
-  const btn=document.getElementById('clearFiltersBtn');
-  if(btn)btn.style.display='none';
+  ddState[currentType]={};
+  buildFilterBar(currentType);
   document.getElementById('dgSearch').value='';
   applyAllFilters();
 }
 
 function applyAllFilters(){
   if(!table)return;
-  const flds=Object.entries(activeFilters[currentType]||{});
+  const state=ddState[currentType]||{};
   const q=document.getElementById('dgSearch').value.trim().toLowerCase();
   const sFields=SEARCH_FIELDS[currentType]||[];
-  if(!flds.length&&!q){table.clearFilter();return}
+  const containsFields=new Set((FILTER_FIELDS[currentType]||[]).filter(f=>f.contains).map(f=>f.field));
+  const hasFilters=Object.values(state).some(s=>s.size>0);
+  if(!hasFilters&&!q){table.clearFilter();return}
   table.setFilter(function(data){
-    for(const [field,val]of flds){
-      if(field==='has_certificate'){if(String(data[field])!==val)return false;}
-      else{if(String(data[field]??'')!==val)return false;}
+    for(const [field,vals]of Object.entries(state)){
+      if(!vals.size)continue;
+      if(field==='has_certificate'){if(!vals.has(String(data[field])))return false;}
+      else if(containsFields.has(field)){const ds=String(data[field]||'');if(![...vals].some(v=>ds.includes(v)))return false;}
+      else{if(!vals.has(String(data[field]??'')))return false;}
     }
     if(q&&!sFields.some(f=>String(data[f]||'').toLowerCase().includes(q)))return false;
     return true;

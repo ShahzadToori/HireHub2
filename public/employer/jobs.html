@@ -83,12 +83,15 @@
     <button class="ep-filter-btn active" onclick="filterJobs('all',this)">All</button>
     <button class="ep-filter-btn" onclick="filterJobs('active',this)">Active</button>
     <button class="ep-filter-btn" onclick="filterJobs('closed',this)">Closed</button>
+    <button class="ep-filter-btn" onclick="filterJobs('requirements',this)"><i class="bi bi-collection me-1"></i>Requirements</button>
     <div class="ms-auto">
       <input type="text" class="ep-input ep-search-input" id="jobSearch" placeholder="Search jobs..." oninput="searchJobs(this.value)">
     </div>
   </div>
 
   <div id="jobsList"><div class="ep-loading">Loading your jobs...</div></div>
+  <div id="ep-pagination" class="ep-pagination"></div>
+  <div id="ep-page-info" class="ep-page-info"></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -120,12 +123,22 @@ async function checkAuth() {
     const n = document.getElementById('epCompanyName');
     const a = document.getElementById('epAvatar');
     if (n) n.textContent = d.employer.company_name;
-    if (a) a.textContent = d.employer.company_name.charAt(0).toUpperCase();
+    if (a) {
+      if (d.employer.logo_url) {
+        a.innerHTML = `<img src="${d.employer.logo_url}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block;">`;
+        a.style.padding = '0';
+        a.style.overflow = 'hidden';
+        a.style.background = 'transparent';
+      } else {
+        a.textContent = d.employer.company_name.charAt(0).toUpperCase();
+      }
+    }
     return d;
   } catch(e) { window.location.href = '/employer/'; return null; }
 }
 
 async function logout() {
+  if (!confirm('Are you sure you want to log out?')) return;
   await API.post('/api/employer/logout', {});
   window.location.href = '/employer/';
 }
@@ -138,6 +151,7 @@ document.addEventListener('click', e => {
   if (menu && !menu.contains(e.target)) {
     document.getElementById('epUserDropdown')?.classList.remove('show');
   }
+  if (!e.target.closest('.ep-action-menu')) closeMenus();
 });
 
 function showToast(msg, type='success') {
@@ -168,6 +182,9 @@ function timeAgo(date) {
 }
 
 let allJobs = [];
+const PAGE_SIZE = 10;
+let currentPage = 1;
+let currentFilteredJobs = [];
 let currentFilter = 'all';
 
 async function init() {
@@ -175,12 +192,21 @@ async function init() {
   const d = await API.get('/api/employer/jobs');
   allJobs = d.jobs || [];
   renderJobs(allJobs);
+
+  if (window.location.hash === '#requirements') {
+    const btn = document.querySelector('[onclick*="filterJobs(\'requirements\'"]');
+    if (btn) filterJobs('requirements', btn);
+  }
 }
 
 function filterJobs(status, btn) {
   currentFilter = status;
   document.querySelectorAll('.ep-filter-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
+  if (status === 'requirements') {
+    renderRequirements(allJobs);
+    return;
+  }
   const filtered = status === 'all' ? allJobs : allJobs.filter(j => j.status === status);
   renderJobs(filtered);
 }
@@ -194,52 +220,211 @@ function searchJobs(q) {
 }
 
 function renderJobs(jobs) {
+  currentFilteredJobs = jobs;
+  currentPage = 1;
+  renderPage();
+}
+
+function renderPage() {
   const wrap = document.getElementById('jobsList');
-  if (!jobs.length) {
+  const pag  = document.getElementById('ep-pagination');
+  const info = document.getElementById('ep-page-info');
+  if (!currentFilteredJobs.length) {
     wrap.innerHTML = '<div class="ep-empty"><i class="bi bi-briefcase"></i><p>No jobs found. <a href="/employer/post-job.html">Post your first job →</a></p></div>';
+    if(pag) pag.innerHTML=''; if(info) info.textContent='';
     return;
   }
-  wrap.innerHTML = jobs.map(j => `
+  const total = Math.ceil(currentFilteredJobs.length / PAGE_SIZE);
+  const start = (currentPage-1)*PAGE_SIZE;
+  const slice = currentFilteredJobs.slice(start, start+PAGE_SIZE);
+  wrap.innerHTML = slice.map(j => `
     <div class="ep-job-card" id="job-${j.id}">
       <div class="ep-job-card-header">
-        <div>
+        <div style="flex:1;min-width:0">
           <div class="ep-job-card-title">${j.title}</div>
           <div class="ep-job-card-meta">
-            <span><i class="bi bi-geo-alt me-1"></i>${j.location}</span>
-            <span><i class="bi bi-briefcase me-1"></i>${j.job_type}</span>
-            ${j.salary ? `<span><i class="bi bi-cash me-1"></i>${j.salary}</span>` : ''}
-            <span><i class="bi bi-clock me-1"></i>${timeAgo(j.created_at)}</span>
-            <span><i class="bi bi-eye me-1"></i>${j.views || 0} views</span>
-            ${j.expires_at ? `<span style="color:${new Date(j.expires_at) < new Date() ? '#dc2626' : new Date(j.expires_at) - new Date() < 86400000 ? '#d97706' : '#059669'}">
-              <i class="bi bi-hourglass-split me-1"></i>${expiryLabel(j.expires_at)}</span>` : ''}
+            <span><i class="bi bi-geo-alt"></i>${j.location}</span>
+            <span><i class="bi bi-briefcase"></i>${j.job_type}</span>
+            ${j.salary?`<span><i class="bi bi-cash"></i>${j.salary}</span>`:''}
+            <span><i class="bi bi-clock"></i>${timeAgo(j.created_at)}</span>
           </div>
         </div>
         <span class="ep-badge ep-badge-${j.status==='active'?'green':j.status==='closed'?'gray':'yellow'}">${j.status}</span>
       </div>
-      <div class="ep-job-card-footer">
-        <div class="ep-job-apps" onclick="window.location.href='/employer/applications.html?job_id=${j.id}'">
-          <i class="bi bi-people-fill me-1"></i>
-          <strong>${j.application_count || 0}</strong> applications
-          ${j.new_applications > 0 ? `<span class="ep-badge ep-badge-blue ms-2">${j.new_applications} new</span>` : ''}
-        </div>
-        <div class="ep-job-card-actions">
-          <button class="ep-btn-outline ep-btn-sm" onclick="window.location.href='/employer/applications.html?job_id=${j.id}'">
-            <i class="bi bi-inbox"></i> Applications
+      <!-- Stats -->
+      <div style="display:flex;align-items:center;gap:.85rem;padding:.5rem 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin:.6rem 0;flex-wrap:wrap">
+        <span style="font-size:.76rem;color:var(--text-muted)"><i class="bi bi-eye me-1"></i>${j.views||0} views</span>
+        <span style="font-size:.76rem;cursor:pointer" onclick="window.location.href='/employer/applications.html?job_id=${j.id}'">
+          <i class="bi bi-people-fill me-1" style="color:var(--primary)"></i>
+          <strong>${j.application_count||0}</strong> applications
+          ${j.new_applications>0?`<span class="ep-badge ep-badge-blue ms-1">${j.new_applications} new</span>`:''}
+        </span>
+        ${j.expires_at?`<span style="font-size:.74rem;color:${new Date(j.expires_at)<new Date()?'#dc2626':new Date(j.expires_at)-new Date()<86400000*7?'#d97706':'var(--text-muted)'}"><i class="bi bi-hourglass-split me-1"></i>${expiryLabel(j.expires_at)}</span>`:''}
+      </div>
+      <!-- Actions -->
+      <div style="display:flex;gap:.4rem;align-items:center">
+        <button class="ep-btn-outline ep-btn-sm" style="flex:1" onclick="window.location.href='/employer/applications.html?job_id=${j.id}'">
+          <i class="bi bi-inbox-fill me-1"></i>Applications
+        </button>
+        <button class="ep-btn-outline ep-btn-sm" style="flex:1;color:#25d366;border-color:#25d366" onclick="shareWhatsApp(${j.id})">
+          <i class="bi bi-whatsapp me-1"></i>Share
+        </button>
+        <div class="ep-action-menu" id="menu-wrap-${j.id}">
+          <button class="ep-btn-outline ep-btn-sm" onclick="toggleJobMenu(${j.id})" style="width:36px;padding:0" title="More actions">
+            <i class="bi bi-three-dots-vertical"></i>
           </button>
-          ${j.status === 'active' ?
-            `<button class="ep-btn-outline ep-btn-sm" onclick="editJob(${j.id})"><i class="bi bi-pencil"></i> Edit</button>
-             <button class="ep-btn-outline ep-btn-sm ep-btn-danger" onclick="closeJob(${j.id})"><i class="bi bi-x-circle"></i> Close</button>` :
-            `<button class="ep-btn-outline ep-btn-sm" onclick="repostJob(${j.id})"><i class="bi bi-arrow-repeat"></i> Repost</button>`
-          }
-          <button class="ep-btn-outline ep-btn-sm" onclick="shareWhatsApp(${j.id})">
-            <i class="bi bi-whatsapp" style="color:#25d366"></i> WhatsApp
-          </button>
-          <button class="ep-btn-outline ep-btn-sm" onclick="copyShareMsg(${j.id})">
-            <i class="bi bi-clipboard"></i> Copy
-          </button>
+          <div class="ep-action-menu-panel" id="menu-${j.id}">
+            ${j.status==='active'?`
+            <div class="ep-action-menu-item" onclick="editJob(${j.id});closeMenus()"><i class="bi bi-pencil" style="color:var(--primary)"></i>Edit Job</div>
+            <div class="ep-action-menu-item" onclick="copyShareMsg(${j.id});closeMenus()"><i class="bi bi-clipboard"></i>Copy Message</div>
+            <div class="ep-action-menu-item danger" onclick="closeJob(${j.id});closeMenus()"><i class="bi bi-x-circle"></i>Close Job</div>
+            <div class="ep-action-menu-item danger" onclick="deleteJob(${j.id});closeMenus()"><i class="bi bi-trash3"></i>Delete Job</div>`:`
+            <div class="ep-action-menu-item" onclick="repostJob(${j.id});closeMenus()"><i class="bi bi-arrow-repeat" style="color:var(--primary)"></i>Repost</div>
+            <div class="ep-action-menu-item" onclick="copyShareMsg(${j.id});closeMenus()"><i class="bi bi-clipboard"></i>Copy Message</div>
+            <div class="ep-action-menu-item danger" onclick="deleteJob(${j.id});closeMenus()"><i class="bi bi-trash3"></i>Delete Job</div>`}
+          </div>
         </div>
       </div>
     </div>`).join('');
+  // Pagination
+  if(pag){
+    if(total<=1){pag.innerHTML='';if(info)info.textContent='';return;}
+    let h=`<button class="ep-page-btn" onclick="gotoPage(${currentPage-1})" ${currentPage===1?'disabled':''}><i class="bi bi-chevron-left"></i></button>`;
+    for(let i=1;i<=total;i++){
+      if(i===1||i===total||(i>=currentPage-1&&i<=currentPage+1))
+        h+=`<button class="ep-page-btn ${i===currentPage?'active':''}" onclick="gotoPage(${i})">${i}</button>`;
+      else if(i===currentPage-2||i===currentPage+2)
+        h+=`<span style="padding:0 .2rem;color:var(--text-muted);line-height:34px">…</span>`;
+    }
+    h+=`<button class="ep-page-btn" onclick="gotoPage(${currentPage+1})" ${currentPage===total?'disabled':''}><i class="bi bi-chevron-right"></i></button>`;
+    pag.innerHTML=h;
+    if(info) info.textContent=`Page ${currentPage} of ${total} · ${currentFilteredJobs.length} jobs`;
+  }
+}
+
+function gotoPage(page){
+  const total=Math.ceil(currentFilteredJobs.length/PAGE_SIZE);
+  if(page<1||page>total)return;
+  currentPage=page;
+  renderPage();
+  document.getElementById('jobsList').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function toggleJobMenu(id){
+  const panel=document.getElementById('menu-'+id);
+  const wasOpen=panel?.classList.contains('show');
+  closeMenus();
+  if(!wasOpen)panel?.classList.add('show');
+}
+
+function closeMenus(){
+  document.querySelectorAll('.ep-action-menu-panel.show').forEach(p=>p.classList.remove('show'));
+}
+
+function renderRequirements(jobs) {
+  const wrap = document.getElementById('jobsList');
+  // Group by batch_id
+  const batches = {};
+  jobs.forEach(j => {
+    if (!j.batch_id) return;
+    if (!batches[j.batch_id]) batches[j.batch_id] = [];
+    batches[j.batch_id].push(j);
+  });
+  const batchList = Object.values(batches);
+  if (!batchList.length) {
+    wrap.innerHTML = '<div class="ep-empty"><i class="bi bi-collection"></i><p>No bulk requirements posted yet.<br><a href="/employer/post-job.html">Post a bulk requirement →</a></p></div>';
+    return;
+  }
+  wrap.innerHTML = batchList.map(batch => {
+    const j0 = batch[0];
+    const totalPositions = batch.reduce((s, j) => s + (parseInt(j.positions) || 1), 0);
+    const totalApps = batch.reduce((s, j) => s + (parseInt(j.application_count) || 0), 0);
+    const newApps = batch.reduce((s, j) => s + (parseInt(j.new_applications) || 0), 0);
+    const hasActive = batch.some(j => j.status === 'active');
+    const link = window.location.origin + '/requirement/' + j0.batch_id;
+  const posList = batch.map(j => '• ' + j.title).join('\n');
+  const descLine = j0.description ? '\n' + j0.description.substring(0,200).trim() + (j0.description.length>200?'...':'') + '\n' : '\n';
+  const waText = encodeURIComponent(
+    '🔵 *URGENT REQUIREMENT*\n' +
+    '*' + j0.company + '*\n\n' +
+    '📍 ' + j0.location + ' | 👥 ' + totalPositions + ' Positions\n\n' +
+    '📋 *Open Positions:*\n' + posList + '\n' +
+    descLine +
+    '👉 ' + link + '\n\n' +
+    '_Posted via JobOrbit.org_'
+  );
+    return `
+    <div style="background:var(--bg-card);border:1.5px solid var(--border);border-radius:14px;padding:1.1rem 1.25rem;margin-bottom:.85rem;box-shadow:0 2px 8px rgba(0,0,0,.06)">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:.75rem;margin-bottom:.6rem">
+        <div style="flex:1;min-width:0">
+          <p style="font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;color:var(--text-primary);margin:0 0 .35rem">${j0.company} — ${j0.location}</p>
+          <div style="display:flex;flex-wrap:wrap;gap:.3rem .65rem">
+            <span style="font-size:.75rem;color:var(--text-muted);display:flex;align-items:center;gap:.25rem"><i class="bi bi-calendar3"></i>${new Date(j0.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</span>
+            <span style="font-size:.75rem;color:var(--text-muted);display:flex;align-items:center;gap:.25rem"><i class="bi bi-people-fill" style="color:var(--primary)"></i>${totalPositions} positions</span>
+            <span style="font-size:.75rem;color:var(--text-muted);display:flex;align-items:center;gap:.25rem"><i class="bi bi-inbox-fill"></i>${totalApps} applications${newApps > 0 ? ` <b style="color:var(--primary)">(${newApps} new)</b>` : ''}</span>
+          </div>
+        </div>
+        <span class="ep-badge ep-badge-${hasActive ? 'green' : 'gray'}">${hasActive ? 'active' : 'closed'}</span>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem .75rem;background:var(--surface);border-radius:10px;margin:.6rem 0">
+        ${batch.map(j => `<span style="font-size:.72rem;font-weight:600;padding:.22rem .65rem;border-radius:20px;background:var(--bg-card);color:var(--text-primary);border:1px solid var(--border);white-space:nowrap">${j.title}</span>`).join('')}
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--border)">
+        <a href="/employer/post-job.html?editBatch=${j0.batch_id}" class="ep-btn-outline ep-btn-sm" style="text-decoration:none;flex:1;min-width:calc(50% - .2rem);justify-content:center">
+          <i class="bi bi-pencil-square"></i> Edit
+        </a>
+        <a href="/requirement/${j0.batch_id}?from=employer" class="ep-btn-outline ep-btn-sm" style="text-decoration:none;flex:1;min-width:calc(50% - .2rem);justify-content:center">
+          <i class="bi bi-box-arrow-up-right"></i> View Page
+        </a>
+        <button class="ep-btn-outline ep-btn-sm" onclick="copyBatchLink('${j0.batch_id}', this)" style="flex:1;min-width:calc(50% - .2rem);justify-content:center">
+          <i class="bi bi-link-45deg"></i> Copy Link
+        </button>
+        <a href="https://wa.me/?text=${waText}" target="_blank" class="ep-btn-outline ep-btn-sm" style="text-decoration:none;flex:1;min-width:calc(50% - .2rem);justify-content:center">
+          <i class="bi bi-whatsapp" style="color:#25d366"></i> WhatsApp
+        </a>
+        <a href="https://t.me/share/url?url=${encodeURIComponent(link)}" target="_blank" class="ep-btn-outline ep-btn-sm" style="text-decoration:none;flex:1;min-width:calc(50% - .2rem);justify-content:center">
+          <i class="bi bi-telegram" style="color:#2aabee"></i> Telegram
+        </a>
+        <button class="ep-btn-outline ep-btn-sm ep-btn-danger" onclick="closeBatch('${j0.batch_id}', this)" style="flex:1;min-width:calc(50% - .2rem);justify-content:center">
+          <i class="bi bi-x-circle"></i> Close All
+        </button>
+        <button class="ep-btn-outline ep-btn-sm ep-btn-danger" onclick="deleteBatch('${j0.batch_id}', this)" style="flex:1;min-width:calc(50% - .2rem);justify-content:center">
+          <i class="bi bi-trash3"></i> Delete All
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function copyBatchLink(batchId, btn) {
+  const link = window.location.origin + '/requirement/' + batchId;
+  navigator.clipboard.writeText(link).then(() => {
+    const orig = btn.innerHTML;
+    btn.innerHTML = '<i class="bi bi-check-lg"></i> Copied!';
+    setTimeout(() => btn.innerHTML = orig, 2000);
+  });
+}
+
+async function closeBatch(batchId, btn) {
+  if (!confirm('Close ALL jobs in this requirement batch? They will be removed from search results.')) return;
+  const batchJobs = allJobs.filter(j => j.batch_id === batchId);
+  btn.disabled = true;
+  for (const j of batchJobs) {
+    await API.del('/api/employer/jobs/' + j.id);
+  }
+  showToast('Requirement closed');
+  init();
+}
+
+async function deleteBatch(batchId, btn) {
+  if (!confirm('Delete this ENTIRE requirement batch? All positions will be permanently removed from your dashboard and the public site. This cannot be undone.')) return;
+  const batchJobs = allJobs.filter(j => j.batch_id === batchId);
+  btn.disabled = true;
+  for (const j of batchJobs) {
+    await API.post('/api/employer/jobs/' + j.id + '/delete', {});
+  }
+  showToast('Requirement deleted');
+  init();
 }
 
 async function closeJob(id) {
@@ -247,6 +432,13 @@ async function closeJob(id) {
   const d = await API.del('/api/employer/jobs/' + id);
   if (d.success) { showToast('Job closed'); init(); }
   else showToast(d.message, 'error');
+}
+
+async function deleteJob(id) {
+  if (!confirm('Delete this job? It will be permanently removed from your dashboard and the public site. This cannot be undone.')) return;
+  const d = await API.post('/api/employer/jobs/' + id + '/delete', {});
+  if (d.success) { showToast('Job deleted'); init(); }
+  else showToast(d.message || 'Failed to delete job', 'error');
 }
 
 async function repostJob(id) {

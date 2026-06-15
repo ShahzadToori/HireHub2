@@ -583,10 +583,6 @@ function renderJobCard(job, isFeaturedSection = false) {
     immediateBadge
   ].filter(Boolean).join('');
 
-  // ── Salary badge ──────────────────────────────────────────
-  const salaryHtml = job.salary
-    ? `<span class="card-salary"><i class="bi bi-cash-stack me-1"></i>${escHtml(job.salary)}</span>`
-    : '';
 
   // ── Visa sponsored badge ──────────────────────────────────
   const visaHtml = job.visa_sponsored
@@ -599,7 +595,11 @@ function renderJobCard(job, isFeaturedSection = false) {
   const locationHtml = `<span class="meta-item"><i class="bi bi-geo-alt"></i>${cityFlag}${escHtml(job.location)}</span>`;
 
   // ── Contact icons ─────────────────────────────────────────
+  const isSaved = isJobSaved(job.id);
+  const saveBtnHtml = `<button type="button" class="btn-contact-icon btn-save-icon${isSaved ? ' saved' : ''}" title="${isSaved ? 'Remove from saved' : 'Save job'}" aria-label="${isSaved ? 'Remove from saved jobs' : 'Save job'}" onclick="event.stopPropagation();toggleSaveJobById(${job.id})"><i class="bi ${isSaved ? 'bi-bookmark-fill' : 'bi-bookmark'}"></i></button>`;
+
   const contacts = [
+    saveBtnHtml,
     job.phone     ? `<a href="tel:${job.phone}" class="btn-contact-icon phone" title="Call" onclick="event.stopPropagation()"><i class="bi bi-telephone-fill"></i></a>` : '',
     job.whatsapp  ? `<a href="${waLink(job)}" class="btn-contact-icon whatsapp" title="WhatsApp" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i class="bi bi-whatsapp"></i></a>` : '',
     job.map_link  ? `<a href="${escHtml(job.map_link)}" class="btn-contact-icon map" title="View on Map" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i class="bi bi-geo-alt-fill"></i></a>` : '',
@@ -622,7 +622,7 @@ function renderJobCard(job, isFeaturedSection = false) {
     <div class="${cardClass}" data-id="${job.id}" data-slug="${job.slug || ''}" role="button" tabindex="0"
          aria-label="View ${escHtml(job.title)} at ${escHtml(job.company)}">
       <div class="card-badges">${badges}${trustHtml ? ' ' + trustHtml : ''}</div>
-      <button class="btn-report-job" onclick="reportJob('${job.id}','${escHtml(job.title).replace(/'/g,"\\'")}',event)" title="Report this listing" aria-label="Report job"><i class="bi bi-flag"></i></button>
+      <!-- Report Job button hidden until a real /api/report-job backend + admin review queue exists -->
       <div class="card-title">${escHtml(job.title)}</div>
       <div class="card-company"><i class="bi bi-building me-1"></i>${escHtml(job.company)}</div>
       ${visaHtml ? `<div class="card-highlights">${visaHtml}</div>` : ""}
@@ -770,6 +770,16 @@ async function openJobBySlug(slug) {
 }
 
 function populateModal(job) {
+  state.currentModalJob = job;
+  const saveBtn = $('#modalSaveBtn');
+  if (saveBtn) {
+    const saved = isJobSaved(job.id);
+    saveBtn.classList.toggle('saved', saved);
+    const icon = saveBtn.querySelector('i');
+    if (icon) icon.className = saved ? 'bi bi-bookmark-fill me-1' : 'bi bi-bookmark me-1';
+    const label = saveBtn.querySelector('.btn-save-label');
+    if (label) label.textContent = saved ? 'Saved' : 'Save';
+  }
   const badges = [
     job.sponsored == 1 ? '<span class="badge-sponsored">Sponsored</span>' : '',
     job.featured  == 1 ? '<span class="badge-featured">⭐ Featured</span>' : ''
@@ -789,6 +799,22 @@ function populateModal(job) {
     .replace(/\n/g, '<br>');
   if (!descEl.innerHTML.startsWith('<p>')) {
     descEl.innerHTML = '<p>' + descEl.innerHTML + '</p>';
+  }
+
+  // Requirements (shown only if the employer provided them)
+  const reqWrap = $('#modalRequirementsWrap');
+  const reqEl   = $('#modalRequirements');
+  if (job.requirements && job.requirements.trim()) {
+    reqEl.innerHTML = escHtml(job.requirements)
+      .replace(/\n\n/g, '</p><p>')
+      .replace(/\n/g, '<br>');
+    if (!reqEl.innerHTML.startsWith('<p>')) {
+      reqEl.innerHTML = '<p>' + reqEl.innerHTML + '</p>';
+    }
+    reqWrap.classList.remove('d-none');
+  } else {
+    reqWrap.classList.add('d-none');
+    reqEl.innerHTML = '';
   }
 
   // Extra fields
@@ -1019,6 +1045,8 @@ function fallbackCopy(text) {
 ══════════════════════════════════════════════════════════════ */
 const RV_KEY = 'jb_recentlyViewed';
 const MAX_RV = 5;
+const SAVED_KEY = 'jb_savedJobs';
+const MAX_SAVED = 50;
 
 function trackRecentlyViewed(job) {
   try {
@@ -1040,10 +1068,89 @@ function renderRecentlyViewed() {
     if (rv.length === 0) { wrap.classList.add('d-none'); return; }
     wrap.classList.remove('d-none');
     list.innerHTML = rv.map(j => `
-      <li class="rv-item" onclick="openJobModal('${j.id}')" title="${escHtml(j.title)}">
-        <div class="rv-title">${escHtml(j.title)}</div>
-        <div class="rv-meta">${escHtml(j.company)} · ${escHtml(j.location)}</div>
+      <li class="list-widget-item" onclick="openJobBySlug('${j.slug}')" title="${escHtml(j.title)}">
+        <div class="list-widget-title">${escHtml(j.title)}</div>
+        <div class="list-widget-meta">${escHtml(j.company)} · ${escHtml(j.location)}</div>
       </li>`).join('');
+  } catch {}
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SAVED / BOOKMARKED JOBS (localStorage)
+══════════════════════════════════════════════════════════════ */
+function isJobSaved(id) {
+  try {
+    return JSON.parse(localStorage.getItem(SAVED_KEY) || '[]').some(j => j.id === id);
+  } catch { return false; }
+}
+
+function toggleSaveJob(job) {
+  try {
+    let saved = JSON.parse(localStorage.getItem(SAVED_KEY) || '[]');
+    const idx = saved.findIndex(j => j.id === job.id);
+    if (idx >= 0) {
+      saved.splice(idx, 1);
+    } else {
+      saved.unshift({ id: job.id, slug: job.slug, title: job.title, company: job.company, location: job.location, created_at: job.created_at });
+      if (saved.length > MAX_SAVED) saved = saved.slice(0, MAX_SAVED);
+    }
+    localStorage.setItem(SAVED_KEY, JSON.stringify(saved));
+    updateSaveButtons(job.id);
+    renderSavedJobs();
+  } catch {}
+}
+
+function toggleSaveJobById(id) {
+  let job = state.jobs.find(j => j.id === id);
+  if (!job && state.currentModalJob && state.currentModalJob.id === id) job = state.currentModalJob;
+  if (!job) return;
+  toggleSaveJob(job);
+}
+
+function updateSaveButtons(id) {
+  const saved = isJobSaved(id);
+  document.querySelectorAll(`.job-card[data-id="${id}"] .btn-save-icon`).forEach(btn => {
+    btn.classList.toggle('saved', saved);
+    btn.title = saved ? 'Remove from saved' : 'Save job';
+    const icon = btn.querySelector('i');
+    if (icon) icon.className = saved ? 'bi bi-bookmark-fill' : 'bi bi-bookmark';
+  });
+  if (state.currentModalJob && state.currentModalJob.id === id) {
+    const modalBtn = $('#modalSaveBtn');
+    if (modalBtn) {
+      modalBtn.classList.toggle('saved', saved);
+      const icon = modalBtn.querySelector('i');
+      if (icon) icon.className = saved ? 'bi bi-bookmark-fill me-1' : 'bi bi-bookmark me-1';
+      const label = modalBtn.querySelector('.btn-save-label');
+      if (label) label.textContent = saved ? 'Saved' : 'Save';
+    }
+  }
+}
+
+function renderSavedJobs() {
+  const wrap = document.getElementById('savedJobsWrap');
+  const list = document.getElementById('savedJobsList');
+  if (!wrap || !list) return;
+  try {
+    const saved = JSON.parse(localStorage.getItem(SAVED_KEY) || '[]');
+    if (saved.length === 0) { wrap.classList.add('d-none'); return; }
+    wrap.classList.remove('d-none');
+    list.innerHTML = saved.map(j => `
+      <li class="list-widget-item" onclick="openJobBySlug('${j.slug}')" title="${escHtml(j.title)}">
+        <div class="list-widget-title">${escHtml(j.title)}</div>
+        <div class="list-widget-meta">${escHtml(j.company)} · ${escHtml(j.location)}</div>
+        <button type="button" class="list-widget-remove" onclick="event.stopPropagation();removeSavedJob(${j.id})" title="Remove from saved" aria-label="Remove from saved jobs"><i class="bi bi-x-lg"></i></button>
+      </li>`).join('');
+  } catch {}
+}
+
+function removeSavedJob(id) {
+  try {
+    let saved = JSON.parse(localStorage.getItem(SAVED_KEY) || '[]');
+    saved = saved.filter(j => j.id !== id);
+    localStorage.setItem(SAVED_KEY, JSON.stringify(saved));
+    updateSaveButtons(id);
+    renderSavedJobs();
   } catch {}
 }
 
@@ -1071,8 +1178,8 @@ function showSearchHistory() {
     const hist = JSON.parse(localStorage.getItem(SH_KEY) || '[]');
     if (hist.length === 0) { drop.classList.remove('show'); return; }
     drop.innerHTML = `<div class="sh-label">Recent searches</div>` +
-      hist.map(q => `<button class="sh-item" onclick="applyHistorySearch('${escHtml(q)}')">${escHtml(q)}</button>`).join('') +
-      `<button class="sh-clear" onclick="clearSearchHistory()"><i class="bi bi-trash me-1"></i>Clear history</button>`;
+      hist.map(q => `<button class="sh-item" data-query="${escHtml(q)}">${escHtml(q)}</button>`).join('') +
+      `<button class="sh-clear" data-action="clear-history"><i class="bi bi-trash me-1"></i>Clear history</button>`;
     drop.classList.add('show');
   } catch {}
 }
@@ -1249,6 +1356,7 @@ async function loadJobOfDay() {
    PHASE 6 — HIRING TRENDS GRAPH
 ══════════════════════════════════════════════════════════════ */
 let trendsChart = null;
+let trendsThemeListenerAttached = false;
 
 async function loadHiringTrends() {
   try {
@@ -1312,10 +1420,13 @@ async function loadHiringTrends() {
         </div>`).join('');
     }
 
-    // Re-render chart on theme toggle
-    document.getElementById('themeToggle')?.addEventListener('click', () => {
-      setTimeout(() => loadHiringTrends(), 100);
-    });
+    // Re-render chart on theme toggle (attach only once — prevents listener pile-up)
+    if (!trendsThemeListenerAttached) {
+      trendsThemeListenerAttached = true;
+      document.getElementById('themeToggle')?.addEventListener('click', () => {
+        setTimeout(() => loadHiringTrends(), 100);
+      });
+    }
 
   } catch (e) { /* silent — non-critical */ }
 }
@@ -1431,6 +1542,17 @@ function bindEvents() {
   if (themeBtn) themeBtn.addEventListener('click', toggleTheme);
   else document.querySelectorAll('.theme-toggle').forEach(btn => btn.addEventListener('click', toggleTheme));
 
+  // Search history item / clear — event delegation (avoids inline onclick injection)
+  document.addEventListener('click', (e) => {
+    const shItem = e.target.closest('.sh-item');
+    if (shItem && shItem.dataset.query !== undefined) {
+      applyHistorySearch(shItem.dataset.query);
+      return;
+    }
+    const shClear = e.target.closest('[data-action="clear-history"]');
+    if (shClear) { clearSearchHistory(); return; }
+  });
+
   // Close share dropdown when clicking outside
   document.addEventListener('click', (e) => {
     const drop = document.getElementById('modalShareDropdown');
@@ -1534,6 +1656,7 @@ async function init() {
   // Non-critical — run after without blocking
   loadCitiesSection();
   renderRecentlyViewed();
+  renderSavedJobs();
   loadJobOfDay();       // Phase 6
   loadHiringTrends();   // Phase 6
 
@@ -1654,6 +1777,22 @@ window.openApplyForm = async function() {
   const msgEl = document.getElementById('applyMsg');
   if (msgEl) { msgEl.className = 'd-none'; msgEl.textContent = ''; }
 
+  // Reset submit button — fixes it getting stuck as "Submitted"/disabled
+  // after a previous successful application in this session
+  const subBtnReset = document.getElementById('applySubmitBtn');
+  if (subBtnReset) {
+    subBtnReset.disabled = false;
+    subBtnReset.innerHTML = '<i class="bi bi-send-fill me-2"></i>Submit Application';
+  }
+
+  // Clear iqama number from any previous application
+  const iqamaNumEl = document.getElementById('applyIqamaNum');
+  if (iqamaNumEl) iqamaNumEl.value = '';
+
+  // Clear any previously-selected CV file from a different job's application
+  const cvFileEl = document.getElementById('applyCVFile');
+  if (cvFileEl) cvFileEl.value = '';
+
   const titleEl = document.getElementById('applyJobTitle');
   if (titleEl) titleEl.textContent = jobTitle || '';
 
@@ -1692,6 +1831,25 @@ window.openApplyForm = async function() {
     if(g('applyRowExpCert'))  g('applyRowExpCert').style.display  = (sE||sC) ? '' : 'none';
     const sIqamaNum=!!fl.require_iqama_number;
     if(g('applyRowIqamaNum')) g('applyRowIqamaNum').style.display=sIqamaNum?'':'none';
+    // CV upload field
+    const requireCv = data.require_cv || 0;
+    let cvRow = document.getElementById('applyRowCV');
+    if (!cvRow) {
+      cvRow = document.createElement('div');
+      cvRow.id = 'applyRowCV';
+      cvRow.style.cssText = 'margin-bottom:.75rem';
+      cvRow.innerHTML = `<label id="applyCVLabel" style="font-size:.83rem;font-weight:600;color:var(--text-primary);display:block;margin-bottom:.3rem">CV / Resume (PDF)</label>
+        <input type="file" id="applyCVFile" accept=".pdf" style="font-size:.82rem;width:100%;padding:.45rem .65rem;border:1.5px solid var(--border);border-radius:9px;background:var(--bg-card);color:var(--text-primary);cursor:pointer">
+        <div style="font-size:.71rem;color:var(--text-muted);margin-top:.2rem">PDF only · Max 5MB</div>`;
+      const submitBtn = document.getElementById('applySubmitBtn');
+      if (submitBtn) submitBtn.parentElement.insertBefore(cvRow, submitBtn);
+    }
+    cvRow.style.display = '';
+    cvRow.dataset.required = requireCv ? '1' : '0';
+    const cvLabel = document.getElementById('applyCVLabel');
+    if (cvLabel) cvLabel.innerHTML = requireCv
+      ? 'CV / Resume (PDF) <span style="color:#dc2626">*</span>'
+      : 'CV / Resume (PDF) <span style="font-size:.72rem;color:var(--text-muted);font-weight:400">(optional)</span>';
   } catch(e) {
     document.getElementById('applyScreeningWrap').classList.add('d-none');
     // Hide all standard fields if screening check fails
@@ -1717,24 +1875,40 @@ window.submitApplication = async function() {
   if (!name)         { showApplyMsg('Full name is required', 'error'); return; }
   if (!phone && !wa) { showApplyMsg('Phone or WhatsApp is required', 'error'); return; }
 
+  const email = document.getElementById('applyEmail').value.trim();
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showApplyMsg('Please enter a valid email address', 'error');
+    return;
+  }
+
   const screeningAnswers = [];
   document.querySelectorAll('.screening-answer').forEach(el => {
     screeningAnswers.push({ q: parseInt(el.dataset.q), answer: el.value.trim() });
   });
 
-  const data = {
-    full_name:         name,
-    email:             document.getElementById('applyEmail').value.trim() || null,
-    phone:             phone || null,
-    whatsapp:          wa    || null,
-    nationality:       document.getElementById('applyNationality').value.trim() || null,
-    iqama_status:      document.getElementById('applyIqama').value || null,
-    experience_years:  parseInt(document.getElementById('applyExp').value) || null,
-    has_certificate:   document.getElementById('applyCert').value === '1' ? 1 : 0,
-    iqama_number:      document.getElementById('applyIqamaNum')?.value.trim() || null,
-    cover_note:        document.getElementById('applyCoverNote').value.trim() || null,
-    screening_answers: screeningAnswers
-  };
+  // CV validation
+  const cvRow = document.getElementById('applyRowCV');
+  const cvFile = document.getElementById('applyCVFile')?.files?.[0];
+  if (cvRow?.dataset.required === '1' && !cvFile) {
+    showApplyMsg('Please upload your CV (PDF, max 5MB)', 'error'); return;
+  }
+  if (cvFile && cvFile.size > 5 * 1024 * 1024) {
+    showApplyMsg('CV file too large. Maximum size is 5MB.', 'error'); return;
+  }
+
+  const fd = new FormData();
+  fd.append('full_name',        name);
+  fd.append('email',            document.getElementById('applyEmail').value.trim() || '');
+  fd.append('phone',            phone || '');
+  fd.append('whatsapp',         wa || '');
+  fd.append('nationality',      document.getElementById('applyNationality').value.trim() || '');
+  fd.append('iqama_status',     document.getElementById('applyIqama').value || '');
+  fd.append('experience_years', document.getElementById('applyExp').value || '');
+  fd.append('has_certificate',  document.getElementById('applyCert').value === '1' ? '1' : '0');
+  fd.append('iqama_number',     document.getElementById('applyIqamaNum')?.value.trim() || '');
+  fd.append('cover_note',       document.getElementById('applyCoverNote').value.trim() || '');
+  fd.append('screening_answers', JSON.stringify(screeningAnswers));
+  if (cvFile) fd.append('cv', cvFile);
 
   subBtn.disabled = true;
   subBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Submitting...';
@@ -1742,8 +1916,7 @@ window.submitApplication = async function() {
   try {
     const resp   = await fetch('/api/employer/apply/' + jobId, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
+      body: fd
     });
     const result = await resp.json();
     if (result.success) {

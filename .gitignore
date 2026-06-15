@@ -13,3 +13,4 @@ qr.png
 .DS_Store
 channel-forwarder/.wwebjs_cache/
 public/uploads/blog/
+patch*.py

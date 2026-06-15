@@ -80,10 +80,23 @@
     </a>
   </div>
 
+  <style>
+    .jf-item{display:flex;align-items:center;gap:.5rem;padding:.4rem .4rem;font-size:.85rem;color:var(--text-primary);cursor:pointer;border-radius:6px}
+    .jf-item:hover{background:var(--surface)}
+    .jf-item input{accent-color:var(--primary);width:16px;height:16px;flex-shrink:0}
+  </style>
   <div class="ep-filter-bar" style="flex-wrap:wrap;gap:.5rem">
-    <select class="ep-input" id="filterJob" style="width:auto;min-width:180px" onchange="loadApplications()">
-      <option value="">All Jobs</option>
-    </select>
+    <input type="text" class="ep-input" id="appSearch" placeholder="Search by name or phone..." style="width:auto;min-width:200px;flex:1 1 200px" oninput="onAppSearchInput()">
+    <div style="position:relative;width:100%;flex:1 1 100%">
+      <button type="button" class="ep-input" id="jobFilterBtn" onclick="toggleJobFilterDropdown(event)" style="width:100%;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:.5rem;cursor:pointer;white-space:nowrap;overflow:hidden">
+        <span id="jobFilterLabel" style="overflow:hidden;text-overflow:ellipsis">All Jobs</span>
+        <i class="bi bi-chevron-down" style="font-size:.7rem;flex-shrink:0"></i>
+      </button>
+      <div id="jobFilterDropdown" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:60;background:var(--bg-card);border:1.5px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.15);width:100%;max-height:340px;overflow-y:auto;padding:.5rem">
+        <input type="text" class="ep-input" id="jobFilterSearch" placeholder="Search jobs..." oninput="renderJobFilterOptions()">
+        <div id="jobFilterOptions" style="margin-top:.4rem"></div>
+      </div>
+    </div>
     <div class="ep-status-tabs">
       <button class="ep-filter-btn active" onclick="filterStatus('',this)">All</button>
       <button class="ep-filter-btn" onclick="filterStatus('new',this)">New</button>
@@ -93,7 +106,21 @@
     </div>
   </div>
 
+  <div id="cvWarningBanner" style="display:none;background:rgba(245,158,11,.08);border:1.5px solid rgba(245,158,11,.3);border-radius:10px;padding:.6rem .85rem;font-size:.78rem;color:#92400e;margin-bottom:.75rem;display:none;align-items:flex-start;gap:.5rem">
+    <i class="bi bi-clock-history" style="color:#d97706;flex-shrink:0;margin-top:.1rem"></i>
+    <span>CVs are <strong>automatically deleted after 30 days</strong>. Download any CVs you want to keep permanently.</span>
+  </div>
+  <div id="bulkActionBar" style="display:none;align-items:center;gap:.5rem;flex-wrap:wrap;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:.6rem .8rem;margin-bottom:.75rem">
+    <span id="bulkSelCount" style="font-size:.82rem;font-weight:700;color:var(--text-primary)"></span>
+    <button class="ep-btn-outline ep-btn-sm" onclick="bulkUpdateStatus('reviewed')"><i class="bi bi-eye me-1"></i>Reviewed</button>
+    <button class="ep-btn-outline ep-btn-sm" onclick="bulkUpdateStatus('shortlisted')"><i class="bi bi-star me-1"></i>Shortlist</button>
+    <button class="ep-btn-outline ep-btn-sm" onclick="bulkUpdateStatus('hired')"><i class="bi bi-check-circle me-1"></i>Hired</button>
+    <button class="ep-btn-outline ep-btn-sm" onclick="bulkUpdateStatus('rejected')" style="color:#dc2626;border-color:rgba(220,38,38,.3)"><i class="bi bi-x-circle me-1"></i>Reject</button>
+    <button class="ep-btn-outline ep-btn-sm" onclick="clearSelection()" style="margin-left:auto"><i class="bi bi-x-lg me-1"></i>Clear</button>
+  </div>
   <div id="appsList"><div class="ep-loading">Loading applications...</div></div>
+  <div id="apps-pagination" class="ep-pagination" style="margin-top:.75rem"></div>
+  <div id="apps-page-info" class="ep-page-info"></div>
 </div>
 
 <!-- Application detail modal -->
@@ -144,12 +171,22 @@ async function checkAuth() {
     const n = document.getElementById('epCompanyName');
     const a = document.getElementById('epAvatar');
     if (n) n.textContent = d.employer.company_name;
-    if (a) a.textContent = d.employer.company_name.charAt(0).toUpperCase();
+    if (a) {
+      if (d.employer.logo_url) {
+        a.innerHTML = `<img src="${d.employer.logo_url}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block;">`;
+        a.style.padding = '0';
+        a.style.overflow = 'hidden';
+        a.style.background = 'transparent';
+      } else {
+        a.textContent = d.employer.company_name.charAt(0).toUpperCase();
+      }
+    }
     return d;
   } catch(e) { window.location.href = '/employer/'; return null; }
 }
 
 async function logout() {
+  if (!confirm('Are you sure you want to log out?')) return;
   await API.post('/api/employer/logout', {});
   window.location.href = '/employer/';
 }
@@ -184,6 +221,144 @@ function timeAgo(date) {
 
 let currentStatus = '';
 let currentApp = null;
+let allApps = [];
+let filteredApps = [];
+let searchQuery = '';
+const APPS_PAGE_SIZE = 15;
+let appsPage = 1;
+
+let selectedApps = new Set();
+let allJobsList = [];
+let selectedJobIds = new Set();
+
+function toggleJobFilterDropdown(e) {
+  if (e) e.stopPropagation();
+  const dd = document.getElementById('jobFilterDropdown');
+  const willShow = dd.style.display === 'none';
+  dd.style.display = willShow ? 'block' : 'none';
+  if (willShow) {
+    document.getElementById('jobFilterSearch').value = '';
+    renderJobFilterOptions();
+    setTimeout(() => document.getElementById('jobFilterSearch')?.focus(), 50);
+  }
+}
+
+function renderJobFilterOptions() {
+  const q = (document.getElementById('jobFilterSearch')?.value || '').trim().toLowerCase();
+  const wrap = document.getElementById('jobFilterOptions');
+  const allChecked = selectedJobIds.size === 0;
+  let html = `<label class="jf-item"><input type="checkbox" ${allChecked?'checked':''} onchange="selectAllJobs()"><strong>All Jobs</strong></label>`;
+  allJobsList
+    .filter(j => j.title.toLowerCase().includes(q))
+    .forEach(j => {
+      const checked = selectedJobIds.has(j.id);
+      const newBadge = j.new_applications > 0 ? ` <span style="color:var(--primary);font-weight:700">(${j.new_applications} new)</span>` : '';
+      html += `<label class="jf-item"><input type="checkbox" ${checked?'checked':''} onchange="toggleJobSelect(${j.id},this.checked)"><span style="overflow:hidden;text-overflow:ellipsis">${j.title}${newBadge}</span></label>`;
+    });
+  wrap.innerHTML = html;
+}
+
+function selectAllJobs() {
+  selectedJobIds.clear();
+  updateJobFilterLabel();
+  renderJobFilterOptions();
+  applyFilters();
+}
+
+function toggleJobSelect(id, checked) {
+  if (checked) selectedJobIds.add(id); else selectedJobIds.delete(id);
+  updateJobFilterLabel();
+  renderJobFilterOptions();
+  applyFilters();
+}
+
+function updateJobFilterLabel() {
+  const label = document.getElementById('jobFilterLabel');
+  if (!label) return;
+  if (selectedJobIds.size === 0) {
+    label.textContent = 'All Jobs';
+  } else if (selectedJobIds.size === 1) {
+    const j = allJobsList.find(j => selectedJobIds.has(j.id));
+    label.textContent = j ? j.title : '1 job selected';
+  } else {
+    label.textContent = selectedJobIds.size + ' jobs selected';
+  }
+}
+
+function applyFilters() {
+  filteredApps = allApps.filter(a => {
+    if (selectedJobIds.size > 0 && !selectedJobIds.has(a.job_id)) return false;
+    if (searchQuery) {
+      const m = (a.full_name||'').toLowerCase().includes(searchQuery) ||
+                (a.phone||'').toLowerCase().includes(searchQuery) ||
+                (a.whatsapp||'').toLowerCase().includes(searchQuery);
+      if (!m) return false;
+    }
+    return true;
+  });
+  appsPage = 1;
+  renderAppsPage();
+}
+
+document.addEventListener('click', (e) => {
+  const dd  = document.getElementById('jobFilterDropdown');
+  const btn = document.getElementById('jobFilterBtn');
+  if (dd && dd.style.display !== 'none' && !dd.contains(e.target) && e.target !== btn && !btn?.contains(e.target)) {
+    dd.style.display = 'none';
+  }
+});
+
+function toggleAppSelect(id, checked) {
+  if (checked) selectedApps.add(id); else selectedApps.delete(id);
+  updateBulkBar();
+}
+
+function updateBulkBar() {
+  const bar = document.getElementById('bulkActionBar');
+  const count = document.getElementById('bulkSelCount');
+  if (!bar) return;
+  if (selectedApps.size > 0) {
+    bar.style.display = 'flex';
+    count.textContent = selectedApps.size + ' selected';
+  } else {
+    bar.style.display = 'none';
+  }
+}
+
+function clearSelection() {
+  selectedApps.clear();
+  renderAppsPage();
+}
+
+async function bulkUpdateStatus(status) {
+  if (!selectedApps.size) return;
+  const ids = [...selectedApps];
+  const labels = { reviewed: 'Reviewed', shortlisted: 'Shortlisted', rejected: 'Rejected', hired: 'Hired' };
+  if (!confirm(`Mark ${ids.length} application(s) as ${labels[status]}?`)) return;
+  try {
+    const d = await API.put('/api/employer/applications/bulk-status', { ids, status });
+    if (d.success) {
+      showToast(`${ids.length} application(s) updated`, 'success');
+      selectedApps.clear();
+      await loadApplications();
+    } else {
+      showToast(d.message || 'Failed to update', 'error');
+    }
+  } catch (e) {
+    showToast('Network error. Please try again.', 'error');
+  }
+}
+
+let _searchDebounce;
+function onAppSearchInput() {
+  clearTimeout(_searchDebounce);
+  _searchDebounce = setTimeout(applySearch, 250);
+}
+
+function applySearch() {
+  searchQuery = (document.getElementById('appSearch')?.value || '').trim().toLowerCase();
+  applyFilters();
+}
 
 async function init() {
   await checkAuth();
@@ -195,14 +370,9 @@ async function init() {
 
   // Load job list for filter
   const jd = await API.get('/api/employer/jobs');
-  const sel = document.getElementById('filterJob');
-  (jd.jobs || []).forEach(j => {
-    const o = document.createElement('option');
-    o.value = j.id;
-    o.textContent = j.title + (j.new_applications > 0 ? ' (' + j.new_applications + ' new)' : '');
-    if (jobId && j.id == jobId) o.selected = true;
-    sel.appendChild(o);
-  });
+  allJobsList = jd.jobs || [];
+  if (jobId) selectedJobIds.add(parseInt(jobId));
+  updateJobFilterLabel();
 
   if (status) {
     currentStatus = status;
@@ -215,23 +385,40 @@ async function init() {
 }
 
 async function loadApplications() {
-  const jobId = document.getElementById('filterJob').value;
   let url = '/api/employer/applications?';
-  if (jobId) url += 'job_id=' + jobId + '&';
   if (currentStatus) url += 'status=' + currentStatus;
 
   document.getElementById('appsList').innerHTML = '<div class="ep-loading">Loading...</div>';
   const d = await API.get(url);
   const apps = d.applications || [];
 
-  if (!apps.length) {
-    document.getElementById('appsList').innerHTML = '<div class="ep-empty"><i class="bi bi-inbox"></i><p>No applications found</p></div>';
-    return;
-  }
+  allApps = apps;
+  appsPage = 1;
+  selectedApps.clear();
+  applyFilters();
+  // Show CV warning banner if any applications have CVs
+  const hasCvs = apps.some(a => a.cv_url);
+  const banner = document.getElementById('cvWarningBanner');
+  if (banner) banner.style.display = hasCvs ? 'flex' : 'none';
+}
 
-  document.getElementById('appsList').innerHTML = apps.map(a => `
+function renderAppsPage() {
+  const wrap = document.getElementById('appsList');
+  const pag  = document.getElementById('apps-pagination');
+  const info = document.getElementById('apps-page-info');
+  if (!filteredApps.length) {
+    wrap.innerHTML = searchQuery
+      ? '<div class="ep-empty"><i class="bi bi-search"></i><p>No applications match "' + searchQuery + '"</p></div>'
+      : '<div class="ep-empty"><i class="bi bi-inbox"></i><p>No applications found</p></div>';
+    if(pag) pag.innerHTML=''; if(info) info.textContent=''; return;
+  }
+  const total = Math.ceil(filteredApps.length / APPS_PAGE_SIZE);
+  const start = (appsPage-1)*APPS_PAGE_SIZE;
+  const slice = filteredApps.slice(start, start+APPS_PAGE_SIZE);
+  wrap.innerHTML = slice.map(a => `
     <div class="ep-app-card" onclick="openApp(${a.id})">
       <div class="ep-app-card-left">
+        <input type="checkbox" class="app-select-cb" onclick="event.stopPropagation()" onchange="toggleAppSelect(${a.id},this.checked)" ${selectedApps.has(a.id)?'checked':''} style="width:18px;height:18px;margin-right:.6rem;align-self:flex-start;margin-top:.35rem;accent-color:var(--primary);cursor:pointer;flex-shrink:0">
         <div class="ep-app-avatar-lg">${a.full_name.charAt(0).toUpperCase()}</div>
         <div class="ep-app-card-info">
           <div class="ep-app-card-name">${a.full_name}</div>
@@ -249,8 +436,32 @@ async function loadApplications() {
       <div class="ep-app-card-contacts">
         ${a.whatsapp ? `<a href="https://wa.me/${a.whatsapp.replace(/\D/g,'')}" onclick="event.stopPropagation()" class="ep-contact-btn ep-wa-btn" target="_blank"><i class="bi bi-whatsapp"></i></a>` : ''}
         ${a.phone ? `<a href="tel:${a.phone}" onclick="event.stopPropagation()" class="ep-contact-btn ep-phone-btn"><i class="bi bi-telephone-fill"></i></a>` : ''}
+        ${a.cv_url ? `<a href="${a.cv_url}" onclick="event.stopPropagation()" class="ep-contact-btn" target="_blank" title="View CV" style="background:rgba(220,38,38,.08);color:#dc2626;border:1.5px solid rgba(220,38,38,.2)"><i class="bi bi-file-earmark-pdf-fill"></i></a>` : ''}
       </div>
     </div>`).join('');
+  // Pagination controls
+  if(pag){
+    if(total<=1){pag.innerHTML='';if(info)info.textContent=filteredApps.length+' applications';return;}
+    let h=`<button class="ep-page-btn" onclick="gotoAppsPage(${appsPage-1})" ${appsPage===1?'disabled':''}><i class="bi bi-chevron-left"></i></button>`;
+    for(let i=1;i<=total;i++){
+      if(i===1||i===total||(i>=appsPage-1&&i<=appsPage+1))
+        h+=`<button class="ep-page-btn ${i===appsPage?'active':''}" onclick="gotoAppsPage(${i})">${i}</button>`;
+      else if(i===appsPage-2||i===appsPage+2)
+        h+=`<span style="padding:0 .2rem;color:var(--text-muted);line-height:34px">…</span>`;
+    }
+    h+=`<button class="ep-page-btn" onclick="gotoAppsPage(${appsPage+1})" ${appsPage===total?'disabled':''}><i class="bi bi-chevron-right"></i></button>`;
+    pag.innerHTML=h;
+    if(info) info.textContent=`Page ${appsPage} of ${total} · ${filteredApps.length} applications`;
+  }
+  updateBulkBar();
+}
+
+function gotoAppsPage(page){
+  const total=Math.ceil(filteredApps.length/APPS_PAGE_SIZE);
+  if(page<1||page>total)return;
+  appsPage=page;
+  renderAppsPage();
+  document.getElementById('appsList').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 function statusColor(s) {
@@ -289,7 +500,19 @@ async function openApp(id) {
     <div class="ep-field mt-3">
       <label class="ep-label">Private Notes</label>
       <textarea class="ep-input" id="appNotes" rows="3" placeholder="Add private notes about this candidate...">${app.employer_notes||''}</textarea>
-    </div>`;
+    </div>
+    ${app.cv_url ? `
+    <div style="margin-top:1rem;padding:1rem;background:var(--surface);border-radius:10px;border:1.5px solid var(--border)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.65rem">
+        <span style="font-size:.82rem;font-weight:700;color:var(--text-primary)"><i class="bi bi-file-earmark-pdf-fill me-2" style="color:#dc2626"></i>CV / Resume</span>
+        <div style="display:flex;gap:.4rem">
+          <a href="${app.cv_url}" target="_blank" class="ep-btn-outline ep-btn-sm" style="font-size:.75rem"><i class="bi bi-eye me-1"></i>View</a>
+          <a href="${app.cv_url}" download class="ep-btn-outline ep-btn-sm" style="font-size:.75rem;color:#059669;border-color:#059669"><i class="bi bi-download me-1"></i>Download</a>
+        </div>
+      </div>
+      <iframe src="${app.cv_url}" style="width:100%;height:420px;border:none;border-radius:8px;background:#fff"></iframe>
+      <p style="font-size:.7rem;color:var(--text-muted);margin:.4rem 0 0;text-align:center"><i class="bi bi-clock me-1"></i>Auto-deleted after 30 days — download to keep</p>
+    </div>` : ''}`;
 
   document.getElementById('appModal').classList.add('show');
   // Mark as reviewed automatically
