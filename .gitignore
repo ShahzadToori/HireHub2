@@ -14,3 +14,5 @@ qr.png
 channel-forwarder/.wwebjs_cache/
 public/uploads/blog/
 patch*.py
+public/uploads/cvs/
+public/uploads/employers/

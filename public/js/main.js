@@ -622,7 +622,11 @@ function renderJobCard(job, isFeaturedSection = false) {
     <div class="${cardClass}" data-id="${job.id}" data-slug="${job.slug || ''}" role="button" tabindex="0"
          aria-label="View ${escHtml(job.title)} at ${escHtml(job.company)}">
       <div class="card-badges">${badges}${trustHtml ? ' ' + trustHtml : ''}</div>
-      <!-- Report Job button hidden until a real /api/report-job backend + admin review queue exists -->
+      <button type="button" class="btn-report-job" title="Report this listing" aria-label="Report this listing"
+        data-slug="${job.slug || ''}" data-title="${escHtml(job.title)}"
+        onclick="event.stopPropagation();reportJobCard(this)">
+        <i class="bi bi-flag"></i>
+      </button>
       <div class="card-title">${escHtml(job.title)}</div>
       <div class="card-company"><i class="bi bi-building me-1"></i>${escHtml(job.company)}</div>
       ${visaHtml ? `<div class="card-highlights">${visaHtml}</div>` : ""}
@@ -1142,6 +1146,17 @@ function renderSavedJobs() {
         <button type="button" class="list-widget-remove" onclick="event.stopPropagation();removeSavedJob(${j.id})" title="Remove from saved" aria-label="Remove from saved jobs"><i class="bi bi-x-lg"></i></button>
       </li>`).join('');
   } catch {}
+}
+
+function reportJobCard(btn) {
+  const title = btn.dataset.title || '';
+  const slug  = btn.dataset.slug  || '';
+  const url   = '/feedback.html?type=report_job'
+    + '&subject=' + encodeURIComponent('Job Report: ' + title)
+    + '&msg='     + encodeURIComponent(
+        'Listing URL: ' + window.location.origin + '/job/' + slug + '\n\nReason: '
+      );
+  window.location = url;
 }
 
 function removeSavedJob(id) {

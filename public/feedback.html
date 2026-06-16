@@ -86,6 +86,10 @@
       color: var(--primary); box-shadow: 0 0 0 3px rgba(15,98,254,.12);
     }
     [data-theme="dark"] .type-btn.active { background: rgba(15,98,254,.12); }
+    .type-btn[data-type="report_job"] { grid-column: 1 / -1; flex-direction: row; justify-content: center; gap: .5rem; color: #dc2626; border-color: #fecaca; }
+    .type-btn[data-type="report_job"]:hover { border-color: #dc2626; color: #dc2626; }
+    .type-btn[data-type="report_job"].active { border-color: #dc2626; background: rgba(220,38,38,.07); color: #dc2626; box-shadow: 0 0 0 3px rgba(220,38,38,.12); }
+    [data-theme="dark"] .type-btn[data-type="report_job"].active { background: rgba(220,38,38,.12); }
 
     /* ── Main card ───────────────────────────────────────── */
     .fb-card {
@@ -345,6 +349,9 @@
               <button class="type-btn" data-type="other" onclick="selectType(this)">
                 <i class="bi bi-three-dots"></i> Other
               </button>
+              <button class="type-btn" data-type="report_job" onclick="selectType(this)">
+                <i class="bi bi-flag-fill"></i> Report a Job Listing
+              </button>
             </div>
             <div style="text-align:center;margin-top:1.5rem">
               <button class="fb-submit" style="max-width:240px" onclick="goStep2()" id="nextBtn" disabled>
@@ -514,6 +521,245 @@
     });
   });
   window.toggleTheme=function(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');};
+})();
+</script>
+
+<script>
+'use strict';
+
+/* ── State ─────────────────────────────────────────────── */
+let currentStep = 1;
+let selectedType = null;
+let selectedRating = 0;
+
+/* ── Type selector ────────────────────────────────────── */
+function selectType(btn) {
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedType = btn.dataset.type;
+  document.getElementById('nextBtn').disabled = false;
+
+  // Animate button
+  btn.style.transform = 'scale(.96)';
+  setTimeout(() => btn.style.transform = '', 120);
+}
+
+/* ── Progress update ──────────────────────────────────── */
+function updateProgress(step) {
+  const labels = ['Choose type', 'Your details', 'Your message'];
+  for (let i = 1; i <= 3; i++) {
+    const el = document.getElementById('ps' + i);
+    el.className = 'progress-step' + (i < step ? ' done' : i === step ? ' active' : '');
+  }
+  document.getElementById('psLabel').textContent = labels[step - 1];
+}
+
+/* ── Step navigation ──────────────────────────────────── */
+function goStep1() {
+  show('step1'); hide('step2'); hide('step3');
+  currentStep = 1;
+  updateProgress(1);
+  clearAlert();
+}
+
+function goStep2() {
+  if (!selectedType) { showAlert('error', 'Please select a message type first.'); return; }
+  show('step2'); hide('step1'); hide('step3');
+  currentStep = 2;
+  updateProgress(2);
+  clearAlert();
+  document.getElementById('fbName').focus();
+}
+
+function goStep3() {
+  const name  = document.getElementById('fbName');
+  const email = document.getElementById('fbEmail');
+  let ok = true;
+
+  clearValidation(name); clearValidation(email);
+
+  if (!name.value.trim())  { setInvalid(name);  ok = false; }
+  if (!isValidEmail(email.value)) { setInvalid(email); ok = false; }
+
+  if (!ok) { showAlert('error', 'Please fix the highlighted fields.'); return; }
+
+  show('step3'); hide('step2'); hide('step1');
+  currentStep = 3;
+  updateProgress(3);
+  clearAlert();
+
+  // Set step label & show rating for feedback type
+  const labels = { feedback: 'Your feedback', bug: 'Describe the bug', question: 'Your question', other: 'Your message', report_job: 'Report details' };
+  document.getElementById('step3Label').textContent = labels[selectedType] || 'Your message';
+
+  const ratingWrap = document.getElementById('ratingWrap');
+  if (selectedType === 'feedback') ratingWrap.classList.remove('d-none');
+  else ratingWrap.classList.add('d-none');
+
+  // Pre-fill subject if empty
+  const subjects = { feedback: 'Site feedback', bug: 'Bug report', question: 'Question', other: 'General enquiry', report_job: 'Job Report' };
+  const subj = document.getElementById('fbSubject');
+  if (!subj.value) subj.value = subjects[selectedType] || '';
+
+  document.getElementById('fbMessage').focus();
+}
+
+/* ── Star rating ──────────────────────────────────────── */
+function setStar(val) {
+  selectedRating = val;
+  document.querySelectorAll('.star-btn').forEach(btn => {
+    const v = parseInt(btn.dataset.v);
+    btn.classList.toggle('lit', v <= val);
+    btn.style.color = v <= val ? '#f59e0b' : '';
+  });
+}
+
+/* ── Character counter ───────────────────────────────── */
+document.getElementById('fbMessage').addEventListener('input', function() {
+  const len = this.value.length;
+  const max = 3000;
+  const counter = document.getElementById('charCounter');
+  counter.textContent = `${len} / ${max}`;
+  counter.className = 'char-counter' + (len > max * .9 ? (len >= max ? ' over' : ' warn') : '');
+});
+
+/* ── Submit ───────────────────────────────────────────── */
+async function submitForm() {
+  const subj = document.getElementById('fbSubject');
+  const msg  = document.getElementById('fbMessage');
+  let ok = true;
+
+  clearValidation(subj); clearValidation(msg);
+
+  if (!subj.value.trim())            { setInvalid(subj); ok = false; }
+  if (msg.value.trim().length < 15)  { setInvalid(msg);  ok = false; }
+
+  if (!ok) { showAlert('error', 'Please fill in the subject and message.'); return; }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.classList.add('loading');
+  clearAlert();
+
+  // Build subject with type prefix and optional rating
+  let fullSubject = subj.value.trim();
+  const typeLabel = { feedback: 'Feedback', bug: 'Bug Report', question: 'Question', other: 'General', report_job: 'Job Report' };
+  fullSubject = `[${typeLabel[selectedType] || 'Contact'}] ${fullSubject}`;
+  if (selectedType === 'feedback' && selectedRating > 0) {
+    fullSubject += ` [${selectedRating}★]`;
+  }
+
+  // Build full message with metadata
+  let fullMessage = msg.value.trim();
+  if (selectedType === 'feedback' && selectedRating > 0) {
+    fullMessage = `Rating: ${'★'.repeat(selectedRating)}${'☆'.repeat(5 - selectedRating)}\n\n` + fullMessage;
+  }
+  fullMessage += `\n\n---\nType: ${selectedType}\nPage: ${window.location.href}\nUA: ${navigator.userAgent.substring(0, 100)}`;
+
+  try {
+    const res = await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name:    document.getElementById('fbName').value.trim(),
+        email:   document.getElementById('fbEmail').value.trim().toLowerCase(),
+        phone:   document.getElementById('fbPhone').value.trim() || null,
+        subject: fullSubject,
+        message: fullMessage
+      })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      // Hide all steps, show success
+      hide('step1'); hide('step2'); hide('step3');
+      hide('fbProgress');
+      const s = document.getElementById('fbSuccess');
+      s.style.display = 'block';
+      s.classList.add('show');
+    } else {
+      showAlert('error', data.message || 'Something went wrong. Please try again.');
+      btn.disabled = false;
+      btn.classList.remove('loading');
+    }
+  } catch {
+    showAlert('error', 'Network error. Please check your connection and try again.');
+    btn.disabled = false;
+    btn.classList.remove('loading');
+  }
+}
+
+/* ── Reset ────────────────────────────────────────────── */
+function resetForm() {
+  selectedType = null; selectedRating = 0; currentStep = 1;
+  document.getElementById('fbName').value    = '';
+  document.getElementById('fbEmail').value   = '';
+  document.getElementById('fbPhone').value   = '';
+  document.getElementById('fbSubject').value = '';
+  document.getElementById('fbMessage').value = '';
+  document.getElementById('charCounter').textContent = '0 / 3000';
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.star-btn').forEach(b => { b.classList.remove('lit'); b.style.color = ''; });
+  document.getElementById('nextBtn').disabled = true;
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('submitBtn').classList.remove('loading');
+
+  const s = document.getElementById('fbSuccess');
+  s.style.display = 'none'; s.classList.remove('show');
+  show('fbProgress');
+  show('step1'); hide('step2'); hide('step3');
+  updateProgress(1);
+  clearAlert();
+}
+
+/* ── FAQ accordion ────────────────────────────────────── */
+function toggleFaq(item) {
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+  if (!isOpen) item.classList.add('open');
+}
+
+/* ── Helpers ──────────────────────────────────────────── */
+function show(id) { const el = document.getElementById(id); if (el) el.style.display = ''; }
+function hide(id) { const el = document.getElementById(id); if (el) el.style.display = 'none'; }
+
+function showAlert(type, msg) {
+  const el = document.getElementById('fbAlert');
+  el.className = `fb-alert ${type}`;
+  el.innerHTML = `<i class="bi bi-${type === 'success' ? 'check-circle-fill' : 'exclamation-circle-fill'}" style="flex-shrink:0;margin-top:.1rem"></i><span>${msg}</span>`;
+}
+function clearAlert() {
+  const el = document.getElementById('fbAlert');
+  el.className = 'fb-alert d-none'; el.textContent = '';
+}
+
+function setInvalid(el) { el.classList.add('is-invalid'); el.focus(); }
+function clearValidation(el) { el.classList.remove('is-invalid'); }
+
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+// Clear validation on input
+['fbName','fbEmail','fbSubject','fbMessage'].forEach(id => {
+  document.getElementById(id)?.addEventListener('input', function() {
+    this.classList.remove('is-invalid');
+  });
+});
+
+// URL param prefill — allows deep links like:
+// /feedback.html?type=report_job&subject=Job+Report:+Title&msg=...
+(function() {
+  const p = new URLSearchParams(window.location.search);
+  const type = p.get('type');
+  if (type) {
+    const btn = document.querySelector(`.type-btn[data-type="${type}"]`);
+    if (btn) selectType(btn);
+  }
+  const subj = p.get('subject');
+  if (subj) document.getElementById('fbSubject').value = decodeURIComponent(subj);
+  const msg = p.get('msg');
+  if (msg) document.getElementById('fbMessage').value = decodeURIComponent(msg);
 })();
 </script>
 </body>

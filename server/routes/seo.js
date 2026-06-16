@@ -658,7 +658,7 @@ const contactBtns = [
 
   <!-- Phase 2: Report a Job link -->
   <p style="margin-top:2rem;text-align:center;font-size:.78rem;color:#9ca3af">
-    ⚑ <a href="/feedback.html" style="color:#9ca3af">Report this listing</a> if it appears fake, expired, or inappropriate.
+    ⚑ <a href="/feedback.html?type=report_job&subject=${encodeURIComponent('Job Report: ' + job.title)}&msg=${encodeURIComponent('Listing URL: ' + (process.env.SITE_URL || 'https://joborbit.org') + '/job/' + job.slug + '\n\nReason: ')}" style="color:#9ca3af">Report this listing</a> if it appears fake, expired, or inappropriate.
   </p>
 </div>
 
@@ -667,7 +667,7 @@ ${(job.employer_id || job.whatsapp || job.phone || job.email) ? `
   ${job.employer_id
     ? `<button class="apply-cta" onclick="openSeoApply()">📩 Apply Now</button>`
     : job.whatsapp
-      ? `<a href="${whatsappUrl}" target="_blank" class="apply-cta" style="background:#22c55e">💬 WhatsApp</a>`
+      ? `<a href="${whatsappUrl}" target="_blank" class="apply-cta">💬 WhatsApp</a>`
       : job.phone
         ? `<a href="tel:${he(job.phone)}" class="apply-cta">📞 Call Now</a>`
         : `<a href="mailto:${he(job.email)}" class="apply-cta">✉️ Email</a>`}
