@@ -6,6 +6,7 @@
 ══════════════════════════════════════════════════════════════ */
 const fs   = require('fs');
 const path = require('path');
+const db   = require('../db/connection');
 
 const PUBLIC_DIR   = path.join(__dirname, '../../public');
 const PARTIALS_DIR = path.join(PUBLIC_DIR, 'partials');
@@ -24,6 +25,64 @@ function loadPartial(name) {
 
 loadPartial('navbar');
 loadPartial('footer');
+
+// ── Per-page meta tag cache (refreshed every 5 min) ──────────
+const PAGE_META_KEYS = {
+  '/':                     'meta_home',
+  '/index.html':           'meta_home',
+  '/about.html':           'meta_about',
+  '/blog/':                'meta_blog',
+  '/blog/index.html':      'meta_blog',
+  '/tools/':               'meta_tools',
+  '/tools/index.html':     'meta_tools',
+  '/feedback.html':        'meta_feedback',
+  '/privacy-policy.html':  'meta_privacy',
+  '/terms.html':           'meta_terms',
+  '/disclaimer.html':      'meta_disclaimer',
+};
+
+let _metaCache = {};
+let _metaCacheAt = 0;
+const META_TTL = 300000; // 5 min
+
+async function loadMetaCache() {
+  try {
+    const [rows] = await db.query(
+      "SELECT \`key\`, \`value\` FROM settings WHERE \`key\` LIKE 'meta_%'"
+    );
+    const c = {};
+    rows.forEach(r => { c[r.key] = r.value; });
+    _metaCache = c;
+    _metaCacheAt = Date.now();
+  } catch(e) {
+    console.warn('[Layout] Meta cache load failed:', e.message);
+  }
+}
+loadMetaCache();
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function injectMeta(html, urlPath) {
+  const key = PAGE_META_KEYS[urlPath];
+  if (!key) return html;
+  const title = (_metaCache[key + '_title'] || '').trim();
+  const desc  = (_metaCache[key + '_desc']  || '').trim();
+  if (title) {
+    html = html.replace(/<title>[^<]*<\/title>/i, `<title>${esc(title)}</title>`);
+  }
+  if (desc) {
+    if (/<meta\s+name=["']description["']/i.test(html)) {
+      html = html.replace(/<meta\s+name=["']description["'][^>]*>/i,
+        `<meta name="description" content="${esc(desc)}">`);
+    } else {
+      html = html.replace(/<\/title>/i,
+        `</title>\n  <meta name="description" content="${esc(desc)}">`);
+    }
+  }
+  return html;
+}
 
 // Auto-reload partials when they change — no server restart needed
 fs.watch(PARTIALS_DIR, (event, filename) => {
@@ -72,13 +131,17 @@ function htmlLayoutMiddleware(req, res, next) {
     if (i >= safeCandidates.length) return next();
     fs.readFile(safeCandidates[i], 'utf8', (err, html) => {
       if (err) return tryNext(i + 1);
+      // Refresh meta cache if stale
+      if (Date.now() - _metaCacheAt > META_TTL) loadMetaCache();
+      const finalHtml = injectMeta(inject(html), urlPath);
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
       res.setHeader('Cache-Control', 'no-cache');
-      res.send(inject(html));
+      res.send(finalHtml);
     });
   }
   tryNext(0);
 }
 
-htmlLayoutMiddleware.inject = inject;
+htmlLayoutMiddleware.inject      = inject;
+htmlLayoutMiddleware.reloadMeta  = loadMetaCache;
 module.exports = htmlLayoutMiddleware;
