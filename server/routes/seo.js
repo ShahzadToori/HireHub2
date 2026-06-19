@@ -337,7 +337,7 @@ router.get('/job/:slug', async (req, res, next) => {
         if (emp && emp.logo_url) employerLogo = emp.logo_url;
       } catch {}
     }
-    const employerLogoSrc = employerLogo.startsWith('http') ? employerLogo : `${siteUrl}${employerLogo}`;
+    const employerLogoSrc = employerLogo.startsWith('http') ? employerLogo : employerLogo;
     const companyInitial  = (job.company || '?').trim().charAt(0).toUpperCase() || '?';
     const postedAgo       = timeAgo(job.created_at);
     const salaryDisplay   = (job.salary || '').trim();
@@ -591,7 +591,7 @@ const contactBtns = [
     <div class="card-head">
       <div class="job-head">
         <div class="company-avatar">
-          ${employerLogo ? `<img src="${he(employerLogoSrc)}" alt="${he(job.company)}">` : he(companyInitial)}
+          ${employerLogo ? `<img src="${he(employerLogoSrc)}" alt="${he(job.company)}" onerror="this.parentElement.textContent='${he(companyInitial)}';this.remove();">` : he(companyInitial)}
         </div>
         <div class="job-head-info">
           <h1>${he(job.title)}</h1>

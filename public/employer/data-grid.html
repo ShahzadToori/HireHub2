@@ -33,9 +33,14 @@
 .sv-err{background:#dc2626}
 @keyframes svp{0%,100%{opacity:1}50%{opacity:.25}}
 /* ── Bulk bar ── */
-.dg-bulk{display:none;align-items:center;justify-content:space-between;gap:.5rem;flex-wrap:wrap;padding:.5rem .85rem;background:#dbeafe;border:1px solid #93c5fd;border-radius:10px;margin-bottom:.75rem;font-size:.82rem;color:#1d4ed8;font-weight:500}
+.dg-bulk{display:flex;align-items:center;justify-content:space-between;gap:.5rem;flex-wrap:wrap;padding:.5rem .85rem;background:#dbeafe;border:1px solid #93c5fd;border-radius:10px;margin-bottom:.75rem;font-size:.82rem;color:#1d4ed8;font-weight:500}
 [data-theme=dark] .dg-bulk{background:#1e3a5f;border-color:#3b82f6;color:#93c5fd}
 .dg-bulk>div{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
+.dg-bulk.idle{background:var(--surface);border-color:var(--border);color:var(--text-muted);font-weight:400}
+[data-theme=dark] .dg-bulk.idle{background:var(--surface);border-color:var(--border)}
+.dg-bulk .dg-bulk-hint{display:none}
+.dg-bulk.idle .dg-bulk-hint{display:flex;align-items:center;gap:.4rem;font-size:.8rem}
+.dg-bulk.idle #selCount,.dg-bulk.idle>.dg-bulk-controls{display:none!important}
 /* ── Grid wrapper ── */
 #dataGrid{border-radius:12px;overflow:hidden;border:1px solid var(--border);margin-bottom:1.5rem}
 /* ── Tabulator overrides ── */
@@ -219,7 +224,7 @@
     <div class="dg-tr">
       <div class="dg-col-wrap" id="colPickerWrap">
         <button class="ep-btn-outline ep-btn-sm" onclick="toggleColPicker()" title="Choose columns">
-          <i class="bi bi-layout-three-columns me-1"></i>Columns
+          <i class="bi bi-layout-three-columns me-1"></i>Show / Hide Columns
         </button>
         <div class="dg-col-panel" id="colPanel"></div>
       </div>
@@ -242,10 +247,14 @@
   <!-- Filter bar -->
   <div class="dg-filter-bar" id="filterBar"></div>
 
-  <!-- Bulk action bar -->
-  <div class="dg-bulk" id="bulkBar">
+  <!-- Bulk action bar — always visible; idle state when no rows selected -->
+  <div class="dg-bulk idle" id="bulkBar">
+    <div class="dg-bulk-hint">
+      <i class="bi bi-check2-square"></i>
+      <span>Tick rows to select — then bulk-update status or export</span>
+    </div>
     <span id="selCount" style="font-weight:600">0 selected</span>
-    <div>
+    <div class="dg-bulk-controls">
       <select class="ep-input" id="bulkStatus" style="height:30px;font-size:.78rem;padding:.2rem .5rem;width:auto">
         <option value="">Change status…</option>
       </select>
@@ -583,7 +592,7 @@ function buildGrid(type){
     },
     rowSelectionChanged:(data,rows)=>{
       const n=rows.length;
-      document.getElementById('bulkBar').style.display=n?'flex':'none';
+      document.getElementById('bulkBar').classList.toggle('idle',!n);
       document.getElementById('selCount').textContent=n+' selected';
     },
     cellEdited:cell=>{
@@ -672,7 +681,7 @@ function updateBulkOptions(type){
   sel.innerHTML='<option value="">Change status…</option>';
   const opts={jobs:JS,applications:AS};
   (opts[type]||[]).forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s.charAt(0).toUpperCase()+s.slice(1);sel.appendChild(o)});
-  document.getElementById('bulkBar').style.display='none';
+  document.getElementById('bulkBar').classList.add('idle');
 }
 async function applyBulkStatus(){
   const status=document.getElementById('bulkStatus').value;
@@ -861,7 +870,7 @@ function renderColPicker(){
   const cols=table.getColumns().filter(c=>c.getDefinition().field);
   if(!cols.length){panel.innerHTML='<div class="dg-col-item" style="color:var(--text-muted)">No columns</div>';return}
   panel.innerHTML=
-    '<div class="dg-col-hdr"><span>Columns</span><button onclick="resetColPrefs()">Reset</button></div>'+
+    '<div class="dg-col-hdr"><span>Show / Hide Columns</span><button onclick="resetColPrefs()">Reset</button></div>'+
     cols.map(c=>{
       const field=c.getDefinition().field;
       const title=c.getDefinition().title||field;

@@ -238,7 +238,12 @@
         </div>
 
         <!-- WhatsApp Templates -->
-        <div class="section-divider" style="margin-top:1.5rem">WhatsApp Message Templates</div>
+        <div style="border:1.5px solid var(--border);border-radius:10px;margin-top:1.5rem;overflow:hidden">
+          <button onclick="toggleWaTemplates()" style="width:100%;padding:.65rem .85rem;background:var(--surface);border:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:700;color:var(--text-primary)">
+            <span><i class="bi bi-whatsapp me-2" style="color:#25d366"></i>WhatsApp Message Templates</span>
+            <i class="bi bi-chevron-down" id="waTemplatesChevron"></i>
+          </button>
+          <div id="waTemplatesBody" style="display:none;padding:.85rem">
         <p style="font-size:.78rem;color:var(--text-muted);margin-bottom:.65rem">
           Write your own format once — it auto-fills when sharing jobs on WhatsApp.
         </p>
@@ -314,6 +319,9 @@
             <button class="ep-btn-outline ep-btn-sm" onclick="resetTemplate('bulk')" style="font-size:.72rem"><i class="bi bi-arrow-counterclockwise me-1"></i>Reset</button>
           </div>
         </div>
+
+          </div><!-- /waTemplatesBody -->
+        </div><!-- /waTemplates -->
 
         <div id="profileMsg" class="ep-msg d-none mt-3"></div>
         <button class="ep-btn-primary mt-3 w-100" id="saveBtn" onclick="saveProfile()">
@@ -523,6 +531,14 @@ async function init() {
   if (e.company_size) document.getElementById('pSize').value   = e.company_size;
 }
 
+
+  function toggleWaTemplates() {
+    const body = document.getElementById('waTemplatesBody');
+    const chevron = document.getElementById('waTemplatesChevron');
+    const open = body.style.display === 'none';
+    body.style.display = open ? 'block' : 'none';
+    chevron.className = open ? 'bi bi-chevron-up' : 'bi bi-chevron-down';
+  }
 function toggleHowTo() {
   const b = document.getElementById('howToBody');
   const ch = document.getElementById('howToChevron');
