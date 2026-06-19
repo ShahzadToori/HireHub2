@@ -83,6 +83,15 @@ app.use("/", seoRoutes);
 app.use(blogSeoRoutes);
 app.use(blogRoutes);
 app.use(adminUsersRoutes);
+// Robots.txt served dynamically from DB — editable from admin Settings page
+app.get('/robots.txt', async (req, res, next) => {
+  try {
+    const dbConn = require('./db/connection');
+    const [[row]] = await dbConn.query("SELECT `value` FROM settings WHERE `key` = 'robots_txt'");
+    if (row && row.value) return res.type('text/plain').send(row.value);
+    next(); // fall through to static file until DB is seeded
+  } catch { next(); }
+});
 app.use(express.static(path.join(__dirname, '../public')));
 app.use('/admin', express.static(path.join(__dirname, '../admin')));
 

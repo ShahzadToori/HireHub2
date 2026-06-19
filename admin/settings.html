@@ -196,6 +196,31 @@
                          placeholder="google-site-verification=abc123...">
                   <small class="text-muted">Paste the full content= value from your Google Search Console verification meta tag.</small>
                 </div>
+                <div class="col-md-6">
+                  <label class="form-label-custom">Bing Webmaster Verification</label>
+                  <input type="text" class="form-control-custom" name="bing_verify"
+                         placeholder="Paste meta tag content= value from Bing Webmaster Tools">
+                  <small class="text-muted">Bing Webmaster Tools → Settings → Verify → Meta tag method.</small>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label-custom">Google Analytics 4 ID</label>
+                  <input type="text" class="form-control-custom" name="ga4_id"
+                         placeholder="G-XXXXXXXXXX">
+                  <small class="text-muted">GA4 → Admin → Data Streams → Measurement ID.</small>
+                </div>
+                <div class="col-12">
+                  <label class="form-label-custom">Page Title Format</label>
+                  <input type="text" class="form-control-custom" name="meta_title_format"
+                         placeholder="{title} | JobOrbit Gulf">
+                  <small class="text-muted">Use <code>{title}</code> for the dynamic page or job title. Applied on job pages and blog posts.</small>
+                </div>
+                <div class="col-12">
+                  <label class="form-label-custom">Robots.txt</label>
+                  <textarea class="form-control-custom" name="robots_txt" rows="14"
+                    style="font-family:monospace;font-size:.78rem;line-height:1.6"
+                    placeholder="User-agent: *&#10;Allow: /"></textarea>
+                  <small class="text-muted">Served live at <code>/robots.txt</code> immediately after saving. Incorrect rules can block Google — edit carefully.</small>
+                </div>
                 <div class="col-12">
                   <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.85rem 1rem;font-size:.82rem;color:var(--text-muted)">
                     <strong style="color:var(--text)">SEO features active on your site:</strong><br>
