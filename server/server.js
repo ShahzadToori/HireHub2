@@ -21,6 +21,7 @@ const htmlLayout = require('./middleware/htmlLayout');
 const blogRoutes    = require('./routes/blog');
 const blogSeoRoutes = require('./routes/blog-routes');
 const adminUsersRoutes = require('./routes/admin-users');
+const redirectsRoutes  = require('./routes/redirects');
 
 
 const app  = express();
@@ -79,6 +80,28 @@ app.get('/manifest.json', (req, res) => res.status(404).json({}));
 
 // Old "Post a Job" contact-form flow is replaced by the employer self-serve portal
 app.get('/contact.html', (req, res) => res.redirect(301, '/employer/'));
+// ── Redirect middleware (cached, 5 min TTL) ───────────────────
+{
+  let _rdxCache = null, _rdxCacheAt = 0;
+  const _rdxTTL = 300000;
+  const _rdxDb  = require('./db/connection');
+  global._invalidateRedirectCache = () => { _rdxCacheAt = 0; };
+  app.use(async (req, res, next) => {
+    if (req.method !== 'GET' || req.path.startsWith('/api') || req.path.startsWith('/admin')) return next();
+    try {
+      if (!_rdxCache || Date.now() - _rdxCacheAt > _rdxTTL) {
+        const [rows] = await _rdxDb.query('SELECT id,from_path,to_path,redirect_type FROM redirects WHERE is_active=1');
+        _rdxCache = rows; _rdxCacheAt = Date.now();
+      }
+      const match = _rdxCache.find(r => r.from_path === req.path);
+      if (match) {
+        _rdxDb.query('UPDATE redirects SET hits=hits+1 WHERE id=?', [match.id]).catch(() => {});
+        return res.redirect(match.redirect_type, match.to_path);
+      }
+    } catch(e) { /* never block on redirect error */ }
+    next();
+  });
+}
 app.use("/", seoRoutes);
 app.use(blogSeoRoutes);
 app.use(blogRoutes);
@@ -116,6 +139,7 @@ app.get('/api/public/form-schema', async (req, res) => {
 // ── API Routes ────────────────────────────────────────────────
 app.use('/api/auth',      authRoutes);
 app.use('/api/jobs',      jobsRoutes);
+app.use('/api/admin/redirects', redirectsRoutes);
 app.use('/api/admin',     adminRoutes);
 app.use('/api/settings',  settingsRoutes);
 app.use('/api/contact',   contactRoutes);

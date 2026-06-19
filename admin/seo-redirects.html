@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redirects Manager – JobOrbit Admin</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/svg+xml" href="/JobOrbitFavicon.svg">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/admin/css/admin.css">
+  <style>
+    .rdx-badge { display:inline-block;padding:.15rem .6rem;border-radius:100px;font-size:.7rem;font-weight:700;white-space:nowrap }
+    .rdx-301 { background:#dbeafe;color:#1d4ed8 }
+    .rdx-302 { background:#fef3c7;color:#92400e }
+    [data-theme=dark] .rdx-301 { background:rgba(59,130,246,.2);color:#93c5fd }
+    [data-theme=dark] .rdx-302 { background:rgba(245,158,11,.15);color:#fcd34d }
+
+    .rdx-table { border:1px solid var(--border);border-radius:12px;overflow:hidden;width:100% }
+    .rdx-table th { background:var(--surface);font-size:.75rem;font-weight:700;color:var(--text-muted);
+      text-transform:uppercase;letter-spacing:.04em;padding:.65rem 1rem;border-bottom:1px solid var(--border);
+      white-space:nowrap }
+    .rdx-table td { padding:.65rem 1rem;font-size:.84rem;color:var(--text-primary);
+      border-bottom:1px solid var(--border);vertical-align:middle }
+    .rdx-table tr:last-child td { border-bottom:none }
+    .rdx-table tr:hover td { background:var(--surface) }
+
+    .rdx-path { font-family:monospace;font-size:.8rem;color:var(--primary);word-break:break-all }
+    .rdx-to   { font-family:monospace;font-size:.8rem;color:var(--text-secondary);word-break:break-all }
+    .rdx-note { font-size:.76rem;color:var(--text-muted);font-style:italic }
+    .rdx-hits { font-weight:700 }
+
+    .stat-card { background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:1rem 1.25rem }
+    .stat-num  { font-family:'Syne',sans-serif;font-size:1.75rem;font-weight:800;color:var(--text-primary) }
+    .stat-lbl  { font-size:.75rem;color:var(--text-muted);margin-top:.2rem }
+
+    .status-dot { display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:.35rem;flex-shrink:0 }
+    .status-dot.on  { background:#22c55e }
+    .status-dot.off { background:var(--text-muted) }
+
+    .rdx-empty { text-align:center;padding:3rem;color:var(--text-muted) }
+    .rdx-empty i { font-size:2.5rem;display:block;margin-bottom:.5rem }
+
+    .tip-box { background:var(--surface);border:1px solid var(--border);border-radius:8px;
+      padding:.6rem 1rem;font-size:.78rem;color:var(--text-muted);margin-top:.5rem }
+    .tip-box strong { color:var(--text-primary) }
+  </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="admin-sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <img src="/JobOrbitFavicon.svg" alt="JobOrbit" class="sidebar-brand" style="height:40px">
+    <span class="sidebar-brand">JobOrbit</span>
+    <button class="btn-sidebar-close d-lg-none" id="sidebarClose"><i class="bi bi-x-lg"></i></button>
+  </div>
+  <nav class="sidebar-nav">
+    <!-- links injected by admin.js -->
+    <hr class="sidebar-divider">
+    <a href="/" class="sidebar-link" target="_blank"><i class="bi bi-box-arrow-up-right"></i><span>View Site</span></a>
+    <button class="sidebar-link sidebar-btn" id="logoutBtn"><i class="bi bi-box-arrow-right"></i><span>Logout</span></button>
+  </nav>
+</aside>
+<div class="sidebar-overlay d-lg-none d-none" id="sidebarOverlay"></div>
+
+<!-- Main -->
+<div class="admin-main">
+  <header class="admin-topbar">
+    <button class="btn-hamburger d-lg-none" id="sidebarToggle"><i class="bi bi-list fs-4"></i></button>
+    <h1 class="topbar-title"><i class="bi bi-signpost-split me-2"></i>Redirects Manager</h1>
+    <div class="topbar-right">
+      <button class="btn-icon-admin" id="themeToggleAdmin" title="Toggle theme">
+        <i class="bi bi-moon-fill" id="themeIcon"></i>
+      </button>
+    </div>
+  </header>
+
+  <div class="admin-content">
+
+    <!-- Alert -->
+    <div id="rdxAlert" class="alert d-none mb-3" role="alert"></div>
+
+    <!-- Stats -->
+    <div class="row g-3 mb-4">
+      <div class="col-4">
+        <div class="stat-card">
+          <div class="stat-num" id="statTotal">—</div>
+          <div class="stat-lbl">Total</div>
+        </div>
+      </div>
+      <div class="col-4">
+        <div class="stat-card">
+          <div class="stat-num" id="statActive">—</div>
+          <div class="stat-lbl">Active</div>
+        </div>
+      </div>
+      <div class="col-4">
+        <div class="stat-card">
+          <div class="stat-num" id="statHits">—</div>
+          <div class="stat-lbl">Total Hits</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add form -->
+    <div class="admin-card mb-4">
+      <div class="admin-card-header">
+        <h5 class="admin-card-title"><i class="bi bi-plus-circle me-2"></i>Add Redirect</h5>
+      </div>
+      <div class="p-3">
+        <div class="row g-2 align-items-end">
+          <div class="col-md-4">
+            <label class="form-label-custom">From Path <span class="text-danger">*</span></label>
+            <input type="text" class="form-control-custom" id="newFrom" placeholder="/old-page-url">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label-custom">To Path or URL <span class="text-danger">*</span></label>
+            <input type="text" class="form-control-custom" id="newTo" placeholder="/new-page or https://...">
+          </div>
+          <div class="col-md-2">
+            <label class="form-label-custom">Type</label>
+            <select class="form-control-custom" id="newType">
+              <option value="301">301 – Permanent</option>
+              <option value="302">302 – Temporary</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <button class="btn btn-primary w-100" style="height:42px" onclick="addRedirect()">
+              <i class="bi bi-plus me-1"></i>Add
+            </button>
+          </div>
+          <div class="col-12">
+            <input type="text" class="form-control-custom" id="newNote"
+              placeholder="Note (optional) — e.g. 'Renamed from old blog post slug'">
+          </div>
+        </div>
+        <div class="tip-box mt-2">
+          <strong>301 = Permanent</strong> — tells Google to transfer all SEO value to the new URL. Use for URL changes that are final.
+          <strong>302 = Temporary</strong> — Google keeps the old URL indexed. Use only when the change is short-term.
+        </div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="admin-card">
+      <div class="admin-card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <h5 class="admin-card-title mb-0">
+          <i class="bi bi-table me-2"></i>All Redirects
+          <span id="totalBadge" style="font-size:.8rem;color:var(--text-muted);font-weight:400;margin-left:.3rem"></span>
+        </h5>
+        <input type="text" class="form-control-custom" id="searchBox"
+          placeholder="Search paths or notes…"
+          style="width:220px;padding:.35rem .75rem;font-size:.82rem"
+          oninput="debounceSearch()">
+      </div>
+      <div style="overflow-x:auto">
+        <table class="rdx-table">
+          <thead>
+            <tr>
+              <th>From Path</th>
+              <th>To</th>
+              <th>Type</th>
+              <th>Hits</th>
+              <th>Status</th>
+              <th>Note</th>
+              <th style="width:90px">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="rdxBody">
+            <tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text-muted)">
+              <div class="spinner-border spinner-border-sm text-primary"></div>
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div id="rdxPaginationWrap" class="admin-card-header"
+        style="border-top:1px solid var(--border);border-bottom:none;justify-content:center;display:none">
+        <ul class="pagination pagination-sm mb-0" id="rdxPagination"></ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalTitle">
+  <div class="modal-dialog">
+    <div class="modal-content" style="background:var(--bg-card);color:var(--text-primary)">
+      <div class="modal-header" style="border-color:var(--border)">
+        <h5 class="modal-title" id="editModalTitle"><i class="bi bi-pencil me-2"></i>Edit Redirect</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editId">
+        <div class="mb-3">
+          <label class="form-label-custom">From Path</label>
+          <input type="text" class="form-control-custom" id="editFrom">
+        </div>
+        <div class="mb-3">
+          <label class="form-label-custom">To Path or URL</label>
+          <input type="text" class="form-control-custom" id="editTo">
+        </div>
+        <div class="mb-3">
+          <label class="form-label-custom">Type</label>
+          <select class="form-control-custom" id="editType">
+            <option value="301">301 – Permanent</option>
+            <option value="302">302 – Temporary</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label-custom">Note (optional)</label>
+          <input type="text" class="form-control-custom" id="editNote" placeholder="For your reference">
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <input type="checkbox" id="editActive" style="width:16px;height:16px;accent-color:var(--primary);cursor:pointer">
+          <label for="editActive" class="form-label-custom mb-0" style="cursor:pointer">Active</label>
+        </div>
+      </div>
+      <div class="modal-footer" style="border-color:var(--border)">
+        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary" onclick="saveEdit()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/admin/js/admin.js"></script>
+<script>
+'use strict';
+
+let curPage     = 1;
+let searchTimer = null;
+let editModal   = null;
+let rdxMap      = {};   // id -> row object for quick edit lookup
+
+document.addEventListener('DOMContentLoaded', () => {
+  requireAuth().then(() => {
+    loadStats();
+    loadRedirects();
+  });
+  editModal = new bootstrap.Modal(document.getElementById('editModal'));
+});
+
+// ── Stats ──────────────────────────────────────────────────────
+async function loadStats() {
+  try {
+    const d = await adminApi.get('/api/admin/redirects/stats');
+    if (!d.success) return;
+    document.getElementById('statTotal').textContent  = d.total;
+    document.getElementById('statActive').textContent = d.active;
+    document.getElementById('statHits').textContent   = Number(d.hits).toLocaleString();
+  } catch(e) { console.warn('Stats error', e); }
+}
+
+// ── Load table ─────────────────────────────────────────────────
+async function loadRedirects() {
+  const search = document.getElementById('searchBox').value.trim();
+  const params = new URLSearchParams({ page: curPage, limit: 20 });
+  if (search) params.set('search', search);
+  try {
+    const d = await adminApi.get('/api/admin/redirects?' + params);
+    if (!d.success) { showAlert('Failed to load redirects', 'danger'); return; }
+    document.getElementById('totalBadge').textContent = `(${d.total})`;
+    renderTable(d.redirects || []);
+    renderPagination(d.total, 20);
+  } catch(e) { showAlert('Error loading redirects', 'danger'); }
+}
+
+function renderTable(rows) {
+  rdxMap = {};
+  const tbody = document.getElementById('rdxBody');
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="7"><div class="rdx-empty"><i class="bi bi-signpost-split"></i>No redirects yet. Add one above.</div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map(r => {
+    rdxMap[r.id] = r;
+    return `<tr>
+      <td><span class="rdx-path">${escHtml(r.from_path)}</span></td>
+      <td><span class="rdx-to">${escHtml(r.to_path)}</span></td>
+      <td><span class="rdx-badge rdx-${r.redirect_type}">${r.redirect_type}</span></td>
+      <td><span class="rdx-hits">${Number(r.hits||0).toLocaleString()}</span></td>
+      <td>
+        <span class="d-flex align-items-center" style="gap:.25rem;cursor:pointer" onclick="toggleActive(${r.id})" title="Click to toggle">
+          <span class="status-dot ${r.is_active?'on':'off'}"></span>
+          <span style="font-size:.82rem">${r.is_active?'Active':'Inactive'}</span>
+        </span>
+      </td>
+      <td><span class="rdx-note">${escHtml(r.note||'')}</span></td>
+      <td>
+        <button class="btn-icon-admin" style="padding:.25rem .4rem;margin-right:.2rem" onclick="openEdit(${r.id})" title="Edit">
+          <i class="bi bi-pencil"></i>
+        </button>
+        <button class="btn-icon-admin" style="padding:.25rem .4rem;color:#ef4444" onclick="delRedirect(${r.id})" title="Delete">
+          <i class="bi bi-trash"></i>
+        </button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function renderPagination(total, perPage) {
+  const pages = Math.ceil(total / perPage);
+  const wrap  = document.getElementById('rdxPaginationWrap');
+  const ul    = document.getElementById('rdxPagination');
+  if (pages <= 1) { wrap.style.display = 'none'; ul.innerHTML = ''; return; }
+  wrap.style.display = '';
+  let html = '';
+  for (let i = 1; i <= pages; i++) {
+    html += `<li class="page-item${i===curPage?' active':''}">
+      <button class="page-link" onclick="goPage(${i})">${i}</button>
+    </li>`;
+  }
+  ul.innerHTML = html;
+}
+
+function goPage(p) { curPage = p; loadRedirects(); }
+function debounceSearch() {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => { curPage = 1; loadRedirects(); }, 350);
+}
+
+// ── Add ────────────────────────────────────────────────────────
+async function addRedirect() {
+  const from_path     = document.getElementById('newFrom').value.trim();
+  const to_path       = document.getElementById('newTo').value.trim();
+  const redirect_type = document.getElementById('newType').value;
+  const note          = document.getElementById('newNote').value.trim();
+
+  if (!from_path || !to_path) { showAlert('From path and To path are required', 'danger'); return; }
+  try {
+    const d = await adminApi.post('/api/admin/redirects', { from_path, to_path, redirect_type, note, is_active:1 });
+    if (d.success) {
+      showAlert('Redirect added successfully', 'success');
+      document.getElementById('newFrom').value = '';
+      document.getElementById('newTo').value   = '';
+      document.getElementById('newNote').value  = '';
+      curPage = 1;
+      loadRedirects();
+      loadStats();
+    } else { showAlert(d.message || 'Failed to add redirect', 'danger'); }
+  } catch { showAlert('Error adding redirect', 'danger'); }
+}
+
+// ── Edit ───────────────────────────────────────────────────────
+function openEdit(id) {
+  const r = rdxMap[id]; if (!r) return;
+  document.getElementById('editId').value       = r.id;
+  document.getElementById('editFrom').value     = r.from_path;
+  document.getElementById('editTo').value       = r.to_path;
+  document.getElementById('editType').value     = String(r.redirect_type);
+  document.getElementById('editNote').value     = r.note || '';
+  document.getElementById('editActive').checked = !!r.is_active;
+  editModal.show();
+}
+
+async function saveEdit() {
+  const id            = document.getElementById('editId').value;
+  const from_path     = document.getElementById('editFrom').value.trim();
+  const to_path       = document.getElementById('editTo').value.trim();
+  const redirect_type = document.getElementById('editType').value;
+  const note          = document.getElementById('editNote').value.trim();
+  const is_active     = document.getElementById('editActive').checked ? 1 : 0;
+  if (!from_path || !to_path) { showAlert('From and To paths are required', 'danger'); return; }
+  try {
+    const d = await adminApi.put(`/api/admin/redirects/${id}`, { from_path, to_path, redirect_type, note, is_active });
+    if (d.success) {
+      editModal.hide();
+      showAlert('Redirect updated', 'success');
+      loadRedirects(); loadStats();
+    } else { showAlert(d.message || 'Failed to update', 'danger'); }
+  } catch { showAlert('Error updating redirect', 'danger'); }
+}
+
+// ── Toggle active ──────────────────────────────────────────────
+async function toggleActive(id) {
+  try {
+    const d = await adminApi.patch(`/api/admin/redirects/${id}/toggle`);
+    if (d.success) { loadRedirects(); loadStats(); }
+    else showAlert('Toggle failed', 'danger');
+  } catch { showAlert('Error toggling redirect', 'danger'); }
+}
+
+// ── Delete ─────────────────────────────────────────────────────
+async function delRedirect(id) {
+  const r = rdxMap[id];
+  if (!confirm(`Delete redirect:\n${r ? r.from_path : id}\n\nThis cannot be undone.`)) return;
+  try {
+    const d = await adminApi.del(`/api/admin/redirects/${id}`);
+    if (d.success) { showAlert('Redirect deleted', 'success'); loadRedirects(); loadStats(); }
+    else showAlert(d.message || 'Failed to delete', 'danger');
+  } catch { showAlert('Error deleting redirect', 'danger'); }
+}
+
+// ── Alert ──────────────────────────────────────────────────────
+function showAlert(msg, type) {
+  const el = document.getElementById('rdxAlert');
+  el.className = `alert alert-${type}`;
+  el.textContent = msg;
+  el.classList.remove('d-none');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.add('d-none'), 4000);
+}
+</script>
+</body>
+</html>
