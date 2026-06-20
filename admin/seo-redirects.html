@@ -143,6 +143,38 @@
       </div>
     </div>
 
+    <!-- CSV Import -->
+    <div class="admin-card mb-4">
+      <div class="admin-card-header">
+        <h5 class="admin-card-title"><i class="bi bi-file-earmark-spreadsheet me-2"></i>Bulk Import (CSV)</h5>
+      </div>
+      <div class="p-3">
+        <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:.75rem">
+          Import many redirects at once. CSV columns: <code>from_path, to_path, type, note</code>
+          — type and note are optional (default: 301).
+          <a href="#" onclick="dlSample();return false" style="color:var(--primary);margin-left:.5rem">
+            <i class="bi bi-download me-1"></i>Download sample CSV
+          </a>
+        </p>
+        <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
+          <input type="file" id="csvFile" accept=".csv,.txt"
+            class="form-control-custom" style="max-width:280px;padding:.35rem .75rem">
+          <button class="btn btn-outline-secondary" onclick="previewCSV()">
+            <i class="bi bi-eye me-1"></i>Preview
+          </button>
+        </div>
+        <div id="csvPreview" style="display:none">
+          <div id="csvTable" style="overflow-x:auto;border:1px solid var(--border);border-radius:8px;margin-bottom:.75rem"></div>
+          <div class="d-flex gap-2 align-items-center">
+            <button class="btn btn-primary" onclick="importCSV()">
+              <i class="bi bi-upload me-1"></i>Import <span id="csvCount">0</span> Redirects
+            </button>
+            <span id="csvMsg" style="font-size:.82rem"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Table -->
     <div class="admin-card">
       <div class="admin-card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
@@ -393,6 +425,94 @@ async function delRedirect(id) {
     if (d.success) { showAlert('Redirect deleted', 'success'); loadRedirects(); loadStats(); }
     else showAlert(d.message || 'Failed to delete', 'danger');
   } catch { showAlert('Error deleting redirect', 'danger'); }
+}
+
+// ── CSV Import ─────────────────────────────────────────────────
+let _csvRows = [];
+
+function parseCSVLine(line) {
+  const cols = []; let cur = '', inQ = false;
+  for (let i=0; i<line.length; i++) {
+    const ch = line[i];
+    if (ch==='"' && !inQ) { inQ=true; continue; }
+    if (ch==='"' && inQ)  { inQ=false; continue; }
+    if (ch===',' && !inQ) { cols.push(cur.trim()); cur=''; continue; }
+    cur += ch;
+  }
+  cols.push(cur.trim());
+  return cols;
+}
+
+function previewCSV() {
+  const file = document.getElementById('csvFile').files[0];
+  if (!file) { showAlert('Select a CSV file first', 'danger'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    const lines = e.target.result.split(/\r?\n/).filter(l => l.trim() && !l.startsWith('#'));
+    _csvRows = [];
+    let skipped = 0;
+    for (const line of lines) {
+      const [from_path, to_path, redirect_type, note] = parseCSVLine(line);
+      if (!from_path || from_path.toLowerCase()==='from_path') continue; // skip header
+      if (!to_path) { skipped++; continue; }
+      _csvRows.push({ from_path, to_path, redirect_type: redirect_type||'301', note: note||'' });
+    }
+    if (!_csvRows.length) {
+      document.getElementById('csvPreview').style.display='none';
+      showAlert(`No valid rows found${skipped?' ('+skipped+' rows missing to_path)':''}`, 'danger');
+      return;
+    }
+    document.getElementById('csvCount').textContent = _csvRows.length;
+    document.getElementById('csvMsg').textContent = skipped ? `(${skipped} rows skipped — missing to_path)` : '';
+    document.getElementById('csvMsg').style.color = 'var(--text-muted)';
+    const rows = _csvRows.slice(0,10).map(r =>
+      `<tr>
+        <td style="font-family:monospace;font-size:.8rem;padding:.5rem .75rem">${escHtml(r.from_path)}</td>
+        <td style="font-family:monospace;font-size:.8rem;padding:.5rem .75rem">${escHtml(r.to_path)}</td>
+        <td style="padding:.5rem .75rem"><span class="rdx-badge rdx-${r.redirect_type}">${escHtml(r.redirect_type)}</span></td>
+        <td style="font-size:.78rem;color:var(--text-muted);padding:.5rem .75rem">${escHtml(r.note)}</td>
+      </tr>`
+    ).join('');
+    document.getElementById('csvTable').innerHTML = `
+      <table style="width:100%;border-collapse:collapse">
+        <thead><tr style="background:var(--surface);font-size:.75rem;text-transform:uppercase;color:var(--text-muted)">
+          <th style="padding:.5rem .75rem;text-align:left">From</th>
+          <th style="padding:.5rem .75rem;text-align:left">To</th>
+          <th style="padding:.5rem .75rem;text-align:left">Type</th>
+          <th style="padding:.5rem .75rem;text-align:left">Note</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      ${_csvRows.length>10 ? `<div style="padding:.4rem .75rem;font-size:.78rem;color:var(--text-muted)">…and ${_csvRows.length-10} more rows</div>` : ''}`;
+    document.getElementById('csvPreview').style.display='';
+  };
+  reader.readAsText(file);
+}
+
+async function importCSV() {
+  if (!_csvRows.length) return;
+  const btn = document.querySelector('#csvPreview .btn-primary');
+  btn.disabled=true; btn.textContent='Importing…';
+  try {
+    const d = await adminApi.post('/api/admin/redirects/bulk', { redirects:_csvRows });
+    if (d.success) {
+      const msg = `✅ Imported ${d.imported}${d.skipped?' · '+d.skipped+' duplicates skipped':''}${d.errors?.length?' · '+d.errors.length+' errors':''}`;
+      showAlert(msg, d.imported>0?'success':'warning');
+      document.getElementById('csvPreview').style.display='none';
+      document.getElementById('csvFile').value='';
+      _csvRows=[];
+      loadRedirects(); loadStats();
+    } else { showAlert(d.message||'Import failed', 'danger'); }
+  } catch { showAlert('Error during import', 'danger'); }
+  btn.disabled=false; btn.textContent='Import';
+}
+
+function dlSample() {
+  const csv = 'from_path,to_path,type,note\n/old-page,/new-page,301,Renamed article\n/blog/old-slug,/blog/new-slug,301,Blog URL change\n/contact,/feedback.html,302,Temporary redirect';
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'redirects-sample.csv';
+  a.click();
 }
 
 // ── Alert ──────────────────────────────────────────────────────

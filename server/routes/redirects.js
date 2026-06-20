@@ -88,6 +88,34 @@ router.patch('/:id/toggle', requireAdmin, async (req, res) => {
   } catch(err) { res.status(500).json({ success:false }); }
 });
 
+// POST /api/admin/redirects/bulk — CSV import
+router.post('/bulk', requireAdmin, async (req, res) => {
+  const { redirects } = req.body;
+  if (!Array.isArray(redirects) || !redirects.length)
+    return res.status(400).json({ success:false, message:'No redirects provided' });
+  let imported=0, skipped=0;
+  const errs=[];
+  for (let r of redirects) {
+    let { from_path, to_path, redirect_type=301, note='' } = r;
+    if (!from_path || !to_path) { errs.push(`Missing from/to for row`); continue; }
+    if (!from_path.startsWith('/') && !from_path.startsWith('http')) from_path='/'+from_path;
+    redirect_type=[301,302].includes(parseInt(redirect_type))?parseInt(redirect_type):301;
+    if (from_path.trim()===to_path.trim()) { errs.push(`${from_path}: same from/to`); continue; }
+    try {
+      await db.query(
+        'INSERT INTO redirects (from_path,to_path,redirect_type,note,is_active) VALUES(?,?,?,?,1)',
+        [from_path.trim(), to_path.trim(), redirect_type, (note||'').trim()]
+      );
+      imported++;
+    } catch(e) {
+      if (e.code==='ER_DUP_ENTRY') skipped++;
+      else errs.push(`${from_path}: ${e.message}`);
+    }
+  }
+  bustCache();
+  res.json({ success:true, imported, skipped, errors:errs.slice(0,10) });
+});
+
 // DELETE /api/admin/redirects/:id
 router.delete('/:id', requireAdmin, async (req, res) => {
   try {

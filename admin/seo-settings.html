@@ -169,6 +169,44 @@
       </div>
     </form>
 
+    <!-- ── Robots.txt URL Tester ──────────────────────────────── -->
+    <div class="admin-card mt-4" style="border-color:rgba(239,68,68,.3)">
+      <div class="admin-card-header" style="background:rgba(239,68,68,.05)">
+        <h5 class="admin-card-title">
+          <i class="bi bi-robot me-2" style="color:#ef4444"></i>Robots.txt URL Tester
+        </h5>
+      </div>
+      <div class="p-3">
+        <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:1rem">
+          Test any URL against your <strong>current draft</strong> robots.txt rules before saving.
+          Prevents accidentally blocking Google.
+        </p>
+        <div class="row g-2 align-items-end">
+          <div class="col-md-5">
+            <label class="form-label-custom">URL Path</label>
+            <input type="text" class="form-control-custom" id="rtUrl"
+              placeholder="/admin/ or /job/welder-jubail">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label-custom">Bot</label>
+            <select class="form-control-custom" id="rtBot">
+              <option value="*">All Bots (*)</option>
+              <option value="googlebot">Googlebot</option>
+              <option value="bingbot">Bingbot</option>
+              <option value="twitterbot">Twitterbot</option>
+              <option value="facebookexternalhit">Facebook</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <button class="btn btn-outline-secondary w-100" onclick="testRobots()">
+              <i class="bi bi-search me-1"></i>Test
+            </button>
+          </div>
+          <div class="col-12" id="rtResult" style="display:none"></div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -208,6 +246,71 @@ document.getElementById('seoForm').addEventListener('submit', async (e) => {
     }
   } catch { showAlert('Error saving settings', 'danger'); }
 });
+
+function testRobots() {
+  const url = document.getElementById('rtUrl').value.trim();
+  const bot = document.getElementById('rtBot').value;
+  const txt = document.querySelector('[name="robots_txt"]')?.value || '';
+  const res = document.getElementById('rtResult');
+  if (!url) {
+    res.style.display = '';
+    res.innerHTML = '<div style="padding:.5rem 1rem;font-size:.82rem;color:#f59e0b">Enter a URL path to test.</div>';
+    return;
+  }
+  const result = _checkRobots(txt, url, bot);
+  res.style.display = '';
+  if (result.allowed) {
+    res.innerHTML = `<div style="background:#d1fae5;border:1px solid #a7f3d0;border-radius:8px;padding:.65rem 1rem;font-size:.84rem;color:#065f46">
+      <i class="bi bi-check-circle-fill me-1"></i><strong>Allowed</strong>
+      ${result.rule ? '— matched rule: <code>'+result.rule+'</code>' : '— ' + result.reason}
+    </div>`;
+  } else {
+    res.innerHTML = `<div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:8px;padding:.65rem 1rem;font-size:.84rem;color:#991b1b">
+      <i class="bi bi-x-circle-fill me-1"></i><strong>Blocked</strong>
+      — matched rule: <code>${result.rule}</code>
+    </div>`;
+  }
+}
+
+function _parseRobots(content) {
+  const groups = [];
+  let agents = [], rules = { allow:[], disallow:[] }, inGroup = false;
+  for (const rawLine of content.split('\n')) {
+    const line = rawLine.split('#')[0].trim();
+    if (!line) {
+      if (inGroup && agents.length) { groups.push({ agents, rules }); agents=[]; rules={allow:[],disallow:[]}; inGroup=false; }
+      continue;
+    }
+    const ci = line.indexOf(':'); if (ci<0) continue;
+    const key = line.slice(0,ci).trim().toLowerCase();
+    const val = line.slice(ci+1).trim();
+    if (key==='user-agent') {
+      if (inGroup && (rules.allow.length||rules.disallow.length)) { groups.push({agents,rules}); agents=[]; rules={allow:[],disallow:[]}; }
+      agents.push(val.toLowerCase()); inGroup=true;
+    } else if (key==='allow')    { rules.allow.push(val); }
+      else if (key==='disallow') { rules.disallow.push(val); }
+  }
+  if (inGroup && agents.length) groups.push({ agents, rules });
+  return groups;
+}
+
+function _checkRobots(content, url, botName) {
+  const groups  = _parseRobots(content);
+  const urlPath = url.startsWith('/') ? url : '/'+url;
+  const target  = botName.toLowerCase();
+  const group   = groups.find(g=>g.agents.includes(target)) || groups.find(g=>g.agents.includes('*'));
+  if (!group) return { allowed:true, rule:null, reason:'No rules found — allowed by default' };
+  let bestLen=-1, bestRule=null, bestType=null;
+  for (const a of group.rules.allow) {
+    if ((a===''||urlPath.startsWith(a)) && a.length>bestLen) { bestLen=a.length; bestRule=a; bestType='allow'; }
+  }
+  for (const d of group.rules.disallow) {
+    if (d && urlPath.startsWith(d) && d.length>bestLen) { bestLen=d.length; bestRule=d; bestType='disallow'; }
+  }
+  if (bestType==='allow')    return { allowed:true,  rule:'Allow: '+bestRule };
+  if (bestType==='disallow') return { allowed:false, rule:'Disallow: '+bestRule };
+  return { allowed:true, rule:null, reason:'No matching rule — allowed by default' };
+}
 
 function showAlert(msg, type) {
   const el = document.getElementById('seoAlert');
