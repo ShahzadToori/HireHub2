@@ -211,6 +211,17 @@ function renderPages(s) {
               onkeyup="updatePreview('${page.key}')">${escHtml(s[page.key+'_desc']||'')}</textarea>
             <div id="${page.key}_desc_count" class="char-count ok">0 / 158</div>
           </div>
+          <div class="col-12">
+            <label class="form-label-custom">
+              OG Image URL
+              <span style="font-size:.72rem;color:var(--text-muted);font-weight:400;margin-left:.4rem">optional · 1200×630px · shown on WhatsApp/LinkedIn share</span>
+            </label>
+            <input type="url" class="form-control-custom"
+              id="${page.key}_og_image"
+              value="${escHtml(s[page.key+'_og_image']||'')}"
+              placeholder="https://joborbit.org/images/share-preview.jpg">
+            <small class="text-muted">Leave blank to use the site-wide OG image from SEO Settings.</small>
+          </div>
         </div>
 
         <!-- SERP Preview -->
@@ -258,8 +269,9 @@ async function flushCache() {
 async function saveAll() {
   const body = {};
   PAGES.forEach(page => {
-    body[page.key+'_title'] = (document.getElementById(page.key+'_title')?.value || '').trim();
-    body[page.key+'_desc']  = (document.getElementById(page.key+'_desc')?.value  || '').trim();
+    body[page.key+'_title']    = (document.getElementById(page.key+'_title')?.value    || '').trim();
+    body[page.key+'_desc']     = (document.getElementById(page.key+'_desc')?.value     || '').trim();
+    body[page.key+'_og_image'] = (document.getElementById(page.key+'_og_image')?.value || '').trim();
   });
 
   try {

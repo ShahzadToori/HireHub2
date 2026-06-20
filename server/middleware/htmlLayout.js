@@ -48,7 +48,7 @@ const META_TTL = 300000; // 5 min
 async function loadMetaCache() {
   try {
     const [rows] = await db.query(
-      "SELECT \`key\`, \`value\` FROM settings WHERE \`key\` LIKE 'meta_%' OR \`key\` = 'ga4_id'"
+      "SELECT \`key\`, \`value\` FROM settings WHERE \`key\` LIKE 'meta_%' OR \`key\` IN ('ga4_id','og_image','site_url')"
     );
     const c = {};
     rows.forEach(r => { c[r.key] = r.value; });
@@ -80,6 +80,38 @@ function injectMeta(html, urlPath) {
       html = html.replace(/<\/title>/i,
         `</title>\n  <meta name="description" content="${esc(desc)}">`);
     }
+  }
+  // Mirror custom title → og:title + twitter:title
+  if (title) {
+    html = html.replace(/<meta\s+property=["']og:title["'][^>]*>/i,
+      `<meta property="og:title" content="${esc(title)}">`);
+    html = html.replace(/<meta\s+name=["']twitter:title["'][^>]*>/i,
+      `<meta name="twitter:title" content="${esc(title)}">`);
+  }
+  // Mirror custom description → og:description + twitter:description
+  if (desc) {
+    html = html.replace(/<meta\s+property=["']og:description["'][^>]*>/i,
+      `<meta property="og:description" content="${esc(desc)}">`);
+    html = html.replace(/<meta\s+name=["']twitter:description["'][^>]*>/i,
+      `<meta name="twitter:description" content="${esc(desc)}">`);
+  }
+  // Per-page OG image (falls back to site-wide og_image)
+  const _ogImg = (_metaCache[key + '_og_image'] || _metaCache['og_image'] || '').trim();
+  if (_ogImg) {
+    if (/<meta\s+property=["']og:image["']/i.test(html)) {
+      html = html.replace(/<meta\s+property=["']og:image["'][^>]*>/i,
+        `<meta property="og:image" content="${esc(_ogImg)}">`);
+    } else {
+      html = html.replace('</head>', `  <meta property="og:image" content="${esc(_ogImg)}">
+</head>`);
+    }
+  }
+  // Fix og:url to full absolute URL
+  const _su = (_metaCache['site_url'] || '').replace(/\/+$/, '');
+  if (_su) {
+    const _ogUrl = _su + (urlPath === '/' ? '/' : urlPath);
+    html = html.replace(/<meta\s+property=["']og:url["'][^>]*>/i,
+      `<meta property="og:url" content="${esc(_ogUrl)}">`);
   }
   // Inject GA4 tracking script if configured
   const _ga4 = (_metaCache['ga4_id'] || '').trim();
