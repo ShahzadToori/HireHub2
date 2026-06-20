@@ -93,7 +93,11 @@ app.get('/contact.html', (req, res) => res.redirect(301, '/employer/'));
         const [rows] = await _rdxDb.query('SELECT id,from_path,to_path,redirect_type FROM redirects WHERE is_active=1');
         _rdxCache = rows; _rdxCacheAt = Date.now();
       }
-      const match = _rdxCache.find(r => r.from_path === req.path);
+      const _rp = req.path.replace(/\/+$/, '') || '/';
+      const match = _rdxCache.find(r => {
+        const _fp = r.from_path.replace(/\/+$/, '') || '/';
+        return _fp.toLowerCase() === _rp.toLowerCase();
+      });
       if (match) {
         _rdxDb.query('UPDATE redirects SET hits=hits+1 WHERE id=?', [match.id]).catch(() => {});
         return res.redirect(match.redirect_type, match.to_path);

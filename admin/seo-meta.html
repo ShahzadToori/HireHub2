@@ -90,10 +90,7 @@
     <button class="btn-hamburger d-lg-none" id="sidebarToggle"><i class="bi bi-list fs-4"></i></button>
     <h1 class="topbar-title"><i class="bi bi-tags me-2"></i>Page Meta Tags</h1>
     <div class="topbar-right">
-      <button class="btn btn-primary" style="padding:.4rem 1.1rem;font-size:.85rem" onclick="saveAll()">
-        <i class="bi bi-floppy me-1"></i>Save All
-      </button>
-      <button class="btn-icon-admin ms-2" id="themeToggleAdmin" title="Toggle theme">
+      <button class="btn-icon-admin" id="themeToggleAdmin" title="Toggle theme">
         <i class="bi bi-moon-fill" id="themeIcon"></i>
       </button>
     </div>
@@ -103,6 +100,16 @@
 
     <!-- Alert -->
     <div id="metaAlert" class="alert d-none mb-3" role="alert"></div>
+
+    <!-- Action bar -->
+    <div class="d-flex gap-2 mb-3">
+      <button class="btn btn-primary" onclick="saveAll()">
+        <i class="bi bi-floppy me-1"></i>Save All
+      </button>
+      <button class="btn btn-outline-secondary" onclick="flushCache()" title="Apply changes immediately without waiting 5 minutes">
+        <i class="bi bi-arrow-clockwise me-1"></i>Flush Cache
+      </button>
+    </div>
 
     <!-- Tips -->
     <div class="tip-box">
@@ -121,8 +128,11 @@
     </div>
 
     <!-- Save button (bottom) -->
-    <div style="text-align:right;margin-top:1rem">
-      <button class="btn btn-primary" style="padding:.5rem 1.5rem" onclick="saveAll()">
+    <div class="d-flex gap-2 justify-content-end mt-3">
+      <button class="btn btn-outline-secondary" onclick="flushCache()">
+        <i class="bi bi-arrow-clockwise me-1"></i>Flush Cache
+      </button>
+      <button class="btn btn-primary" onclick="saveAll()">
         <i class="bi bi-floppy me-1"></i>Save All Changes
       </button>
     </div>
@@ -236,6 +246,13 @@ function updatePreview(key) {
   const descEl  = document.getElementById(key+'_prev_desc');
   if (titleEl) titleEl.textContent = title || (page ? page.label + ' | JobOrbit Gulf' : '');
   if (descEl)  descEl.textContent  = desc;
+}
+
+async function flushCache() {
+  try {
+    const data = await adminApi.post('/api/settings/flush-meta-cache', {});
+    showAlert(data.success ? 'Cache flushed — changes now live immediately.' : 'Flush failed', data.success ? 'success' : 'danger');
+  } catch { showAlert('Error flushing cache', 'danger'); }
 }
 
 async function saveAll() {

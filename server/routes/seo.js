@@ -327,7 +327,15 @@ router.get('/job/:slug', async (req, res, next) => {
     const siteUrl  = await getSiteUrl();
     const siteName = await getSiteName();
     const logoUrl  = await getLogoUrl();
+    const titleFmt = await getSetting('meta_title_format', '');
+    const ga4Id    = await getSetting('ga4_id', '');
     const logoSrc  = logoUrl.startsWith('http') ? logoUrl : `${siteUrl}${logoUrl}`;
+    const pageTitle = titleFmt
+      ? titleFmt.replace('{title}', job.title||'').replace('{company}', job.company||'').replace('{site}', siteName||'')
+      : `${job.title} at ${job.company} – ${siteName}`;
+    const ga4Script = ga4Id
+      ? `  <!-- Google Analytics 4 -->\n  <script async src="https://www.googletagmanager.com/gtag/js?id=${ga4Id}"></script>\n  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${ga4Id}');</script>`
+      : '';
 
     // Employer logo (for employer-posted jobs)
     let employerLogo = '';
@@ -432,7 +440,7 @@ const contactBtns = [
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>${he(job.title)} at ${he(job.company)} – ${he(siteName)}</title>
+  <title>${he(pageTitle)}</title>
   <meta name="description" content="${he(metaDesc)}">
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
   <link rel="canonical" href="${he(canonical)}">
@@ -567,6 +575,7 @@ const contactBtns = [
       .mobile-apply-bar .apply-cta{margin:0}
     }
   </style>
+${ga4Script}
 </head>
 <body>
 

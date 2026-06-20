@@ -48,7 +48,7 @@ const META_TTL = 300000; // 5 min
 async function loadMetaCache() {
   try {
     const [rows] = await db.query(
-      "SELECT \`key\`, \`value\` FROM settings WHERE \`key\` LIKE 'meta_%'"
+      "SELECT \`key\`, \`value\` FROM settings WHERE \`key\` LIKE 'meta_%' OR \`key\` = 'ga4_id'"
     );
     const c = {};
     rows.forEach(r => { c[r.key] = r.value; });
@@ -80,6 +80,12 @@ function injectMeta(html, urlPath) {
       html = html.replace(/<\/title>/i,
         `</title>\n  <meta name="description" content="${esc(desc)}">`);
     }
+  }
+  // Inject GA4 tracking script if configured
+  const _ga4 = (_metaCache['ga4_id'] || '').trim();
+  if (_ga4) {
+    html = html.replace('</head>',
+      `  <!-- Google Analytics 4 -->\n  <script async src="https://www.googletagmanager.com/gtag/js?id=${_ga4}"></script>\n  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${_ga4}');</script>\n</head>`);
   }
   return html;
 }

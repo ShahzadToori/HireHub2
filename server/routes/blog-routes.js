@@ -8,6 +8,7 @@ const express = require('express');
 const router  = express.Router();
 const path    = require('path');
 const fs      = require('fs');
+const db      = require('../db/connection');
 
 const PUBLIC_DIR = path.join(__dirname, '../../public');
 
@@ -30,10 +31,73 @@ router.get('/blog/:slug', async (req, res) => {
       if (err) res.status(404).send('Not found');
     });
   }
-  // Serve dynamic article page
-  res.sendFile(path.join(PUBLIC_DIR, 'blog', 'article.html'), err => {
-    if (err) res.status(404).send('Article not found');
-  });
+  // SSR: inject real meta tags from DB before serving article.html
+  try {
+    const [[article]] = await db.query(
+      "SELECT title,slug,excerpt,content,featured_image,meta_title,meta_description,"
+      + "author,reading_time,category,published_at "
+      + "FROM blog_articles WHERE slug=? AND status='published' LIMIT 1",
+      [slug]
+    );
+
+    if (!article) {
+      return res.status(404).sendFile(path.join(PUBLIC_DIR, 'blog', 'article.html'),
+        err => err && res.status(404).send('Article not found'));
+    }
+
+    // Increment view count async (don't block response)
+    db.query('UPDATE blog_articles SET views=views+1 WHERE slug=?', [slug]).catch(() => {});
+
+    // Load site URL for canonical
+    const [[siteRow]] = await db.query("SELECT `value` FROM settings WHERE `key`='site_url'");
+    const siteUrl = (siteRow && siteRow.value) || 'https://joborbit.org';
+
+    const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+    const title     = article.meta_title        || article.title;
+    const desc      = article.meta_description  || article.excerpt || '';
+    const canonical = `${siteUrl}/blog/${article.slug}`;
+    const ogImage   = article.featured_image    || `${siteUrl}/uploads/logo-1772305890056.svg`;
+    const pubDate   = article.published_at ? new Date(article.published_at).toISOString() : '';
+
+    const jsonLd = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type':    'BlogPosting',
+      headline:   title,
+      description: desc,
+      image:      ogImage,
+      datePublished: pubDate,
+      author:     { '@type': 'Organization', name: 'JobOrbit' },
+      publisher:  { '@type': 'Organization', name: 'JobOrbit', url: siteUrl },
+      url:        canonical
+    });
+
+    let html = fs.readFileSync(path.join(PUBLIC_DIR, 'blog', 'article.html'), 'utf8');
+
+    html = html
+      .replace('<title id="page-title">Article \u2013 JobOrbit Blog</title>',
+               `<title id="page-title">${esc(title)} \u2013 JobOrbit Blog</title>`)
+      .replace('<meta name="description" id="page-desc" content="">',
+               `<meta name="description" id="page-desc" content="${esc(desc)}">`)
+      .replace('<meta property="og:title" id="og-title" content="">',
+               `<meta property="og:title" id="og-title" content="${esc(title)}">`)
+      .replace('<meta property="og:description" id="og-desc" content="">',
+               `<meta property="og:description" id="og-desc" content="${esc(desc)}">`)
+      .replace('<meta property="og:image" id="og-image" content="">',
+               `<meta property="og:image" id="og-image" content="${esc(ogImage)}">`)
+      .replace('<link rel="canonical" id="page-canonical" href="">',
+               `<link rel="canonical" id="page-canonical" href="${esc(canonical)}">`)
+      .replace('</head>',
+               `<script type="application/ld+json">${jsonLd}</script>\n</head>`);
+
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Cache-Control', 'public, max-age=300'); // 5 min cache
+    res.send(html);
+  } catch(e) {
+    console.error('[Blog SSR]', e.message);
+    res.sendFile(path.join(PUBLIC_DIR, 'blog', 'article.html'),
+      err => err && res.status(500).send('Server error'));
+  }
 });
 
 module.exports = router;

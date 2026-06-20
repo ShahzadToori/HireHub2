@@ -40,4 +40,13 @@ router.put('/', requireAdmin, async (req, res) => {
   }
 });
 
+// POST /api/settings/flush-meta-cache
+router.post('/flush-meta-cache', requireAdmin, async (req, res) => {
+  try {
+    const layout = require('../middleware/htmlLayout');
+    if (typeof layout.reloadMeta === 'function') await layout.reloadMeta();
+    res.json({ success:true, message:'Meta cache refreshed' });
+  } catch(e) { res.status(500).json({ success:false }); }
+});
+
 module.exports = router;
