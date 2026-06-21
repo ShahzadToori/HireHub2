@@ -21,8 +21,7 @@ const htmlLayout = require('./middleware/htmlLayout');
 const blogRoutes    = require('./routes/blog');
 const blogSeoRoutes = require('./routes/blog-routes');
 const adminUsersRoutes = require('./routes/admin-users');
-const redirectsRoutes       = require('./routes/redirects');
-const adminEmployersRoutes  = require('./routes/admin-employers');
+const redirectsRoutes  = require('./routes/redirects');
 
 
 const app  = express();
@@ -144,9 +143,8 @@ app.get('/api/public/form-schema', async (req, res) => {
 // ── API Routes ────────────────────────────────────────────────
 app.use('/api/auth',      authRoutes);
 app.use('/api/jobs',      jobsRoutes);
-app.use('/api/admin/redirects',  redirectsRoutes);
-app.use('/api/admin/employers',  adminEmployersRoutes);
-app.use('/api/admin',            adminRoutes);
+app.use('/api/admin/redirects', redirectsRoutes);
+app.use('/api/admin',     adminRoutes);
 app.use('/api/settings',  settingsRoutes);
 app.use('/api/contact',   contactRoutes);
 app.use('/api/alerts',    alertsRouter);

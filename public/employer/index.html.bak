@@ -371,12 +371,7 @@ async function doRegister() {
 
   try {
     const d = await API.post('/api/employer/register', data);
-    if (d.success && d.pending) {
-      // Account created but needs admin approval — show message, no redirect
-      showMsg(msg, d.message, 'success');
-      btn.innerHTML = '<i class="bi bi-clock me-2"></i>Application Submitted';
-      // Don't re-enable button — prevent duplicate submissions
-    } else if (d.success) {
+    if (d.success) {
       window.location.href = '/employer/dashboard.html';
     } else {
       showMsg(msg, d.message || 'Registration failed', 'error');

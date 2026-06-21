@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Employers – JobOrbit Admin</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/svg+xml" href="/JobOrbitFavicon.svg">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/admin/css/admin.css">
+  <style>
+    /* ── Status badges ─────────────────────────────────────────── */
+    .status-badge{display:inline-flex;align-items:center;font-size:.7rem;font-weight:700;padding:.18rem .55rem;border-radius:100px;text-transform:capitalize;white-space:nowrap}
+    .status-active    {background:#d1fae5;color:#065f46}
+    .status-pending   {background:#fef3c7;color:#92400e}
+    .status-suspended {background:#fee2e2;color:#991b1b}
+    [data-theme="dark"] .status-active    {background:rgba(16,185,129,.18);color:#6ee7b7}
+    [data-theme="dark"] .status-pending   {background:rgba(245,158,11,.18);color:#fcd34d}
+    [data-theme="dark"] .status-suspended {background:rgba(239,68,68,.18);color:#fca5a5}
+
+    /* ── Filter status tabs ────────────────────────────────────── */
+    .status-tabs{display:flex;gap:.35rem;flex-wrap:wrap}
+    .status-tab{display:inline-flex;align-items:center;gap:.35rem;padding:.32rem .8rem;border-radius:100px;border:1.5px solid var(--border);background:transparent;font-size:.78rem;font-weight:600;color:var(--text-muted);cursor:pointer;transition:all .18s;white-space:nowrap}
+    .status-tab:hover{border-color:var(--primary);color:var(--primary)}
+    .status-tab.active{border-color:var(--primary);background:rgba(15,98,254,.1);color:var(--primary)}
+    .status-tab .tab-count{background:var(--primary);color:#fff;border-radius:100px;font-size:.65rem;padding:.05rem .38rem;min-width:18px;text-align:center}
+    .status-tab.active .tab-count{background:#fff;color:var(--primary)}
+    .status-tab.tab-pending.active{border-color:#d97706;background:rgba(217,119,6,.1);color:#92400e}
+    .status-tab.tab-pending.active .tab-count{background:#d97706;color:#fff}
+    .status-tab.tab-suspended.active{border-color:#dc2626;background:rgba(220,38,38,.08);color:#991b1b}
+    .status-tab.tab-suspended.active .tab-count{background:#dc2626;color:#fff}
+
+    /* ── Search row ─────────────────────────────────────────────── */
+    .filter-row{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin-bottom:.75rem}
+    .filter-search{flex:1;min-width:180px}
+
+    /* ── Pagination ─────────────────────────────────────────────── */
+    .pag-wrap{display:flex;justify-content:space-between;align-items:center;padding:.75rem 1rem;border-top:1px solid var(--border);flex-wrap:wrap;gap:.5rem}
+    .pag-info{font-size:.8rem;color:var(--text-muted)}
+    .pagination{margin:0;flex-wrap:nowrap}
+    .page-link{color:var(--primary);background:var(--bg-card);border-color:var(--border);font-size:.82rem;padding:.3rem .6rem}
+    .page-item.active .page-link{background:var(--primary);border-color:var(--primary);color:#fff}
+    .page-item.disabled .page-link{color:var(--text-muted);background:var(--surface)}
+
+    /* ── Employer mobile cards ──────────────────────────────────── */
+    .emp-mob-card{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:.9rem;margin-bottom:.6rem}
+    .emp-mob-name{font-weight:700;font-size:.9rem;color:var(--text)}
+    .emp-mob-sub{font-size:.78rem;color:var(--text-muted);margin-top:.1rem}
+    .emp-mob-meta{font-size:.75rem;color:var(--text-muted);margin-top:.4rem}
+
+    @media(max-width:767px){.desktop-table{display:none}.mobile-cards{display:block}.pag-wrap{justify-content:center}}
+    @media(min-width:768px){.desktop-table{display:block}.mobile-cards{display:none}}
+
+    /* ── Pending banner ─────────────────────────────────────────── */
+    .pending-banner{background:rgba(217,119,6,.08);border:1px solid rgba(217,119,6,.25);border-radius:10px;padding:.75rem 1rem;display:flex;align-items:center;gap:.6rem;margin-bottom:1rem;font-size:.875rem;color:#92400e}
+    [data-theme="dark"] .pending-banner{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.25);color:#fcd34d}
+
+    /* ── Logo avatar ─────────────────────────────────────────────  */
+    .emp-avatar{width:36px;height:36px;border-radius:8px;object-fit:cover;background:var(--primary);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;color:#fff;flex-shrink:0}
+    .emp-avatar img{width:36px;height:36px;border-radius:8px;object-fit:cover}
+
+    /* ── Action buttons ─────────────────────────────────────────── */
+    .btn-approve{background:#d1fae5;color:#065f46;border:none;border-radius:6px;padding:.25rem .6rem;font-size:.75rem;font-weight:600;cursor:pointer;transition:background .15s}
+    .btn-approve:hover{background:#a7f3d0}
+    .btn-suspend{background:#fef3c7;color:#92400e;border:none;border-radius:6px;padding:.25rem .6rem;font-size:.75rem;font-weight:600;cursor:pointer;transition:background .15s}
+    .btn-suspend:hover{background:#fde68a}
+    .btn-unsuspend{background:#dbeafe;color:#1e40af;border:none;border-radius:6px;padding:.25rem .6rem;font-size:.75rem;font-weight:600;cursor:pointer;transition:background .15s}
+    .btn-unsuspend:hover{background:#bfdbfe}
+
+    /* ── Error toast ────────────────────────────────────────────── */
+    #errToast{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;max-width:380px;background:#dc3545;color:#fff;border-radius:10px;padding:.75rem 1rem;font-size:.82rem;display:none;box-shadow:0 4px 20px rgba(0,0,0,.25)}
+
+    /* ── Modal detail field ─────────────────────────────────────── */
+    .detail-row{display:flex;gap:.5rem;padding:.45rem 0;border-bottom:1px solid var(--border);font-size:.875rem}
+    .detail-row:last-child{border-bottom:none}
+    .detail-label{color:var(--text-muted);width:130px;flex-shrink:0;font-size:.8rem}
+    .detail-val{color:var(--text);font-weight:500;word-break:break-word}
+  </style>
+</head>
+<body class="admin-body">
+
+<aside class="admin-sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <img src="/JobOrbitFavicon.svg" alt="JobOrbit" class="sidebar-brand" style="height:40px">
+    <span class="sidebar-brand">JobOrbit</span>
+    <button class="btn-sidebar-close d-lg-none" id="sidebarClose"><i class="bi bi-x-lg"></i></button>
+  </div>
+  <nav class="sidebar-nav">
+    <a href="dashboard.html"    class="sidebar-link"><i class="bi bi-speedometer2"></i><span>Dashboard</span></a>
+    <a href="employers.html"    class="sidebar-link active"><i class="bi bi-buildings"></i><span>Employers</span></a>
+    <a href="jobs.html"         class="sidebar-link"><i class="bi bi-briefcase"></i><span>All Jobs</span></a>
+    <a href="add-job.html"      class="sidebar-link"><i class="bi bi-plus-circle"></i><span>Add Job</span></a>
+    <a href="bulk-upload.html"  class="sidebar-link"><i class="bi bi-upload"></i><span>Bulk Upload</span></a>
+    <a href="categories.html"   class="sidebar-link"><i class="bi bi-tag"></i><span>Categories</span></a>
+    <a href="messages.html"     class="sidebar-link"><i class="bi bi-envelope"></i><span>Messages</span></a>
+    <a href="monetization.html" class="sidebar-link"><i class="bi bi-currency-dollar"></i><span>Monetization</span></a>
+    <a href="settings.html"     class="sidebar-link"><i class="bi bi-gear"></i><span>Settings</span></a>
+    <hr class="sidebar-divider">
+    <a href="/" class="sidebar-link" target="_blank"><i class="bi bi-box-arrow-up-right"></i><span>View Site</span></a>
+    <button class="sidebar-link sidebar-btn" id="logoutBtn"><i class="bi bi-box-arrow-right"></i><span>Logout</span></button>
+  </nav>
+</aside>
+<div class="sidebar-overlay d-lg-none d-none" id="sidebarOverlay"></div>
+
+<div class="admin-main">
+  <header class="admin-topbar">
+    <button class="btn-hamburger d-lg-none" id="sidebarToggle"><i class="bi bi-list fs-4"></i></button>
+    <h1 class="topbar-title">Employers</h1>
+    <div class="topbar-right">
+      <button class="btn-icon-admin" id="themeToggleAdmin" title="Toggle theme"><i class="bi bi-moon-fill" id="adminThemeIcon"></i></button>
+    </div>
+  </header>
+
+  <main class="admin-content">
+
+    <!-- Pending banner -->
+    <div class="pending-banner d-none" id="pendingBanner">
+      <i class="bi bi-clock-fill"></i>
+      <span id="pendingBannerText"></span>
+      <button class="btn btn-sm ms-auto" style="background:#d97706;color:#fff;border:none;border-radius:6px;font-size:.78rem;font-weight:600;padding:.25rem .7rem" onclick="filterByStatus('pending')">
+        Review Now
+      </button>
+    </div>
+
+    <!-- Filters -->
+    <div class="admin-card mb-3">
+      <div class="p-3">
+        <div class="filter-row">
+          <input type="text" class="form-control-custom filter-search" id="filterQ" placeholder="Search company, email, contact…">
+          <button class="btn btn-admin-primary btn-sm" id="applySearch">
+            <i class="bi bi-search me-1"></i>Search
+          </button>
+          <button class="btn btn-admin-outline btn-sm d-none" id="clearSearch">
+            <i class="bi bi-x me-1"></i>Clear
+          </button>
+        </div>
+        <div class="status-tabs">
+          <button class="status-tab active" data-status="" onclick="filterByStatus('')">
+            All <span class="tab-count" id="countAll">–</span>
+          </button>
+          <button class="status-tab tab-pending" data-status="pending" onclick="filterByStatus('pending')">
+            Pending <span class="tab-count" id="countPending">–</span>
+          </button>
+          <button class="status-tab" data-status="active" onclick="filterByStatus('active')">
+            Active <span class="tab-count" id="countActive">–</span>
+          </button>
+          <button class="status-tab tab-suspended" data-status="suspended" onclick="filterByStatus('suspended')">
+            Suspended <span class="tab-count" id="countSuspended">–</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="admin-card">
+      <!-- Desktop table -->
+      <div class="desktop-table">
+        <div class="table-responsive">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Company</th>
+                <th>Contact</th>
+                <th>Sector / City</th>
+                <th>CR No.</th>
+                <th>Status</th>
+                <th>Jobs</th>
+                <th>Registered</th>
+                <th>Last Login</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="empTable">
+              <tr><td colspan="9" class="text-center text-muted py-4">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Mobile cards -->
+      <div class="mobile-cards p-2" id="empMobile"></div>
+
+      <!-- Pagination -->
+      <div class="pag-wrap">
+        <span class="pag-info" id="tableInfo">–</span>
+        <nav><ul class="pagination pagination-sm mb-0" id="tablePagination"></ul></nav>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ── Detail Modal ─────────────────────────────────────────────── -->
+<div class="modal fade" id="detailModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content" style="background:var(--bg-card);border:1px solid var(--border)">
+      <div class="modal-header" style="border-color:var(--border)">
+        <h5 class="modal-title" id="modalTitle" style="color:var(--text)">Employer Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="modalBody" style="color:var(--text)">
+        <div class="text-center py-4"><div class="spinner-border spinner-border-sm text-primary"></div></div>
+      </div>
+      <div class="modal-footer" style="border-color:var(--border);flex-wrap:wrap;gap:.5rem">
+        <button class="btn btn-admin-outline btn-sm" data-bs-dismiss="modal">Close</button>
+        <button class="btn btn-sm" id="modalEmailBtn" style="background:var(--surface);border:1px solid var(--border);color:var(--text);font-size:.82rem" onclick="openEmailModal()">
+          <i class="bi bi-envelope me-1"></i>Send Email
+        </button>
+        <button class="btn btn-sm btn-approve" id="modalApproveBtn" onclick="modalAction('active')">
+          <i class="bi bi-check-circle me-1"></i>Approve
+        </button>
+        <button class="btn btn-sm btn-suspend" id="modalSuspendBtn" onclick="modalAction('suspended')">
+          <i class="bi bi-pause-circle me-1"></i>Suspend
+        </button>
+        <button class="btn btn-sm btn-unsuspend d-none" id="modalUnsuspendBtn" onclick="modalAction('active')">
+          <i class="bi bi-play-circle me-1"></i>Unsuspend
+        </button>
+        <button class="btn btn-sm btn-action-del" id="modalDeleteBtn" onclick="modalAction('deleted')">
+          <i class="bi bi-trash me-1"></i>Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Email Modal ──────────────────────────────────────────────── -->
+<div class="modal fade" id="emailModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content" style="background:var(--bg-card);border:1px solid var(--border)">
+      <div class="modal-header" style="border-color:var(--border)">
+        <h5 class="modal-title" style="color:var(--text)">Send Email</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label" style="color:var(--text-muted);font-size:.82rem;font-weight:600">Subject</label>
+          <input type="text" class="form-control-custom w-100" id="emailSubject" placeholder="Email subject">
+        </div>
+        <div class="mb-2">
+          <label class="form-label" style="color:var(--text-muted);font-size:.82rem;font-weight:600">Message</label>
+          <textarea class="form-control-custom w-100" id="emailBody" rows="6" placeholder="Your message…" style="resize:vertical"></textarea>
+        </div>
+        <div id="emailMsg" class="d-none" style="font-size:.82rem;margin-top:.5rem"></div>
+      </div>
+      <div class="modal-footer" style="border-color:var(--border)">
+        <button class="btn btn-admin-outline btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-admin-primary btn-sm" id="sendEmailBtn" onclick="sendEmail()">
+          <i class="bi bi-send me-1"></i>Send
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="errToast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/admin/js/admin.js"></script>
+<script>
+'use strict';
+
+window.addEventListener('error', e => showErrToast(e.message));
+window.addEventListener('unhandledrejection', e => showErrToast(e.reason?.message || String(e.reason)));
+function showErrToast(msg) {
+  const t = document.getElementById('errToast');
+  t.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-2"></i><strong>Error:</strong> ' + msg;
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 8000);
+}
+
+let currentPage  = 1;
+let totalPages   = 1;
+let currentQ     = '';
+let currentStatus = '';
+let activeEmpId  = null;
+let activeEmpStatus = null;
+
+const detailModalEl = document.getElementById('detailModal');
+const emailModalEl  = document.getElementById('emailModal');
+const detailModal   = new bootstrap.Modal(detailModalEl);
+const emailModal    = new bootstrap.Modal(emailModalEl);
+
+document.addEventListener('DOMContentLoaded', async () => {
+  await requireAuth();
+  await loadEmployers(1);
+  bindEvents();
+});
+
+function bindEvents() {
+  document.getElementById('applySearch').addEventListener('click', () => {
+    currentQ = document.getElementById('filterQ').value.trim();
+    document.getElementById('clearSearch').classList.toggle('d-none', !currentQ);
+    loadEmployers(1);
+  });
+  document.getElementById('filterQ').addEventListener('keypress', e => {
+    if (e.key === 'Enter') document.getElementById('applySearch').click();
+  });
+  document.getElementById('clearSearch').addEventListener('click', () => {
+    currentQ = '';
+    document.getElementById('filterQ').value = '';
+    document.getElementById('clearSearch').classList.add('d-none');
+    loadEmployers(1);
+  });
+}
+
+function filterByStatus(status) {
+  currentStatus = status;
+  currentPage   = 1;
+  document.querySelectorAll('.status-tab').forEach(t =>
+    t.classList.toggle('active', t.dataset.status === status)
+  );
+  loadEmployers(1);
+}
+
+async function loadEmployers(page = 1) {
+  currentPage = page;
+  const params = new URLSearchParams({ page, limit: 20 });
+  if (currentQ)      params.set('q', currentQ);
+  if (currentStatus) params.set('status', currentStatus);
+
+  const tbody  = document.getElementById('empTable');
+  const mobile = document.getElementById('empMobile');
+  const spin   = '<div class="spinner-border spinner-border-sm text-primary"></div>';
+  tbody.innerHTML  = `<tr><td colspan="9" class="text-center py-4">${spin}</td></tr>`;
+  mobile.innerHTML = `<div class="text-center py-4">${spin}</div>`;
+
+  try {
+    const data = await adminApi.get('/api/admin/employers?' + params);
+    if (!data.success) throw new Error(data.message || 'API error');
+
+    totalPages = data.pages || 1;
+
+    // Update pending banner
+    const banner = document.getElementById('pendingBanner');
+    if (data.pendingCount > 0 && currentStatus !== 'pending') {
+      document.getElementById('pendingBannerText').textContent =
+        `${data.pendingCount} employer${data.pendingCount > 1 ? 's' : ''} waiting for approval`;
+      banner.classList.remove('d-none');
+    } else {
+      banner.classList.add('d-none');
+    }
+
+    // Update tab counts (only when showing all)
+    if (!currentStatus && !currentQ) {
+      updateTabCounts(data.employers, data.total, data.pendingCount);
+    }
+
+    document.getElementById('tableInfo').textContent =
+      `${data.total} employer${data.total !== 1 ? 's' : ''}  ·  Page ${page} of ${totalPages}`;
+
+    if (!data.employers || !data.employers.length) {
+      const msg = currentStatus === 'pending' ? 'No pending employers' : 'No employers found';
+      tbody.innerHTML  = `<tr><td colspan="9" class="text-center text-muted py-5">${msg}</td></tr>`;
+      mobile.innerHTML = `<p class="text-center text-muted py-4">${msg}</p>`;
+      buildPagination(1, 1);
+      return;
+    }
+
+    tbody.innerHTML = data.employers.map(emp => `
+      <tr>
+        <td>
+          <div class="d-flex align-items-center gap-2">
+            ${empAvatar(emp, 32)}
+            <div>
+              <strong style="font-size:.875rem;display:block">${escHtml(emp.company_name)}</strong>
+              <small class="text-muted">${escHtml(emp.email)}</small>
+            </div>
+          </div>
+        </td>
+        <td style="font-size:.82rem">${escHtml(emp.contact_name || '—')}</td>
+        <td style="font-size:.82rem">${escHtml(emp.sector || '—')} / ${escHtml(emp.city || '—')}</td>
+        <td style="font-size:.78rem;color:var(--text-muted)">${escHtml(emp.cr_number || '—')}</td>
+        <td><span class="status-badge status-${emp.status}">${emp.status}</span></td>
+        <td style="font-size:.82rem;text-align:center">
+          <strong>${emp.active_jobs || 0}</strong>
+          <span class="text-muted">/${emp.total_jobs || 0}</span>
+        </td>
+        <td style="font-size:.78rem;color:var(--text-muted);white-space:nowrap">${timeAgo(emp.created_at)}</td>
+        <td style="font-size:.78rem;color:var(--text-muted);white-space:nowrap">${emp.last_login ? timeAgo(emp.last_login) : 'Never'}</td>
+        <td>
+          <div class="d-flex gap-1 flex-wrap">
+            <button class="btn-action btn-action-edit" onclick="openDetail(${emp.id})" title="View details"><i class="bi bi-eye"></i></button>
+            ${emp.status === 'pending'    ? `<button class="btn-approve" onclick="quickAction(${emp.id},'active',this)">Approve</button>` : ''}
+            ${emp.status === 'active'     ? `<button class="btn-suspend" onclick="quickAction(${emp.id},'suspended',this)">Suspend</button>` : ''}
+            ${emp.status === 'suspended'  ? `<button class="btn-unsuspend" onclick="quickAction(${emp.id},'active',this)">Unsuspend</button>` : ''}
+          </div>
+        </td>
+      </tr>`).join('');
+
+    mobile.innerHTML = data.employers.map(emp => `
+      <div class="emp-mob-card">
+        <div class="d-flex align-items-start gap-2 mb-2">
+          ${empAvatar(emp, 36)}
+          <div class="flex-grow-1">
+            <div class="emp-mob-name">${escHtml(emp.company_name)}</div>
+            <div class="emp-mob-sub">${escHtml(emp.email)}</div>
+          </div>
+          <span class="status-badge status-${emp.status}">${emp.status}</span>
+        </div>
+        <div class="emp-mob-meta">
+          ${escHtml(emp.sector || '—')} · ${escHtml(emp.city || '—')}
+          · <strong>${emp.active_jobs || 0}</strong>/${emp.total_jobs || 0} jobs
+          · ${timeAgo(emp.created_at)}
+        </div>
+        <div class="d-flex gap-1 mt-2 flex-wrap">
+          <button class="btn-action btn-action-edit" onclick="openDetail(${emp.id})" title="View"><i class="bi bi-eye"></i></button>
+          ${emp.status === 'pending'    ? `<button class="btn-approve" onclick="quickAction(${emp.id},'active',this)">Approve</button>` : ''}
+          ${emp.status === 'active'     ? `<button class="btn-suspend" onclick="quickAction(${emp.id},'suspended',this)">Suspend</button>` : ''}
+          ${emp.status === 'suspended'  ? `<button class="btn-unsuspend" onclick="quickAction(${emp.id},'active',this)">Unsuspend</button>` : ''}
+        </div>
+      </div>`).join('');
+
+    buildPagination(page, totalPages);
+  } catch (e) {
+    const msg = e.message || 'Failed to load employers';
+    tbody.innerHTML  = `<tr><td colspan="9" class="text-center text-danger py-4"><i class="bi bi-exclamation-triangle me-2"></i>${msg}</td></tr>`;
+    mobile.innerHTML = `<p class="text-center text-danger py-4">${msg}</p>`;
+    showErrToast(msg);
+  }
+}
+
+function updateTabCounts(employers, total) {
+  document.getElementById('countAll').textContent = total;
+  const pending   = employers.filter(e => e.status === 'pending').length;
+  const active    = employers.filter(e => e.status === 'active').length;
+  const suspended = employers.filter(e => e.status === 'suspended').length;
+  // These are page-level counts; for full counts we'd need separate API calls
+  // Use pendingCount from API for the pending badge specifically
+  document.getElementById('countPending').textContent   = document.getElementById('pendingBannerText').textContent.match(/\d+/)?.[0] || pending;
+  document.getElementById('countActive').textContent    = active;
+  document.getElementById('countSuspended').textContent = suspended;
+}
+
+function empAvatar(emp, size) {
+  const s = size || 36;
+  if (emp.logo_url) {
+    return `<img src="${escHtml(emp.logo_url)}" alt="" style="width:${s}px;height:${s}px;border-radius:8px;object-fit:cover;flex-shrink:0" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <div style="width:${s}px;height:${s}px;border-radius:8px;background:var(--primary);display:none;align-items:center;justify-content:center;font-weight:700;font-size:${Math.round(s*0.38)}px;color:#fff;flex-shrink:0">${escHtml(emp.company_name.charAt(0).toUpperCase())}</div>`;
+  }
+  return `<div style="width:${s}px;height:${s}px;border-radius:8px;background:var(--primary);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:${Math.round(s*0.38)}px;color:#fff;flex-shrink:0">${escHtml(emp.company_name.charAt(0).toUpperCase())}</div>`;
+}
+
+async function quickAction(id, status, btn) {
+  const label = status === 'active' ? 'approve' : 'suspend';
+  if (!confirm(`${label.charAt(0).toUpperCase() + label.slice(1)} this employer?`)) return;
+  btn.disabled = true;
+  try {
+    await adminApi.patch(`/api/admin/employers/${id}/status`, { status });
+    loadEmployers(currentPage);
+  } catch (e) {
+    alert('Action failed: ' + (e.message || 'Server error'));
+    btn.disabled = false;
+  }
+}
+
+async function openDetail(id) {
+  activeEmpId = id;
+  document.getElementById('modalBody').innerHTML =
+    '<div class="text-center py-4"><div class="spinner-border spinner-border-sm text-primary"></div></div>';
+  detailModal.show();
+
+  try {
+    const data = await adminApi.get(`/api/admin/employers/${id}`);
+    if (!data.success) throw new Error(data.message);
+    const emp = data.employer;
+    const stats = data.stats;
+    activeEmpStatus = emp.status;
+
+    document.getElementById('modalTitle').textContent = emp.company_name;
+
+    // Show/hide action buttons based on current status
+    document.getElementById('modalApproveBtn').classList.toggle('d-none', emp.status !== 'pending');
+    document.getElementById('modalSuspendBtn').classList.toggle('d-none', emp.status !== 'active');
+    document.getElementById('modalUnsuspendBtn').classList.toggle('d-none', emp.status !== 'suspended');
+
+    document.getElementById('modalBody').innerHTML = `
+      <!-- Stats row -->
+      <div class="row g-2 mb-3">
+        <div class="col-4">
+          <div style="background:var(--surface);border-radius:8px;padding:.6rem;text-align:center">
+            <div style="font-size:1.3rem;font-weight:800;color:var(--primary)">${stats.active_jobs}</div>
+            <div style="font-size:.7rem;color:var(--text-muted)">Active Jobs</div>
+          </div>
+        </div>
+        <div class="col-4">
+          <div style="background:var(--surface);border-radius:8px;padding:.6rem;text-align:center">
+            <div style="font-size:1.3rem;font-weight:800;color:var(--text)">${stats.total_jobs}</div>
+            <div style="font-size:.7rem;color:var(--text-muted)">Total Jobs</div>
+          </div>
+        </div>
+        <div class="col-4">
+          <div style="background:var(--surface);border-radius:8px;padding:.6rem;text-align:center">
+            <div style="font-size:1.3rem;font-weight:800;color:var(--text)">${stats.total_applications}</div>
+            <div style="font-size:.7rem;color:var(--text-muted)">Applications</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile details -->
+      <div style="border:1px solid var(--border);border-radius:8px;padding:.75rem;margin-bottom:1rem">
+        <div class="detail-row"><span class="detail-label">Status</span><span class="detail-val"><span class="status-badge status-${emp.status}">${emp.status}</span></span></div>
+        <div class="detail-row"><span class="detail-label">Email</span><span class="detail-val">${escHtml(emp.email)}</span></div>
+        <div class="detail-row"><span class="detail-label">Contact</span><span class="detail-val">${escHtml(emp.contact_name || '—')}</span></div>
+        <div class="detail-row"><span class="detail-label">Phone</span><span class="detail-val">${escHtml(emp.phone || '—')}</span></div>
+        <div class="detail-row"><span class="detail-label">WhatsApp</span><span class="detail-val">${escHtml(emp.whatsapp || '—')}</span></div>
+        <div class="detail-row"><span class="detail-label">Sector</span><span class="detail-val">${escHtml(emp.sector || '—')}</span></div>
+        <div class="detail-row"><span class="detail-label">City</span><span class="detail-val">${escHtml(emp.city || '—')}</span></div>
+        <div class="detail-row"><span class="detail-label">CR Number</span><span class="detail-val">${escHtml(emp.cr_number || '—')}</span></div>
+        <div class="detail-row"><span class="detail-label">Company Size</span><span class="detail-val">${escHtml(emp.company_size || '—')}</span></div>
+        <div class="detail-row"><span class="detail-label">Founded</span><span class="detail-val">${emp.founded_year || '—'}</span></div>
+        <div class="detail-row"><span class="detail-label">Website</span><span class="detail-val">${emp.website ? `<a href="${escHtml(emp.website)}" target="_blank" style="color:var(--primary)">${escHtml(emp.website)}</a>` : '—'}</span></div>
+        <div class="detail-row"><span class="detail-label">LinkedIn</span><span class="detail-val">${emp.linkedin_url ? `<a href="${escHtml(emp.linkedin_url)}" target="_blank" style="color:var(--primary)">View Profile</a>` : '—'}</span></div>
+        <div class="detail-row"><span class="detail-label">Email Verified</span><span class="detail-val">${emp.email_verified ? '<span style="color:#16a34a">✓ Yes</span>' : '<span style="color:#dc2626">✗ No</span>'}</span></div>
+        <div class="detail-row"><span class="detail-label">Registered</span><span class="detail-val">${new Date(emp.created_at).toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'})}</span></div>
+        <div class="detail-row"><span class="detail-label">Last Login</span><span class="detail-val">${emp.last_login ? timeAgo(emp.last_login) : 'Never'}</span></div>
+        ${emp.about ? `<div class="detail-row"><span class="detail-label">About</span><span class="detail-val" style="font-size:.82rem">${escHtml(emp.about)}</span></div>` : ''}
+        ${emp.address ? `<div class="detail-row"><span class="detail-label">Address</span><span class="detail-val">${escHtml(emp.address)}</span></div>` : ''}
+      </div>
+
+      <!-- Admin notes -->
+      <div style="margin-bottom:.5rem">
+        <label style="font-size:.8rem;font-weight:600;color:var(--text-muted);margin-bottom:.35rem;display:block">
+          <i class="bi bi-sticky me-1"></i>Admin Notes (internal only)
+        </label>
+        <textarea id="adminNotes" class="form-control-custom w-100" rows="3"
+          placeholder="Internal notes about this employer…" style="resize:vertical">${escHtml(emp.admin_notes || '')}</textarea>
+        <button class="btn btn-admin-outline btn-sm mt-2" onclick="saveNotes()">
+          <i class="bi bi-floppy me-1"></i>Save Notes
+        </button>
+        <span id="notesSaved" class="text-success small ms-2 d-none"><i class="bi bi-check-circle me-1"></i>Saved</span>
+      </div>`;
+  } catch (e) {
+    document.getElementById('modalBody').innerHTML =
+      `<p class="text-danger text-center py-4"><i class="bi bi-exclamation-triangle me-2"></i>${e.message || 'Failed to load'}</p>`;
+  }
+}
+
+async function modalAction(status) {
+  if (!activeEmpId) return;
+  const labels = { active: 'approve', suspended: 'suspend', deleted: 'permanently delete' };
+  const label  = labels[status] || status;
+  if (!confirm(`Are you sure you want to ${label} this employer?${status === 'deleted' ? '\n\nThis cannot be undone. All their active jobs will be closed.' : ''}`)) return;
+
+  try {
+    await adminApi.patch(`/api/admin/employers/${activeEmpId}/status`, { status });
+    detailModal.hide();
+    loadEmployers(currentPage);
+  } catch (e) {
+    alert('Action failed: ' + (e.message || 'Server error'));
+  }
+}
+
+async function saveNotes() {
+  if (!activeEmpId) return;
+  const notes = document.getElementById('adminNotes').value.trim();
+  try {
+    await adminApi.patch(`/api/admin/employers/${activeEmpId}/notes`, { notes });
+    const saved = document.getElementById('notesSaved');
+    saved.classList.remove('d-none');
+    setTimeout(() => saved.classList.add('d-none'), 2500);
+  } catch (e) {
+    alert('Failed to save notes');
+  }
+}
+
+function openEmailModal() {
+  document.getElementById('emailSubject').value = '';
+  document.getElementById('emailBody').value = '';
+  document.getElementById('emailMsg').classList.add('d-none');
+  document.getElementById('sendEmailBtn').disabled = false;
+  document.getElementById('sendEmailBtn').innerHTML = '<i class="bi bi-send me-1"></i>Send';
+  emailModal.show();
+}
+
+async function sendEmail() {
+  const subject = document.getElementById('emailSubject').value.trim();
+  const message = document.getElementById('emailBody').value.trim();
+  const msgEl   = document.getElementById('emailMsg');
+  const btn     = document.getElementById('sendEmailBtn');
+
+  if (!subject) { showEmailMsg('Subject is required', 'danger'); return; }
+  if (!message) { showEmailMsg('Message is required', 'danger'); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Sending…';
+
+  try {
+    await adminApi.post(`/api/admin/employers/${activeEmpId}/email`, { subject, message });
+    showEmailMsg('Email sent successfully!', 'success');
+    btn.innerHTML = '<i class="bi bi-check-circle me-1"></i>Sent';
+    setTimeout(() => emailModal.hide(), 1500);
+  } catch (e) {
+    showEmailMsg(e.message || 'Failed to send email', 'danger');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="bi bi-send me-1"></i>Send';
+  }
+}
+
+function showEmailMsg(text, type) {
+  const el = document.getElementById('emailMsg');
+  el.className = `text-${type} small`;
+  el.textContent = text;
+  el.classList.remove('d-none');
+}
+
+/* ── Pagination ─────────────────────────────────────────────────── */
+function buildPagination(cur, total) {
+  const ul = document.getElementById('tablePagination');
+  ul.innerHTML = '';
+  if (total <= 1) return;
+
+  function smartRange(cur, total) {
+    const delta = 2, range = [];
+    for (let i = Math.max(2, cur-delta); i <= Math.min(total-1, cur+delta); i++) range.push(i);
+    if (cur-delta > 2)         range.unshift('…');
+    if (cur+delta < total-1)   range.push('…');
+    range.unshift(1);
+    if (total > 1) range.push(total);
+    return range;
+  }
+
+  const btn = (label, page, disabled, active) => {
+    const li = document.createElement('li');
+    li.className = 'page-item' + (disabled?' disabled':'') + (active?' active':'');
+    const a = document.createElement('a');
+    a.className = 'page-link'; a.href = '#'; a.innerHTML = label;
+    if (!disabled && !active) a.addEventListener('click', e => { e.preventDefault(); loadEmployers(page); });
+    li.appendChild(a); ul.appendChild(li);
+  };
+
+  btn('<i class="bi bi-chevron-left"></i>', cur-1, cur===1, false);
+  smartRange(cur, total).forEach(p => {
+    if (p === '…') {
+      const li = document.createElement('li');
+      li.className = 'page-item disabled';
+      li.innerHTML = '<span class="page-link" style="pointer-events:none">…</span>';
+      ul.appendChild(li);
+    } else btn(p, p, false, p===cur);
+  });
+  btn('<i class="bi bi-chevron-right"></i>', cur+1, cur===total, false);
+}
+</script>
+</body>
+</html>

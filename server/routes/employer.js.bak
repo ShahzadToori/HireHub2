@@ -41,7 +41,7 @@ router.post('/register', async (req, res) => {
 
     const [result] = await db.query(
       `INSERT INTO employers (company_name, contact_name, email, password_hash, phone, whatsapp, sector, city, verify_token, status)
-       VALUES (?,?,?,?,?,?,?,?,?,'pending')`,
+       VALUES (?,?,?,?,?,?,?,?,?,'active')`,
       [
         company_name.trim(), contact_name?.trim() || '', email.trim().toLowerCase(),
         hash, phone?.trim() || null, whatsapp?.trim() || null,
@@ -49,35 +49,25 @@ router.post('/register', async (req, res) => {
       ]
     );
 
-    // Notify admin of new employer registration (fire-and-forget)
-    const _regBase = process.env.NODE_ENV === 'production'
-      ? 'https://joborbit.org'
-      : (process.env.SITE_URL || 'http://localhost:3000');
-    sendMail({
-      to: process.env.MAIL_USER,
-      subject: `New Employer Registration — ${company_name.trim()} | JobOrbit`,
-      html: `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:2rem">
-        <h2 style="color:#0f62fe;margin-bottom:.5rem">New Employer Registration</h2>
-        <p style="color:#374151;margin-bottom:1rem">A new employer is awaiting your approval:</p>
-        <table style="width:100%;border-collapse:collapse;margin-bottom:1.5rem">
-          <tr><td style="padding:.35rem 0;color:#6b7280;width:110px;font-size:.9rem">Company</td><td style="padding:.35rem 0;font-weight:600">${company_name.trim()}</td></tr>
-          <tr><td style="padding:.35rem 0;color:#6b7280;font-size:.9rem">Contact</td><td style="padding:.35rem 0">${contact_name?.trim() || '—'}</td></tr>
-          <tr><td style="padding:.35rem 0;color:#6b7280;font-size:.9rem">Email</td><td style="padding:.35rem 0">${email.trim().toLowerCase()}</td></tr>
-          <tr><td style="padding:.35rem 0;color:#6b7280;font-size:.9rem">Phone</td><td style="padding:.35rem 0">${phone?.trim() || '—'}</td></tr>
-          <tr><td style="padding:.35rem 0;color:#6b7280;font-size:.9rem">Sector</td><td style="padding:.35rem 0">${sector?.trim() || '—'}</td></tr>
-          <tr><td style="padding:.35rem 0;color:#6b7280;font-size:.9rem">City</td><td style="padding:.35rem 0">${city?.trim() || '—'}</td></tr>
-        </table>
-        <a href="${_regBase}/admin/employers.html" style="display:inline-block;background:#0f62fe;color:#fff;padding:.65rem 1.4rem;border-radius:8px;text-decoration:none;font-weight:600;font-size:.9rem">
-          Review in Admin →
-        </a>
-        <p style="color:#9ca3af;font-size:.75rem;margin-top:1.5rem">JobOrbit Admin Notification</p>
-      </div>`
-    }).catch(e => console.warn('[register admin notify]', e.message));
+    // Create session
+    const sessionToken = makeToken();
+    const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
+    await db.query(
+      'INSERT INTO employer_sessions (employer_id, token, expires_at) VALUES (?,?,?)',
+      [result.insertId, sessionToken, expires]
+    );
+
+    res.cookie('emp_token', sessionToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+      sameSite: 'lax'
+    });
 
     res.json({
       success: true,
-      pending: true,
-      message: 'Account created! Our team will review your application and notify you by email within 24 hours.'
+      message: 'Account created successfully',
+      employer: { id: result.insertId, company_name: company_name.trim(), email: email.trim() }
     });
   } catch (err) {
     console.error('[employer/register]', err);
@@ -97,7 +87,6 @@ router.post('/login', async (req, res) => {
     );
     if (!emp) return res.status(401).json({ success: false, message: 'Invalid email or password' });
     if (emp.status === 'suspended') return res.status(403).json({ success: false, message: 'Account suspended. Contact support.' });
-    if (emp.status === 'pending')   return res.status(403).json({ success: false, message: 'Your account is pending approval. You will receive an email once it\'s approved.' });
 
     const match = await bcrypt.compare(password, emp.password_hash);
     if (!match) return res.status(401).json({ success: false, message: 'Invalid email or password' });
