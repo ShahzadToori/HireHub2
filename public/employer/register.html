@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Create Employer Account — JobOrbit</title>
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="icon" href="/JobOrbitFavicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/employer/employer.css">
+</head>
+<body><script>
+(function(){
+  function applyTheme(t,save){
+    document.documentElement.setAttribute('data-theme',t);
+    document.documentElement.style.colorScheme=t;
+    var i=document.getElementById('themeIcon');
+    if(i)i.className=t==='dark'?'bi bi-sun-fill':'bi bi-moon-fill';
+    if(save!==false)localStorage.setItem('theme',t);
+  }
+  applyTheme(localStorage.getItem('theme')||'light',false);
+  document.addEventListener('DOMContentLoaded',function(){
+    var btn=document.getElementById('themeToggle');
+    if(btn)btn.addEventListener('click',function(){
+      applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');
+    });
+  });
+  window.toggleTheme=function(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');};
+})();
+</script>
+<div class="ep-auth-mobile-header">
+  <a href="/">
+    <img src="/uploads/logo-1772305890056.svg" alt="JobOrbit" style="height:34px;filter:brightness(10)">
+  </a>
+  <p>Post jobs free and reach skilled workers across Saudi Arabia, UAE, Qatar &amp; Kuwait.</p>
+</div>
+<div class="ep-auth-page">
+  <div class="ep-auth-left">
+    <a href="/" class="ep-auth-logo">
+      <img src="/uploads/logo-1772305890056.svg" alt="JobOrbit" style="height:40px;filter:brightness(10)">
+    </a>
+    <h1>Find the Right Workers.<br>Faster.</h1>
+    <p>Post jobs, manage applications, and build your talent pool — all in one place. Free forever.</p>
+    <div class="ep-auth-features">
+      <div class="ep-auth-feat"><i class="bi bi-check-circle-fill"></i>Free job posting</div>
+      <div class="ep-auth-feat"><i class="bi bi-check-circle-fill"></i>Pre-screened candidates</div>
+      <div class="ep-auth-feat"><i class="bi bi-check-circle-fill"></i>Gulf-specific filters</div>
+      <div class="ep-auth-feat"><i class="bi bi-check-circle-fill"></i>Application inbox</div>
+      <div class="ep-auth-feat"><i class="bi bi-check-circle-fill"></i>Job templates</div>
+    </div>
+  </div>
+  <div class="ep-auth-right">
+    <div class="ep-auth-card">
+      <h2 style="font-size:1.3rem;font-weight:800;margin-bottom:.35rem;color:var(--text)">Create Your Free Account</h2>
+      <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:1.25rem">
+        Your account will be reviewed before you can post jobs — usually within 24 hours.
+      </p>
+
+      <div id="registerForm">
+        <div class="row g-2">
+          <div class="col-12">
+            <div class="ep-field">
+              <label class="ep-label">Company Name <span class="text-danger">*</span></label>
+              <input type="text" class="ep-input" id="regCompany" maxlength="200" placeholder="e.g. Al-Rajhi Contracting">
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="ep-field">
+              <label class="ep-label">Your Name <span class="text-danger">*</span></label>
+              <input type="text" class="ep-input" id="regName" maxlength="100" placeholder="Contact person">
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="ep-field">
+              <label class="ep-label">Phone / WhatsApp</label>
+              <input type="tel" class="ep-input" id="regPhone" maxlength="30" placeholder="+966 5XX XXX XXXX">
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="ep-field">
+              <label class="ep-label">Sector</label>
+              <select class="ep-input" id="regSector">
+                <option value="">Select sector</option>
+                <option>Construction</option>
+                <option>Oil & Gas</option>
+                <option>Healthcare</option>
+                <option>Technology</option>
+                <option>Manufacturing</option>
+                <option>Hospitality</option>
+                <option>Finance</option>
+                <option>Education</option>
+                <option>Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="ep-field">
+              <label class="ep-label">City</label>
+              <input type="text" class="ep-input" id="regCity" maxlength="100" placeholder="e.g. Riyadh">
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="ep-field">
+              <label class="ep-label">Address <span class="text-danger">*</span></label>
+              <input type="text" class="ep-input" id="regAddress" maxlength="255" placeholder="e.g. Jubail Industrial Area 2, near Tasnee">
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="ep-field">
+              <label class="ep-label">Google Maps Link <span style="color:var(--text-muted);font-weight:400">(optional)</span></label>
+              <input type="text" class="ep-input" id="regMapLink" maxlength="500" placeholder="Paste your location link here">
+              <p style="font-size:.72rem;color:var(--text-muted);margin:.3rem 0 0">
+                In Google Maps: long-press your location → Share → Copy Link, then paste here
+              </p>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="ep-field">
+              <label class="ep-label">CR Number <span style="color:var(--text-muted);font-weight:400">(optional)</span></label>
+              <input type="text" class="ep-input" id="regCR" maxlength="100" placeholder="Commercial Registration No.">
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="ep-field">
+              <label class="ep-label">Website <span style="color:var(--text-muted);font-weight:400">(optional)</span></label>
+              <input type="text" class="ep-input" id="regWebsite" maxlength="300" placeholder="www.example.com">
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="ep-field">
+              <label class="ep-label">About Your Business <span style="color:var(--text-muted);font-weight:400">(optional)</span></label>
+              <textarea class="ep-input" id="regAbout" maxlength="2000" rows="3" placeholder="A short description of what your company does"></textarea>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="ep-field">
+              <label class="ep-label">Email Address <span class="text-danger">*</span></label>
+              <input type="email" class="ep-input" id="regEmail" maxlength="160" placeholder="company@email.com">
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="ep-field">
+              <label class="ep-label">Password <span class="text-danger">*</span></label>
+              <div class="ep-input-wrap">
+                <input type="password" class="ep-input" id="regPass" maxlength="72" placeholder="Min 8 characters">
+                <button class="ep-input-eye" onclick="togglePass('regPass',this)" type="button"><i class="bi bi-eye"></i></button>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="ep-field">
+              <label class="ep-label">Confirm Password <span class="text-danger">*</span></label>
+              <div class="ep-input-wrap">
+                <input type="password" class="ep-input" id="regPassConfirm" maxlength="72" placeholder="Re-enter password">
+                <button class="ep-input-eye" onclick="togglePass('regPassConfirm',this)" type="button"><i class="bi bi-eye"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="registerMsg" class="ep-msg d-none"></div>
+        <button class="ep-btn-primary w-100 mt-2" onclick="doRegister()">
+          <i class="bi bi-person-plus-fill me-2"></i>Create Free Account
+        </button>
+        <p style="font-size:.75rem;color:var(--text-muted);text-align:center;margin-top:1rem">
+          By creating an account you agree to our <a href="/terms.html" style="color:var(--primary)">Terms</a> and <a href="/privacy-policy.html" style="color:var(--primary)">Privacy Policy</a>.
+        </p>
+        <p style="text-align:center;margin-top:.75rem;font-size:.85rem;color:var(--text-muted)">
+          Already have an account? <a href="index.html" style="color:var(--primary);font-weight:600;text-decoration:none">Sign In</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+<button class="ep-icon-btn ep-auth-theme-toggle" id="themeToggle">
+  <i class="bi bi-moon-fill" id="themeIcon"></i>
+</button>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+
+const API = {
+  async get(url) {
+    const r = await fetch(url, { credentials: 'include' });
+    return r.json();
+  },
+  async post(url, data) {
+    const r = await fetch(url, { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+    return r.json();
+  }
+};
+
+// If already logged in, skip straight to dashboard
+API.get('/api/employer/me').then(d => {
+  if (d.success) window.location.href = '/employer/dashboard.html';
+}).catch(() => {});
+
+function togglePass(id, btn) {
+  const inp = document.getElementById(id);
+  const show = inp.type === 'password';
+  inp.type = show ? 'text' : 'password';
+  btn.innerHTML = show ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
+}
+
+function showMsg(el, text, type) {
+  el.className = 'ep-msg ep-msg-' + type;
+  el.textContent = text;
+  el.classList.remove('d-none');
+}
+
+async function doRegister() {
+  const password = document.getElementById('regPass').value;
+  const confirm_password = document.getElementById('regPassConfirm').value;
+
+  const data = {
+    company_name:     document.getElementById('regCompany').value.trim(),
+    contact_name:     document.getElementById('regName').value.trim(),
+    email:            document.getElementById('regEmail').value.trim(),
+    password,
+    confirm_password,
+    phone:            document.getElementById('regPhone').value.trim(),
+    sector:           document.getElementById('regSector').value,
+    city:             document.getElementById('regCity').value.trim(),
+    address:          document.getElementById('regAddress').value.trim(),
+    map_link:         document.getElementById('regMapLink').value.trim(),
+    cr_number:        document.getElementById('regCR').value.trim(),
+    website:          document.getElementById('regWebsite').value.trim(),
+    about:            document.getElementById('regAbout').value.trim()
+  };
+  const msg = document.getElementById('registerMsg');
+  const btn = event.target;
+
+  if (!data.company_name) { showMsg(msg, 'Company name is required', 'error'); return; }
+  if (!data.contact_name) { showMsg(msg, 'Your name is required', 'error'); return; }
+  if (!data.email)        { showMsg(msg, 'Email is required', 'error'); return; }
+  if (!data.address)      { showMsg(msg, 'Address is required', 'error'); return; }
+  if (password.length < 8) { showMsg(msg, 'Password must be at least 8 characters', 'error'); return; }
+  if (password !== confirm_password) { showMsg(msg, 'Passwords do not match', 'error'); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Creating account...';
+
+  try {
+    const d = await API.post('/api/employer/register', data);
+    if (d.success && d.pending) {
+      showMsg(msg, d.message, 'success');
+      btn.innerHTML = '<i class="bi bi-clock me-2"></i>Application Submitted';
+      // Don't re-enable button — prevent duplicate submissions
+    } else if (d.success) {
+      window.location.href = '/employer/dashboard.html';
+    } else {
+      showMsg(msg, d.message || 'Registration failed', 'error');
+      btn.disabled = false;
+      btn.innerHTML = '<i class="bi bi-person-plus-fill me-2"></i>Create Free Account';
+    }
+  } catch(e) {
+    showMsg(msg, 'Network error. Please try again.', 'error');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="bi bi-person-plus-fill me-2"></i>Create Free Account';
+  }
+}
+
+document.addEventListener('keypress', e => {
+  if (e.key === 'Enter') doRegister();
+});
+</script>
+<script src="/employer/feedback-widget.js"></script>
+</body></html>

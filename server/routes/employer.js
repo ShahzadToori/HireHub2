@@ -26,11 +26,31 @@ function makeToken() { return crypto.randomBytes(32).toString('hex'); }
 // POST /api/employer/register
 router.post('/register', async (req, res) => {
   try {
-    const { company_name, contact_name, email, password, phone, whatsapp, sector, city } = req.body;
+    const {
+      company_name, contact_name, email, password, confirm_password,
+      phone, whatsapp, sector, city, address, map_link,
+      cr_number, website, about
+    } = req.body;
 
     if (!company_name?.trim()) return res.status(400).json({ success: false, message: 'Company name is required' });
+    if (!contact_name?.trim()) return res.status(400).json({ success: false, message: 'Your name is required' });
     if (!email?.trim())        return res.status(400).json({ success: false, message: 'Email is required' });
     if (!password || password.length < 8) return res.status(400).json({ success: false, message: 'Password must be at least 8 characters' });
+    if (password.length > 72)  return res.status(400).json({ success: false, message: 'Password must be 72 characters or less' });
+    if (confirm_password !== undefined && password !== confirm_password)
+      return res.status(400).json({ success: false, message: 'Passwords do not match' });
+    if (!address?.trim())      return res.status(400).json({ success: false, message: 'Address is required' });
+
+    // Server-side length guards (defense in depth — client maxlength can be bypassed via direct API calls)
+    const lenChecks = [
+      [company_name, 200, 'Company name'], [contact_name, 100, 'Your name'], [email, 160, 'Email'],
+      [phone, 30, 'Phone'], [whatsapp, 30, 'WhatsApp'], [sector, 100, 'Sector'], [city, 100, 'City'],
+      [address, 255, 'Address'], [map_link, 500, 'Map link'], [cr_number, 100, 'CR number'],
+      [website, 300, 'Website'], [about, 2000, 'About']
+    ];
+    for (const [val, max, label] of lenChecks) {
+      if (val && val.length > max) return res.status(400).json({ success: false, message: `${label} must be ${max} characters or less` });
+    }
 
     // Check duplicate
     const [[existing]] = await db.query('SELECT id FROM employers WHERE email = ?', [email.trim().toLowerCase()]);
@@ -40,12 +60,15 @@ router.post('/register', async (req, res) => {
     const token = makeToken();
 
     const [result] = await db.query(
-      `INSERT INTO employers (company_name, contact_name, email, password_hash, phone, whatsapp, sector, city, verify_token, status)
-       VALUES (?,?,?,?,?,?,?,?,?,'pending')`,
+      `INSERT INTO employers (company_name, contact_name, email, password_hash, phone, whatsapp, sector, city, address, map_link, cr_number, website, about, verify_token, status)
+       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,'pending')`,
       [
-        company_name.trim(), contact_name?.trim() || '', email.trim().toLowerCase(),
+        company_name.trim(), contact_name.trim(), email.trim().toLowerCase(),
         hash, phone?.trim() || null, whatsapp?.trim() || null,
-        sector?.trim() || null, city?.trim() || null, token
+        sector?.trim() || null, city?.trim() || null,
+        address.trim(), map_link?.trim() || null,
+        cr_number?.trim() || null, website?.trim() || null, about?.trim() || null,
+        token
       ]
     );
 
@@ -61,11 +84,14 @@ router.post('/register', async (req, res) => {
         <p style="color:#374151;margin-bottom:1rem">A new employer is awaiting your approval:</p>
         <table style="width:100%;border-collapse:collapse;margin-bottom:1.5rem">
           <tr><td style="padding:.35rem 0;color:#6b7280;width:110px;font-size:.9rem">Company</td><td style="padding:.35rem 0;font-weight:600">${company_name.trim()}</td></tr>
-          <tr><td style="padding:.35rem 0;color:#6b7280;font-size:.9rem">Contact</td><td style="padding:.35rem 0">${contact_name?.trim() || '—'}</td></tr>
+          <tr><td style="padding:.35rem 0;color:#6b7280;font-size:.9rem">Contact</td><td style="padding:.35rem 0">${contact_name.trim()}</td></tr>
           <tr><td style="padding:.35rem 0;color:#6b7280;font-size:.9rem">Email</td><td style="padding:.35rem 0">${email.trim().toLowerCase()}</td></tr>
           <tr><td style="padding:.35rem 0;color:#6b7280;font-size:.9rem">Phone</td><td style="padding:.35rem 0">${phone?.trim() || '—'}</td></tr>
           <tr><td style="padding:.35rem 0;color:#6b7280;font-size:.9rem">Sector</td><td style="padding:.35rem 0">${sector?.trim() || '—'}</td></tr>
           <tr><td style="padding:.35rem 0;color:#6b7280;font-size:.9rem">City</td><td style="padding:.35rem 0">${city?.trim() || '—'}</td></tr>
+          <tr><td style="padding:.35rem 0;color:#6b7280;font-size:.9rem">Address</td><td style="padding:.35rem 0">${address.trim()}</td></tr>
+          <tr><td style="padding:.35rem 0;color:#6b7280;font-size:.9rem">CR Number</td><td style="padding:.35rem 0">${cr_number?.trim() || '—'}</td></tr>
+          <tr><td style="padding:.35rem 0;color:#6b7280;font-size:.9rem">Map Link</td><td style="padding:.35rem 0">${map_link?.trim() ? `<a href="${map_link.trim()}">View on Map</a>` : '—'}</td></tr>
         </table>
         <a href="${_regBase}/admin/employers.html" style="display:inline-block;background:#0f62fe;color:#fff;padding:.65rem 1.4rem;border-radius:8px;text-decoration:none;font-weight:600;font-size:.9rem">
           Review in Admin →
@@ -254,6 +280,18 @@ router.put('/profile', requireEmployer, async (req, res) => {
     } = req.body;
     if (!company_name?.trim())
       return res.status(400).json({ success: false, message: 'Company name is required' });
+
+    // Server-side length guards (defense in depth — client maxlength can be bypassed via direct API calls)
+    const lenChecks = [
+      [company_name, 200, 'Company name'], [contact_name, 100, 'Contact name'], [phone, 30, 'Phone'],
+      [whatsapp, 30, 'WhatsApp'], [sector, 100, 'Sector'], [city, 100, 'City'], [website, 300, 'Website'],
+      [address, 255, 'Address'], [map_link, 500, 'Map link'], [company_size, 50, 'Company size'],
+      [cr_number, 100, 'CR number'], [linkedin_url, 255, 'LinkedIn URL'], [about, 2000, 'About']
+    ];
+    for (const [val, max, label] of lenChecks) {
+      if (val && val.length > max) return res.status(400).json({ success: false, message: `${label} must be ${max} characters or less` });
+    }
+
     await db.query(
       `UPDATE employers SET
          company_name=?, contact_name=?, phone=?, whatsapp=?, sector=?, city=?,

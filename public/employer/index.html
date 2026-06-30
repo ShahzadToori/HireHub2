@@ -56,10 +56,7 @@
   </div>
   <div class="ep-auth-right">
     <div class="ep-auth-card">
-      <div class="ep-auth-tabs">
-        <button class="ep-auth-tab active" onclick="showTab('login')">Sign In</button>
-        <button class="ep-auth-tab" onclick="showTab('register')">Create Account</button>
-      </div>
+      <h2 style="font-size:1.3rem;font-weight:800;margin-bottom:1.25rem;color:var(--text)">Sign In</h2>
 
       <!-- LOGIN -->
       <div id="loginForm">
@@ -88,6 +85,9 @@
         <button class="ep-btn-primary w-100 mt-2" onclick="doLogin()">
           <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
         </button>
+        <p style="text-align:center;margin-top:1rem;font-size:.85rem;color:var(--text-muted)">
+          Don't have an account? <a href="register.html" style="color:var(--primary);font-weight:600;text-decoration:none">Sign Up</a>
+        </p>
       </div>
 
       <!-- FORGOT PASSWORD -->
@@ -106,75 +106,6 @@
         <button class="ep-btn-outline w-100 mt-2" onclick="backToLogin()">
           <i class="bi bi-arrow-left me-2"></i>Back to Sign In
         </button>
-      </div>
-
-      <!-- REGISTER -->
-      <div id="registerForm" class="d-none">
-        <div class="row g-2">
-          <div class="col-12">
-            <div class="ep-field">
-              <label class="ep-label">Company Name <span class="text-danger">*</span></label>
-              <input type="text" class="ep-input" id="regCompany" placeholder="e.g. Al-Rajhi Contracting">
-            </div>
-          </div>
-          <div class="col-sm-6">
-            <div class="ep-field">
-              <label class="ep-label">Your Name <span class="text-danger">*</span></label>
-              <input type="text" class="ep-input" id="regName" placeholder="Contact person">
-            </div>
-          </div>
-          <div class="col-sm-6">
-            <div class="ep-field">
-              <label class="ep-label">Phone / WhatsApp</label>
-              <input type="tel" class="ep-input" id="regPhone" placeholder="+966 5XX XXX XXXX">
-            </div>
-          </div>
-          <div class="col-sm-6">
-            <div class="ep-field">
-              <label class="ep-label">Sector</label>
-              <select class="ep-input" id="regSector">
-                <option value="">Select sector</option>
-                <option>Construction</option>
-                <option>Oil & Gas</option>
-                <option>Healthcare</option>
-                <option>Technology</option>
-                <option>Manufacturing</option>
-                <option>Hospitality</option>
-                <option>Finance</option>
-                <option>Education</option>
-                <option>Other</option>
-              </select>
-            </div>
-          </div>
-          <div class="col-sm-6">
-            <div class="ep-field">
-              <label class="ep-label">City</label>
-              <input type="text" class="ep-input" id="regCity" placeholder="e.g. Riyadh">
-            </div>
-          </div>
-          <div class="col-12">
-            <div class="ep-field">
-              <label class="ep-label">Email Address <span class="text-danger">*</span></label>
-              <input type="email" class="ep-input" id="regEmail" placeholder="company@email.com">
-            </div>
-          </div>
-          <div class="col-12">
-            <div class="ep-field">
-              <label class="ep-label">Password <span class="text-danger">*</span></label>
-              <div class="ep-input-wrap">
-                <input type="password" class="ep-input" id="regPass" placeholder="Min 8 characters">
-                <button class="ep-input-eye" onclick="togglePass('regPass',this)"><i class="bi bi-eye"></i></button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div id="registerMsg" class="ep-msg d-none"></div>
-        <button class="ep-btn-primary w-100 mt-2" onclick="doRegister()">
-          <i class="bi bi-person-plus-fill me-2"></i>Create Free Account
-        </button>
-        <p style="font-size:.75rem;color:var(--text-muted);text-align:center;margin-top:1rem">
-          By creating an account you agree to our <a href="/terms.html" style="color:var(--primary)">Terms</a> and <a href="/privacy-policy.html" style="color:var(--primary)">Privacy Policy</a>.
-        </p>
       </div>
     </div>
   </div>
@@ -274,9 +205,7 @@ API.get('/api/employer/me').then(d => {
 
 function showForgot() {
   document.getElementById('loginForm').classList.add('d-none');
-  document.getElementById('registerForm').classList.add('d-none');
   document.getElementById('forgotForm').classList.remove('d-none');
-  document.querySelectorAll('.ep-auth-tab').forEach(t => t.classList.remove('active'));
 }
 
 function backToLogin() {
@@ -308,10 +237,8 @@ async function doForgotPassword() {
 }
 
 function showTab(tab) {
-  document.getElementById('loginForm').classList.toggle('d-none', tab !== 'login');
-  document.getElementById('registerForm').classList.toggle('d-none', tab !== 'register');
+  document.getElementById('loginForm').classList.remove('d-none');
   document.getElementById('forgotForm').classList.add('d-none');
-  document.querySelectorAll('.ep-auth-tab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='login')||(i===1&&tab==='register')));
 }
 
 function togglePass(id, btn) {
@@ -349,47 +276,6 @@ async function doLogin() {
   }
 }
 
-async function doRegister() {
-  const data = {
-    company_name: document.getElementById('regCompany').value.trim(),
-    contact_name: document.getElementById('regName').value.trim(),
-    email:        document.getElementById('regEmail').value.trim(),
-    password:     document.getElementById('regPass').value,
-    phone:        document.getElementById('regPhone').value.trim(),
-    sector:       document.getElementById('regSector').value,
-    city:         document.getElementById('regCity').value.trim()
-  };
-  const msg = document.getElementById('registerMsg');
-  const btn = event.target;
-
-  if (!data.company_name) { showMsg(msg, 'Company name is required', 'error'); return; }
-  if (!data.email)         { showMsg(msg, 'Email is required', 'error'); return; }
-  if (data.password.length < 8) { showMsg(msg, 'Password must be at least 8 characters', 'error'); return; }
-
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Creating account...';
-
-  try {
-    const d = await API.post('/api/employer/register', data);
-    if (d.success && d.pending) {
-      // Account created but needs admin approval — show message, no redirect
-      showMsg(msg, d.message, 'success');
-      btn.innerHTML = '<i class="bi bi-clock me-2"></i>Application Submitted';
-      // Don't re-enable button — prevent duplicate submissions
-    } else if (d.success) {
-      window.location.href = '/employer/dashboard.html';
-    } else {
-      showMsg(msg, d.message || 'Registration failed', 'error');
-      btn.disabled = false;
-      btn.innerHTML = '<i class="bi bi-person-plus-fill me-2"></i>Create Free Account';
-    }
-  } catch(e) {
-    showMsg(msg, 'Network error. Please try again.', 'error');
-    btn.disabled = false;
-    btn.innerHTML = '<i class="bi bi-person-plus-fill me-2"></i>Create Free Account';
-  }
-}
-
 function showMsg(el, text, type) {
   el.className = 'ep-msg ep-msg-' + type;
   el.textContent = text;
@@ -400,7 +286,7 @@ document.addEventListener('keypress', e => {
   if (e.key === 'Enter') {
     const loginVisible = !document.getElementById('loginForm').classList.contains('d-none');
     if (loginVisible) doLogin();
-    else doRegister();
+    else doForgotPassword();
   }
 });
 </script>

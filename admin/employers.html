@@ -517,6 +517,7 @@ async function openDetail(id) {
         <div class="detail-row"><span class="detail-label">Last Login</span><span class="detail-val">${emp.last_login ? timeAgo(emp.last_login) : 'Never'}</span></div>
         ${emp.about ? `<div class="detail-row"><span class="detail-label">About</span><span class="detail-val" style="font-size:.82rem">${escHtml(emp.about)}</span></div>` : ''}
         ${emp.address ? `<div class="detail-row"><span class="detail-label">Address</span><span class="detail-val">${escHtml(emp.address)}</span></div>` : ''}
+        ${emp.map_link ? `<div class="detail-row"><span class="detail-label">Map Link</span><span class="detail-val"><a href="${escHtml(emp.map_link)}" target="_blank" style="color:var(--primary)"><i class="bi bi-geo-alt-fill me-1"></i>View on Map</a></span></div>` : ''}
       </div>
 
       <!-- Admin notes -->

@@ -71,7 +71,7 @@ router.get('/:id', async (req, res) => {
   try {
     const [[emp]] = await db.query(
       `SELECT e.id, e.company_name, e.contact_name, e.email, e.phone, e.whatsapp,
-              e.sector, e.city, e.about, e.website, e.address, e.logo_url,
+              e.sector, e.city, e.about, e.website, e.address, e.map_link, e.logo_url,
               e.status, e.cr_number, e.linkedin_url, e.founded_year,
               e.company_size, e.created_at, e.last_login, e.email_verified,
               e.admin_notes
