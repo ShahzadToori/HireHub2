@@ -100,6 +100,26 @@ router.post('/register', async (req, res) => {
       </div>`
     }).catch(e => console.warn('[register admin notify]', e.message));
 
+    // Send verification email to the employer (fire-and-forget, non-blocking, no expiry)
+    const verifyLink = `${_regBase}/api/employer/verify-email/${token}`;
+    sendMail({
+      to: email.trim().toLowerCase(),
+      subject: 'Verify Your Email | JobOrbit',
+      html: `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:2rem">
+        <h2 style="color:#0f62fe;margin-bottom:.5rem">Verify Your Email</h2>
+        <p>Hi ${contact_name.trim()},</p>
+        <p>Thanks for registering with JobOrbit. Please confirm this is your email address by clicking the button below.</p>
+        <p style="margin:1.5rem 0">
+          <a href="${verifyLink}" style="background:#0f62fe;color:#fff;padding:.7rem 1.5rem;border-radius:8px;text-decoration:none;font-weight:600;display:inline-block">
+            Verify Email →
+          </a>
+        </p>
+        <p style="color:#6b7280;font-size:.82rem">Your account is also pending admin approval — you'll receive a separate email once it's reviewed.</p>
+        <hr style="border:none;border-top:1px solid #e5e7eb;margin:1.5rem 0">
+        <p style="color:#9ca3af;font-size:.75rem">Powered by <a href="${_regBase}" style="color:#0f62fe">JobOrbit.org</a></p>
+      </div>`
+    }).catch(e => console.warn('[register verify email]', e.message));
+
     res.json({
       success: true,
       pending: true,
@@ -108,6 +128,24 @@ router.post('/register', async (req, res) => {
   } catch (err) {
     console.error('[employer/register]', err);
     res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+// GET /api/employer/verify-email/:token — confirms employer owns this email.
+// No time-based expiry (per product decision). One-time use: token cleared after success.
+router.get('/verify-email/:token', async (req, res) => {
+  const base = process.env.NODE_ENV === 'production' ? 'https://joborbit.org' : (process.env.SITE_URL || 'http://localhost:3000');
+  try {
+    const [[emp]] = await db.query('SELECT id, email_verified FROM employers WHERE verify_token = ?', [req.params.token]);
+    if (!emp) return res.redirect(`${base}/employer/?verify_error=1`);
+
+    if (!emp.email_verified) {
+      await db.query('UPDATE employers SET email_verified = 1, verify_token = NULL WHERE id = ?', [emp.id]);
+    }
+    res.redirect(`${base}/employer/?verified=1`);
+  } catch (err) {
+    console.error('[verify-email]', err);
+    res.redirect(`${base}/employer/?verify_error=1`);
   }
 });
 

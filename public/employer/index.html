@@ -198,6 +198,19 @@ if (window.location.search.includes('reason=timeout')) {
     if (msg) { msg.className = 'ep-msg ep-msg-error'; msg.textContent = 'Your session expired due to inactivity. Please log in again.'; msg.classList.remove('d-none'); }
   }, 300);
 }
+// Show email verification result if redirected from the verification link
+if (window.location.search.includes('verified=1')) {
+  setTimeout(() => {
+    const msg = document.getElementById('loginMsg');
+    if (msg) { msg.className = 'ep-msg ep-msg-success'; msg.textContent = 'Email verified! You can sign in once your account is approved.'; msg.classList.remove('d-none'); }
+  }, 300);
+}
+if (window.location.search.includes('verify_error=1')) {
+  setTimeout(() => {
+    const msg = document.getElementById('loginMsg');
+    if (msg) { msg.className = 'ep-msg ep-msg-error'; msg.textContent = 'Invalid or already-used verification link.'; msg.classList.remove('d-none'); }
+  }, 300);
+}
 // Check if already logged in
 API.get('/api/employer/me').then(d => {
   if (d.success) window.location.href = '/employer/dashboard.html';
