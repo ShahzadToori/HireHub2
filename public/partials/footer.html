@@ -47,6 +47,78 @@
   </div>
 </footer>
 
+<!-- ══════════════════════════════════════════════
+     WHATSAPP JOB ALERTS MODAL — shared, every page
+════════════════════════════════════════════════ -->
+<div class="modal fade" id="alertsModal" tabindex="-1" aria-labelledby="alertsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:18px;border:1px solid var(--border);background:var(--bg-card)">
+      <div class="modal-header border-0 pb-0">
+        <div>
+          <h5 class="modal-title fw-bold" id="alertsModalLabel" style="font-family:'Syne',sans-serif">
+            <i class="bi bi-envelope-fill me-2" style="color:var(--primary)"></i>Email Job Alerts
+          </h5>
+          <p class="text-muted small mb-0">New matching jobs delivered to your inbox. Free, no account needed.</p>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body pt-3">
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Email Address <span class="text-danger">*</span></label>
+          <input type="email" class="form-control" id="alertEmail" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Job Category <span class="text-muted fw-normal">(optional)</span></label>
+          <select class="form-select" id="alertCategorySelect">
+            <option value="">All Categories — send me everything</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">City <span class="text-muted fw-normal">(optional)</span></label>
+          <input type="text" class="form-control" id="alertCity" placeholder="e.g. Riyadh, Jeddah, Dubai">
+        </div>
+        <div id="alertMsg"></div>
+        <div style="background:rgba(15,98,254,.06);border:1px solid rgba(15,98,254,.2);border-radius:10px;padding:.7rem .9rem;font-size:.78rem;color:var(--text-secondary);margin-top:.75rem">
+          <i class="bi bi-shield-check me-1" style="color:var(--primary)"></i>
+          You will receive a confirmation email first. One-click unsubscribe anytime.
+        </div>
+      </div>
+      <div class="modal-footer border-0 pt-0">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="alertSubmitBtn" onclick="submitAlerts()" style="font-family:'Syne',sans-serif;font-weight:700">
+          <i class="bi bi-envelope-fill me-1"></i>Subscribe
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     MOBILE BOTTOM NAV — shared, every page
+════════════════════════════════════════════════ -->
+<nav class="mobile-bottom-nav" aria-label="Mobile navigation">
+  <a href="/#jobs" class="mbn-item" onclick="bnGo(event,'jobs')">
+    <i class="bi bi-briefcase-fill"></i>
+    <span>Jobs</span>
+  </a>
+  <a href="/#categories" class="mbn-item" onclick="bnGo(event,'categories')">
+    <i class="bi bi-grid-fill"></i>
+    <span>Browse</span>
+  </a>
+  <button class="mbn-item" onclick="openAlertsModal()" aria-label="Get email job alerts">
+    <i class="bi bi-envelope-fill"></i>
+    <span>Alerts</span>
+  </button>
+  <a href="/employer/" class="mbn-item">
+    <i class="bi bi-plus-circle-fill"></i>
+    <span>Post Job</span>
+  </a>
+  <button class="mbn-item" onclick="toggleTheme()" aria-label="Toggle dark mode">
+    <i class="bi bi-moon-fill" id="mbnThemeIcon"></i>
+    <span>Theme</span>
+  </button>
+</nav>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
 <script>
 /* ── Shared layout script — loaded on every page via footer partial ── */
@@ -112,4 +184,105 @@ document.querySelectorAll('.navbar-nav .nav-link').forEach(link => {
 
 // Run loadSettings (safe to call even if main.js already called it — it's idempotent)
 if (typeof loadSettings === 'function') loadSettings();
+
+/* ── Mobile bottom nav: Jobs/Browse links ──
+   On the homepage, scroll to the section directly.
+   On other pages, let the link's href (/#jobs, /#categories) navigate home instead. */
+window.bnGo = function(ev, sectionId) {
+  const el = document.getElementById(sectionId);
+  if (el) {
+    ev.preventDefault();
+    el.scrollIntoView({ behavior: 'smooth' });
+  }
+};
+
+/* ── Mobile bottom nav: highlight current page (non-home pages) ──
+   The homepage drives its own scroll-based highlighting (see main.js initMobileNavActive). */
+if (location.pathname !== '/' && location.pathname !== '/index.html') {
+  document.querySelectorAll('.mobile-bottom-nav .mbn-item[href]').forEach(item => {
+    const href = item.getAttribute('href');
+    if (href === '/#jobs' || href === '/#categories') return;
+    if (location.pathname === href || location.pathname.startsWith(href)) {
+      item.classList.add('active');
+    }
+  });
+}
+
+/* ── Job Alerts modal — fallback for pages without main.js ── */
+async function _ensureAlertCategories() {
+  const sel = document.getElementById('alertCategorySelect');
+  if (!sel || sel.dataset.populated) return;
+  sel.dataset.populated = '1';
+  try {
+    const data = await fetch('/api/jobs/categories').then(r => r.json());
+    (data.categories || []).forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.slug;
+      opt.textContent = c.name;
+      sel.appendChild(opt);
+    });
+  } catch (e) {}
+}
+
+if (typeof openAlertsModal === 'undefined') {
+  window.openAlertsModal = async function() {
+    const el = document.getElementById('alertsModal');
+    if (!el) return;
+    await _ensureAlertCategories();
+    bootstrap.Modal.getOrCreateInstance(el).show();
+  };
+}
+
+if (typeof submitAlerts === 'undefined') {
+  window.submitAlerts = async function() {
+    const emailEl  = document.getElementById('alertEmail');
+    const category = document.getElementById('alertCategorySelect')?.value || '';
+    const city     = document.getElementById('alertCity')?.value.trim() || '';
+    const btn      = document.getElementById('alertSubmitBtn');
+    const msgEl    = document.getElementById('alertMsg');
+
+    const email = emailEl?.value.trim().toLowerCase();
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRe.test(email)) {
+      msgEl.textContent = 'Please enter a valid email address.';
+      msgEl.className = 'alert-msg error';
+      emailEl?.focus();
+      return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Subscribing…';
+    msgEl.textContent = '';
+
+    try {
+      const res  = await fetch('/api/alerts/subscribe', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ email, category, city, channel: 'email' })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        msgEl.textContent = data.message;
+        msgEl.className   = 'alert-msg success';
+        btn.innerHTML     = '<i class="bi bi-check-lg me-1"></i>Done!';
+        localStorage.setItem('jb_alertSub', JSON.stringify({ email, category, city, ts: Date.now() }));
+        setTimeout(() => {
+          bootstrap.Modal.getInstance(document.getElementById('alertsModal'))?.hide();
+          btn.disabled  = false;
+          btn.innerHTML = '<i class="bi bi-envelope-fill me-1"></i>Subscribe';
+          msgEl.textContent = '';
+          if (emailEl) emailEl.value = '';
+        }, 3000);
+      } else {
+        throw new Error(data.message || 'Failed to subscribe');
+      }
+    } catch (e) {
+      msgEl.textContent = e.message || 'Network error. Please try again.';
+      msgEl.className   = 'alert-msg error';
+      btn.disabled      = false;
+      btn.innerHTML     = '<i class="bi bi-envelope-fill me-1"></i>Subscribe';
+    }
+  };
+}
 </script>

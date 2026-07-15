@@ -260,8 +260,6 @@
   border-radius: 14px;
   padding: 1.25rem;
   margin-bottom: 1.5rem;
-  position: sticky;
-  top: 0;
 }
 .rb-ats-score-ring {
   position: relative;

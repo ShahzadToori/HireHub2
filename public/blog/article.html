@@ -78,9 +78,13 @@
 <section class="blog-hero">
   <div class="container blog-hero-inner">
     <div class="breadcrumb-bar" style="justify-content:center;margin-bottom:.75rem">
+      <a href="/blog/" onclick="backToBlog(event)" style="color:rgba(255,255,255,.8);font-weight:700">
+        <i class="bi bi-arrow-left me-1"></i>Back
+      </a>
+      <i class="bi bi-chevron-right" style="font-size:.65rem;color:rgba(255,255,255,.3)"></i>
       <a href="/" style="color:rgba(255,255,255,.45)">Home</a>
       <i class="bi bi-chevron-right" style="font-size:.65rem;color:rgba(255,255,255,.3)"></i>
-      <a href="/blog/" onclick="if(document.referrer.includes('/blog/')){event.preventDefault();history.back();}" style="color:rgba(255,255,255,.45)">Blog</a>
+      <a href="/blog/" onclick="backToBlog(event)" style="color:rgba(255,255,255,.45)">Blog</a>
       <i class="bi bi-chevron-right" style="font-size:.65rem;color:rgba(255,255,255,.3)"></i>
       <span id="hero-category" style="color:rgba(255,255,255,.45)">Article</span>
     </div>
@@ -105,7 +109,7 @@
     <!-- Main content -->
     <div class="col-lg-8">
       <div class="breadcrumb-bar">
-        <a href="/blog/" onclick="if(document.referrer.includes('/blog/')){event.preventDefault();history.back();}"><i class="bi bi-arrow-left me-1"></i>Back to Blog</a>
+        <a href="/blog/" onclick="backToBlog(event)"><i class="bi bi-arrow-left me-1"></i>Back to Blog</a>
       </div>
       <img id="featured-img" class="featured-img d-none" src="" alt="">
       <article class="article-body" id="article-content"></article>
@@ -144,6 +148,16 @@
 <!-- FOOTER -->
 
 <script>
+// Referrer-Policy is set to "no-referrer" site-wide, so document.referrer is always
+// empty here — we can't use it to detect where the user came from. Instead, the blog
+// listing page records its own page/filter state in sessionStorage before you leave it,
+// and we read that back here to return to the exact page you were on.
+function backToBlog(e) {
+  if (e) e.preventDefault();
+  const hash = sessionStorage.getItem('blogHash') || '';
+  window.location.href = '/blog/' + hash;
+}
+
 const slug = window.location.pathname.replace(/^\/blog\/?/, '').replace(/\/$/, '');
 
 const iconMap = {
@@ -187,7 +201,7 @@ async function loadArticle() {
 
     if (!res.ok || !data.success) {
       document.getElementById('article-title').textContent = 'Article not found';
-      document.getElementById('article-content').innerHTML = '<p>This article could not be found. <a href="/blog/" onclick="if(document.referrer.includes('/blog/')){event.preventDefault();history.back();}">Back to Blog</a></p>';
+      document.getElementById('article-content').innerHTML = '<p>This article could not be found. <a href="/blog/" onclick="backToBlog(event)">Back to Blog</a></p>';
       return;
     }
 

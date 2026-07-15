@@ -148,13 +148,18 @@ function buildPagination(pages){
 }
 
 function changePage(page){
-  history.replaceState(null,'','#page='+page);
   if(page<1)return;
+  history.pushState({page},'','#page='+page);
+  sessionStorage.setItem('blogHash','#page='+page);
   loadArticles(page);
   // Smooth scroll to articles grid, not top of page
   const grid=document.getElementById('articles-grid');
   window.scrollTo({top:0,behavior:'smooth'});
 }
+window.addEventListener('popstate',()=>{
+  const p=parseInt(window.location.hash.replace('#page=',''))||1;
+  loadArticles(p);
+});
 async function loadCategories(){
   const res=await fetch('/api/blog/categories');
   const data=await res.json();
@@ -201,6 +206,7 @@ async function loadHeroImage(){
 }
 
 const hashPage = parseInt(window.location.hash.replace('#page=','')) || 1;
+sessionStorage.setItem('blogHash', window.location.hash || '#page=1');
 loadFeatured();loadCategories();
 loadHeroImage();loadArticles(hashPage);
 
