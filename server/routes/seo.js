@@ -10,8 +10,18 @@
 'use strict';
 
 const express = require('express');
+const fs      = require('fs');
+const path    = require('path');
 const db      = require('../db/connection');
 const router  = express.Router();
+
+// Shared apply-form partial — single source of truth, also used by the
+// homepage job-detail modal (see public/js/apply-form.js + htmlLayout.js)
+const APPLY_FORM_PARTIAL = path.join(__dirname, '../../public/partials/apply-form.html');
+function readApplyFormPartial() {
+  try { return fs.readFileSync(APPLY_FORM_PARTIAL, 'utf8'); }
+  catch (e) { return ''; }
+}
 
 /* ── helpers ────────────────────────────────────────────────── */
 function xe(str) {                           // XML / HTML escape
@@ -444,6 +454,7 @@ const contactBtns = [
   <meta name="description" content="${he(metaDesc)}">
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
   <link rel="canonical" href="${he(canonical)}">
+  <link rel="stylesheet" href="/css/apply-form.css">
 
   <!-- Open Graph -->
   <meta property="og:type"        content="article">
@@ -536,23 +547,6 @@ const contactBtns = [
     .cnt-option:hover{background:#f9fafb}
     .cnt-option strong{color:#0f62fe;font-weight:700}
 
-    /* Apply modal */
-    .seo-apply-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;padding:1rem}
-    .seo-apply-overlay.open{display:flex}
-    .seo-apply-modal{background:#fff;border-radius:18px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
-    .seo-apply-header{padding:1.25rem 1.5rem;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between}
-    .seo-apply-header h3{margin:0;font-size:1.05rem;font-weight:800;color:#161616}
-    .seo-apply-body{padding:1.25rem 1.5rem}
-    .seo-field{margin-bottom:.85rem}
-    .seo-label{display:block;font-size:.78rem;font-weight:700;color:#6b7280;margin-bottom:.3rem}
-    .seo-input{width:100%;padding:.6rem .85rem;border:1.5px solid #e5e7eb;border-radius:9px;font-size:.9rem;outline:none;box-sizing:border-box}
-    .seo-input:focus{border-color:#0f62fe}
-    .seo-row{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
-    .seo-apply-footer{padding:1rem 1.5rem;border-top:1px solid #e5e7eb;display:flex;gap:.5rem;justify-content:flex-end}
-    .seo-btn-primary{background:#0f62fe;color:#fff;border:none;padding:.65rem 1.25rem;border-radius:9px;font-weight:700;cursor:pointer;font-size:.88rem}
-    .seo-btn-secondary{background:#f1f3f4;color:#374151;border:none;padding:.65rem 1.25rem;border-radius:9px;font-weight:600;cursor:pointer;font-size:.88rem}
-    .seo-msg{padding:.65rem 1rem;border-radius:8px;font-size:.83rem;margin-bottom:.75rem}
-
     /* Similar Jobs */
     .sim-section{margin-top:2rem}
     .sim-heading{font-size:1.05rem;font-weight:700;color:#0f172a;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid #e5e7eb}
@@ -631,7 +625,7 @@ ${ga4Script}
     <div class="card-body apply-section">
       <div class="apply-head">${job.employer_id ? 'Apply for this Job' : 'Apply Now'}</div>
       ${job.employer_id ? `
-      <button class="apply-cta" onclick="openSeoApply()">📩 Apply Now</button>
+      <button class="apply-cta" onclick="openApplyForm(${job.id}, ${he(JSON.stringify(job.title))})">📩 Apply Now</button>
       <p class="apply-sub">${he(job.company) || 'The employer'} will review your application directly on ${he(siteName)}.</p>
       ` : ''}
       ${contactBtns ? `
@@ -674,7 +668,7 @@ ${ga4Script}
 ${(job.employer_id || job.whatsapp || job.phone || job.email) ? `
 <div class="mobile-apply-bar">
   ${job.employer_id
-    ? `<button class="apply-cta" onclick="openSeoApply()">📩 Apply Now</button>`
+    ? `<button class="apply-cta" onclick="openApplyForm(${job.id}, ${he(JSON.stringify(job.title))})">📩 Apply Now</button>`
     : job.whatsapp
       ? `<a href="${whatsappUrl}" target="_blank" class="apply-cta">💬 WhatsApp</a>`
       : job.phone
@@ -693,229 +687,11 @@ ${(job.employer_id || job.whatsapp || job.phone || job.email) ? `
   })();
 </script>
 
-<!-- Apply Now Modal -->
-<div class="seo-apply-overlay" id="seoApplyOverlay">
-  <div class="seo-apply-modal">
-    <div class="seo-apply-header">
-      <div>
-        <h3>Apply for this Job</h3>
-        <p style="margin:.2rem 0 0;font-size:.78rem;color:#6b7280">${he(job.title)} — ${he(job.company)}</p>
-      </div>
-      <button onclick="closeSeoApply()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:#6b7280">✕</button>
-    </div>
-    <div class="seo-apply-body">
-      <div id="seoApplyMsg"></div>
-      <div id="seoScreeningWrap" style="display:none;margin-bottom:1rem">
-        <div style="font-size:.75rem;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.65rem">Pre-Screening Questions</div>
-        <div id="seoScreeningFields"></div>
-        <hr style="border-color:#e5e7eb;margin:.75rem 0">
-      </div>
-      <div class="seo-field">
-        <label class="seo-label">Full Name *</label>
-        <input type="text" class="seo-input" id="seoName" placeholder="Your full name">
-      </div>
-      <div class="seo-row">
-        <div class="seo-field">
-          <label class="seo-label">Phone</label>
-          <input type="tel" class="seo-input" id="seoPhone" placeholder="+966 5XX XXX XXX">
-        </div>
-        <div class="seo-field">
-          <label class="seo-label">WhatsApp</label>
-          <input type="tel" class="seo-input" id="seoWA" placeholder="+966 5XX XXX XXX">
-        </div>
-      </div>
-      <div class="seo-field">
-        <label class="seo-label">Email (for confirmation)</label>
-        <input type="email" class="seo-input" id="seoEmail" placeholder="your@email.com">
-      </div>
-      <div class="seo-row" id="seoRowNatIqama" style="display:none">
-        <div class="seo-field" id="seoColNat">
-          <label class="seo-label">Nationality</label>
-          <div class="cnt-picker">
-            <input type="text" class="seo-input" id="seoNatSearch" placeholder="Search nationality..." oninput="filterCntSingle('seoNat',this.value)" onfocus="filterCntSingle('seoNat',this.value)" autocomplete="off">
-            <div class="cnt-dropdown" id="seoNatDd"></div>
-            <input type="hidden" id="seoNat">
-          </div>
-        </div>
-        <div class="seo-field" id="seoColIqama">
-          <label class="seo-label">Iqama Status</label>
-          <select class="seo-input" id="seoIqama">
-            <option value="">Select...</option>
-            <option>Transferable</option>
-            <option>Non-transferable</option>
-            <option>Visit visa</option>
-            <option>Outside Saudi</option>
-            <option>Saudi National</option>
-          </select>
-        </div>
-      </div>
-      <div class="seo-row" id="seoRowExpCert" style="display:none">
-        <div class="seo-field" id="seoColExp">
-          <label class="seo-label">Experience (years)</label>
-          <input type="number" class="seo-input" id="seoExp" placeholder="0" min="0">
-        </div>
-        <div class="seo-field" id="seoColCert">
-          <label class="seo-label">Has Required Cert?</label>
-          <select class="seo-input" id="seoCert">
-            <option value="0">No</option>
-            <option value="1">Yes</option>
-          </select>
-        </div>
-      </div>
-      <div id="seoRowIqamaNum" style="display:none">
-        <div class="seo-field">
-          <label class="seo-label">Iqama Number</label>
-          <input type="text" class="seo-input" id="seoIqamaNum" inputmode="numeric" placeholder="e.g. 2490123456">
-        </div>
-      </div>
-      <div class="seo-field">
-        <label class="seo-label">Cover Note (optional)</label>
-        <textarea class="seo-input" id="seoCover" rows="3" placeholder="Briefly introduce yourself..."></textarea>
-      </div>
-      <div id="seoCvRow" style="display:none" class="seo-field">
-        <label class="seo-label" id="seoCvLabel">CV / Resume (PDF)</label>
-        <input type="file" id="seoCvFile" accept=".pdf" class="seo-input" style="cursor:pointer;padding:.45rem .65rem">
-        <div style="font-size:.71rem;color:#6b7280;margin-top:.2rem">PDF only · Max 5MB</div>
-      </div>
-    </div>
-    <div class="seo-apply-footer">
-      <button class="seo-btn-secondary" onclick="closeSeoApply()">Cancel</button>
-      <button class="seo-btn-primary" id="seoSubmitBtn" onclick="submitSeoApplication()">📩 Submit Application</button>
-    </div>
-  </div>
-</div>
+<!-- Apply Now form (shared with the homepage modal — see public/partials/apply-form.html) -->
+${readApplyFormPartial()}
 
-<script>
-var SEO_JOB_ID = ${job.id};
-
-async function openSeoApply() {
-  var g = function(id){ return document.getElementById(id); };
-  g('seoApplyMsg').innerHTML = '';
-  g('seoSubmitBtn').disabled = false;
-  g('seoSubmitBtn').textContent = '📩 Submit Application';
-  var ns=g('seoNatSearch'); if(ns) ns.value='';
-  var nh=g('seoNat'); if(nh) nh.value='';
-
-  // Reset — hide all optional fields first
-  ['seoRowNatIqama','seoRowExpCert','seoRowIqamaNum'].forEach(function(id){
-    var el=g(id); if(el) el.style.display='none';
-  });
-  g('seoScreeningWrap').style.display='none';
-  if(g('seoScreeningFields')) g('seoScreeningFields').innerHTML='';
-
-  // Load screening and show only what employer enabled
-  try {
-    var resp = await fetch('/api/employer/screening/' + SEO_JOB_ID);
-    var data = await resp.json();
-    if (data.success) {
-      var fl = data.filters || {};
-      var sN = !!fl.nationalities, sI = !!fl.iqama_types;
-      var sE = fl.min_experience > 0, sC = !!fl.required_certs;
-      if(g('seoColNat'))       g('seoColNat').style.display       = sN ? '' : 'none';
-      if(g('seoColIqama'))     g('seoColIqama').style.display     = sI ? '' : 'none';
-      if(g('seoRowNatIqama'))  g('seoRowNatIqama').style.display  = (sN||sI) ? '' : 'none';
-      if(g('seoColExp'))       g('seoColExp').style.display       = sE ? '' : 'none';
-      if(g('seoColCert'))      g('seoColCert').style.display      = sC ? '' : 'none';
-      if(g('seoRowExpCert'))   g('seoRowExpCert').style.display   = (sE||sC) ? '' : 'none';
-      if(g('seoRowIqamaNum')) g('seoRowIqamaNum').style.display = fl.require_iqama_number ? '' : 'none';
-      var requireCv = data.require_cv || 0;
-      var cvRow = g('seoCvRow'); var cvLabel = g('seoCvLabel');
-      if (cvRow) { cvRow.style.display = ''; cvRow.dataset = cvRow.dataset||{}; cvRow.setAttribute('data-required', requireCv?'1':'0'); }
-      if (cvLabel) cvLabel.innerHTML = requireCv
-        ? 'CV / Resume (PDF) <span style="color:#dc2626">*</span>'
-        : 'CV / Resume (PDF) <span style="font-size:.71rem;color:#6b7280">(optional)</span>';
-      if (data.questions && data.questions.length) {
-        var fields = g('seoScreeningFields');
-        fields.innerHTML = data.questions.map(function(q, i) {
-          return '<div style="margin-bottom:.65rem"><label style="font-size:.82rem;font-weight:600;color:#161616;display:block;margin-bottom:.25rem">' + (i+1) + '. ' + q.text + '</label>'
-            + (q.type === 'yesno'
-              ? '<select class="seo-input screening-ans" data-q="'+i+'"><option value="">Select...</option><option value="yes">Yes</option><option value="no">No</option></select>'
-              : '<input type="text" class="seo-input screening-ans" data-q="'+i+'" placeholder="Your answer...">')
-            + '</div>';
-        }).join('');
-        g('seoScreeningWrap').style.display = 'block';
-      }
-    }
-  } catch(e) {}
-  g('seoApplyOverlay').classList.add('open');
-}
-
-function closeSeoApply() {
-  document.getElementById('seoApplyOverlay').classList.remove('open');
-}
-
-async function submitSeoApplication() {
-  var name  = document.getElementById('seoName').value.trim();
-  var phone = document.getElementById('seoPhone').value.trim();
-  var wa    = document.getElementById('seoWA').value.trim();
-  var msgEl = document.getElementById('seoApplyMsg');
-
-  if (!name)         { showSeoMsg('Full name is required', 'error'); return; }
-  if (!phone && !wa) { showSeoMsg('Phone or WhatsApp is required', 'error'); return; }
-
-  var email = document.getElementById('seoEmail').value.trim();
-  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    showSeoMsg('Please enter a valid email address', 'error');
-    return;
-  }
-
-  var answers = [];
-  document.querySelectorAll('.screening-ans').forEach(function(el) {
-    answers.push({ q: parseInt(el.dataset.q), answer: el.value.trim() });
-  });
-
-  var btn = document.getElementById('seoSubmitBtn');
-  btn.disabled = true;
-  btn.textContent = 'Submitting...';
-
-  var cvFile = document.getElementById('seoCvFile') ? document.getElementById('seoCvFile').files[0] : null;
-  var cvRequired = document.getElementById('seoCvRow') && document.getElementById('seoCvRow').getAttribute('data-required') === '1';
-  if (cvRequired && !cvFile) { showSeoMsg('Please upload your CV (PDF, max 5MB)', 'error'); return; }
-  if (cvFile && cvFile.size > 5*1024*1024) { showSeoMsg('CV too large — max 5MB', 'error'); return; }
-
-  var fd = new FormData();
-  fd.append('full_name',        name);
-  fd.append('email',            document.getElementById('seoEmail').value.trim() || '');
-  fd.append('phone',            phone || '');
-  fd.append('whatsapp',         wa || '');
-  fd.append('nationality',      document.getElementById('seoNat').value.trim() || '');
-  fd.append('iqama_status',     document.getElementById('seoIqama').value || '');
-  fd.append('experience_years', document.getElementById('seoExp').value || '');
-  fd.append('has_certificate',  document.getElementById('seoCert').value === '1' ? '1' : '0');
-  fd.append('iqama_number',     document.getElementById('seoIqamaNum') ? document.getElementById('seoIqamaNum').value.trim() : '');
-  fd.append('cover_note',       document.getElementById('seoCover').value.trim() || '');
-  fd.append('screening_answers', JSON.stringify(answers));
-  if (cvFile) fd.append('cv', cvFile);
-
-  try {
-    var resp = await fetch('/api/employer/apply/' + SEO_JOB_ID, {
-      method: 'POST',
-      body: fd
-    });
-    var result = await resp.json();
-    if (result.success) {
-      showSeoMsg('✅ Application submitted! The employer will contact you.', 'success');
-      btn.textContent = '✅ Submitted';
-    } else {
-      showSeoMsg(result.message || 'Failed to submit.', 'error');
-      btn.disabled = false;
-      btn.textContent = '📩 Submit Application';
-    }
-  } catch(e) {
-    showSeoMsg('Network error. Please try again.', 'error');
-    btn.disabled = false;
-    btn.textContent = '📩 Submit Application';
-  }
-}
-
-function showSeoMsg(text, type) {
-  var el = document.getElementById('seoApplyMsg');
-  el.innerHTML = '<div class="seo-msg" style="background:'
-    + (type==='success' ? 'rgba(16,185,129,.1);color:#059669;border:1px solid rgba(16,185,129,.2)' : 'rgba(239,68,68,.08);color:#dc2626;border:1px solid rgba(239,68,68,.2)')
-    + '">' + text + '</div>';
-}
-</script>
 <script src="/js/countries.js"></script>
+<script src="/js/apply-form.js"></script>
 
 </body>
 </html>`;

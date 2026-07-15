@@ -1,0 +1,99 @@
+<!-- ══════════════════════════════════════════════════════════════
+     SHARED APPLY FORM — single source of truth.
+     Used by the homepage job-detail modal AND the SSR /job/:slug
+     page (embedded directly by server/routes/seo.js). Logic lives
+     in /js/apply-form.js, styling in /css/apply-form.css.
+════════════════════════════════════════════════════════════════ -->
+<div class="af-overlay" id="applyOverlay">
+  <div class="af-modal">
+    <div class="af-header">
+      <div>
+        <h3 class="af-title">Apply for this Job</h3>
+        <p class="af-subtitle" id="applyJobTitle"></p>
+      </div>
+      <button type="button" class="af-close-btn" onclick="closeApplyForm()" aria-label="Close">&times;</button>
+    </div>
+    <div class="af-body">
+      <div id="applyMsg" class="af-msg" style="display:none"></div>
+
+      <!-- Screening questions (shown if employer set them) -->
+      <div id="applyScreeningWrap" style="display:none">
+        <div class="af-screening-title">Pre-Screening Questions</div>
+        <div id="applyScreeningFields"></div>
+        <hr class="af-hr">
+      </div>
+
+      <div class="af-field">
+        <label class="af-label">Full Name <span class="af-required">*</span></label>
+        <input type="text" class="af-input" id="applyName" placeholder="Your full name">
+      </div>
+      <div class="af-row">
+        <div class="af-field">
+          <label class="af-label">Phone</label>
+          <input type="tel" class="af-input" id="applyPhone" placeholder="+966 5XX XXX XXX">
+        </div>
+        <div class="af-field">
+          <label class="af-label">WhatsApp</label>
+          <input type="tel" class="af-input" id="applyWhatsApp" placeholder="+966 5XX XXX XXX">
+        </div>
+      </div>
+      <div class="af-field">
+        <label class="af-label">Email <span class="af-optional">(for confirmation)</span></label>
+        <input type="email" class="af-input" id="applyEmail" placeholder="your@email.com">
+      </div>
+      <div class="af-row" id="applyRowNatIqama" style="display:none">
+        <div class="af-field" id="applyColNat">
+          <label class="af-label">Nationality</label>
+          <div class="cnt-picker">
+            <input type="text" class="af-input" id="applyNatSearch" placeholder="Search nationality..." oninput="filterCntSingle('applyNat',this.value)" onfocus="filterCntSingle('applyNat',this.value)" autocomplete="off">
+            <div class="cnt-dropdown" id="applyNatDd"></div>
+            <input type="hidden" id="applyNationality">
+          </div>
+        </div>
+        <div class="af-field" id="applyColIqama">
+          <label class="af-label">Iqama Status</label>
+          <select class="af-input" id="applyIqama">
+            <option value="">Select...</option>
+            <option>Transferable</option>
+            <option>Non-transferable</option>
+            <option>Visit visa</option>
+            <option>Outside Saudi</option>
+            <option>Saudi National</option>
+          </select>
+        </div>
+      </div>
+      <div id="applyRowIqamaNum" style="display:none">
+        <div class="af-field">
+          <label class="af-label">Iqama Number</label>
+          <input type="text" class="af-input" id="applyIqamaNum" inputmode="numeric" placeholder="e.g. 2490123456">
+        </div>
+      </div>
+      <div class="af-row" id="applyRowExpCert" style="display:none">
+        <div class="af-field" id="applyColExp">
+          <label class="af-label">Experience (years)</label>
+          <input type="number" class="af-input" id="applyExp" placeholder="0" min="0" max="50">
+        </div>
+        <div class="af-field" id="applyColCert">
+          <label class="af-label">Has Required Cert?</label>
+          <select class="af-input" id="applyCert">
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+          </select>
+        </div>
+      </div>
+      <div class="af-field">
+        <label class="af-label">Cover Note <span class="af-optional">(optional)</span></label>
+        <textarea class="af-input" id="applyCoverNote" rows="3" placeholder="Briefly introduce yourself and why you're a good fit..."></textarea>
+      </div>
+      <div id="applyRowCV" class="af-field" style="display:none">
+        <label class="af-label" id="applyCVLabel">CV / Resume (PDF)</label>
+        <input type="file" id="applyCVFile" accept=".pdf" class="af-input" style="cursor:pointer">
+        <div class="af-hint">PDF only · Max 5MB</div>
+      </div>
+    </div>
+    <div class="af-footer">
+      <button type="button" class="af-btn-secondary" onclick="closeApplyForm()">Cancel</button>
+      <button type="button" id="applySubmitBtn" class="af-btn-primary" onclick="submitApplication()">Submit Application</button>
+    </div>
+  </div>
+</div>

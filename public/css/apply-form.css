@@ -1,0 +1,106 @@
+/* ═══════════════════════════════════════════════════════════
+   SHARED APPLY FORM
+   Used by the homepage job-detail modal AND the SSR /job/:slug
+   page (server/routes/seo.js). Framework-free on purpose — the
+   SSR page loads no Bootstrap, so this must work standalone.
+   Colors use CSS variables (already defined site-wide in
+   style.css) with light-theme fallbacks for pages that don't
+   define them.
+═══════════════════════════════════════════════════════════ */
+.af-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.6);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+.af-overlay.open { display: flex; }
+
+.af-modal {
+  background: var(--bg-card, #fff);
+  border-radius: 18px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,.3);
+}
+
+.af-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border, #e5e7eb);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.af-title { margin: 0; font-size: 1.05rem; font-weight: 800; color: var(--text-primary, #161616); font-family: 'Syne', sans-serif; }
+.af-subtitle { margin: .2rem 0 0; font-size: .78rem; color: var(--text-muted, #6b7280); }
+.af-close-btn { background: none; border: none; font-size: 1.3rem; line-height: 1; cursor: pointer; color: var(--text-muted, #6b7280); padding: 0; }
+
+.af-body { padding: 1.25rem 1.5rem; }
+.af-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border, #e5e7eb);
+  display: flex;
+  gap: .5rem;
+  justify-content: flex-end;
+}
+
+.af-field { margin-bottom: .85rem; }
+.af-label { display: block; font-size: .8rem; font-weight: 700; color: var(--text-secondary, #374151); margin-bottom: .35rem; }
+.af-required { color: #dc2626; }
+.af-optional { color: var(--text-muted, #9ca3af); font-weight: 400; }
+.af-hint { font-size: .71rem; color: var(--text-muted, #6b7280); margin-top: .3rem; }
+
+.af-input {
+  width: 100%;
+  padding: .6rem .85rem;
+  border: 1.5px solid var(--border, #e5e7eb);
+  border-radius: 9px;
+  background: var(--bg-card, #fff);
+  color: var(--text-primary, #161616);
+  font-size: .9rem;
+  outline: none;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+.af-input:focus { border-color: var(--primary, #0f62fe); }
+
+.af-row { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+@media(max-width:480px) { .af-row { grid-template-columns: 1fr; } }
+
+.af-hr { border: none; border-top: 1px solid var(--border, #e5e7eb); margin: .75rem 0; }
+.af-screening-title {
+  font-size: .75rem; font-weight: 700; color: var(--text-muted, #6b7280);
+  text-transform: uppercase; letter-spacing: .05em; margin-bottom: .65rem;
+}
+
+.af-btn-primary {
+  background: var(--primary, #0f62fe);
+  color: #fff;
+  border: none;
+  padding: .65rem 1.25rem;
+  border-radius: 9px;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: .88rem;
+  font-family: 'Syne', sans-serif;
+}
+.af-btn-primary:disabled { opacity: .7; cursor: not-allowed; }
+.af-btn-secondary {
+  background: var(--surface, #f1f3f4);
+  color: var(--text-secondary, #374151);
+  border: none;
+  padding: .65rem 1.25rem;
+  border-radius: 9px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: .88rem;
+}
+
+.af-msg { padding: .65rem 1rem; border-radius: 8px; font-size: .83rem; margin-bottom: .85rem; }
+.af-msg-success { background: rgba(16,185,129,.1); color: #059669; border: 1px solid rgba(16,185,129,.2); }
+.af-msg-error   { background: rgba(239,68,68,.08); color: #dc2626; border: 1px solid rgba(239,68,68,.2); }

@@ -12,7 +12,7 @@ const PUBLIC_DIR   = path.join(__dirname, '../../public');
 const PARTIALS_DIR = path.join(PUBLIC_DIR, 'partials');
 
 // ── Load partials into memory cache ──────────────────────────
-const cache = { navbar: '', footer: '' };
+const cache = { navbar: '', footer: '', 'apply-form': '' };
 
 function loadPartial(name) {
   try {
@@ -25,6 +25,7 @@ function loadPartial(name) {
 
 loadPartial('navbar');
 loadPartial('footer');
+loadPartial('apply-form');
 
 // ── Per-page meta tag cache (refreshed every 5 min) ──────────
 const PAGE_META_KEYS = {
@@ -136,7 +137,8 @@ fs.watch(PARTIALS_DIR, (event, filename) => {
 function inject(html) {
   return html
     .replace(/<!--\s*NAVBAR\s*-->/g, cache.navbar)
-    .replace(/<!--\s*FOOTER\s*-->/g, cache.footer);
+    .replace(/<!--\s*FOOTER\s*-->/g, cache.footer)
+    .replace(/<!--\s*APPLY_FORM\s*-->/g, cache['apply-form']);
 }
 
 // ── Middleware ────────────────────────────────────────────────
