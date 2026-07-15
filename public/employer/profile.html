@@ -25,9 +25,6 @@
   .logo-upload-spinner{display:none}
   .section-divider{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);padding:.25rem 0;margin:1rem 0 .75rem;border-bottom:1px solid var(--border)}
   .map-hint{font-size:.73rem;color:var(--text-muted);margin-top:.3rem;display:flex;align-items:center;gap:.3rem}
-    .wa-ph{font-size:.72rem;padding:.15rem .4rem;border-radius:5px;background:rgba(15,98,254,.08);color:var(--primary);border:1px solid rgba(15,98,254,.2);cursor:pointer;user-select:none;font-family:monospace}
-  .wa-ph:hover{background:rgba(15,98,254,.15)}
-  .wa-ph:active{transform:scale(.95)}
   </style>
 </head>
 <body><script>
@@ -238,88 +235,84 @@
         </div>
 
         <!-- WhatsApp Templates -->
-        <div style="border:1.5px solid var(--border);border-radius:10px;margin-top:1.5rem;overflow:hidden">
-          <button onclick="toggleWaTemplates()" style="width:100%;padding:.65rem .85rem;background:var(--surface);border:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:700;color:var(--text-primary)">
-            <span><i class="bi bi-whatsapp me-2" style="color:#25d366"></i>WhatsApp Message Templates</span>
+        <div class="section-divider">WhatsApp Message Templates</div>
+        <div class="ep-subcard">
+          <button class="ep-subcard-header" onclick="toggleWaTemplates()" aria-expanded="false" aria-controls="waTemplatesBody">
+            <span><i class="bi bi-whatsapp me-2" style="color:#25d366"></i>Customize your message format</span>
             <i class="bi bi-chevron-down" id="waTemplatesChevron"></i>
           </button>
-          <div id="waTemplatesBody" style="display:none;padding:.85rem">
-        <p style="font-size:.78rem;color:var(--text-muted);margin-bottom:.65rem">
-          Write your own format once — it auto-fills when sharing jobs on WhatsApp.
-        </p>
+          <div class="ep-subcard-body" id="waTemplatesBody" style="display:none">
+            <p class="ep-hint">Write your own format once — it auto-fills when sharing jobs on WhatsApp.</p>
 
-        <!-- How to use — collapsible -->
-        <div style="border:1.5px solid var(--border);border-radius:10px;margin-bottom:.85rem;overflow:hidden">
-          <button onclick="toggleHowTo()" style="width:100%;padding:.55rem .75rem;background:var(--surface);border:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:600;color:var(--text-secondary)">
-            <span><i class="bi bi-info-circle-fill me-2" style="color:var(--primary)"></i>How to use placeholders</span>
-            <i class="bi bi-chevron-down" id="howToChevron"></i>
-          </button>
-          <div id="howToBody" style="display:none;padding:.75rem;background:var(--bg-card)">
-            <p style="font-size:.78rem;color:var(--text-secondary);margin-bottom:.6rem">
-              Placeholders are words in <code style="font-size:.75rem;color:var(--primary)">{curly brackets}</code> that get replaced with real data when you share a job.
-            </p>
-            <div style="background:var(--surface);border-radius:8px;padding:.6rem .75rem;margin-bottom:.6rem">
-              <p style="font-size:.73rem;font-weight:700;color:var(--text-muted);margin-bottom:.3rem">AVAILABLE PLACEHOLDERS:</p>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:.2rem .5rem;font-size:.76rem">
-                <span><code style="color:var(--primary)">{company}</code> → Your company name</span>
-                <span><code style="color:var(--primary)">{title}</code> → Job title</span>
-                <span><code style="color:var(--primary)">{location}</code> → City/region</span>
-                <span><code style="color:var(--primary)">{type}</code> → Full-time, Contract…</span>
-                <span><code style="color:var(--primary)">{salary}</code> → Salary range</span>
-                <span><code style="color:var(--primary)">{description}</code> → Job description</span>
-                <span><code style="color:var(--primary)">{phone}</code> → Phone number</span>
-                <span><code style="color:var(--primary)">{whatsapp}</code> → WhatsApp number</span>
-                <span><code style="color:var(--primary)">{link}</code> → Job URL</span>
-                <span><code style="color:var(--primary)">{positions}</code> → Total openings (bulk)</span>
-                <span><code style="color:var(--primary)">{titles}</code> → Job list (bulk)</span>
-              </div>
-            </div>
-            <p style="font-size:.73rem;font-weight:700;color:var(--text-muted);margin-bottom:.3rem">EXAMPLE:</p>
-            <pre style="font-size:.72rem;background:var(--surface);border-radius:8px;padding:.55rem .75rem;margin:0;overflow-x:auto;color:var(--text-secondary);line-height:1.6">📋 *{title}*
+            <!-- How to use — collapsible -->
+            <div class="ep-subcard">
+              <button class="ep-subcard-header ep-subcard-header-sm" onclick="toggleHowTo()" aria-expanded="false" aria-controls="howToBody">
+                <span><i class="bi bi-info-circle-fill me-2" style="color:var(--primary)"></i>How to use placeholders</span>
+                <i class="bi bi-chevron-down" id="howToChevron"></i>
+              </button>
+              <div class="ep-subcard-body" id="howToBody" style="display:none">
+                <p class="ep-hint">Placeholders are words in <code class="ep-code">{curly brackets}</code> that get replaced with real data when you share a job.</p>
+                <div class="ep-callout">
+                  <p class="ep-callout-title">Available placeholders</p>
+                  <div class="ep-placeholder-grid">
+                    <span><code class="ep-code">{company}</code> → Your company name</span>
+                    <span><code class="ep-code">{title}</code> → Job title</span>
+                    <span><code class="ep-code">{location}</code> → City/region</span>
+                    <span><code class="ep-code">{type}</code> → Full-time, Contract…</span>
+                    <span><code class="ep-code">{salary}</code> → Salary range</span>
+                    <span><code class="ep-code">{description}</code> → Job description</span>
+                    <span><code class="ep-code">{phone}</code> → Phone number</span>
+                    <span><code class="ep-code">{whatsapp}</code> → WhatsApp number</span>
+                    <span><code class="ep-code">{link}</code> → Job URL</span>
+                    <span><code class="ep-code">{positions}</code> → Total openings (bulk)</span>
+                    <span><code class="ep-code">{titles}</code> → Job list (bulk)</span>
+                  </div>
+                </div>
+                <p class="ep-callout-title">Example</p>
+                <pre class="ep-code-block">📋 *{title}*
 📍 {location} | 💰 {salary}
 
 🔗 {link}</pre>
-            <p style="font-size:.72rem;color:var(--text-muted);margin:.4rem 0 0">Unused placeholders (e.g. empty salary) are removed automatically.</p>
-          </div>
-        </div>
+                <p class="ep-hint" style="margin:.4rem 0 0">Unused placeholders (e.g. empty salary) are removed automatically.</p>
+              </div>
+            </div>
 
-        <!-- Placeholder chips -->
-        <div style="display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:.85rem">
-          <span style="font-size:.7rem;font-weight:700;color:var(--text-muted);width:100%;margin-bottom:.2rem">Tap placeholder to copy:</span>
-          <code onclick="copyPlaceholder(this)" class="wa-ph" title="Company name">{company}</code>
-          <code onclick="copyPlaceholder(this)" class="wa-ph" title="Job title">{title}</code>
-          <code onclick="copyPlaceholder(this)" class="wa-ph" title="Location">{location}</code>
-          <code onclick="copyPlaceholder(this)" class="wa-ph" title="Job type">{type}</code>
-          <code onclick="copyPlaceholder(this)" class="wa-ph" title="Salary">{salary}</code>
-          <code onclick="copyPlaceholder(this)" class="wa-ph" title="Description (200 chars)">{description}</code>
-          <code onclick="copyPlaceholder(this)" class="wa-ph" title="Phone number">{phone}</code>
-          <code onclick="copyPlaceholder(this)" class="wa-ph" title="WhatsApp number">{whatsapp}</code>
-          <code onclick="copyPlaceholder(this)" class="wa-ph" title="Job URL">{link}</code>
-          <code onclick="copyPlaceholder(this)" class="wa-ph" title="Total positions (bulk only)">{positions}</code>
-          <code onclick="copyPlaceholder(this)" class="wa-ph" title="Bullet job list (bulk only)">{titles}</code>
-        </div>
+            <!-- Placeholder chips -->
+            <div class="ep-chip-row">
+              <span class="ep-chip-label">Tap placeholder to copy:</span>
+              <code onclick="copyPlaceholder(this)" class="ep-chip" title="Company name">{company}</code>
+              <code onclick="copyPlaceholder(this)" class="ep-chip" title="Job title">{title}</code>
+              <code onclick="copyPlaceholder(this)" class="ep-chip" title="Location">{location}</code>
+              <code onclick="copyPlaceholder(this)" class="ep-chip" title="Job type">{type}</code>
+              <code onclick="copyPlaceholder(this)" class="ep-chip" title="Salary">{salary}</code>
+              <code onclick="copyPlaceholder(this)" class="ep-chip" title="Description (200 chars)">{description}</code>
+              <code onclick="copyPlaceholder(this)" class="ep-chip" title="Phone number">{phone}</code>
+              <code onclick="copyPlaceholder(this)" class="ep-chip" title="WhatsApp number">{whatsapp}</code>
+              <code onclick="copyPlaceholder(this)" class="ep-chip" title="Job URL">{link}</code>
+              <code onclick="copyPlaceholder(this)" class="ep-chip" title="Total positions (bulk only)">{positions}</code>
+              <code onclick="copyPlaceholder(this)" class="ep-chip" title="Bullet job list (bulk only)">{titles}</code>
+            </div>
 
-        <!-- Single job template -->
-        <div class="ep-field">
-          <label class="ep-label"><i class="bi bi-briefcase-fill me-1"></i>Single Job Template</label>
-          <textarea class="ep-input" id="pWaSingle" rows="12" placeholder="Leave blank to use default format..." style="font-family:monospace;font-size:.78rem;line-height:1.6;resize:vertical"></textarea>
-          <div style="display:flex;justify-content:flex-end;margin-top:.3rem">
-            <button class="ep-btn-outline ep-btn-sm" onclick="previewTemplate('single')" style="font-size:.72rem"><i class="bi bi-eye me-1"></i>Preview sample</button>
-            <button class="ep-btn-outline ep-btn-sm" onclick="resetTemplate('single')" style="font-size:.72rem"><i class="bi bi-arrow-counterclockwise me-1"></i>Reset</button>
-          </div>
-        </div>
+            <!-- Single job template -->
+            <div class="ep-field">
+              <label class="ep-label"><i class="bi bi-briefcase-fill me-1"></i>Single Job Template</label>
+              <textarea class="ep-input ep-input-mono" id="pWaSingle" rows="12" placeholder="Leave blank to use default format..."></textarea>
+              <div class="ep-template-actions">
+                <button class="ep-btn-outline ep-btn-sm" onclick="previewTemplate('single')"><i class="bi bi-eye me-1"></i>Preview sample</button>
+                <button class="ep-btn-outline ep-btn-sm" onclick="resetTemplate('single')"><i class="bi bi-arrow-counterclockwise me-1"></i>Reset</button>
+              </div>
+            </div>
 
-        <!-- Bulk template -->
-        <div class="ep-field" style="margin-top:.75rem">
-          <label class="ep-label"><i class="bi bi-collection-fill me-1"></i>Bulk Requirements Template</label>
-          <p style="font-size:.72rem;color:var(--text-muted);margin-bottom:.35rem">Extra placeholders: <code style="font-size:.7rem">{positions}</code> (total count), <code style="font-size:.7rem">{titles}</code> (bullet list)</p>
-          <textarea class="ep-input" id="pWaBulk" rows="12" placeholder="Leave blank to use default format..." style="font-family:monospace;font-size:.78rem;line-height:1.6;resize:vertical"></textarea>
-          <div style="display:flex;justify-content:flex-end;margin-top:.3rem">
-            <button class="ep-btn-outline ep-btn-sm" onclick="previewTemplate('bulk')" style="font-size:.72rem"><i class="bi bi-eye me-1"></i>Preview sample</button>
-            <button class="ep-btn-outline ep-btn-sm" onclick="resetTemplate('bulk')" style="font-size:.72rem"><i class="bi bi-arrow-counterclockwise me-1"></i>Reset</button>
-          </div>
-        </div>
-
+            <!-- Bulk template -->
+            <div class="ep-field mt-3">
+              <label class="ep-label"><i class="bi bi-collection-fill me-1"></i>Bulk Requirements Template</label>
+              <p class="ep-hint">Extra placeholders: <code class="ep-code">{positions}</code> (total count), <code class="ep-code">{titles}</code> (bullet list)</p>
+              <textarea class="ep-input ep-input-mono" id="pWaBulk" rows="12" placeholder="Leave blank to use default format..."></textarea>
+              <div class="ep-template-actions">
+                <button class="ep-btn-outline ep-btn-sm" onclick="previewTemplate('bulk')"><i class="bi bi-eye me-1"></i>Preview sample</button>
+                <button class="ep-btn-outline ep-btn-sm" onclick="resetTemplate('bulk')"><i class="bi bi-arrow-counterclockwise me-1"></i>Reset</button>
+              </div>
+            </div>
           </div><!-- /waTemplatesBody -->
         </div><!-- /waTemplates -->
 
@@ -332,6 +325,7 @@
 
     <!-- ── Right column ── -->
     <div class="col-lg-5">
+    <div class="ep-sticky-col">
       <div class="ep-card">
         <h2 class="ep-card-title mb-3">Account Info</h2>
         <div class="ep-field">
@@ -356,14 +350,14 @@
         <div class="ep-field mt-3">
           <label class="ep-label">New Password</label>
           <div class="ep-input-wrap">
-            <input type="password" class="ep-input" id="cpNew" placeholder="Min 8 characters" autocomplete="new-password">
+            <input type="password" class="ep-input" id="cpNew" maxlength="72" placeholder="Min 8 characters" autocomplete="new-password">
             <button class="ep-input-eye" onclick="togglePass('cpNew',this)"><i class="bi bi-eye"></i></button>
           </div>
         </div>
         <div class="ep-field mt-3">
           <label class="ep-label">Confirm New Password</label>
           <div class="ep-input-wrap">
-            <input type="password" class="ep-input" id="cpConfirm" placeholder="Re-enter new password" autocomplete="new-password">
+            <input type="password" class="ep-input" id="cpConfirm" maxlength="72" placeholder="Re-enter new password" autocomplete="new-password">
             <button class="ep-input-eye" onclick="togglePass('cpConfirm',this)"><i class="bi bi-eye"></i></button>
           </div>
         </div>
@@ -374,12 +368,13 @@
       </div>
 
       <div class="ep-card mt-4">
-        <h2 class="ep-card-title mb-1" style="color:#dc2626">Danger Zone</h2>
-        <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:1rem">This will end all active sessions</p>
-        <button class="ep-btn-outline ep-btn-danger w-100" onclick="logout()">
+        <h2 class="ep-card-title mb-1">Session</h2>
+        <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:1rem">Sign out everywhere if you suspect unauthorized access to your account.</p>
+        <button class="ep-btn-outline w-100" onclick="logoutAllDevices()">
           <i class="bi bi-box-arrow-left me-2"></i>Logout from All Devices
         </button>
       </div>
+    </div><!-- /ep-sticky-col -->
     </div>
   </div>
 </div>
@@ -412,6 +407,12 @@ async function checkAuth() {
 async function logout() {
   if (!confirm('Are you sure you want to log out?')) return;
   await API.post('/api/employer/logout',{});
+  window.location.href='/employer/';
+}
+
+async function logoutAllDevices() {
+  if (!confirm('This will sign you out on every device, including this one. Continue?')) return;
+  await API.post('/api/employer/logout-all',{});
   window.location.href='/employer/';
 }
 
@@ -538,6 +539,7 @@ async function init() {
     const open = body.style.display === 'none';
     body.style.display = open ? 'block' : 'none';
     chevron.className = open ? 'bi bi-chevron-up' : 'bi bi-chevron-down';
+    body.previousElementSibling.setAttribute('aria-expanded', open);
   }
 function toggleHowTo() {
   const b = document.getElementById('howToBody');
@@ -545,6 +547,7 @@ function toggleHowTo() {
   const open = b.style.display === 'none';
   b.style.display = open ? 'block' : 'none';
   ch.className = open ? 'bi bi-chevron-up' : 'bi bi-chevron-down';
+  b.previousElementSibling.setAttribute('aria-expanded', open);
 }
 
 const SAMPLE_SINGLE = {

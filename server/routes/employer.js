@@ -283,6 +283,17 @@ router.post('/logout', requireEmployer, async (req, res) => {
   }
 });
 
+// POST /api/employer/logout-all — end every session for this account, including this one
+router.post('/logout-all', requireEmployer, async (req, res) => {
+  try {
+    await db.query('DELETE FROM employer_sessions WHERE employer_id = ?', [req.employer.id]);
+    res.clearCookie('emp_token');
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
 // GET /api/employer/me
 router.get('/me', requireEmployer, async (req, res) => {
   try {
@@ -359,6 +370,7 @@ router.put('/change-password', requireEmployer, async (req, res) => {
     const { current_password, new_password } = req.body;
     if (!current_password) return res.status(400).json({ success: false, message: 'Current password is required' });
     if (!new_password || new_password.length < 8) return res.status(400).json({ success: false, message: 'New password must be at least 8 characters' });
+    if (new_password.length > 72) return res.status(400).json({ success: false, message: 'New password must be 72 characters or less' });
 
     const [[emp]] = await db.query('SELECT password_hash FROM employers WHERE id = ?', [req.employer.id]);
     if (!emp) return res.status(404).json({ success: false, message: 'Account not found' });
