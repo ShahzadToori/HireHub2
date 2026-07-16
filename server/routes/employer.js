@@ -7,6 +7,82 @@ const db       = require('../db/connection');
 const { requireEmployer } = require('../middleware/employerAuth');
 const router   = express.Router();
 const { sendMail } = require('../utils/mailer');
+const { isValidImage, isValidPdf, deleteFile } = require('../utils/fileValidation');
+const { validate, z } = require('../middleware/validate');
+const { authRateLimit, recordAuthFailure, recordAuthSuccess } = require('../middleware/authRateLimit');
+const { publicFormLimiter } = require('../middleware/tieredRateLimit');
+
+const employerLoginLimiter    = authRateLimit('employer-login', (req) => req.body.email);
+const employerRegisterLimiter = authRateLimit('employer-register', (req) => req.body.email);
+const forgotPasswordLimiter   = authRateLimit('employer-forgot-password', (req) => req.body.email);
+const resetPasswordLimiter    = authRateLimit('employer-reset-password'); // no account concept yet — IP only
+
+// ─── shared field schemas ───────────────────────────────────────
+const emailField    = z.string().trim().max(160).email();
+const passwordField = z.string().min(8).max(72);
+const optStr = (max) => z.string().trim().max(max).optional().or(z.literal(''));
+const optUrl = (max) => z.union([
+  z.string().trim().max(max).url(),
+  z.literal(''),
+]).optional();
+
+const registerSchema = z.object({
+  company_name:     z.string().trim().min(1).max(200),
+  contact_name:     z.string().trim().min(1).max(100),
+  email:            emailField,
+  password:         passwordField,
+  confirm_password: z.string().max(72).optional(),
+  phone:            optStr(30),
+  whatsapp:         optStr(30),
+  sector:           optStr(100),
+  city:             optStr(100),
+  address:          z.string().trim().min(1).max(255),
+  map_link:         optUrl(500),
+  cr_number:        optStr(100),
+  website:          optUrl(300),
+  about:            optStr(2000),
+}).strict().refine(
+  data => data.confirm_password === undefined || data.confirm_password === data.password,
+  { message: 'Passwords do not match', path: ['confirm_password'] }
+);
+
+const loginSchema = z.object({
+  email:       emailField,
+  password:    z.string().min(1).max(72),
+  remember_me: z.boolean().optional(),
+}).strict();
+
+const forgotPasswordSchema = z.object({
+  email: emailField,
+}).strict();
+
+const resetPasswordSchema = z.object({
+  token:    z.string().trim().min(1).max(128),
+  password: passwordField,
+}).strict();
+
+const digitsOnly = (max) => z.string().trim().max(max).regex(/^\d*$/, 'Must contain digits only').optional().or(z.literal(''));
+
+const applySchema = z.object({
+  full_name:          z.string().trim().min(1).max(150),
+  email:              z.union([z.string().trim().max(160).email(), z.literal('')]).optional(),
+  phone:              optStr(30),
+  whatsapp:           optStr(30),
+  nationality:        optStr(100),
+  iqama_status:       optStr(50),
+  iqama_number:       digitsOnly(20),
+  experience_years:   digitsOnly(3),
+  has_certificate:    z.enum(['0', '1']).optional().or(z.literal('')),
+  cover_note:         optStr(2000),
+  screening_answers:  z.string().max(5000).optional().or(z.literal('')),
+}).strict().refine(
+  data => (data.phone && data.phone.length) || (data.whatsapp && data.whatsapp.length),
+  { message: 'Phone or WhatsApp is required', path: ['phone'] }
+);
+
+const jobIdParamSchema = z.object({
+  jobId: z.string().regex(/^\d+$/, 'Invalid job id'),
+}).strict();
 
 // ─── helpers ────────────────────────────────────────────────────
 function slugify(text) {
@@ -24,37 +100,20 @@ function makeToken() { return crypto.randomBytes(32).toString('hex'); }
 ══════════════════════════════════════════════════════════════ */
 
 // POST /api/employer/register
-router.post('/register', async (req, res) => {
+router.post('/register', employerRegisterLimiter, validate(registerSchema), async (req, res) => {
   try {
     const {
-      company_name, contact_name, email, password, confirm_password,
+      company_name, contact_name, email, password,
       phone, whatsapp, sector, city, address, map_link,
       cr_number, website, about
     } = req.body;
 
-    if (!company_name?.trim()) return res.status(400).json({ success: false, message: 'Company name is required' });
-    if (!contact_name?.trim()) return res.status(400).json({ success: false, message: 'Your name is required' });
-    if (!email?.trim())        return res.status(400).json({ success: false, message: 'Email is required' });
-    if (!password || password.length < 8) return res.status(400).json({ success: false, message: 'Password must be at least 8 characters' });
-    if (password.length > 72)  return res.status(400).json({ success: false, message: 'Password must be 72 characters or less' });
-    if (confirm_password !== undefined && password !== confirm_password)
-      return res.status(400).json({ success: false, message: 'Passwords do not match' });
-    if (!address?.trim())      return res.status(400).json({ success: false, message: 'Address is required' });
-
-    // Server-side length guards (defense in depth — client maxlength can be bypassed via direct API calls)
-    const lenChecks = [
-      [company_name, 200, 'Company name'], [contact_name, 100, 'Your name'], [email, 160, 'Email'],
-      [phone, 30, 'Phone'], [whatsapp, 30, 'WhatsApp'], [sector, 100, 'Sector'], [city, 100, 'City'],
-      [address, 255, 'Address'], [map_link, 500, 'Map link'], [cr_number, 100, 'CR number'],
-      [website, 300, 'Website'], [about, 2000, 'About']
-    ];
-    for (const [val, max, label] of lenChecks) {
-      if (val && val.length > max) return res.status(400).json({ success: false, message: `${label} must be ${max} characters or less` });
-    }
-
     // Check duplicate
     const [[existing]] = await db.query('SELECT id FROM employers WHERE email = ?', [email.trim().toLowerCase()]);
-    if (existing) return res.status(400).json({ success: false, message: 'An account with this email already exists' });
+    if (existing) {
+      await recordAuthFailure(req);
+      return res.status(400).json({ success: false, message: 'An account with this email already exists' });
+    }
 
     const hash  = await bcrypt.hash(password, 12);
     const token = makeToken();
@@ -120,6 +179,7 @@ router.post('/register', async (req, res) => {
       </div>`
     }).catch(e => console.warn('[register verify email]', e.message));
 
+    await recordAuthSuccess(req);
     res.json({
       success: true,
       pending: true,
@@ -150,30 +210,31 @@ router.get('/verify-email/:token', async (req, res) => {
 });
 
 // POST /api/employer/login
-router.post('/login', async (req, res) => {
+router.post('/login', employerLoginLimiter, validate(loginSchema), async (req, res) => {
   try {
-    const { email, password } = req.body;
-    if (!email || !password) return res.status(400).json({ success: false, message: 'Email and password required' });
+    const { email, password, remember_me } = req.body;
 
     const [[emp]] = await db.query(
       'SELECT * FROM employers WHERE email = ? LIMIT 1',
       [email.trim().toLowerCase()]
     );
-    if (!emp) return res.status(401).json({ success: false, message: 'Invalid email or password' });
-    if (emp.status === 'suspended') return res.status(403).json({ success: false, message: 'Account suspended. Contact support.' });
-    if (emp.status === 'pending')   return res.status(403).json({ success: false, message: 'Your account is pending approval. You will receive an email once it\'s approved.' });
+    if (!emp) { await recordAuthFailure(req); return res.status(401).json({ success: false, message: 'Invalid email or password' }); }
+    if (emp.status === 'suspended') { await recordAuthFailure(req); return res.status(403).json({ success: false, message: 'Account suspended. Contact support.' }); }
+    if (emp.status === 'pending')   { await recordAuthFailure(req); return res.status(403).json({ success: false, message: 'Your account is pending approval. You will receive an email once it\'s approved.' }); }
 
     const match = await bcrypt.compare(password, emp.password_hash);
-    if (!match) return res.status(401).json({ success: false, message: 'Invalid email or password' });
+    if (!match) { await recordAuthFailure(req); return res.status(401).json({ success: false, message: 'Invalid email or password' }); }
 
     // Clear old sessions
     await db.query('DELETE FROM employer_sessions WHERE employer_id = ? AND expires_at < NOW()', [emp.id]);
 
+    const remembered = !!remember_me;
     const sessionToken = makeToken();
-    const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+    const maxAgeMs = remembered ? 30 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000; // 30 days vs 1 day
+    const expires = new Date(Date.now() + maxAgeMs);
     await db.query(
-      'INSERT INTO employer_sessions (employer_id, token, expires_at) VALUES (?,?,?)',
-      [emp.id, sessionToken, expires]
+      'INSERT INTO employer_sessions (employer_id, token, expires_at, remember_me) VALUES (?,?,?,?)',
+      [emp.id, sessionToken, expires, remembered ? 1 : 0]
     );
 
     await db.query('UPDATE employers SET last_login = NOW() WHERE id = ?', [emp.id]);
@@ -181,10 +242,11 @@ router.post('/login', async (req, res) => {
     res.cookie('emp_token', sessionToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 30 * 24 * 60 * 60 * 1000,
+      maxAge: maxAgeMs,
       sameSite: 'lax'
     });
 
+    await recordAuthSuccess(req);
     res.json({
       success: true,
       employer: {
@@ -200,11 +262,9 @@ router.post('/login', async (req, res) => {
 });
 
 // POST /api/employer/forgot-password
-router.post('/forgot-password', async (req, res) => {
+router.post('/forgot-password', forgotPasswordLimiter, validate(forgotPasswordSchema), async (req, res) => {
   try {
     const { email } = req.body;
-    if (!email?.trim()) return res.status(400).json({ success: false, message: 'Email is required' });
-
     const cleanEmail = email.trim().toLowerCase();
     const [[emp]] = await db.query('SELECT id, company_name, contact_name FROM employers WHERE email = ?', [cleanEmail]);
 
@@ -238,6 +298,10 @@ router.post('/forgot-password', async (req, res) => {
       }).catch(e => console.warn('[forgot-password email]', e.message));
     }
 
+    // Recorded unconditionally (whether or not the account exists) so the
+    // rate-limit bucket itself can never be used as a side channel to
+    // detect which emails are registered.
+    await recordAuthFailure(req);
     res.json({ success: true, message: genericMsg });
   } catch (err) {
     console.error('[forgot-password]', err);
@@ -246,17 +310,18 @@ router.post('/forgot-password', async (req, res) => {
 });
 
 // POST /api/employer/reset-password
-router.post('/reset-password', async (req, res) => {
+router.post('/reset-password', resetPasswordLimiter, validate(resetPasswordSchema), async (req, res) => {
   try {
     const { token, password } = req.body;
-    if (!token)    return res.status(400).json({ success: false, message: 'Reset token is required' });
-    if (!password || password.length < 8) return res.status(400).json({ success: false, message: 'Password must be at least 8 characters' });
 
     const [[emp]] = await db.query(
       'SELECT id FROM employers WHERE reset_token = ? AND reset_expires > NOW()',
       [token]
     );
-    if (!emp) return res.status(400).json({ success: false, message: 'This reset link is invalid or has expired. Please request a new one.' });
+    if (!emp) {
+      await recordAuthFailure(req);
+      return res.status(400).json({ success: false, message: 'This reset link is invalid or has expired. Please request a new one.' });
+    }
 
     const hash = await bcrypt.hash(password, 12);
     await db.query('UPDATE employers SET password_hash=?, reset_token=NULL, reset_expires=NULL WHERE id=?', [hash, emp.id]);
@@ -264,6 +329,7 @@ router.post('/reset-password', async (req, res) => {
     // Security: log out of all existing sessions after password reset
     await db.query('DELETE FROM employer_sessions WHERE employer_id=?', [emp.id]);
 
+    await recordAuthSuccess(req);
     res.json({ success: true, message: 'Password updated successfully. You can now sign in with your new password.' });
   } catch (err) {
     console.error('[reset-password]', err);
@@ -658,15 +724,41 @@ router.get('/applications', requireEmployer, async (req, res) => {
     if (status)  { where += ' AND a.status = ?'; params.push(status); }
 
     const [applications] = await db.query(
-      `SELECT a.*, j.title AS job_title, j.location AS job_location, j.batch_id
+      `SELECT a.*, j.title AS job_title, j.location AS job_location, j.batch_id,
+              s.required_certs AS job_required_certs
          FROM job_applications a
          JOIN jobs j ON j.id = a.job_id
+         LEFT JOIN job_screening s ON s.job_id = a.job_id
         ${where}
         ORDER BY a.created_at DESC`,
       params
     );
+    // Never expose the stored filename/path directly — only a URL that re-checks
+    // ownership on every request via requireEmployer below.
+    applications.forEach(a => { if (a.cv_url) a.cv_url = `/api/employer/cv/${a.id}`; });
     res.json({ success: true, applications });
   } catch (err) {
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+// GET /api/employer/cv/:id — stream a candidate's CV, only to the employer who owns it
+router.get('/cv/:id', requireEmployer, async (req, res) => {
+  try {
+    const [[app]] = await db.query(
+      'SELECT cv_url FROM job_applications WHERE id = ? AND employer_id = ?',
+      [req.params.id, req.employer.id]
+    );
+    if (!app || !app.cv_url) return res.status(404).json({ success: false, message: 'CV not found' });
+
+    const filePath = resolveCvPath(app.cv_url);
+    if (!filePath) return res.status(404).json({ success: false, message: 'CV not found' });
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.sendFile(filePath);
+  } catch (err) {
+    console.error('[cv download]', err);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });
@@ -732,13 +824,31 @@ router.get('/screening/:jobId', async (req, res) => {
 });
 
 // ── CV upload storage (defined early — used in apply route) ──
+// Stored outside the public web root — CVs are personal candidate data and
+// must only ever be reachable through the authenticated GET /cv/:id route
+// below, never as a directly-guessable static URL.
 const _multer = require('multer');
 const _fs     = require('fs');
+const _path   = require('path');
+const CV_PRIVATE_DIR = _path.join(__dirname, '../../uploads-private/cvs');
+const CV_LEGACY_PUBLIC_DIR = _path.join(__dirname, '../../public/uploads/cvs'); // pre-migration files
+
+// job_applications.cv_url stores either a bare filename (current format) or,
+// for rows created before this file-storage migration, a legacy
+// '/uploads/cvs/<filename>' path. Resolves either to where the file actually
+// lives on disk, checking the new private location first.
+function resolveCvPath(cvUrlValue) {
+  const filename = _path.basename(cvUrlValue); // strips any legacy '/uploads/cvs/' prefix
+  const privatePath = _path.join(CV_PRIVATE_DIR, filename);
+  if (_fs.existsSync(privatePath)) return privatePath;
+  const legacyPath = _path.join(CV_LEGACY_PUBLIC_DIR, filename);
+  if (_fs.existsSync(legacyPath)) return legacyPath;
+  return null;
+}
 const _cvStorage = _multer.diskStorage({
   destination: (req, file, cb) => {
-    const dir = require('path').join(__dirname, '../../public/uploads/cvs');
-    _fs.mkdirSync(dir, { recursive: true });
-    cb(null, dir);
+    _fs.mkdirSync(CV_PRIVATE_DIR, { recursive: true });
+    cb(null, CV_PRIVATE_DIR);
   },
   filename: (req, file, cb) => {
     cb(null, 'cv-' + require('crypto').randomBytes(16).toString('hex') + '.pdf');
@@ -753,7 +863,10 @@ const cvUpload = _multer({
 });
 
 // POST /api/employer/apply/:jobId
-router.post('/apply/:jobId', cvUpload.single('cv'), async (req, res) => {
+router.post('/apply/:jobId', publicFormLimiter, cvUpload.single('cv'),
+  validate(jobIdParamSchema, 'params', (req) => req.file && deleteFile(req.file.path)),
+  validate(applySchema, 'body', (req) => req.file && deleteFile(req.file.path)),
+  async (req, res) => {
   try {
     const full_name        = req.body.full_name;
     const email            = req.body.email;
@@ -767,22 +880,38 @@ router.post('/apply/:jobId', cvUpload.single('cv'), async (req, res) => {
     const cover_note       = req.body.cover_note;
     const screening_answers = req.body.screening_answers;
 
-    if (!full_name?.trim()) return res.status(400).json({ success: false, message: 'Name is required' });
-    if (!phone?.trim() && !whatsapp?.trim()) return res.status(400).json({ success: false, message: 'Phone or WhatsApp is required' });
-
     const [[job]] = await db.query(
       'SELECT id, employer_id, title, company, status, require_cv FROM jobs WHERE id = ? AND status = "active"',
       [req.params.jobId]
     );
     if (!job) return res.status(404).json({ success: false, message: 'Job not found or no longer active' });
     if (job.require_cv && !req.file) return res.status(400).json({ success: false, message: 'Please upload your CV (PDF, max 5MB) — it is required for this job' });
+    if (req.file && !isValidPdf(req.file.path)) {
+      deleteFile(req.file.path);
+      return res.status(400).json({ success: false, message: 'CV file is not a valid PDF' });
+    }
 
-    // Prevent duplicate applications from the same person to the same job
+    // Screening filters — fetched early since the duplicate check below
+    // also needs to know whether this job requires an iqama number.
+    const [[screening]] = await db.query('SELECT * FROM job_screening WHERE job_id = ?', [job.id]);
+
+    // Prevent duplicate applications from the same person to the same job —
+    // matched on phone/WhatsApp, email, and (only when this job actually
+    // requires it) iqama number.
     const contactPhone = phone?.trim() || whatsapp?.trim() || '';
-    if (contactPhone) {
+    const cleanEmail   = email?.trim().toLowerCase() || '';
+    const dupConditions = [];
+    const dupParams = [];
+    if (contactPhone) { dupConditions.push('phone = ? OR whatsapp = ?'); dupParams.push(contactPhone, contactPhone); }
+    if (cleanEmail)    { dupConditions.push('LOWER(email) = ?'); dupParams.push(cleanEmail); }
+    if (screening?.require_iqama_number && iqama_number?.trim()) {
+      dupConditions.push('iqama_number = ?');
+      dupParams.push(iqama_number.trim());
+    }
+    if (dupConditions.length) {
       const [[dup]] = await db.query(
-        'SELECT id FROM job_applications WHERE job_id=? AND (phone=? OR whatsapp=?) LIMIT 1',
-        [job.id, contactPhone, contactPhone]
+        `SELECT id FROM job_applications WHERE job_id=? AND (${dupConditions.join(' OR ')}) LIMIT 1`,
+        [job.id, ...dupParams]
       );
       if (dup) return res.status(400).json({ success: false, message: 'You have already applied to this job.' });
     }
@@ -795,8 +924,7 @@ router.post('/apply/:jobId', cvUpload.single('cv'), async (req, res) => {
         : (screening_answers || []);
     } catch(e) { parsedAnswers = []; }
 
-    // Check ALL pre-screening filters set by the employer
-    const [[screening]] = await db.query('SELECT * FROM job_screening WHERE job_id = ?', [job.id]);
+    // Check ALL pre-screening filters set by the employer (fetched earlier, above)
     let customQs = [];
     if (screening) {
       // Nationality — if employer set a filter, candidate MUST provide a nationality
@@ -870,7 +998,10 @@ router.post('/apply/:jobId', cvUpload.single('cv'), async (req, res) => {
       } catch(e) {}
     }
 
-    const cvUrl = req.file ? '/uploads/cvs/' + req.file.filename : null;
+    // Stores just the filename now — actual file lives outside the web root
+    // (uploads-private/cvs/) and is only ever served via the authenticated
+    // GET /api/employer/cv/:id route below, never as a direct static URL.
+    const cvUrl = req.file ? req.file.filename : null;
     await db.query(
       `INSERT INTO job_applications
          (job_id, employer_id, full_name, email, phone, whatsapp, nationality,
@@ -1004,6 +1135,7 @@ router.get('/grid/candidates', requireEmployer, async (req, res) => {
   try {
     const [rows] = await db.query(`
       SELECT a.full_name, a.nationality, a.iqama_status, a.iqama_number, a.phone, a.whatsapp,
+             MAX(a.email)             AS email,
              MAX(a.experience_years)  AS experience_years,
              MAX(a.has_certificate)   AS has_certificate,
              COUNT(DISTINCT a.job_id) AS jobs_applied,
@@ -1082,7 +1214,7 @@ router.get('/share/requests', requireEmployer, async (req, res) => {
        LIMIT 50`, [req.employer.id]);
     const pending = requests.filter(r => r.status === 'pending').length;
     res.json({ success: true, requests, pending });
-  } catch (err) { res.status(500).json({ success: false }); }
+  } catch (err) { console.error('[share requests]', err); res.status(500).json({ success: false }); }
 });
 
 // GET /api/employer/share/:token  — no auth required (public endpoint)
@@ -1140,7 +1272,7 @@ router.get('/share/:token', async (req, res) => {
                 a.nationality, a.iqama_status, a.iqama_number,
                 a.experience_years, a.has_certificate,
                 a.phone, a.whatsapp, a.cover_note, a.employer_notes,
-                a.cv_url, a.created_at
+                a.created_at
            FROM job_applications a
            JOIN jobs j ON j.id = a.job_id
           ${where} ORDER BY a.created_at DESC`,
@@ -1291,6 +1423,10 @@ const logoUpload = multer({
 router.post('/upload-logo', requireEmployer, logoUpload.single('logo'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ success:false, message:'Invalid file. Use JPG, PNG or WebP under 2MB.' });
+    if (!isValidImage(req.file.path)) {
+      deleteFile(req.file.path);
+      return res.status(400).json({ success:false, message:'File is not a valid JPG, PNG, or WebP image' });
+    }
     const logoUrl = '/uploads/employers/' + req.file.filename;
     // Delete old logo file if exists
     const [[emp]] = await db.query('SELECT logo_url FROM employers WHERE id=?', [req.employer.id]);
