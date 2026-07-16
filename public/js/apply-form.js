@@ -61,6 +61,10 @@ window.openApplyForm = async function(jobId, jobTitle) {
     if (g('applyColIqama'))    g('applyColIqama').style.display    = sI ? '' : 'none';
     if (g('applyColExp'))      g('applyColExp').style.display      = sE ? '' : 'none';
     if (g('applyColCert'))     g('applyColCert').style.display     = sC ? '' : 'none';
+    const certLabel = g('applyCertLabel');
+    if (certLabel) certLabel.textContent = sC
+      ? 'Do you have: ' + fl.required_certs + '?'
+      : 'Do you have the required certificate?';
     if (g('applyRowNatIqama')) g('applyRowNatIqama').style.display = (sN||sI) ? '' : 'none';
     if (g('applyRowExpCert'))  g('applyRowExpCert').style.display  = (sE||sC) ? '' : 'none';
     const sIqamaNum = !!fl.require_iqama_number;
