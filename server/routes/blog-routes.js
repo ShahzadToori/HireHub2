@@ -4,11 +4,12 @@
    Handles /blog/ and /blog → serves blog-index.html
    Add BEFORE app.use(express.static(...)) in server.js
 ══════════════════════════════════════════════════════════════ */
-const express = require('express');
-const router  = express.Router();
-const path    = require('path');
-const fs      = require('fs');
-const db      = require('../db/connection');
+const express   = require('express');
+const router    = express.Router();
+const path      = require('path');
+const fs        = require('fs');
+const db        = require('../db/connection');
+const htmlLayout = require('../middleware/htmlLayout');
 
 const PUBLIC_DIR = path.join(__dirname, '../../public');
 
@@ -41,16 +42,26 @@ router.get('/blog/:slug', async (req, res) => {
     );
 
     if (!article) {
-      return res.status(404).sendFile(path.join(PUBLIC_DIR, 'blog', 'article.html'),
-        err => err && res.status(404).send('Article not found'));
+      try {
+        const html = fs.readFileSync(path.join(PUBLIC_DIR, 'blog', 'article.html'), 'utf8');
+        return res.status(404).send(htmlLayout.injectAnalytics(htmlLayout.inject(html)));
+      } catch (e) {
+        return res.status(404).send('Article not found');
+      }
     }
 
     // Increment view count async (don't block response)
     db.query('UPDATE blog_articles SET views=views+1 WHERE slug=?', [slug]).catch(() => {});
 
-    // Load site URL for canonical
-    const [[siteRow]] = await db.query("SELECT `value` FROM settings WHERE `key`='site_url'");
-    const siteUrl = (siteRow && siteRow.value) || 'https://joborbit.org';
+    // Load site settings for canonical + page title format
+    const [settingsRows] = await db.query(
+      "SELECT `key`, `value` FROM settings WHERE `key` IN ('site_url','site_name','meta_title_format')"
+    );
+    const settingsMap = {};
+    settingsRows.forEach(r => { settingsMap[r.key] = r.value; });
+    const siteUrl  = settingsMap.site_url  || 'https://joborbit.org';
+    const siteName = settingsMap.site_name || 'JobOrbit';
+    const titleFmt = settingsMap.meta_title_format || '';
 
     const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
@@ -59,6 +70,13 @@ router.get('/blog/:slug', async (req, res) => {
     const canonical = `${siteUrl}/blog/${article.slug}`;
     const ogImage   = article.featured_image    || `${siteUrl}/uploads/logo-1772305890056.svg`;
     const pubDate   = article.published_at ? new Date(article.published_at).toISOString() : '';
+
+    // <title> tag only — og:title/twitter:title/JSON-LD headline stay as
+    // the clean article title below; only the browser-tab/SERP title gets
+    // the site-wide format applied, same as job pages already do.
+    const pageTitle = titleFmt
+      ? titleFmt.replace('{title}', title).replace('{company}', '').replace('{site}', siteName)
+      : `${title} – ${siteName} Blog`;
 
     const jsonLd = JSON.stringify({
       '@context': 'https://schema.org',
@@ -76,7 +94,7 @@ router.get('/blog/:slug', async (req, res) => {
 
     html = html
       .replace('<title id="page-title">Article \u2013 JobOrbit Blog</title>',
-               `<title id="page-title">${esc(title)} \u2013 JobOrbit Blog</title>`)
+               `<title id="page-title">${esc(pageTitle)}</title>`)
       .replace('<meta name="description" id="page-desc" content="">',
                `<meta name="description" id="page-desc" content="${esc(desc)}">`)
       .replace('<meta property="og:title" id="og-title" content="">',
@@ -90,13 +108,19 @@ router.get('/blog/:slug', async (req, res) => {
       .replace('</head>',
                `<script type="application/ld+json">${jsonLd}</script>\n</head>`);
 
+    html = htmlLayout.injectAnalytics(htmlLayout.inject(html));
+
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.setHeader('Cache-Control', 'public, max-age=300'); // 5 min cache
     res.send(html);
   } catch(e) {
     console.error('[Blog SSR]', e.message);
-    res.sendFile(path.join(PUBLIC_DIR, 'blog', 'article.html'),
-      err => err && res.status(500).send('Server error'));
+    try {
+      const html = fs.readFileSync(path.join(PUBLIC_DIR, 'blog', 'article.html'), 'utf8');
+      res.status(500).send(htmlLayout.injectAnalytics(htmlLayout.inject(html)));
+    } catch (e2) {
+      res.status(500).send('Server error');
+    }
   }
 });
 

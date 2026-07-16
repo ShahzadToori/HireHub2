@@ -41,6 +41,18 @@ function he(str) {                           // HTML-only escape (for href etc.)
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
 }
+// Bing/Twitter verification+handle tags — server-rendered so their actual
+// crawlers (neither executes JS) see them, unlike the old client-side-only
+// setMeta() calls in main.js.
+async function verificationTags() {
+  const bingVerify    = await getSetting('bing_verify', '');
+  const twitterHandle = await getSetting('twitter_handle', '');
+  return [
+    bingVerify    ? `  <meta name="msvalidate.01" content="${he(bingVerify)}">`    : '',
+    twitterHandle ? `  <meta name="twitter:site" content="${he(twitterHandle)}">` : ''
+  ].filter(Boolean).join('\n');
+}
+
 function timeAgo(dateStr) {                  // "2d ago" / "3mo ago" etc.
   const diffMs = Date.now() - new Date(dateStr).getTime();
   const min = Math.floor(diffMs / 60000);
@@ -364,6 +376,7 @@ router.get('/job/:slug', async (req, res, next) => {
     const ga4Script = ga4Id
       ? `  <!-- Google Analytics 4 -->\n  <script async src="https://www.googletagmanager.com/gtag/js?id=${ga4Id}"></script>\n  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${ga4Id}');</script>`
       : '';
+    const verifyTags = await verificationTags();
 
     // Employer logo + website (for employer-posted jobs)
     let employerLogo = '';
@@ -602,6 +615,7 @@ const contactBtns = [
     }
   </style>
 ${ga4Script}
+${verifyTags}
   <script src="/js/analytics.js" defer></script>
 </head>
 <body>
@@ -875,6 +889,11 @@ router.get('/:slug(aramco-jobs|hse-jobs|qc-jobs|wpr-jobs|shutdown-jobs|neom-jobs
     const siteUrl  = await getSiteUrl();
     const siteName = await getSiteName();
     const canonical = `${siteUrl}/${req.params.slug}`;
+    const ga4Id    = await getSetting('ga4_id', '');
+    const ga4Script = ga4Id
+      ? `  <!-- Google Analytics 4 -->\n  <script async src="https://www.googletagmanager.com/gtag/js?id=${ga4Id}"></script>\n  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${ga4Id}');</script>`
+      : '';
+    const verifyTags = await verificationTags();
 
     // Build search query for all terms
     const orClauses = page.search.map(() => 'j.title LIKE ? OR j.description LIKE ?').join(' OR ');
@@ -966,6 +985,8 @@ router.get('/:slug(aramco-jobs|hse-jobs|qc-jobs|wpr-jobs|shutdown-jobs|neom-jobs
     footer{margin-top:3rem;padding:1.5rem;text-align:center;font-size:.8rem;color:#9ca3af;border-top:1px solid #e5e7eb}
     @media(max-width:600px){.hero{padding:2rem 1rem}.stat{padding:.4rem 1rem}}
   </style>
+${ga4Script}
+${verifyTags}
   <script src="/js/analytics.js" defer></script>
 </head>
 <body>

@@ -49,7 +49,7 @@ const META_TTL = 300000; // 5 min
 async function loadMetaCache() {
   try {
     const [rows] = await db.query(
-      "SELECT \`key\`, \`value\` FROM settings WHERE \`key\` LIKE 'meta_%' OR \`key\` IN ('ga4_id','og_image','site_url')"
+      "SELECT \`key\`, \`value\` FROM settings WHERE \`key\` LIKE 'meta_%' OR \`key\` IN ('ga4_id','og_image','site_url','bing_verify','twitter_handle')"
     );
     const c = {};
     rows.forEach(r => { c[r.key] = r.value; });
@@ -114,19 +114,31 @@ function injectMeta(html, urlPath) {
     html = html.replace(/<meta\s+property=["']og:url["'][^>]*>/i,
       `<meta property="og:url" content="${esc(_ogUrl)}">`);
   }
-  // Inject GA4 tracking script if configured
-  const _ga4 = (_metaCache['ga4_id'] || '').trim();
-  if (_ga4) {
-    html = html.replace('</head>',
-      `  <!-- Google Analytics 4 -->\n  <script async src="https://www.googletagmanager.com/gtag/js?id=${_ga4}"></script>\n  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${_ga4}');</script>\n</head>`);
-  }
   return html;
 }
 
 // Unconditional — unlike injectMeta(), this runs on every HTML page served
 // from public/ (including public/employer/*), regardless of PAGE_META_KEYS.
+// GA4 used to live inside injectMeta() gated by PAGE_META_KEYS, which meant
+// most pages (every blog article, every tool page, the whole employer
+// portal) never got a tracking script at all — moved here so it always
+// fires exactly once, sitewide, alongside the first-party beacon.
 function injectAnalytics(html) {
-  return html.replace('</head>', '  <script src="/js/analytics.js" defer></script>\n</head>');
+  const ga4Id = (_metaCache['ga4_id'] || '').trim();
+  const ga4Script = ga4Id
+    ? `  <!-- Google Analytics 4 -->\n  <script async src="https://www.googletagmanager.com/gtag/js?id=${ga4Id}"></script>\n  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${ga4Id}');</script>\n`
+    : '';
+
+  // Server-rendered so real crawlers (Bing, Twitter — neither executes JS
+  // the way Googlebot does) actually see these, unlike the old client-side
+  // setMeta() calls in main.js which only ever reached JS-executing visitors.
+  const bingVerify = (_metaCache['bing_verify'] || '').trim();
+  const bingTag = bingVerify ? `  <meta name="msvalidate.01" content="${esc(bingVerify)}">\n` : '';
+
+  const twitterHandle = (_metaCache['twitter_handle'] || '').trim();
+  const twitterTag = twitterHandle ? `  <meta name="twitter:site" content="${esc(twitterHandle)}">\n` : '';
+
+  return html.replace('</head>', `${ga4Script}${bingTag}${twitterTag}  <script src="/js/analytics.js" defer></script>\n</head>`);
 }
 
 // Auto-reload partials when they change — no server restart needed
@@ -188,6 +200,7 @@ function htmlLayoutMiddleware(req, res, next) {
   tryNext(0);
 }
 
-htmlLayoutMiddleware.inject      = inject;
-htmlLayoutMiddleware.reloadMeta  = loadMetaCache;
+htmlLayoutMiddleware.inject           = inject;
+htmlLayoutMiddleware.injectAnalytics  = injectAnalytics;
+htmlLayoutMiddleware.reloadMeta       = loadMetaCache;
 module.exports = htmlLayoutMiddleware;
