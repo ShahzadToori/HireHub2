@@ -207,7 +207,12 @@ function filterJobs(status, btn) {
     renderRequirements(allJobs);
     return;
   }
-  const filtered = status === 'all' ? allJobs : allJobs.filter(j => j.status === status);
+  // 'expired' (auto-set once expires_at passes) is grouped under the
+  // "Closed" tab too, so an auto-expired job doesn't just vanish from
+  // both filter views from the employer's perspective.
+  const filtered = status === 'all' ? allJobs
+    : status === 'closed' ? allJobs.filter(j => j.status === 'closed' || j.status === 'expired')
+    : allJobs.filter(j => j.status === status);
   renderJobs(filtered);
 }
 

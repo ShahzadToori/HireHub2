@@ -77,6 +77,40 @@ async function getLogoUrl() {
   return getSetting('logo_url', '');
 }
 
+// A real 404 for missing/closed/expired jobs — the site's SPA catch-all
+// (server.js) serves index.html with a 200 for any unmatched path, which
+// would otherwise turn every dead job link into a "soft 404" (Google
+// Search Console explicitly flags these as a coverage issue).
+async function sendJobNotFound(res) {
+  const siteUrl = await getSiteUrl();
+  res.status(404).type('html').send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Job Not Found – JobOrbit</title>
+<meta name="robots" content="noindex, follow">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f8f9fa;color:#161616;
+    min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:1.5rem}
+  .box{max-width:420px}
+  h1{font-size:1.5rem;font-weight:800;color:#0f172a;margin-bottom:.6rem}
+  p{font-size:.92rem;color:#64748b;margin-bottom:1.5rem;line-height:1.6}
+  a{display:inline-block;background:#0f62fe;color:#fff;text-decoration:none;font-weight:700;font-size:.9rem;
+    padding:.7rem 1.5rem;border-radius:9px}
+</style>
+</head>
+<body>
+  <div class="box">
+    <h1>This job is no longer available</h1>
+    <p>It may have been filled, closed, or expired. Browse current openings instead.</p>
+    <a href="${siteUrl}/">Browse Jobs</a>
+  </div>
+</body>
+</html>`);
+}
+
 /* ══════════════════════════════════════════════════════════════
    GET /sitemap.xml
 ══════════════════════════════════════════════════════════════ */
@@ -91,14 +125,6 @@ router.get('/sitemap.xml', async (req, res) => {
         WHERE status = 'active'
         ORDER BY created_at DESC
         LIMIT 10000`
-    );
-
-    const [cats] = await db.query(
-      `SELECT c.slug, MAX(j.created_at) AS last_job
-         FROM categories c
-         LEFT JOIN jobs j ON j.category_id = c.id AND j.status = 'active'
-         GROUP BY c.id, c.slug
-         ORDER BY c.name`
     );
 
     const [blogs] = await db.query(
@@ -200,14 +226,6 @@ router.get('/sitemap.xml', async (req, res) => {
     <lastmod>${today}</lastmod>
   </url>
 
-  <!-- ── Category Filter Pages ── -->
-${cats.map(c => `  <url>
-    <loc>${siteUrl}/?category=${xe(c.slug)}</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-    <lastmod>${c.last_job ? new Date(c.last_job).toISOString().split('T')[0] : today}</lastmod>
-  </url>`).join('\n')}
-
   <!-- ── Job Detail Pages ── -->
 ${jobs.map(j => `  <url>
     <loc>${siteUrl}/job/${xe(j.slug)}</loc>
@@ -280,7 +298,7 @@ router.get('/feed.rss', async (req, res) => {
     <atom:link href="${siteUrl}/feed.rss" rel="self" type="application/rss+xml"/>
     <ttl>60</ttl>
     <image>
-      <url>${siteUrl}/images/icon-512x512.svg</url>
+      <url>${siteUrl}/JobOrbitFavicon.png</url>
       <title>${xe(siteName)}</title>
       <link>${siteUrl}</link>
     </image>
@@ -320,7 +338,7 @@ router.get('/job/:slug', async (req, res, next) => {
       [req.params.slug]
     );
 
-    if (rows.length === 0) return next(); // 404 → SPA handles it
+    if (rows.length === 0) return sendJobNotFound(res); // real 404, not a soft-404
 
     const job      = rows[0];
 
@@ -347,12 +365,14 @@ router.get('/job/:slug', async (req, res, next) => {
       ? `  <!-- Google Analytics 4 -->\n  <script async src="https://www.googletagmanager.com/gtag/js?id=${ga4Id}"></script>\n  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${ga4Id}');</script>`
       : '';
 
-    // Employer logo (for employer-posted jobs)
+    // Employer logo + website (for employer-posted jobs)
     let employerLogo = '';
+    let employerWebsite = '';
     if (job.employer_id) {
       try {
-        const [[emp]] = await db.query('SELECT logo_url FROM employers WHERE id = ?', [job.employer_id]);
+        const [[emp]] = await db.query('SELECT logo_url, website FROM employers WHERE id = ?', [job.employer_id]);
         if (emp && emp.logo_url) employerLogo = emp.logo_url;
+        if (emp && emp.website) employerWebsite = emp.website;
       } catch {}
     }
     const employerLogoSrc = employerLogo.startsWith('http') ? employerLogo : employerLogo;
@@ -373,6 +393,23 @@ router.get('/job/:slug', async (req, res, next) => {
       'Contract':  'CONTRACTOR', 'Freelance': 'CONTRACTOR', 'Remote': 'FULL_TIME'
     };
 
+    // Gulf-market job board — default to the country's own currency rather
+    // than USD; keyed off the same country_code setting used for jobLocation.
+    const CURRENCY_BY_COUNTRY = { SA: 'SAR', AE: 'AED', QA: 'QAR', KW: 'KWD', OM: 'OMR', BH: 'BHD' };
+    const countryCode = await getSetting('country_code', 'SA');
+
+    // Reflect the job's real expiry instead of a flat +60 days so Google
+    // isn't told every posting is freshly valid regardless of its actual
+    // expires_at (jobs past expiry are auto-marked 'expired' and 404 above,
+    // so this only ever runs for genuinely still-active jobs).
+    const validThrough = job.expires_at
+      ? new Date(job.expires_at).toISOString().split('T')[0]
+      : new Date(new Date(job.created_at).getTime() + 60*24*60*60*1000).toISOString().split('T')[0];
+
+    const employerLogoAbs = employerLogo
+      ? (employerLogo.startsWith('http') ? employerLogo : `${siteUrl}${employerLogo}`)
+      : '';
+
     // ── JobPosting schema ─────────────────────────────────────
     const jobSchema = {
       '@context': 'https://schema.org',
@@ -380,7 +417,7 @@ router.get('/job/:slug', async (req, res, next) => {
       title: job.title,
       description: job.description,
       datePosted: datePosted,
-      validThrough: new Date(Date.now() + 60*24*60*60*1000).toISOString().split('T')[0],
+      validThrough,
       employmentType: empTypeMap[job.job_type] || 'FULL_TIME',
       url: canonical,
       directApply: !!(job.phone || job.whatsapp || job.email),
@@ -388,21 +425,25 @@ router.get('/job/:slug', async (req, res, next) => {
       hiringOrganization: {
         '@type': 'Organization',
         name: job.company || 'Company Name Not Provided',
-        sameAs: siteUrl
+        // sameAs identifies the hiring company's own site/profile — only
+        // set it when we actually have the employer's own website, never
+        // our own domain (that would misidentify JobOrbit as the employer).
+        ...(employerWebsite ? { sameAs: employerWebsite } : {}),
+        ...(employerLogoAbs ? { logo: employerLogoAbs } : {})
       },
       jobLocation: {
         '@type': 'Place',
         address: {
           '@type': 'PostalAddress',
           addressLocality: job.location,
-          addressCountry: await getSetting('country_code', 'US')
+          addressCountry: countryCode
         }
       }
     };
 
     if (extra.salary_min || extra.salary_max) {
       jobSchema.baseSalary = {
-        '@type': 'MonetaryAmount', currency: 'USD',
+        '@type': 'MonetaryAmount', currency: CURRENCY_BY_COUNTRY[countryCode] || 'SAR',
         value: { '@type': 'QuantitativeValue', unitText: 'YEAR',
           minValue: extra.salary_min || undefined,
           maxValue: extra.salary_max || undefined }
@@ -462,7 +503,7 @@ const contactBtns = [
   <meta property="og:description" content="${he(metaDesc)}">
   <meta property="og:url"         content="${he(canonical)}">
   <meta property="og:site_name"   content="${he(siteName)}">
-  <meta property="og:image"       content="${he(siteUrl)}/images/icon-512x512.svg">
+  <meta property="og:image"       content="${he(siteUrl)}/JobOrbitFavicon.png">
 
   <!-- Twitter Card -->
   <meta name="twitter:card"        content="summary_large_image">
@@ -472,15 +513,6 @@ const contactBtns = [
   <!-- Structured Data -->
   <script type="application/ld+json">${JSON.stringify(jobSchema)}</script>
   <script type="application/ld+json">${JSON.stringify(breadcrumb)}</script>
-
-  <!-- Redirect real users to SPA (only once, prevents loop) -->
-  <script>
-    var ua = navigator.userAgent;
-    var isBot = /googlebot|bingbot|yandex|baidu|duckduck|twitterbot|facebookexternalhit|linkedinbot|slackbot|whatsapp|crawler|spider|bot/i.test(ua);
-    if (!isBot && window.location.hash !== '#ssr') {
-      // redirect removed — SSR page shown directly
-    }
-  </script>
 
   <style>
     *{box-sizing:border-box;margin:0;padding:0}

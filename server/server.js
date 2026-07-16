@@ -265,4 +265,22 @@ app.listen(PORT, () => {
   };
   _analyticsClean();
   setInterval(_analyticsClean, 24 * 60 * 60 * 1000);
+
+  // Hourly job expiry sweep — nothing else ever checks expires_at, so
+  // without this a job stays 'active' (indexed, in the sitemap, claiming
+  // a fresh validThrough in its JobPosting schema) forever past its real
+  // expiry unless an employer manually closes it.
+  const _jobExpireSweep = async () => {
+    try {
+      const db = require('./db/connection');
+      const [result] = await db.query(
+        `UPDATE jobs SET status='expired' WHERE status='active' AND expires_at IS NOT NULL AND expires_at < NOW()`
+      );
+      if (result.affectedRows) {
+        console.log('[Job expiry] Marked', result.affectedRows, 'job(s) as expired');
+      }
+    } catch(e) { console.error('[Job expiry]', e.message); }
+  };
+  _jobExpireSweep();
+  setInterval(_jobExpireSweep, 60 * 60 * 1000);
 });

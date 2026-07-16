@@ -182,7 +182,7 @@ function injectSiteSchema() {
   if (s.google_verify) setMeta('name', 'google-site-verification', s.google_verify);
 
   // OG image
-  const ogImg = s.og_image || s.logo_url || `${siteUrl}/images/icon-512x512.svg`;
+  const ogImg = s.og_image || s.logo_url || `${siteUrl}/JobOrbitFavicon.png`;
   setMeta('property', 'og:image', ogImg);
   setMeta('name', 'twitter:image', ogImg);
 
