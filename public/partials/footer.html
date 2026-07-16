@@ -34,6 +34,10 @@
     <a href="https://linkedin.com/company/joborbit-gulf" class="footer-social" title="LinkedIn"><i class="bi bi-linkedin"></i></a>
     <a href="https://www.facebook.com/share/18kqymhqcP/" class="footer-social" title="Facebook"><i class="bi bi-facebook"></i></a>
   </div>
+  <div id="ad-footer" class="ad-zone d-none">
+    <span class="ad-label">Advertisement</span>
+    <div id="ad-footer-code"></div>
+  </div>
   <hr class="footer-divider">
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
       <p class="mb-0 footer-copy">&copy; <span id="footerYear"></span> <span class="footer-brand-inline" id="footer-copy-name">JobOrbit</span>. All rights reserved.</p>
@@ -168,6 +172,19 @@ if (_tt && !_tt.dataset.wired) {
 // Footer year
 const _fy = document.getElementById('footerYear');
 if (_fy) _fy.textContent = new Date().getFullYear();
+
+// Footer ad zone — runs on every page (footer.html is shared everywhere
+// main.js isn't), independent of which loadSettings variant is active.
+(async function loadFooterAd() {
+  try {
+    const data = await fetch('/api/ads').then(r => r.json());
+    const code = data.ads && data.ads.footer;
+    if (!code) return;
+    const wrap = document.getElementById('ad-footer');
+    const slot = document.getElementById('ad-footer-code');
+    if (wrap && slot) { slot.innerHTML = code; wrap.classList.remove('d-none'); }
+  } catch (e) {}
+})();
 
 // Auto-highlight active nav link based on current URL
 document.querySelectorAll('.navbar-nav .nav-link').forEach(link => {

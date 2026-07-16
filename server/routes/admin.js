@@ -199,7 +199,7 @@ router.post('/jobs', async (req, res) => {
     const {
       title, company, category_id, location, job_type = 'Full-time',
       description, phone, whatsapp, email, map_link, apply_link, extra_fields, salary,
-      status = 'active', featured = 0, sponsored = 0, featured_until
+      status = 'active', featured = 0, sponsored = 0, featured_until, sponsored_until
     } = req.body;
 
     if (!title || !company || !category_id || !location || !description) {
@@ -211,13 +211,13 @@ router.post('/jobs', async (req, res) => {
     await db.execute(
       `INSERT INTO jobs
          (title, company, category_id, location, job_type, description,
-          salary, phone, whatsapp, email, map_link, apply_link, extra_fields, status, featured, sponsored, featured_until, slug)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          salary, phone, whatsapp, email, map_link, apply_link, extra_fields, status, featured, sponsored, featured_until, sponsored_until, slug)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [title, company, category_id, location, job_type, description, salary || null,
        phone || null, whatsapp || null, email || null, map_link || null, apply_link || null,
        extra_fields ? JSON.stringify(extra_fields) : null,
        status, featured ? 1 : 0, sponsored ? 1 : 0,
-       featured_until || null, slug]
+       featured_until || null, sponsored_until || null, slug]
     );
 
       res.json({ success: true, message: 'Job posted successfully', slug });
@@ -233,7 +233,7 @@ router.put('/jobs/:id', async (req, res) => {
     const {
       title, company, category_id, location, job_type,
       description, phone, whatsapp, email, map_link, apply_link, extra_fields, salary,
-      status, featured, sponsored, featured_until
+      status, featured, sponsored, featured_until, sponsored_until
     } = req.body;
 
     const [existing] = await db.execute('SELECT slug FROM jobs WHERE id = ? LIMIT 1', [req.params.id]);
@@ -245,13 +245,13 @@ router.put('/jobs/:id', async (req, res) => {
       `UPDATE jobs SET
          title=?, company=?, category_id=?, location=?, job_type=?,
          description=?, salary=?, phone=?, whatsapp=?, email=?, map_link=?, apply_link=?, extra_fields=?,
-         status=?, featured=?, sponsored=?, featured_until=?, slug=?
+         status=?, featured=?, sponsored=?, featured_until=?, sponsored_until=?, slug=?
        WHERE id=?`,
       [title, company, category_id, location, job_type,
        description, salary || null, phone || null, whatsapp || null, email || null, map_link || null, apply_link || null,
        extra_fields ? JSON.stringify(extra_fields) : null,
        status, featured ? 1 : 0, sponsored ? 1 : 0,
-       featured_until || null, slug, req.params.id]
+       featured_until || null, sponsored_until || null, slug, req.params.id]
     );
 
     res.json({ success: true, message: 'Job updated successfully' });
@@ -363,9 +363,14 @@ router.delete('/categories/:id', async (req, res) => {
 
 // ── Monetization ───────────────────────────────────────────────
 router.get('/monetization', async (req, res) => {
-  const [rows] = await db.execute('SELECT * FROM monetization');
-  const [ads]  = await db.execute('SELECT * FROM ad_placements');
-  res.json({ success: true, features: rows, adPlacements: ads });
+  try {
+    const [rows] = await db.execute('SELECT * FROM monetization');
+    const [ads]  = await db.execute('SELECT * FROM ad_placements');
+    res.json({ success: true, features: rows, adPlacements: ads });
+  } catch (err) {
+    console.error('[monetization GET]', err);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
 });
 
 router.put('/monetization/:id', async (req, res) => {

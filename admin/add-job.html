@@ -123,6 +123,10 @@
                   <small class="text-muted d-block">Pinned at top of all listings</small>
                 </div>
               </div>
+              <div id="sponsoredDateWrap" class="mt-3 d-none">
+                <label class="form-label-custom">Sponsored Until</label>
+                <input type="date" class="form-control-custom" name="sponsored_until">
+              </div>
             </div>
           </div>
 <!-- Apply Link Card -->
@@ -163,11 +167,26 @@ const editId   = params.get('id');
 const isEdit   = !!editId;
 let schema     = { sections: [] };
 let categories = [];
+let monetizationByFeature = {}; // feature name -> { duration_days, ... }
+
+// today + N days as YYYY-MM-DD, for pre-filling *_until date inputs
+function addDays(n) {
+  const d = new Date();
+  d.setDate(d.getDate() + n);
+  return d.toISOString().slice(0, 10);
+}
+
+async function loadMonetizationDurations() {
+  try {
+    const data = await adminApi.get('/api/admin/monetization');
+    (data.features || []).forEach(f => { monetizationByFeature[f.feature] = f; });
+  } catch (e) { /* pre-fill is a convenience, not required */ }
+}
 
 /* ══════════ INIT ══════════ */
 document.addEventListener('DOMContentLoaded', async () => {
   await requireAuth();
-  await Promise.all([loadCategories(), loadSchema()]);
+  await Promise.all([loadCategories(), loadSchema(), loadMonetizationDurations()]);
   renderForm();
 
   if (isEdit) {
@@ -176,9 +195,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadJobData();
   }
 
-  document.getElementById('featuredCheck').addEventListener('change', e =>
-    document.getElementById('featuredDateWrap').classList.toggle('d-none', !e.target.checked)
-  );
+  document.getElementById('featuredCheck').addEventListener('change', e => {
+    const wrap  = document.getElementById('featuredDateWrap');
+    const input = wrap.querySelector('[name="featured_until"]');
+    wrap.classList.toggle('d-none', !e.target.checked);
+    if (e.target.checked && !input.value) {
+      const days = monetizationByFeature.featured_job?.duration_days;
+      if (days) input.value = addDays(days);
+    }
+  });
+
+  document.getElementById('sponsoredCheck').addEventListener('change', e => {
+    const wrap  = document.getElementById('sponsoredDateWrap');
+    const input = wrap.querySelector('[name="sponsored_until"]');
+    wrap.classList.toggle('d-none', !e.target.checked);
+    if (e.target.checked && !input.value) {
+      const days = monetizationByFeature.sponsored_top?.duration_days;
+      if (days) input.value = addDays(days);
+    }
+  });
 
   document.getElementById('jobForm').addEventListener('submit', handleSubmit);
   console.log('Event listener attached');
@@ -387,7 +422,7 @@ async function loadJobData() {
       category_id:'category_id',job_type:'job_type',description:'description',
       phone:'phone',whatsapp:'whatsapp',email:'email',map_link:'map_link',
       apply_link: 'apply_link', salary: 'salary',
-      status:'status',featured_until:'featured_until'
+      status:'status',featured_until:'featured_until',sponsored_until:'sponsored_until'
     };
 
     Object.entries(coreMap).forEach(([coreKey, jobKey]) => {
@@ -399,7 +434,10 @@ async function loadJobData() {
       form.querySelector('[name="featured"]').checked = true;
       document.getElementById('featuredDateWrap').classList.remove('d-none');
     }
-    if (job.sponsored) form.querySelector('[name="sponsored"]').checked = true;
+    if (job.sponsored) {
+      form.querySelector('[name="sponsored"]').checked = true;
+      document.getElementById('sponsoredDateWrap').classList.remove('d-none');
+    }
 
     // Extra fields
     let extraFields = job.extra_fields;
@@ -458,9 +496,10 @@ async function handleSubmit(e) {
     apply_link:      getVal(form,'apply_link'),
     salary:         getVal(form,'salary'),
     status:         getVal(form,'status'),
-    featured:       form.querySelector('[name="featured"]')?.checked ? 1 : 0,
-    sponsored:      form.querySelector('[name="sponsored"]')?.checked ? 1 : 0,
-    featured_until: getVal(form,'featured_until'),
+    featured:        form.querySelector('[name="featured"]')?.checked ? 1 : 0,
+    sponsored:       form.querySelector('[name="sponsored"]')?.checked ? 1 : 0,
+    featured_until:  getVal(form,'featured_until'),
+    sponsored_until: getVal(form,'sponsored_until'),
     extra_fields:   {}
   };
 

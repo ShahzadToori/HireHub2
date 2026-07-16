@@ -24,6 +24,7 @@ const redirectsRoutes       = require('./routes/redirects');
 const adminEmployersRoutes  = require('./routes/admin-employers');
 const analyticsRoutes       = require('./routes/analytics');
 const adminAnalyticsRoutes  = require('./routes/admin-analytics');
+const adsRoutes             = require('./routes/ads');
 
 
 // Fail fast rather than silently signing sessions with a well-known fallback
@@ -159,6 +160,7 @@ app.use('/api/admin/redirects',  redirectsRoutes);
 app.use('/api/admin/employers',  adminEmployersRoutes);
 app.use('/api/admin/analytics',  adminAnalyticsRoutes);
 app.use('/api/analytics',        analyticsRoutes);
+app.use('/api/ads',              adsRoutes);
 app.use('/api/admin',            adminRoutes);
 app.use('/api/settings',  settingsRoutes);
 app.use('/api/contact',   contactRoutes);
@@ -183,7 +185,7 @@ app.get('/requirement/:batchId', (req, res) => {
     const html = require('fs').readFileSync(
       require('path').join(__dirname, '../public/requirement.html'), 'utf8'
     );
-    res.send(htmlLayout.inject(html));
+    res.send(htmlLayout.injectAnalytics(htmlLayout.inject(html)));
   } catch(e) { res.status(500).send('Page not found'); }
 });
 
@@ -198,7 +200,7 @@ app.get('*', (req, res) => {
     require('path').join(__dirname, '../public/index.html'), 'utf8'
   );
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
-  res.send(htmlLayout.inject(html));
+  res.send(htmlLayout.injectAnalytics(htmlLayout.inject(html)));
 });
 
 // ── Error handler ─────────────────────────────────────────────

@@ -346,8 +346,7 @@ async function loadSettings() {
     const savedTheme = localStorage.getItem('theme') || s.default_theme || 'light';
     applyTheme(savedTheme, false);
 
-    if (s.show_banner_top  === '1') $('#ad-top').classList.remove('d-none');
-    if (s.show_banner_side === '1') $('#ad-sidebar').classList.remove('d-none');
+    loadAds(s);
 
     // Inject site-level SEO schema now that settings are loaded
     injectSiteSchema();
@@ -355,6 +354,30 @@ async function loadSettings() {
   } catch (e) {
     console.warn('Settings load failed:', e);
   }
+}
+
+// Homepage ad zones (top/sidebar/between-jobs). The footer zone is handled
+// independently in footer.html since that partial is shared on every page,
+// not just this one. A zone only shows if the admin has both enabled it in
+// Monetization AND (for top/sidebar, which predate the ads feed) left the
+// matching Section Visibility toggle on.
+async function loadAds(settings) {
+  try {
+    const data = await cachedGet('/api/ads', 300000); // cache 5 min
+    const ads = data.ads || {};
+    const zones = [
+      { zone: 'top',          wrapId: 'ad-top',          codeId: 'ad-top-code',          gate: settings.show_banner_top  === '1' },
+      { zone: 'sidebar',      wrapId: 'ad-sidebar',      codeId: 'ad-sidebar-code',      gate: settings.show_banner_side === '1' },
+      { zone: 'between_jobs', wrapId: 'ad-between-jobs', codeId: 'ad-between-jobs-code', gate: true }
+    ];
+    zones.forEach(({ zone, wrapId, codeId, gate }) => {
+      const code = ads[zone];
+      if (!code || !gate) return;
+      const wrap = document.getElementById(wrapId);
+      const slot = document.getElementById(codeId);
+      if (wrap && slot) { slot.innerHTML = code; wrap.classList.remove('d-none'); }
+    });
+  } catch (e) { /* ads are non-critical — fail silently */ }
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -423,6 +446,10 @@ function filterByCategory(slug) {
    FEATURED JOBS
 ══════════════════════════════════════════════════════════════ */
 async function loadFeaturedJobs() {
+  if (state.settings.show_featured === '0') {
+    $('#featured').classList.add('d-none');
+    return;
+  }
   try {
     const data = await api.get('/api/jobs/featured');
     const container = $('#featuredList');
@@ -535,8 +562,8 @@ async function loadJobs() {
    RENDER JOB CARD
 ══════════════════════════════════════════════════════════════ */
 function renderJobCard(job, isFeaturedSection = false) {
-  const isFeatured  = job.featured == 1;
-  const isSponsored = job.sponsored == 1;
+  const isFeatured  = job.featured  == 1 && state.settings.show_featured  !== '0';
+  const isSponsored = job.sponsored == 1 && state.settings.show_sponsored !== '0';
 
   // ── Urgency logic ─────────────────────────────────────────
   const daysOld        = Math.floor((Date.now() - new Date(job.created_at).getTime()) / 86400000);
@@ -727,8 +754,8 @@ function populateModal(job) {
     if (label) label.textContent = saved ? 'Saved' : 'Save';
   }
   const badges = [
-    job.sponsored == 1 ? '<span class="badge-sponsored">Sponsored</span>' : '',
-    job.featured  == 1 ? '<span class="badge-featured">⭐ Featured</span>' : ''
+    job.sponsored == 1 && state.settings.show_sponsored !== '0' ? '<span class="badge-sponsored">Sponsored</span>' : '',
+    job.featured  == 1 && state.settings.show_featured  !== '0' ? '<span class="badge-featured">⭐ Featured</span>' : ''
   ].filter(Boolean).join('');
 
   $('#modalBadges').innerHTML     = badges;

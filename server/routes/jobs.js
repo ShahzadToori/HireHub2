@@ -10,6 +10,33 @@ const intOr = (v, def) => {
   return isNaN(n) ? def : n;
 };
 
+async function getSetting(key, fallback = '') {
+  try {
+    const [[row]] = await db.query('SELECT `value` FROM settings WHERE `key`=? LIMIT 1', [key]);
+    return (row && row.value) ? row.value : fallback;
+  } catch { return fallback; }
+}
+
+// SQL boolean expressions for "is this job currently a valid paid
+// placement" — literal 0 (never true) when the site owner has switched the
+// feature off entirely (Settings → Section Visibility), regardless of the
+// job's own featured/sponsored flags; otherwise the existing per-job
+// expiry check (featured_until / sponsored_until).
+async function getPromotionSql() {
+  const [showFeatured, showSponsored] = await Promise.all([
+    getSetting('show_featured', '1'),
+    getSetting('show_sponsored', '1')
+  ]);
+  // NOTE: must not be a bare integer literal like '0' — MySQL treats a
+  // bare integer in ORDER BY as a positional column reference ("ORDER BY 0"
+  // errors with "Unknown column '0'"), not a constant. (1=0) is unambiguous
+  // in both WHERE and ORDER BY.
+  return {
+    featuredSql:  showFeatured  !== '0' ? '(j.featured = 1 AND (j.featured_until IS NULL OR j.featured_until >= CURDATE()))'   : '(1=0)',
+    sponsoredSql: showSponsored !== '0' ? '(j.sponsored = 1 AND (j.sponsored_until IS NULL OR j.sponsored_until >= CURDATE()))' : '(1=0)'
+  };
+}
+
 const digitsStr = (max) => z.string().regex(/^\d+$/).max(max);
 
 const flagParam = () => z.enum(['0', '1']).optional().or(z.literal(''));
@@ -68,6 +95,8 @@ router.get('/', validate(searchSchema, 'query'), async (req, res) => {
     const perPage = Math.min(intOr(limit, 12), 50);
     const offset  = (intOr(page, 1) - 1) * perPage;
 
+    const { featuredSql, sponsoredSql } = await getPromotionSql();
+
     let where  = ['j.status = "active"', '(j.employer_id IS NULL OR e.status = "active")'];
     let params = [];
 
@@ -88,7 +117,7 @@ router.get('/', validate(searchSchema, 'query'), async (req, res) => {
       params.push(type);
     }
     if (featured === '1') {
-      where.push('j.featured = 1 AND (j.featured_until IS NULL OR j.featured_until >= CURDATE())');
+      where.push(featuredSql);
     }
     if (visa === '1') {
       where.push('j.visa_sponsored = 1');
@@ -145,7 +174,7 @@ router.get('/', validate(searchSchema, 'query'), async (req, res) => {
          JOIN categories c ON j.category_id = c.id
          LEFT JOIN employers e ON e.id = j.employer_id
        ${whereSql}
-       ORDER BY j.sponsored DESC, j.featured DESC, ${orderSql}
+       ORDER BY ${sponsoredSql} DESC, ${featuredSql} DESC, ${orderSql}
        LIMIT ? OFFSET ?`,
       [...params, perPage, offset]
     );
@@ -170,6 +199,7 @@ router.get('/', validate(searchSchema, 'query'), async (req, res) => {
 // GET /api/jobs/featured  – sponsored + featured jobs
 router.get('/featured', async (req, res) => {
   try {
+    const { featuredSql, sponsoredSql } = await getPromotionSql();
     const [jobs] = await db.query(
       `SELECT j.id, j.title, j.company, j.location, j.job_type,
               j.description, j.phone, j.whatsapp, j.email, j.map_link, j.extra_fields,
@@ -180,9 +210,8 @@ router.get('/featured', async (req, res) => {
          LEFT JOIN employers e ON e.id = j.employer_id
         WHERE j.status = 'active'
           AND (j.employer_id IS NULL OR e.status = 'active')
-          AND (j.featured = 1 OR j.sponsored = 1)
-          AND (j.featured_until IS NULL OR j.featured_until >= CURDATE())
-        ORDER BY j.sponsored DESC, j.created_at DESC
+          AND (${featuredSql} OR ${sponsoredSql})
+        ORDER BY ${sponsoredSql} DESC, j.created_at DESC
         LIMIT 6`
     );
     res.json({ success: true, jobs });
@@ -227,6 +256,7 @@ router.get('/cities', async (req, res) => {
 // GET /api/jobs/job-of-day  – Phase 6: featured job of the day
 router.get('/job-of-day', async (req, res) => {
   try {
+    const { featuredSql, sponsoredSql } = await getPromotionSql();
     // Prefer featured/sponsored jobs from last 7 days
     let [rows] = await db.query(
       `SELECT j.id, j.title, j.company, j.location, j.job_type,
@@ -235,7 +265,7 @@ router.get('/job-of-day', async (req, res) => {
          FROM jobs j JOIN categories c ON j.category_id = c.id
          LEFT JOIN employers e ON e.id = j.employer_id
         WHERE j.status = 'active' AND (j.employer_id IS NULL OR e.status = 'active')
-          AND (j.featured = 1 OR j.sponsored = 1)
+          AND (${featuredSql} OR ${sponsoredSql})
           AND j.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
         ORDER BY j.created_at DESC LIMIT 1`
     );
