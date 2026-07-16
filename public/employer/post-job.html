@@ -1232,6 +1232,7 @@ async function submitJob() {
       if (d.success) {
         isDirty = false;
         showToast('Job posted successfully!');
+        if (window.jbTrack) window.jbTrack('job_posted', { job_id: d.job?.id });
         setTimeout(() => window.location.href = '/employer/jobs.html', 1000);
       } else {
         showMsg(msg, d.message || 'Failed to post job', 'error');
@@ -1672,6 +1673,7 @@ async function bSubmit() {
     document.getElementById('bBar').style.background = '#22c55e';
     if (d.success) {
       isDirty = false;
+      if (window.jbTrack) window.jbTrack('job_posted', { batch_id: d.batch_id, count: d.created });
       const shareUrl = window.location.origin + '/requirement/' + d.batch_id;
       document.getElementById('bProgText').innerHTML =
         '✅ ' + d.created + ' jobs posted! <a href="' + shareUrl + '" target="_blank" style="color:var(--primary);font-weight:700">View Requirement Page →</a>';

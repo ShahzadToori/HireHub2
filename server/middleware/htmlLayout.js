@@ -123,6 +123,12 @@ function injectMeta(html, urlPath) {
   return html;
 }
 
+// Unconditional — unlike injectMeta(), this runs on every HTML page served
+// from public/ (including public/employer/*), regardless of PAGE_META_KEYS.
+function injectAnalytics(html) {
+  return html.replace('</head>', '  <script src="/js/analytics.js" defer></script>\n</head>');
+}
+
 // Auto-reload partials when they change — no server restart needed
 fs.watch(PARTIALS_DIR, (event, filename) => {
   if (filename && filename.endsWith('.html')) {
@@ -173,7 +179,7 @@ function htmlLayoutMiddleware(req, res, next) {
       if (err) return tryNext(i + 1);
       // Refresh meta cache if stale
       if (Date.now() - _metaCacheAt > META_TTL) loadMetaCache();
-      const finalHtml = injectMeta(inject(html), urlPath);
+      const finalHtml = injectAnalytics(injectMeta(inject(html), urlPath));
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
       res.setHeader('Cache-Control', 'no-cache');
       res.send(finalHtml);

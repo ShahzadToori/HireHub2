@@ -249,6 +249,7 @@ async function doRegister() {
 
   try {
     const d = await API.post('/api/employer/register', data);
+    if (d.success && window.jbTrack) window.jbTrack('employer_registered', {});
     if (d.success && d.pending) {
       showMsg(msg, d.message, 'success');
       btn.innerHTML = '<i class="bi bi-clock me-2"></i>Application Submitted';

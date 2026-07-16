@@ -22,6 +22,8 @@ const blogSeoRoutes = require('./routes/blog-routes');
 const adminUsersRoutes = require('./routes/admin-users');
 const redirectsRoutes       = require('./routes/redirects');
 const adminEmployersRoutes  = require('./routes/admin-employers');
+const analyticsRoutes       = require('./routes/analytics');
+const adminAnalyticsRoutes  = require('./routes/admin-analytics');
 
 
 // Fail fast rather than silently signing sessions with a well-known fallback
@@ -155,6 +157,8 @@ app.use('/api/auth',      authRoutes);
 app.use('/api/jobs',      jobsRoutes);
 app.use('/api/admin/redirects',  redirectsRoutes);
 app.use('/api/admin/employers',  adminEmployersRoutes);
+app.use('/api/admin/analytics',  adminAnalyticsRoutes);
+app.use('/api/analytics',        analyticsRoutes);
 app.use('/api/admin',            adminRoutes);
 app.use('/api/settings',  settingsRoutes);
 app.use('/api/contact',   contactRoutes);
@@ -246,4 +250,19 @@ app.listen(PORT, () => {
   };
   _cvClean(); // run on startup to catch any missed
   setInterval(_cvClean, 24 * 60 * 60 * 1000);
+
+  // Daily analytics retention cleanup — bound table growth
+  const _analyticsClean = async () => {
+    try {
+      const db = require('./db/connection');
+      const days = parseInt(process.env.ANALYTICS_RETENTION_DAYS) || 180;
+      const [pv] = await db.query('DELETE FROM analytics_pageviews WHERE created_at < NOW() - INTERVAL ? DAY', [days]);
+      const [ev] = await db.query('DELETE FROM analytics_events WHERE created_at < NOW() - INTERVAL ? DAY', [days]);
+      if (pv.affectedRows || ev.affectedRows) {
+        console.log('[Analytics cleanup] Deleted', pv.affectedRows, 'pageviews,', ev.affectedRows, 'events older than', days, 'days');
+      }
+    } catch(e) { console.error('[Analytics cleanup]', e.message); }
+  };
+  _analyticsClean();
+  setInterval(_analyticsClean, 24 * 60 * 60 * 1000);
 });

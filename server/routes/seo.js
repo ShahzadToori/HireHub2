@@ -570,6 +570,7 @@ const contactBtns = [
     }
   </style>
 ${ga4Script}
+  <script src="/js/analytics.js" defer></script>
 </head>
 <body>
 
@@ -933,6 +934,7 @@ router.get('/:slug(aramco-jobs|hse-jobs|qc-jobs|wpr-jobs|shutdown-jobs|neom-jobs
     footer{margin-top:3rem;padding:1.5rem;text-align:center;font-size:.8rem;color:#9ca3af;border-top:1px solid #e5e7eb}
     @media(max-width:600px){.hero{padding:2rem 1rem}.stat{padding:.4rem 1rem}}
   </style>
+  <script src="/js/analytics.js" defer></script>
 </head>
 <body>
 <nav>

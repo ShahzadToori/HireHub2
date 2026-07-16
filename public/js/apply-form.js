@@ -154,6 +154,7 @@ window.submitApplication = async function() {
     if (result.success) {
       showApplyMsg('✅ Application submitted! The employer will contact you.', 'success');
       subBtn.textContent = 'Submitted';
+      if (window.jbTrack) window.jbTrack('job_apply_submitted', { job_id: jobId });
     } else {
       showApplyMsg(result.message || 'Failed to submit. Please try again.', 'error');
       subBtn.disabled = false;

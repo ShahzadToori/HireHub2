@@ -266,6 +266,7 @@ if (typeof submitAlerts === 'undefined') {
         msgEl.className   = 'alert-msg success';
         btn.innerHTML     = '<i class="bi bi-check-lg me-1"></i>Done!';
         localStorage.setItem('jb_alertSub', JSON.stringify({ email, category, city, ts: Date.now() }));
+        if (window.jbTrack) window.jbTrack('job_alert_subscribed', {});
         setTimeout(() => {
           bootstrap.Modal.getInstance(document.getElementById('alertsModal'))?.hide();
           btn.disabled  = false;

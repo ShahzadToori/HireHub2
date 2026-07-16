@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analytics – JobOrbit Admin</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/svg+xml" href="/JobOrbitFavicon.svg">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/admin/css/admin.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    .an-range{display:flex;gap:.4rem;margin-bottom:1rem}
+    .an-range-btn{border:1.5px solid var(--border);background:var(--bg-card);color:var(--text-secondary);
+      padding:.4rem 1rem;border-radius:8px;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .15s}
+    .an-range-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+    .an-chart-wrap{position:relative;height:280px;padding:1rem}
+    .an-device-row{display:flex;align-items:center;gap:.75rem;padding:.5rem 0}
+    .an-device-label{width:80px;font-size:.82rem;color:var(--text-secondary);text-transform:capitalize}
+    .an-device-bar-wrap{flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+    .an-device-bar{height:100%;background:var(--primary);border-radius:4px}
+    .an-device-count{width:50px;text-align:right;font-size:.82rem;font-weight:700}
+  </style>
+</head>
+
+<body class="admin-body">
+
+<!-- ── Sidebar ────────────────────────────────────────────── -->
+<aside class="admin-sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <img src="/JobOrbitFavicon.svg" alt="JobOrbit" class="sidebar-brand" style="height: 40px;">
+    <span class="sidebar-brand">JobOrbit</span>
+    <button class="btn-sidebar-close d-lg-none" id="sidebarClose"><i class="bi bi-x-lg"></i></button>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a href="dashboard.html"  class="sidebar-link"><i class="bi bi-speedometer2"></i><span>Dashboard</span></a>
+    <a href="jobs.html"       class="sidebar-link"><i class="bi bi-briefcase"></i><span>All Jobs</span></a>
+    <a href="add-job.html"    class="sidebar-link"><i class="bi bi-plus-circle"></i><span>Add Job</span></a>
+    <a href="bulk-upload.html" class="sidebar-link"><i class="bi bi-upload"></i><span>Bulk Upload</span></a>
+    <a href="categories.html" class="sidebar-link"><i class="bi bi-tag"></i><span>Categories</span></a>
+    <a href="blog.html" class="sidebar-link"><i class="bi bi-journal-richtext"></i><span>Blog</span></a>
+    <a href="messages.html"     class="sidebar-link"><i class="bi bi-envelope"></i><span>Messages</span></a>
+    <a href="monetization.html" class="sidebar-link"><i class="bi bi-currency-dollar"></i><span>Monetization</span></a>
+    <a href="analytics.html"    class="sidebar-link active"><i class="bi bi-graph-up-arrow"></i><span>Analytics</span></a>
+    <a href="settings.html"     class="sidebar-link"><i class="bi bi-gear"></i><span>Settings</span></a>
+    <a href="form-builder.html" class="sidebar-link"><i class="bi bi-ui-checks-grid"></i><span>Form Builder</span></a>
+    <hr class="sidebar-divider">
+    <a href="/"               class="sidebar-link" target="_blank"><i class="bi bi-box-arrow-up-right"></i><span>View Site</span></a>
+    <button class="sidebar-link sidebar-btn" id="logoutBtn"><i class="bi bi-box-arrow-right"></i><span>Logout</span></button>
+  </nav>
+</aside>
+
+<!-- ── Sidebar Overlay (mobile) ───────────────────────────── -->
+<div class="sidebar-overlay d-lg-none d-none" id="sidebarOverlay"></div>
+
+<!-- ── Main Content ──────────────────────────────────────── -->
+<div class="admin-main">
+
+  <!-- Top Bar -->
+  <header class="admin-topbar">
+    <button class="btn-hamburger d-lg-none" id="sidebarToggle"><i class="bi bi-list fs-4"></i></button>
+    <h1 class="topbar-title">Analytics</h1>
+    <div class="topbar-right">
+      <button class="btn-icon-admin" id="themeToggleAdmin" title="Toggle theme"><i class="bi bi-moon-fill" id="adminThemeIcon"></i></button>
+      <div class="admin-avatar" id="adminName">A</div>
+    </div>
+  </header>
+
+  <main class="admin-content">
+
+    <!-- Range selector -->
+    <div class="an-range">
+      <button class="an-range-btn" data-range="7">Last 7 days</button>
+      <button class="an-range-btn active" data-range="30">Last 30 days</button>
+      <button class="an-range-btn" data-range="90">Last 90 days</button>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-lg-3">
+        <div class="stat-card stat-primary">
+          <div class="stat-icon"><i class="bi bi-eye-fill"></i></div>
+          <div class="stat-value" id="statPageviews">–</div>
+          <div class="stat-label">Pageviews</div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="stat-card stat-success">
+          <div class="stat-icon"><i class="bi bi-people-fill"></i></div>
+          <div class="stat-value" id="statVisitors">–</div>
+          <div class="stat-label">Unique Visitors</div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="stat-card stat-warning">
+          <div class="stat-icon"><i class="bi bi-lightning-fill"></i></div>
+          <div class="stat-value" id="statEvents">–</div>
+          <div class="stat-label">Total Events</div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="stat-card stat-info">
+          <div class="stat-icon"><i class="bi bi-graph-up"></i></div>
+          <div class="stat-value" id="statAvgViews">–</div>
+          <div class="stat-label">Pages / Visitor</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="admin-card mb-4">
+      <div class="admin-card-header">
+        <h5 class="admin-card-title">Pageviews &amp; Unique Visitors</h5>
+      </div>
+      <div class="an-chart-wrap">
+        <canvas id="analyticsChart"></canvas>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+      <!-- Top Pages -->
+      <div class="col-lg-6">
+        <div class="admin-card h-100">
+          <div class="admin-card-header"><h5 class="admin-card-title">Top Pages</h5></div>
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead><tr><th>Path</th><th>Views</th></tr></thead>
+              <tbody id="topPagesTable"><tr><td colspan="2" class="text-center text-muted py-3">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- Top Referrers -->
+      <div class="col-lg-6">
+        <div class="admin-card h-100">
+          <div class="admin-card-header"><h5 class="admin-card-title">Top Referrers</h5></div>
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead><tr><th>Referrer</th><th>Visits</th></tr></thead>
+              <tbody id="topReferrersTable"><tr><td colspan="2" class="text-center text-muted py-3">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-3">
+      <!-- Devices -->
+      <div class="col-lg-5">
+        <div class="admin-card h-100">
+          <div class="admin-card-header"><h5 class="admin-card-title">Devices</h5></div>
+          <div class="p-3" id="deviceBreakdown">
+            <div class="text-center text-muted py-3">Loading…</div>
+          </div>
+        </div>
+      </div>
+      <!-- Events -->
+      <div class="col-lg-7">
+        <div class="admin-card h-100">
+          <div class="admin-card-header"><h5 class="admin-card-title">Events</h5></div>
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead><tr><th>Event</th><th>Count</th><th>Unique Sessions</th></tr></thead>
+              <tbody id="eventsTable"><tr><td colspan="3" class="text-center text-muted py-3">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/admin/js/admin.js"></script>
+<script>
+  let currentRange = 30;
+  let analyticsChart = null;
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    await requireAuth();
+    document.querySelectorAll('.an-range-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.an-range-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentRange = parseInt(btn.dataset.range);
+        loadAnalytics();
+      });
+    });
+    loadAnalytics();
+  });
+
+  async function loadAnalytics() {
+    try {
+      const [summary, timeseries] = await Promise.all([
+        adminApi.get(`/api/admin/analytics/summary?range=${currentRange}`),
+        adminApi.get(`/api/admin/analytics/timeseries?range=${currentRange}`)
+      ]);
+      if (summary.success) renderSummary(summary);
+      if (timeseries.success) renderChart(timeseries.series);
+    } catch (e) {
+      console.error('[analytics] load error', e);
+    }
+  }
+
+  function renderSummary(d) {
+    document.getElementById('statPageviews').textContent = d.pageviews_total.toLocaleString();
+    document.getElementById('statVisitors').textContent  = d.unique_visitors.toLocaleString();
+    document.getElementById('statAvgViews').textContent  = d.avg_pageviews_per_visitor;
+
+    const totalEvents = d.events_breakdown.reduce((sum, e) => sum + e.count, 0);
+    document.getElementById('statEvents').textContent = totalEvents.toLocaleString();
+
+    const pagesBody = document.getElementById('topPagesTable');
+    pagesBody.innerHTML = d.top_pages.length
+      ? d.top_pages.map(p => `<tr><td>${escHtml(p.path)}</td><td>${p.views}</td></tr>`).join('')
+      : '<tr><td colspan="2" class="text-center text-muted py-3">No data yet</td></tr>';
+
+    const refBody = document.getElementById('topReferrersTable');
+    refBody.innerHTML = d.top_referrers.length
+      ? d.top_referrers.map(r => `<tr><td>${escHtml(r.referrer_domain)}</td><td>${r.count}</td></tr>`).join('')
+      : '<tr><td colspan="2" class="text-center text-muted py-3">No referrer traffic yet</td></tr>';
+
+    const deviceWrap = document.getElementById('deviceBreakdown');
+    const deviceTotal = d.device_breakdown.reduce((sum, x) => sum + x.count, 0) || 1;
+    deviceWrap.innerHTML = d.device_breakdown.length
+      ? d.device_breakdown.map(x => `
+          <div class="an-device-row">
+            <div class="an-device-label">${escHtml(x.device_type)}</div>
+            <div class="an-device-bar-wrap"><div class="an-device-bar" style="width:${Math.round(x.count/deviceTotal*100)}%"></div></div>
+            <div class="an-device-count">${x.count}</div>
+          </div>`).join('')
+      : '<div class="text-center text-muted py-3">No data yet</div>';
+
+    const eventsBody = document.getElementById('eventsTable');
+    eventsBody.innerHTML = d.events_breakdown.length
+      ? d.events_breakdown.map(e => `<tr><td>${escHtml(e.event_name)}</td><td>${e.count}</td><td>${e.unique_sessions}</td></tr>`).join('')
+      : '<tr><td colspan="3" class="text-center text-muted py-3">No events yet</td></tr>';
+  }
+
+  function renderChart(series) {
+    const labels = series.map(s => s.date.slice(5)); // MM-DD
+    const pageviews = series.map(s => s.pageviews);
+    const visitors  = series.map(s => s.unique_visitors);
+
+    if (analyticsChart) analyticsChart.destroy();
+    const ctx = document.getElementById('analyticsChart').getContext('2d');
+    analyticsChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          { label: 'Pageviews', data: pageviews, borderColor: '#0f62fe', backgroundColor: 'rgba(15,98,254,.08)', tension: .3, fill: true },
+          { label: 'Unique Visitors', data: visitors, borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,.08)', tension: .3, fill: true }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'top' } },
+        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+      }
+    });
+  }
+</script>
+</body>
+</html>

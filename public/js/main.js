@@ -709,6 +709,7 @@ async function openJobBySlug(slug) {
     trackRecentlyViewed(data.job);
     populateModal(data.job);
     bootstrap.Modal.getOrCreateInstance($('#jobModal')).show();
+    if (window.jbTrack) window.jbTrack('job_view', { job_id: data.job.id });
   } catch (e) {
     console.warn('[openJobBySlug]', e);
   }
@@ -1539,6 +1540,7 @@ function bindEvents() {
     state.page = 1;
     loadJobs();
     toggleClearBtn();
+    if (window.jbTrack) window.jbTrack('search_performed', { query: state.filters.q, has_location: !!state.filters.location });
   });
 
   $('#searchInput').addEventListener('input', () => {
