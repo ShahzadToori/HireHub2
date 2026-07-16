@@ -11,7 +11,6 @@
         <h6 class="footer-heading">Quick Links</h6>
         <ul class="footer-links">
           <li><a href="/">Browse Jobs</a></li>
-          <li><a href="/#categories">Categories</a></li>
           <li><a href="/blog/">Blog</a></li>
           <li><a href="/tools/">Career Tools</a></li>
           <li><a href="/tools/resume-builder/">CV Builder</a></li>
@@ -101,9 +100,9 @@
     <i class="bi bi-briefcase-fill"></i>
     <span>Jobs</span>
   </a>
-  <a href="/#categories" class="mbn-item" onclick="bnGo(event,'categories')">
-    <i class="bi bi-grid-fill"></i>
-    <span>Browse</span>
+  <a href="/#savedJobsWrap" class="mbn-item" onclick="bnGo(event,'savedJobsWrap')">
+    <i class="bi bi-bookmark-fill"></i>
+    <span>Saved</span>
   </a>
   <button class="mbn-item" onclick="openAlertsModal()" aria-label="Get email job alerts">
     <i class="bi bi-envelope-fill"></i>
@@ -185,9 +184,9 @@ document.querySelectorAll('.navbar-nav .nav-link').forEach(link => {
 // Run loadSettings (safe to call even if main.js already called it — it's idempotent)
 if (typeof loadSettings === 'function') loadSettings();
 
-/* ── Mobile bottom nav: Jobs/Browse links ──
+/* ── Mobile bottom nav: Jobs link ──
    On the homepage, scroll to the section directly.
-   On other pages, let the link's href (/#jobs, /#categories) navigate home instead. */
+   On other pages, let the link's href (/#jobs) navigate home instead. */
 window.bnGo = function(ev, sectionId) {
   const el = document.getElementById(sectionId);
   if (el) {
@@ -201,7 +200,7 @@ window.bnGo = function(ev, sectionId) {
 if (location.pathname !== '/' && location.pathname !== '/index.html') {
   document.querySelectorAll('.mobile-bottom-nav .mbn-item[href]').forEach(item => {
     const href = item.getAttribute('href');
-    if (href === '/#jobs' || href === '/#categories') return;
+    if (href === '/#jobs' || href === '/#savedJobsWrap') return;
     if (location.pathname === href || location.pathname.startsWith(href)) {
       item.classList.add('active');
     }

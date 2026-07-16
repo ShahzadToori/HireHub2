@@ -393,17 +393,6 @@ async function loadCategories() {
 
     $('#stat-cats').textContent = state.categories.length;
 
-    const chipsContainer = $('#categoryChips');
-    if (chipsContainer) {
-      chipsContainer.innerHTML = '<option value="">🗂 All Categories</option>';
-      state.categories.filter(c => c.count >= 5).forEach(c => {
-        const opt = document.createElement('option');
-        opt.value = c.slug;
-        opt.textContent = c.name + ' (' + c.count + ')';
-        chipsContainer.appendChild(opt);
-      });
-    }
-
     const sidebarCats = $('#sidebarCats');
     state.categories.forEach(c => {
       const li = document.createElement('li');
@@ -415,7 +404,6 @@ async function loadCategories() {
     // Sync with URL param if set
     if (state.filters.category) {
       catFilter.value = state.filters.category;
-      if (chipsContainer) chipsContainer.value = state.filters.category;
     }
   } catch (e) {
     console.warn('Categories load failed:', e);
@@ -425,7 +413,6 @@ async function loadCategories() {
 function filterByCategory(slug) {
   state.filters.category = slug;
   state.page = 1;
-  $('#categoryChips').value = slug;
   $('#categoryFilter').value = slug;
   loadJobs();
   toggleClearBtn();
@@ -674,52 +661,6 @@ function calcTrustScore(job) {
   if (score >= 40) return { level: 'medium', label: 'Partial Info' };
   return               { level: 'low',    label: 'Basic Listing' };
 }
-
-async function loadCitiesSection() {
-  const grid = document.getElementById('citiesGrid');
-  if (!grid) return;
-
-  // Gulf cities with flags — counts pulled from your own job data
-  const GULF_CITIES = [
-    { name: 'Riyadh',    flag: '🇸🇦', param: 'Riyadh' },
-    { name: 'Jeddah',    flag: '🇸🇦', param: 'Jeddah' },
-    { name: 'Dammam',    flag: '🇸🇦', param: 'Dammam' },
-    { name: 'Dubai',     flag: '🇦🇪', param: 'Dubai'  },
-    { name: 'Abu Dhabi', flag: '🇦🇪', param: 'Abu Dhabi' },
-    { name: 'Doha',      flag: '🇶🇦', param: 'Doha'   },
-    { name: 'Kuwait',    flag: '🇰🇼', param: 'Kuwait' },
-    { name: 'Muscat',    flag: '🇴🇲', param: 'Muscat' },
-  ];
-
-  // Try to get live counts from your jobs data
-  let countMap = {};
-  try {
-    const data = await api.get('/api/jobs/cities');
-    if (data.cities) data.cities.forEach(c => { countMap[c.city] = c.count; });
-  } catch { /* silently use static data */ }
-
-  grid.innerHTML = GULF_CITIES.map(city => {
-    const count = countMap[city.name] || countMap[city.param] || '';
-    const countHtml = count ? `<div class="city-count">${count} jobs</div>` : '';
-    return `
-      <a class="city-card" href="/?location=${encodeURIComponent(city.param)}"
-         onclick="event.preventDefault(); filterByCity('${city.param}')">
-        <span class="city-flag">${city.flag}</span>
-        <div class="city-name">${city.name}</div>
-        ${countHtml}
-      </a>`;
-  }).join('');
-}
-
-window.filterByCity = function(cityName) {
-  state.filters.location = cityName;
-  state.page = 1;
-  const locInput = document.getElementById('locationInput');
-  if (locInput) locInput.value = cityName;
-  loadJobs();
-  toggleClearBtn();
-  document.getElementById('jobs')?.scrollIntoView({ behavior: 'smooth' });
-};
 
 /* ══════════════════════════════════════════════════════════════
    JOB MODAL
@@ -1137,8 +1078,11 @@ function renderSavedJobs() {
   if (!wrap || !list) return;
   try {
     const saved = JSON.parse(localStorage.getItem(SAVED_KEY) || '[]');
-    if (saved.length === 0) { wrap.classList.add('d-none'); return; }
     wrap.classList.remove('d-none');
+    if (saved.length === 0) {
+      list.innerHTML = '<li class="text-muted small">No saved jobs yet — tap the bookmark icon on a job to save it here.</li>';
+      return;
+    }
     list.innerHTML = saved.map(j => `
       <li class="list-widget-item" onclick="openJobBySlug('${j.slug}')" title="${escHtml(j.title)}">
         <div class="list-widget-title">${escHtml(j.title)}</div>
@@ -1523,7 +1467,6 @@ window.resetFilters = function() {
   if (vf) vf.value = '';
   if (df) df.value = '';
   ['iqamaFilter','immediateFilter','localFilter'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('active'); });
-  $('#categoryChips').value = '';
   toggleClearBtn();
   loadJobs();
 };
@@ -1669,7 +1612,6 @@ async function init() {
   await loadJobs();
 
   // Non-critical — run after without blocking
-  loadCitiesSection();
   renderRecentlyViewed();
   renderSavedJobs();
   loadJobOfDay();       // Phase 6
@@ -1702,10 +1644,9 @@ function initMobileNavActive() {
 
   // Map section IDs to nav item index
   const sectionMap = {
-    'jobs':       0,  // Jobs tab
-    'featured':   0,  // also Jobs
-    'categories': 1,  // Browse tab
-    'cities':     1,  // also Browse
+    'jobs':          0,  // Jobs tab
+    'featured':      0,  // also Jobs
+    'savedJobsWrap': 1,  // Saved tab
   };
 
   // Set active tab by index
@@ -1739,7 +1680,7 @@ function initMobileNavActive() {
   });
 
   // Observe the key sections
-  ['jobs', 'categories', 'cities', 'featured'].forEach(id => {
+  ['jobs', 'featured', 'savedJobsWrap'].forEach(id => {
     const el = document.getElementById(id);
     if (el) observer.observe(el);
   });
