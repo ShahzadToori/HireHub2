@@ -372,7 +372,7 @@ async function checkAuth(){
     return d;
   }catch(e){window.location.href='/employer/';return null}
 }
-async function logout(){if(!confirm('Are you sure you want to log out?'))return;await API.post('/api/employer/logout',{});window.location.href='/employer/'}
+async function logout(){if(!(await showConfirm('Are you sure you want to log out?',{title:'Log out'})))return;await API.post('/api/employer/logout',{});window.location.href='/employer/'}
 function toggleUserMenu(){document.getElementById('epUserDropdown')?.classList.toggle('show')}
 document.addEventListener('click',e=>{
   if(!document.getElementById('epUserMenu')?.contains(e.target))
@@ -405,10 +405,12 @@ const pendingSaves=new Map();
 let sharePrivacy='public';
 
 /* ══ Formatters ══ */
-function fmtBadge(cell){const v=cell.getValue()||'';return`<span class="dg-b dg-b-${v}">${v||'—'}</span>`}
+function escAttr(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
+function fmtBadge(cell){const v=cell.getValue()||'';return`<span class="dg-b dg-b-${escAttr(v)}">${escAttr(v)||'—'}</span>`}
 function fmtDate(cell){const v=cell.getValue();if(!v)return'<span style="color:var(--text-muted)">—</span>';return new Date(v).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'2-digit'})}
-function fmtPhone(cell){const v=cell.getValue();if(!v)return'<span style="color:var(--text-muted)">—</span>';return`<a href="tel:${v}" style="color:var(--primary)">${v}</a>`}
-function fmtWa(cell){const v=cell.getValue();if(!v)return'<span style="color:var(--text-muted)">—</span>';return`<a href="https://wa.me/${(v||'').replace(/\D/g,'')}" target="_blank" style="color:#25d366">${v}</a>`}
+function fmtPhone(cell){const v=cell.getValue();if(!v)return'<span style="color:var(--text-muted)">—</span>';return`<a href="tel:${escAttr(v)}" style="color:var(--primary)">${escAttr(v)}</a>`}
+function fmtWa(cell){const v=cell.getValue();if(!v)return'<span style="color:var(--text-muted)">—</span>';return`<a href="https://wa.me/${(v||'').replace(/\D/g,'')}" target="_blank" style="color:#25d366">${escAttr(v)}</a>`}
+function fmtEmail(cell){const v=cell.getValue();if(!v)return'<span style="color:var(--text-muted)">—</span>';return`<a href="mailto:${escAttr(v)}" style="color:var(--primary)">${escAttr(v)}</a>`}
 function fmtExpiry(cell){const v=cell.getValue();if(!v)return'<span style="color:var(--text-muted)">No expiry</span>';const diff=new Date(v)-new Date();const days=Math.floor(diff/86400000);const c=diff<0?'#dc2626':days<3?'#d97706':'#059669';return`<span style="color:${c}">${diff<0?'Expired':days+'d left'}</span>`}
 function fmtApps(cell){const v=cell.getValue()||0;const id=cell.getRow().getData().id;return`<a href="/employer/applications.html?job_id=${id}" style="color:var(--primary);font-weight:600">${v}</a>`}
 function fmtNull(cell){return cell.getValue()||'<span style="color:var(--text-muted)">—</span>'}
@@ -459,6 +461,7 @@ function getColumns(type){
     {title:'Nationality',field:'nationality',minWidth:110,editable:false,formatter:fmtNull,responsive:2},
     {title:'Iqama',field:'iqama_status',minWidth:115,editable:false,formatter:fmtNull,responsive:2},
     {title:'Exp',field:'experience_years',minWidth:60,hozAlign:'center',editable:false,sorter:'number',formatter:c=>c.getValue()!=null?c.getValue()+'yr':'—',responsive:3},
+    {title:'Email',field:'email',minWidth:170,editable:false,formatter:fmtEmail,responsive:2},
     {title:'Phone',field:'phone',minWidth:120,editable:false,formatter:fmtPhone,responsive:2},
     {title:'WhatsApp',field:'whatsapp',minWidth:120,editable:false,formatter:fmtWa,responsive:3},
     {title:'Iqama No.',field:'iqama_number',minWidth:110,editable:false,formatter:fmtNull,responsive:2},
@@ -473,6 +476,7 @@ function getColumns(type){
     {title:'Nationality',field:'nationality',minWidth:110,editable:false,formatter:fmtNull,responsive:1},
     {title:'Iqama',field:'iqama_status',minWidth:115,editable:false,formatter:fmtNull,responsive:2},
     {title:'Exp',field:'experience_years',minWidth:60,hozAlign:'center',editable:false,sorter:'number',formatter:c=>c.getValue()!=null?c.getValue()+'yr':'—',responsive:3},
+    {title:'Email',field:'email',minWidth:170,editable:false,formatter:fmtEmail,responsive:2},
     {title:'Phone',field:'phone',minWidth:120,editable:false,formatter:fmtPhone,responsive:1},
     {title:'WhatsApp',field:'whatsapp',minWidth:120,editable:false,formatter:fmtWa,responsive:2},
     {title:'Iqama No.',field:'iqama_number',minWidth:110,editable:false,formatter:fmtNull,responsive:3},
@@ -1088,6 +1092,7 @@ function toggleCol(field,visible){
   localStorage.setItem(key,JSON.stringify(h));
 }
 </script>
+<script src="/employer/js/ui-dialogs.js"></script>
 <script src="/employer/feedback-widget.js"></script>
 </body>
 </html>

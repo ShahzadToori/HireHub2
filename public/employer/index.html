@@ -161,7 +161,7 @@ async function checkAuth() {
 }
 
 async function logout() {
-  if (!confirm('Are you sure you want to log out?')) return;
+  if (!(await showConfirm('Are you sure you want to log out?', { title: 'Log out' }))) return;
   await API.post('/api/employer/logout', {});
   window.location.href = '/employer/';
 }
@@ -306,5 +306,6 @@ document.addEventListener('keypress', e => {
   }
 });
 </script>
+<script src="/employer/js/ui-dialogs.js"></script>
 <script src="/employer/feedback-widget.js"></script>
 </body></html>

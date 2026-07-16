@@ -138,7 +138,7 @@ async function checkAuth() {
 }
 
 async function logout() {
-  if (!confirm('Are you sure you want to log out?')) return;
+  if (!(await showConfirm('Are you sure you want to log out?', { title: 'Log out' }))) return;
   await API.post('/api/employer/logout', {});
   window.location.href = '/employer/';
 }
@@ -406,7 +406,7 @@ function copyBatchLink(batchId, btn) {
 }
 
 async function closeBatch(batchId, btn) {
-  if (!confirm('Close ALL jobs in this requirement batch? They will be removed from search results.')) return;
+  if (!(await showConfirm('Close ALL jobs in this requirement batch? They will be removed from search results.', { title: 'Close requirement', confirmText: 'Close all' }))) return;
   const batchJobs = allJobs.filter(j => j.batch_id === batchId);
   btn.disabled = true;
   for (const j of batchJobs) {
@@ -417,7 +417,7 @@ async function closeBatch(batchId, btn) {
 }
 
 async function deleteBatch(batchId, btn) {
-  if (!confirm('Delete this ENTIRE requirement batch? All positions will be permanently removed from your dashboard and the public site. This cannot be undone.')) return;
+  if (!(await showConfirm('Delete this ENTIRE requirement batch? All positions will be permanently removed from your dashboard and the public site. This cannot be undone.', { title: 'Delete requirement', danger: true, confirmText: 'Delete' }))) return;
   const batchJobs = allJobs.filter(j => j.batch_id === batchId);
   btn.disabled = true;
   for (const j of batchJobs) {
@@ -428,14 +428,14 @@ async function deleteBatch(batchId, btn) {
 }
 
 async function closeJob(id) {
-  if (!confirm('Close this job? It will no longer appear in search results.')) return;
+  if (!(await showConfirm('Close this job? It will no longer appear in search results.', { title: 'Close job' }))) return;
   const d = await API.del('/api/employer/jobs/' + id);
   if (d.success) { showToast('Job closed'); init(); }
   else showToast(d.message, 'error');
 }
 
 async function deleteJob(id) {
-  if (!confirm('Delete this job? It will be permanently removed from your dashboard and the public site. This cannot be undone.')) return;
+  if (!(await showConfirm('Delete this job? It will be permanently removed from your dashboard and the public site. This cannot be undone.', { title: 'Delete job', danger: true, confirmText: 'Delete' }))) return;
   const d = await API.post('/api/employer/jobs/' + id + '/delete', {});
   if (d.success) { showToast('Job deleted'); init(); }
   else showToast(d.message || 'Failed to delete job', 'error');
@@ -516,5 +516,6 @@ init();
   reset();
 })();
 </script>
+<script src="/employer/js/ui-dialogs.js"></script>
 <script src="/employer/feedback-widget.js"></script>
 </body></html>

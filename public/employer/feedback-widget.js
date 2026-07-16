@@ -302,9 +302,9 @@
 
   window.fbSubmit = async function () {
     const msg = document.getElementById('fbMsg').value.trim();
-    if (!_rating)    { alert('Please select a rating'); return; }
-    if (!_category)  { alert('Please select a category'); return; }
-    if (!msg)        { alert('Please enter a message'); return; }
+    if (!_rating)    { await showAlert('Please select a rating', { type: 'error' }); return; }
+    if (!_category)  { await showAlert('Please select a category', { type: 'error' }); return; }
+    if (!msg)        { await showAlert('Please enter a message', { type: 'error' }); return; }
 
     const btn = document.getElementById('fbSubmitBtn');
     btn.disabled = true;
@@ -327,12 +327,12 @@
         document.getElementById('fb-form-view').style.display = 'none';
         document.getElementById('fb-success-view').style.display = '';
       } else {
-        alert(d.message || 'Failed to send. Please try again.');
+        await showAlert(d.message || 'Failed to send. Please try again.', { type: 'error' });
         btn.disabled = false;
         btn.innerHTML = '<i class="bi bi-send-fill me-2"></i>Send Feedback';
       }
     } catch (e) {
-      alert('Network error. Please try again.');
+      await showAlert('Network error. Please try again.', { type: 'error' });
       btn.disabled = false;
       btn.innerHTML = '<i class="bi bi-send-fill me-2"></i>Send Feedback';
     }

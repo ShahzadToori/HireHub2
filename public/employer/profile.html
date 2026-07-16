@@ -405,13 +405,13 @@ async function checkAuth() {
 }
 
 async function logout() {
-  if (!confirm('Are you sure you want to log out?')) return;
+  if (!(await showConfirm('Are you sure you want to log out?', { title: 'Log out' }))) return;
   await API.post('/api/employer/logout',{});
   window.location.href='/employer/';
 }
 
 async function logoutAllDevices() {
-  if (!confirm('This will sign you out on every device, including this one. Continue?')) return;
+  if (!(await showConfirm('This will sign you out on every device, including this one. Continue?', { title: 'Sign out everywhere', danger: true, confirmText: 'Sign out all' }))) return;
   await API.post('/api/employer/logout-all',{});
   window.location.href='/employer/';
 }
@@ -616,6 +616,21 @@ document.addEventListener('change', e => {
 window.addEventListener('beforeunload', e => {
   if (isDirty) { e.preventDefault(); e.returnValue = ''; }
 });
+// In-app navigation (nav bar tabs, profile/logout links) — show our own
+// styled dialog instead of letting the click through to a raw unload,
+// since browsers never let sites customize the native beforeunload prompt.
+document.addEventListener('click', async e => {
+  const link = e.target.closest('a[href]');
+  if (!link || !isDirty || link.target === '_blank') return;
+  const href = link.getAttribute('href');
+  if (!href || href.startsWith('#') || href.startsWith('javascript:')) return;
+  e.preventDefault();
+  const leave = await showConfirm(
+    'You have unsaved changes. If you leave now, they will be lost.',
+    { title: 'Unsaved changes', danger: true, confirmText: 'Leave without saving', cancelText: 'Stay on page' }
+  );
+  if (leave) { isDirty = false; window.location.href = href; }
+});
 
 function copyPlaceholder(el) {
   navigator.clipboard.writeText(el.textContent).then(() => {
@@ -722,5 +737,6 @@ init();
   reset();
 })();
 </script>
+<script src="/employer/js/ui-dialogs.js"></script>
 <script src="/employer/feedback-widget.js"></script>
 </body></html>
