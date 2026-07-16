@@ -14,16 +14,33 @@
 const express = require('express');
 const db      = require('../db/connection');
 const { requireAdmin } = require('../middleware/auth');
+const { validate, z } = require('../middleware/validate');
 
 const router  = express.Router();
+
+const currentYear = new Date().getFullYear();
+const rating = () => z.union([z.number().int().min(1).max(5), z.literal(null)]).optional();
+
+const reviewSchema = z.object({
+  company_name:     z.string().trim().min(1).max(100),
+  job_title:        z.string().trim().max(100).nullable().optional().or(z.literal('')),
+  rating_overall:   z.number().int().min(1).max(5),
+  rating_salary:    rating(),
+  rating_iqama:     rating(),
+  rating_recommend: rating(),
+  review_text:      z.string().trim().min(30).max(2000),
+  worked_from:      z.string().trim().regex(/^\d{4}$/, 'Must be a 4-digit year').nullable().optional().or(z.literal('')),
+  worked_to:        z.string().trim().max(10).regex(/^(\d{4}|present)$/i, 'Must be a year or "present"').nullable().optional().or(z.literal('')),
+  nationality:      z.string().trim().max(50).nullable().optional().or(z.literal('')),
+}).strict();
 
 /* ── Simple rate limit (in-memory) ───────────────────────────── */
 const reviewAttempts = new Map();
 function reviewRateLimit(req, res, next) {
   const ip  = req.ip || req.connection.remoteAddress;
   const now = Date.now();
-  const win = 60 * 60 * 1000; // 1 hour
-  const max = 3;               // max 3 reviews per IP per hour
+  const win = parseInt(process.env.RATE_LIMIT_REVIEWS_WINDOW_MS) || 60 * 60 * 1000; // 1 hour
+  const max = parseInt(process.env.RATE_LIMIT_REVIEWS_MAX)       || 3;              // reviews per IP per window
   const entry = reviewAttempts.get(ip) || { count: 0, start: now };
   if (now - entry.start > win) { reviewAttempts.set(ip, { count: 1, start: now }); return next(); }
   if (entry.count >= max) return res.status(429).json({ success: false, message: 'Too many reviews submitted. Please try again later.' });
@@ -35,25 +52,20 @@ function reviewRateLimit(req, res, next) {
 /* ══════════════════════════════════════════════════════════════
    POST /api/reviews   – Submit anonymous review
 ══════════════════════════════════════════════════════════════ */
-router.post('/', reviewRateLimit, async (req, res) => {
+router.post('/', reviewRateLimit, validate(reviewSchema), async (req, res) => {
   try {
     const {
       company_name,
       job_title,
-      rating_overall,   // 1–5
-      rating_salary,    // 1–5 (salary paid on time)
-      rating_iqama,     // 1–5 (iqama processed properly)
-      rating_recommend, // 1–5 (recommend to expat)
+      rating_overall,
+      rating_salary,
+      rating_iqama,
+      rating_recommend,
       review_text,
-      worked_from,      // year e.g. 2022
-      worked_to,        // year e.g. 2024 or 'present'
-      nationality       // optional
+      worked_from,
+      worked_to,
+      nationality
     } = req.body;
-
-    // Validate
-    if (!company_name?.trim()) return res.status(400).json({ success: false, message: 'Company name is required.' });
-    if (!rating_overall || rating_overall < 1 || rating_overall > 5) return res.status(400).json({ success: false, message: 'Overall rating (1–5) is required.' });
-    if (!review_text?.trim() || review_text.trim().length < 30) return res.status(400).json({ success: false, message: 'Review must be at least 30 characters.' });
 
     // Basic spam filter
     const spamWords = ['http://', 'https://', 'www.', 'click here', 'buy now', 'free money'];
@@ -68,16 +80,16 @@ router.post('/', reviewRateLimit, async (req, res) => {
           approved, created_at)
        VALUES (?,?,?,?,?,?,?,?,?,?,0,NOW())`,
       [
-        company_name.trim().substring(0, 100),
-        job_title?.trim()?.substring(0, 100) || null,
-        parseInt(rating_overall),
-        rating_salary  ? parseInt(rating_salary)  : null,
-        rating_iqama   ? parseInt(rating_iqama)   : null,
-        rating_recommend ? parseInt(rating_recommend) : null,
-        review_text.trim().substring(0, 2000),
+        company_name,
+        job_title || null,
+        rating_overall,
+        rating_salary  ?? null,
+        rating_iqama   ?? null,
+        rating_recommend ?? null,
+        review_text,
         worked_from ? parseInt(worked_from) : null,
-        worked_to?.trim()?.substring(0, 10) || null,
-        nationality?.trim()?.substring(0, 50) || null
+        worked_to || null,
+        nationality || null
       ]
     );
 

@@ -1,5 +1,14 @@
 const express = require('express');
+const { validate, z } = require('../middleware/validate');
+const { publicFormLimiter } = require('../middleware/tieredRateLimit');
 const router  = express.Router();
+
+// html can legitimately be a few MB (embeds a base64 profile photo data URI);
+// capped well short of the global 5mb body-parser limit set in server.js.
+const pdfSchema = z.object({
+  html:     z.string().min(1).max(4 * 1024 * 1024),
+  filename: z.string().trim().max(150).optional(),
+}).strict();
 
 async function getBrowser() {
   if (getBrowser._b) { try { await getBrowser._b.version(); return getBrowser._b; } catch(e) { getBrowser._b = null; } }
@@ -15,9 +24,8 @@ async function getBrowser() {
   return getBrowser._b;
 }
 
-router.post('/api/resume/pdf', async (req, res) => {
+router.post('/api/resume/pdf', publicFormLimiter, validate(pdfSchema), async (req, res) => {
   const { html, filename } = req.body;
-  if (!html) return res.status(400).json({ error: 'No HTML provided' });
   let page;
   try {
     const b = await getBrowser();
@@ -33,8 +41,8 @@ router.post('/api/resume/pdf', async (req, res) => {
     res.writeHead(200, { 'Content-Type':'application/pdf', 'Content-Disposition':`attachment; filename="${safe}.pdf"`, 'Content-Length': buf.length, 'Cache-Control':'no-cache' });
     res.end(buf);
   } catch(err) {
-    console.error('[PDF]', err.message);
-    res.status(500).json({ error: err.message });
+    console.error('[PDF]', err);
+    res.status(500).json({ error: 'PDF generation failed' });
   } finally { if (page) try { await page.close(); } catch(e) {} }
 });
 

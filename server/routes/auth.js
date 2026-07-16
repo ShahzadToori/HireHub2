@@ -1,16 +1,27 @@
 const express = require('express');
 const bcrypt  = require('bcryptjs');
 const db      = require('../db/connection');
+const { validate, z } = require('../middleware/validate');
+const { authRateLimit, recordAuthFailure, recordAuthSuccess } = require('../middleware/authRateLimit');
 const router  = express.Router();
 
+const adminLoginLimiter = authRateLimit('admin-login', (req) => req.body.username);
+
+const loginSchema = z.object({
+  username: z.string().trim().min(1).max(160),
+  password: z.string().min(1).max(72)
+}).strict();
+
+const setupSchema = z.object({
+  username: z.string().trim().min(3).max(80).regex(/^[a-zA-Z0-9_.-]+$/, 'Username may only contain letters, numbers, dots, underscores, and hyphens'),
+  email: z.string().trim().max(160).email(),
+  password: z.string().min(8).max(72)
+}).strict();
+
 // POST /api/auth/login
-router.post('/login', async (req, res) => {
+router.post('/login', adminLoginLimiter, validate(loginSchema), async (req, res) => {
   try {
     const { username, password } = req.body;
-
-    if (!username || !password) {
-      return res.status(400).json({ success: false, message: 'Username and password required' });
-    }
 
     const [rows] = await db.query(
       'SELECT * FROM admins WHERE username = ? OR email = ? LIMIT 1',
@@ -18,6 +29,7 @@ router.post('/login', async (req, res) => {
     );
 
     if (rows.length === 0) {
+      await recordAuthFailure(req);
       return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 
@@ -25,17 +37,21 @@ router.post('/login', async (req, res) => {
     const isValid = await bcrypt.compare(password, admin.password);
 
     if (!isValid) {
+      await recordAuthFailure(req);
       return res.status(401).json({ success: false, message: 'Invalid credentials' });
+    }
+
+    // Check account status BEFORE establishing any session — a disabled
+    // admin must never receive a valid session cookie, even momentarily.
+    if (admin.status === 'inactive') {
+      await recordAuthFailure(req);
+      return res.status(403).json({ success: false, message: 'Account is disabled' });
     }
 
     req.session.adminId  = admin.id;
     req.session.username = admin.username;
     req.session.role     = admin.role || 'super_admin';
     req.session.status   = admin.status || 'active';
-
-    if (admin.status === 'inactive') {
-      return res.status(403).json({ success: false, message: 'Account is disabled' });
-    }
 
     // Fetch permissions for this role
     const [roleRows] = await db.query(
@@ -45,6 +61,7 @@ router.post('/login', async (req, res) => {
     const permissions = roleRows.length ? (typeof roleRows[0].permissions === "string" ? JSON.parse(roleRows[0].permissions) : roleRows[0].permissions) : [];
     req.session.permissions = permissions;
 
+    await recordAuthSuccess(req);
     res.json({ success: true, message: 'Login successful', username: admin.username, role: admin.role, permissions });
   } catch (err) {
     console.error(err);
@@ -74,7 +91,7 @@ router.get('/me', async (req, res) => {
 });
 
 // POST /api/auth/setup  (run once to create first admin)
-router.post('/setup', async (req, res) => {
+router.post('/setup', validate(setupSchema), async (req, res) => {
   try {
     const [existing] = await db.query('SELECT id FROM admins LIMIT 1');
     if (existing.length > 0) {
@@ -82,10 +99,6 @@ router.post('/setup', async (req, res) => {
     }
 
     const { username, email, password } = req.body;
-    if (!username || !email || !password) {
-      return res.status(400).json({ success: false, message: 'All fields required' });
-    }
-
     const hash = await bcrypt.hash(password, 12);
     await db.query(
       'INSERT INTO admins (username, email, password) VALUES (?, ?, ?)',

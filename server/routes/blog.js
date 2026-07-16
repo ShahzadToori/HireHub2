@@ -9,6 +9,21 @@ const path        = require('path');
 const fs          = require('fs');
 const db          = require('../db/connection');
 const { requireAdmin } = require('../middleware/auth');
+const { isValidImage, deleteFile } = require('../utils/fileValidation');
+const { validate, z } = require('../middleware/validate');
+
+// Both fetched server-side below — restricted to Unsplash's own domains so
+// this can't be used as an SSRF proxy to fetch arbitrary internal/external URLs.
+const unsplashUrl = (allowedHost) => z.string().url().max(1000).refine(
+  (val) => { try { return new URL(val).hostname === allowedHost; } catch { return false; } },
+  { message: `URL must be hosted on ${allowedHost}` }
+);
+const selectImageSchema = z.object({
+  photoUrl:         unsplashUrl('images.unsplash.com'),
+  downloadLocation: unsplashUrl('api.unsplash.com'),
+  attribution:      z.string().trim().max(300).optional().or(z.literal('')),
+  attributionLink:  z.union([z.string().trim().max(500).url(), z.literal('')]).optional(),
+}).strict();
 
 /* ── Image upload (blog featured images) ──────────────────── */
 const blogImgStorage = multer.diskStorage({
@@ -261,6 +276,10 @@ router.delete('/api/admin/blog/:id', requireAdmin, async (req, res) => {
 /* POST /api/admin/blog/upload-image — featured image upload */
 router.post('/api/admin/blog/upload-image', requireAdmin, blogUpload.single('image'), (req, res) => {
   if (!req.file) return res.status(400).json({ success: false, error: 'No image uploaded' });
+  if (!isValidImage(req.file.path)) {
+    deleteFile(req.file.path);
+    return res.status(400).json({ success: false, error: 'File is not a valid JPG, PNG, or WebP image' });
+  }
   res.json({ success: true, url: `/uploads/blog/${req.file.filename}` });
 });
 
@@ -318,13 +337,13 @@ router.post('/api/admin/blog/generate-image', requireAdmin, async (req, res) => 
 
     res.json({ success: true, photos, query });
   } catch (err) {
-    console.error('[Unsplash]', err.message);
-    res.status(500).json({ success: false, error: err.message });
+    console.error('[Unsplash]', err);
+    res.status(500).json({ success: false, error: 'Server error' });
   }
 });
 
 /* POST /api/admin/blog/select-image — download chosen Unsplash photo */
-router.post('/api/admin/blog/select-image', requireAdmin, async (req, res) => {
+router.post('/api/admin/blog/select-image', requireAdmin, validate(selectImageSchema), async (req, res) => {
   const { photoUrl, downloadLocation, attribution, attributionLink } = req.body;
   const key = process.env.UNSPLASH_ACCESS_KEY;
   try {
@@ -337,7 +356,8 @@ router.post('/api/admin/blog/select-image', requireAdmin, async (req, res) => {
     require('fs').writeFileSync(require('path').join(dir, filename), buf);
     res.json({ success: true, url: '/uploads/blog/' + filename, attribution, attributionLink });
   } catch(err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('[select-image]', err);
+    res.status(500).json({ success: false, error: 'Server error' });
   }
 });
 

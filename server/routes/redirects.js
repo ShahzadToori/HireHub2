@@ -15,7 +15,7 @@ router.get('/stats', requireAdmin, async (req, res) => {
     const [[{ active }]] = await db.query('SELECT COUNT(*) AS active FROM redirects WHERE is_active=1');
     const [[{ hits }]]   = await db.query('SELECT COALESCE(SUM(hits),0) AS hits FROM redirects');
     res.json({ success:true, total, active, hits:Number(hits) });
-  } catch(err) { res.status(500).json({ success:false }); }
+  } catch(err) { console.error('[redirects stats]', err); res.status(500).json({ success:false }); }
 });
 
 // GET /api/admin/redirects
@@ -85,7 +85,7 @@ router.patch('/:id/toggle', requireAdmin, async (req, res) => {
     await db.query('UPDATE redirects SET is_active=NOT is_active WHERE id=?', [req.params.id]);
     bustCache();
     res.json({ success:true });
-  } catch(err) { res.status(500).json({ success:false }); }
+  } catch(err) { console.error('[redirects toggle]', err); res.status(500).json({ success:false }); }
 });
 
 // POST /api/admin/redirects/bulk — CSV import
@@ -109,7 +109,7 @@ router.post('/bulk', requireAdmin, async (req, res) => {
       imported++;
     } catch(e) {
       if (e.code==='ER_DUP_ENTRY') skipped++;
-      else errs.push(`${from_path}: ${e.message}`);
+      else { console.error('[redirects bulk]', from_path, e); errs.push(`${from_path}: could not be saved`); }
     }
   }
   bustCache();

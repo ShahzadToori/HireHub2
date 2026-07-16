@@ -32,7 +32,8 @@ router.post('/api/admin-users', requireSuperAdmin, async (req, res) => {
     );
     res.json({ success: true, message: 'Admin account created' });
   } catch(e) {
-    res.status(500).json({ success: false, message: e.message });
+    console.error('[admin-users POST]', e);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 
@@ -53,7 +54,8 @@ router.put('/api/admin-users/:id', requireSuperAdmin, async (req, res) => {
     }
     res.json({ success: true, message: 'Account updated' });
   } catch(e) {
-    res.status(500).json({ success: false, message: e.message });
+    console.error('[admin-users PUT]', e);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 
@@ -82,7 +84,8 @@ router.post('/api/admin-roles', requireSuperAdmin, async (req, res) => {
     );
     res.json({ success: true, message: 'Role created' });
   } catch(e) {
-    res.status(500).json({ success: false, message: e.message });
+    console.error('[admin-roles POST]', e);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 
@@ -119,7 +122,7 @@ router.get('/api/admin-menu', async (req, res) => {
     // Super admin sees everything active
     const filtered = role === 'super_admin' ? items : items.filter(i => perms.includes(i.key_name));
     res.json({ success: true, menu: filtered });
-  } catch(e) { res.status(500).json({ success: false, error: e.message }); }
+  } catch(e) { console.error('[admin-menu]', e); res.status(500).json({ success: false, error: 'Server error' }); }
 });
 
 // GET /api/admin-menu/all — all items including inactive (super admin only)

@@ -1,22 +1,23 @@
 const express = require('express');
 const db      = require('../db/connection');
 const { requireAdmin } = require('../middleware/auth');
+const { validate, z } = require('../middleware/validate');
+const { publicFormLimiter } = require('../middleware/tieredRateLimit');
 const router  = express.Router();
 
+const contactSchema = z.object({
+  name:    z.string().trim().min(1).max(120),
+  email:   z.string().trim().max(160).email(),
+  phone:   z.string().trim().max(30).nullable().optional(),
+  company: z.string().trim().max(200).nullable().optional(),
+  subject: z.string().trim().min(1).max(255),
+  message: z.string().trim().min(1).max(5000),
+}).strict();
+
 // POST /api/contact  – public
-router.post('/', async (req, res) => {
+router.post('/', publicFormLimiter, validate(contactSchema), async (req, res) => {
   try {
     const { name, email, phone, company, subject, message } = req.body;
-    if (!name || !email || !subject || !message) {
-      return res.status(400).json({ success: false, message: 'Name, email, subject and message are required.' });
-    }
-    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRe.test(email)) {
-      return res.status(400).json({ success: false, message: 'Invalid email address.' });
-    }
-    if (name.length > 120 || email.length > 160 || subject.length > 255 || message.length > 5000) {
-      return res.status(400).json({ success: false, message: 'Input too long.' });
-    }
     await db.query(
       'INSERT INTO messages (name, email, phone, company, subject, message) VALUES (?, ?, ?, ?, ?, ?)',
       [name.trim(), email.trim().toLowerCase(), phone ? phone.trim() : null, company ? company.trim() : null, subject.trim(), message.trim()]

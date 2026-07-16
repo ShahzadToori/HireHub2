@@ -13,13 +13,34 @@
 const express = require('express');
 const db      = require('../db/connection');
 const { requireAdmin } = require('../middleware/auth');
+const { validate, z } = require('../middleware/validate');
+const { publicFormLimiter } = require('../middleware/tieredRateLimit');
 
 const router  = express.Router();
+
+const digitsStr = (max) => z.string().regex(/^\d+$/).max(max).optional().or(z.literal(''));
+
+const listQuerySchema = z.object({
+  page:  digitsStr(6),
+  limit: digitsStr(3),
+}).strict();
+
+const searchQuerySchema = z.object({
+  q: z.string().trim().max(100).optional().or(z.literal('')),
+}).strict();
+
+const reportSchema = z.object({
+  company_name:   z.string().trim().min(1).max(100),
+  city:           z.string().trim().max(100).nullable().optional().or(z.literal('')),
+  issue_type:     z.enum(['salary_delay', 'no_iqama', 'passport_held', 'fake_offer', 'poor_conditions', 'other']),
+  description:    z.string().trim().min(20).max(1000),
+  reported_year:  z.string().trim().regex(/^\d{4}$/, 'Must be a 4-digit year').nullable().optional().or(z.literal('')),
+}).strict();
 
 /* ═══════════════════════════════════════════════════════════════
    GET /api/blacklist  – List approved entries (paginated)
 ═══════════════════════════════════════════════════════════════ */
-router.get('/', async (req, res) => {
+router.get('/', validate(listQuerySchema, 'query'), async (req, res) => {
   try {
     const { page = 1, limit = 20 } = req.query;
     const perPage = Math.min(parseInt(limit) || 20, 100);
@@ -44,7 +65,7 @@ router.get('/', async (req, res) => {
 /* ═══════════════════════════════════════════════════════════════
    GET /api/blacklist/search?q=CompanyName  – Search
 ═══════════════════════════════════════════════════════════════ */
-router.get('/search', async (req, res) => {
+router.get('/search', validate(searchQuerySchema, 'query'), async (req, res) => {
   try {
     const q = (req.query.q || '').trim();
     if (!q || q.length < 2) return res.json({ success: true, entries: [], found: false });
@@ -68,18 +89,9 @@ router.get('/search', async (req, res) => {
 /* ═══════════════════════════════════════════════════════════════
    POST /api/blacklist  – Submit a report
 ═══════════════════════════════════════════════════════════════ */
-router.post('/', async (req, res) => {
+router.post('/', publicFormLimiter, validate(reportSchema), async (req, res) => {
   try {
     const { company_name, city, issue_type, description, reported_year } = req.body;
-
-    if (!company_name?.trim()) return res.status(400).json({ success: false, message: 'Company name is required.' });
-    if (!issue_type)           return res.status(400).json({ success: false, message: 'Issue type is required.' });
-    if (!description?.trim() || description.trim().length < 20) {
-      return res.status(400).json({ success: false, message: 'Description must be at least 20 characters.' });
-    }
-
-    const validIssues = ['salary_delay', 'no_iqama', 'passport_held', 'fake_offer', 'poor_conditions', 'other'];
-    if (!validIssues.includes(issue_type)) return res.status(400).json({ success: false, message: 'Invalid issue type.' });
 
     // Check if company already reported — increment count instead of duplicate entry
     const [existing] = await db.query(
@@ -97,10 +109,10 @@ router.post('/', async (req, res) => {
          (company_name, city, issue_type, description, reported_year, report_count, approved, created_at)
        VALUES (?,?,?,?,?,1,0,NOW())`,
       [
-        company_name.trim().substring(0, 100),
-        city?.trim()?.substring(0, 100) || null,
+        company_name,
+        city || null,
         issue_type,
-        description.trim().substring(0, 1000),
+        description,
         reported_year ? parseInt(reported_year) : null
       ]
     );

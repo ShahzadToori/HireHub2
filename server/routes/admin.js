@@ -4,17 +4,26 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const { promises: fsPromises } = require('fs');
+const crypto = require('crypto');
 const db = require('../db/connection');
 const { requireAdmin } = require('../middleware/auth');
 const { exec } = require('child_process');
 const csv = require('csv-parser');
 const XLSX = require('xlsx');
+const { isValidImage, isValidSpreadsheet, deleteFile } = require('../utils/fileValidation');
+const { authenticatedLimiter } = require('../middleware/tieredRateLimit');
 const router = express.Router();
 
 // All admin routes require authentication
 router.use(requireAdmin);
+// Looser tier than the public-facing endpoints — these routes are only
+// reachable by a logged-in admin already, but still bounded (not
+// unlimited) in case a session is ever compromised or a script misfires.
+router.use(authenticatedLimiter);
 
-// ── Multer setup (logo upload) ─────────────────────────────────
+// ── Multer setup (site logo upload — image only, deliberately no SVG:
+//    SVG is scriptable XML, not a verifiable raster format, and these
+//    files are served back to every visitor from the public site) ────
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const dir = path.join(__dirname, '../../public/uploads');
@@ -23,20 +32,45 @@ const storage = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname).toLowerCase();
-    cb(null, `logo-${Date.now()}${ext}`);
+    cb(null, `logo-${crypto.randomBytes(16).toString('hex')}${ext}`);
   }
 });
 const upload = multer({
   storage,
   limits: { fileSize: parseInt(process.env.MAX_FILE_SIZE) || 2 * 1024 * 1024 },
-fileFilter: (req, file, cb) => {
-  const ext = path.extname(file.originalname).toLowerCase();
-  if (/\.(jpg|jpeg|png|svg|webp|csv|xlsx|xls)$/i.test(file.originalname)) {
-    cb(null, true);
-  } else {
-    cb(new Error('Only image files, CSV, and Excel files are allowed'));
+  fileFilter: (req, file, cb) => {
+    if (/\.(jpg|jpeg|png|webp)$/i.test(file.originalname)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only JPG, PNG, or WebP image files are allowed'));
+    }
   }
-}
+});
+
+// ── Multer setup (bulk job import — CSV/Excel) ──────────────────
+// Stored outside the public web root and deleted after processing —
+// these are transient data files, never meant to be served to anyone.
+const bulkUploadDir = path.join(__dirname, '../../uploads-private/bulk-import');
+const bulkStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    fs.mkdirSync(bulkUploadDir, { recursive: true });
+    cb(null, bulkUploadDir);
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    cb(null, `import-${crypto.randomBytes(16).toString('hex')}${ext}`);
+  }
+});
+const bulkUpload = multer({
+  storage: bulkStorage,
+  limits: { fileSize: parseInt(process.env.MAX_FILE_SIZE) || 2 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (/\.(csv|xlsx|xls)$/i.test(file.originalname)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only CSV and Excel files are allowed'));
+    }
+  }
 });
 
 // Helper to generate unique slug
@@ -124,7 +158,7 @@ router.get('/jobs', async (req, res) => {
       params
     );
 
-    const [jobs] = await db.execute(
+    const [jobs] = await db.query(
       `SELECT j.id, j.title, j.company, j.location, j.status,
               j.featured, j.sponsored, j.views, j.created_at, j.slug,
               c.name AS category
@@ -132,14 +166,14 @@ router.get('/jobs', async (req, res) => {
          JOIN categories c ON j.category_id = c.id
        ${whereSql}
        ${orderSql}
-       LIMIT ${perPage} OFFSET ${offset}`,
-      params
+       LIMIT ? OFFSET ?`,
+      [...params, perPage, offset]
     );
 
     res.json({ success: true, total, page: parseInt(page), perPage, pages: Math.ceil(total / perPage), jobs });
   } catch (err) {
     console.error('Admin GET /jobs error:', err);
-    res.status(500).json({ success: false, message: err.message || 'Server error' });
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 
@@ -285,11 +319,16 @@ router.delete('/jobs', async (req, res) => {
 router.post('/upload-logo', upload.single('logo'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ success: false, message: 'No file uploaded' });
+    if (!isValidImage(req.file.path)) {
+      deleteFile(req.file.path);
+      return res.status(400).json({ success: false, message: 'File is not a valid JPG, PNG, or WebP image' });
+    }
     const logoUrl = `/uploads/${req.file.filename}`;
     await db.execute('UPDATE settings SET `value`=? WHERE `key`="logo_url"', [logoUrl]);
     res.json({ success: true, logoUrl });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    console.error('[upload-logo]', err);
+    res.status(500).json({ success: false, message: 'Upload failed' });
   }
 });
 
@@ -307,7 +346,8 @@ router.post('/categories', async (req, res) => {
     await db.execute('INSERT INTO categories (name, slug) VALUES (?,?)', [name, slug]);
     res.json({ success: true, message: 'Category added' });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    console.error('[categories POST]', err);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 
@@ -316,7 +356,8 @@ router.delete('/categories/:id', async (req, res) => {
     await db.execute('DELETE FROM categories WHERE id=?', [req.params.id]);
     res.json({ success: true, message: 'Category deleted' });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    console.error('[categories DELETE]', err);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 
@@ -336,7 +377,8 @@ router.put('/monetization/:id', async (req, res) => {
     );
     res.json({ success: true, message: 'Updated' });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    console.error('[monetization PUT]', err);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 
@@ -349,7 +391,8 @@ router.put('/ad-placements/:id', async (req, res) => {
     );
     res.json({ success: true, message: 'Ad placement updated' });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    console.error('[ad-placements PUT]', err);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 
@@ -364,7 +407,8 @@ router.get('/form-schema', async (req, res) => {
     const schema = row ? JSON.parse(row.value) : DEFAULT_SCHEMA_V2;
     res.json({ success: true, schema });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    console.error('[form-schema GET]', err);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 
@@ -377,7 +421,8 @@ router.put('/form-schema', async (req, res) => {
     );
     res.json({ success: true, message: 'Form schema saved' });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    console.error('[form-schema PUT]', err);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 
@@ -406,7 +451,7 @@ exec(`/var/www/HireHub2/venv/bin/python ${scriptPath} < ${tempFile}`, async (err
 
   if (error) {
     console.error('Python exec error:', error);
-    return res.status(500).json({ success: false, message: 'AI service error: ' + error.message });
+    return res.status(500).json({ success: false, message: 'AI parsing service is unavailable' });
   }
 
   // Extract JSON from stdout (find first '{' and last '}')
@@ -456,7 +501,7 @@ exec(`/var/www/HireHub2/venv/bin/python ${scriptPath} < ${tempFile}`, async (err
 
 
 // ── Bulk upload jobs from CSV or Excel ─────────────────────────────────
-router.post('/bulk-upload', requireAdmin, upload.single('csvFile'), async (req, res) => {
+router.post('/bulk-upload', requireAdmin, bulkUpload.single('csvFile'), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ success: false, message: 'No file uploaded' });
   }
@@ -466,6 +511,11 @@ router.post('/bulk-upload', requireAdmin, upload.single('csvFile'), async (req, 
   let inserted = 0;
   let updated = 0;
   const fileExt = req.file.originalname.split('.').pop().toLowerCase();
+
+  if ((fileExt === 'xlsx' || fileExt === 'xls') && !isValidSpreadsheet(req.file.path)) {
+    deleteFile(req.file.path);
+    return res.status(400).json({ success: false, message: 'File is not a valid Excel spreadsheet' });
+  }
 
   // Helper to parse value (empty string becomes null)
 const parseValue = (value, type = 'string', allowNull = true) => {
@@ -635,11 +685,13 @@ if (!slug) {
           inserted++;
         }
       } catch (err) {
-        errors.push(`Row error: ${err.message}`);
+        console.error('[bulk-upload row]', err);
+        errors.push(`Row error (${row?.title || 'untitled row'}): could not be saved — check required fields and try again`);
       }
     }
   } catch (err) {
-    errors.push(`File parsing error: ${err.message}`);
+    console.error('[bulk-upload parse]', err);
+    errors.push('Could not read the uploaded file — make sure it is a valid CSV or Excel file');
   } finally {
     // Clean up uploaded file
     require('fs').unlink(req.file.path, () => {});
@@ -677,7 +729,7 @@ router.patch('/feedback/:id/status', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid status' });
     await db.query('UPDATE employer_feedback SET status=? WHERE id=?', [status, req.params.id]);
     res.json({ success: true });
-  } catch(err) { res.status(500).json({ success: false }); }
+  } catch(err) { console.error('[employer-feedback status]', err); res.status(500).json({ success: false }); }
 });
 
 module.exports = router;

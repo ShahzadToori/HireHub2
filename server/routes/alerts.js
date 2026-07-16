@@ -17,8 +17,16 @@ const crypto   = require('crypto');
 const db       = require('../db/connection');
 const { requireAdmin } = require('../middleware/auth');
 const { sendMail, confirmationEmail, jobAlertEmail, SITE_URL, SITE_NAME } = require('../utils/mailer');
+const { validate, z } = require('../middleware/validate');
 
 const router = express.Router();
+
+const subscribeSchema = z.object({
+  email:    z.string().trim().max(160).email(),
+  category: z.string().trim().max(100).nullable().optional().or(z.literal('')),
+  city:     z.string().trim().max(100).nullable().optional().or(z.literal('')),
+  channel:  z.enum(['email', 'whatsapp', 'telegram']).optional(),
+}).strict();
 
 // ── Rate limiting for subscribe endpoint ──────────────────────
 const subscribeAttempts = new Map(); // simple in-memory rate limit
@@ -26,8 +34,8 @@ const subscribeAttempts = new Map(); // simple in-memory rate limit
 function alertRateLimit(req, res, next) {
   const ip  = req.ip || req.connection.remoteAddress;
   const now = Date.now();
-  const win = 60 * 60 * 1000; // 1 hour window
-  const max = 5;               // max 5 subscriptions per IP per hour
+  const win = parseInt(process.env.RATE_LIMIT_ALERTS_WINDOW_MS) || 60 * 60 * 1000; // 1 hour window
+  const max = parseInt(process.env.RATE_LIMIT_ALERTS_MAX)       || 5;              // subscriptions per IP per window
 
   const entry = subscribeAttempts.get(ip) || { count: 0, start: now };
   if (now - entry.start > win) {
@@ -55,23 +63,12 @@ setInterval(() => {
    POST /api/alerts/subscribe
    Body: { email, category?, city?, channel? }
 ══════════════════════════════════════════════════════════════ */
-router.post('/subscribe', alertRateLimit, async (req, res) => {
+router.post('/subscribe', alertRateLimit, validate(subscribeSchema), async (req, res) => {
   try {
     let { email, category, city, channel = 'email' } = req.body;
-
-    // ── Validate ──────────────────────────────────────────────
-    if (!email || typeof email !== 'string') {
-      return res.status(400).json({ success: false, message: 'Email address is required.' });
-    }
     email = email.trim().toLowerCase();
-    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRe.test(email) || email.length > 160) {
-      return res.status(400).json({ success: false, message: 'Please enter a valid email address.' });
-    }
-
     category = category?.trim() || null;
     city     = city?.trim()     || null;
-    channel  = ['email', 'whatsapp', 'telegram'].includes(channel) ? channel : 'email';
 
     // ── Check if already subscribed ───────────────────────────
     const [existing] = await db.query(
@@ -286,7 +283,7 @@ router.post('/send-digest', requireAdmin, async (req, res) => {
         // Small delay to avoid SMTP rate limits
         await new Promise(r => setTimeout(r, 150));
       } catch (e) {
-        errors.push({ email: sub.email, error: e.message });
+        errors.push({ email: sub.email, error: 'Failed to send' });
         console.warn(`[alerts] Failed to send to ${sub.email}:`, e.message);
       }
     }

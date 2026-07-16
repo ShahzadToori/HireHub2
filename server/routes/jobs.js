@@ -1,5 +1,7 @@
 const express = require('express');
 const db      = require('../db/connection');
+const { validate, z } = require('../middleware/validate');
+const { publicFormLimiter } = require('../middleware/tieredRateLimit');
 const router  = express.Router();
 
 // Helper – safe integer
@@ -8,8 +10,46 @@ const intOr = (v, def) => {
   return isNaN(n) ? def : n;
 };
 
+const digitsStr = (max) => z.string().regex(/^\d+$/).max(max);
+
+const flagParam = () => z.enum(['0', '1']).optional().or(z.literal(''));
+
+const searchSchema = z.object({
+  q:        z.string().trim().max(100).optional().or(z.literal('')),
+  category: z.string().trim().max(100).optional().or(z.literal('')),
+  location: z.string().trim().max(100).optional().or(z.literal('')),
+  type:     z.string().trim().max(50).optional().or(z.literal('')),
+  sort:     z.enum(['newest', 'oldest', 'title', 'salary_high']).optional().or(z.literal('')),
+  page:     digitsStr(6).optional().or(z.literal('')),
+  limit:    digitsStr(3).optional().or(z.literal('')),
+  featured: flagParam(),
+  salary:   z.string().trim().max(20).regex(/^\d+(-\d+)?\+?$/, 'Invalid salary filter').optional().or(z.literal('')),
+  visa:     flagParam(),
+  date:     digitsStr(4).optional().or(z.literal('')),
+  iqama:     flagParam(),
+  immediate: flagParam(),
+  local:     flagParam(),
+}).strict();
+
+const jobSubmitSchema = z.object({
+  title:       z.string().trim().min(1).max(200),
+  company:     z.string().trim().min(1).max(200),
+  location:    z.string().trim().min(1).max(200),
+  job_type:    z.string().trim().max(50).optional(),
+  description: z.string().trim().min(1).max(10000),
+  phone:       z.string().trim().max(30).optional().or(z.literal('')),
+  whatsapp:    z.string().trim().max(30).optional().or(z.literal('')),
+  email:       z.union([z.string().trim().max(160).email(), z.literal('')]).optional(),
+  category_id: z.union([z.string(), z.number()]).optional(),
+  map_link:    z.union([z.string().trim().max(500).url(), z.literal('')]).optional(),
+  salary:      z.string().trim().max(100).optional().or(z.literal('')),
+}).strict().refine(
+  data => data.email || data.phone || data.whatsapp,
+  { message: 'Please provide at least one contact method (email, phone, or WhatsApp).', path: ['email'] }
+);
+
 // GET /api/jobs  – public listing with search/filter/pagination
-router.get('/', async (req, res) => {
+router.get('/', validate(searchSchema, 'query'), async (req, res) => {
   try {
     const {
       q,
@@ -244,20 +284,12 @@ router.get('/trends', async (req, res) => {
 });
 
 // POST /api/jobs/submit  – public job submission (status = pending, admin reviews)
-router.post('/submit', async (req, res) => {
+router.post('/submit', publicFormLimiter, validate(jobSubmitSchema), async (req, res) => {
   try {
     const {
       title, company, location, job_type = 'Full-time',
       description, phone, whatsapp, email, category_id, map_link, salary
     } = req.body;
-
-    // Basic validation
-    if (!title || !company || !location || !description) {
-      return res.status(400).json({ success: false, message: 'Title, company, location and description are required.' });
-    }
-    if (!email && !phone && !whatsapp) {
-      return res.status(400).json({ success: false, message: 'Please provide at least one contact method (email, phone, or WhatsApp).' });
-    }
 
     // Resolve category – use first available if none provided
     let catId = parseInt(category_id) || null;

@@ -5,7 +5,6 @@ const MySQLStore   = require('express-mysql-session')(session);
 const helmet        = require('helmet');
 const cors          = require('cors');
 const path          = require('path');
-const rateLimit     = require('express-rate-limit');
 
 const authRoutes     = require('./routes/auth');
 const jobsRoutes     = require('./routes/jobs');
@@ -25,6 +24,13 @@ const redirectsRoutes       = require('./routes/redirects');
 const adminEmployersRoutes  = require('./routes/admin-employers');
 
 
+// Fail fast rather than silently signing sessions with a well-known fallback
+// secret that's visible to anyone reading the source.
+if (!process.env.SESSION_SECRET) {
+  console.error('FATAL: SESSION_SECRET is not set in .env — refusing to start with an insecure default.');
+  process.exit(1);
+}
+
 const app  = express();
 app.set('trust proxy', 1);
 const PORT = process.env.PORT || 3000;
@@ -34,13 +40,12 @@ app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors({ origin: false }));
 
 // ── Rate limiting ─────────────────────────────────────────────
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 200,
-  standardHeaders: true,
-  legacyHeaders:   false
-});
-app.use('/api/', limiter);
+// Baseline safety-net tier for all /api/* — thresholds configurable via
+// RATE_LIMIT_GLOBAL_WINDOW_MS / RATE_LIMIT_GLOBAL_MAX env vars. Individual
+// route groups (see tieredRateLimit.js, authRateLimit.js) layer stricter
+// or looser limits on top of this for their specific risk level.
+const { globalLimiter } = require('./middleware/tieredRateLimit');
+app.use('/api/', globalLimiter);
 
 // ── Body parsing ──────────────────────────────────────────────
 app.use(express.json({ limit: '5mb' }));
@@ -61,7 +66,7 @@ const sessionStore = new MySQLStore({
 });
 
 app.use(session({
-  secret:            process.env.SESSION_SECRET || 'super-secret-key',
+  secret:            process.env.SESSION_SECRET,
   resave:            false,
   saveUninitialized: false,
   store:             sessionStore,
@@ -72,6 +77,12 @@ app.use(session({
   }
 }));
 
+// Old "Post a Job" contact-form flow is replaced by the employer self-serve portal
+// MUST be registered before the htmlLayout static-file middleware below —
+// public/contact.html still exists on disk, so htmlLayout would otherwise
+// serve that stale file directly and this redirect would never run.
+app.get('/contact.html', (req, res) => res.redirect(301, '/employer/'));
+
 // ── Static files ──────────────────────────────────────────────
 app.use((req, res, next) => {
   if (req.path.startsWith('/api/')) return next();
@@ -79,8 +90,6 @@ app.use((req, res, next) => {
 });
 app.get('/manifest.json', (req, res) => res.status(404).json({}));
 
-// Old "Post a Job" contact-form flow is replaced by the employer self-serve portal
-app.get('/contact.html', (req, res) => res.redirect(301, '/employer/'));
 // ── Redirect middleware (cached, 5 min TTL) ───────────────────
 {
   let _rdxCache = null, _rdxCacheAt = 0;
@@ -190,10 +199,12 @@ app.get('*', (req, res) => {
 
 // ── Error handler ─────────────────────────────────────────────
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(err.status || 500).json({
+  // Full details go to the server log only — never to the client.
+  console.error(err.stack || err);
+  const status = err.status && err.status >= 400 && err.status < 600 ? err.status : 500;
+  res.status(status).json({
     success: false,
-    message: err.message || 'Internal server error'
+    message: status < 500 && err.expose ? err.message : 'Internal server error'
   });
 });
 
@@ -215,10 +226,16 @@ app.listen(PORT, () => {
       const [expired] = await db.query(
         'SELECT id, cv_url FROM job_applications WHERE cv_url IS NOT NULL AND cv_uploaded_at < DATE_SUB(NOW(), INTERVAL 30 DAY)'
       );
+      // cv_url is a bare filename (current uploads) or, for rows predating the
+      // uploads-private migration, a legacy '/uploads/cvs/<filename>' path —
+      // check both locations so old and new CVs both get cleaned up.
       for (const a of expired) {
         try {
-          const fp = path.join(__dirname, '../public', a.cv_url);
-          if (fs.existsSync(fp)) fs.unlinkSync(fp);
+          const filename = path.basename(a.cv_url);
+          const privateFp = path.join(__dirname, '../uploads-private/cvs', filename);
+          const legacyFp  = path.join(__dirname, '../public/uploads/cvs', filename);
+          if (fs.existsSync(privateFp)) fs.unlinkSync(privateFp);
+          else if (fs.existsSync(legacyFp)) fs.unlinkSync(legacyFp);
         } catch(e) {}
       }
       if (expired.length) {
