@@ -41,8 +41,8 @@
   // Attach button click — wait for DOM to be ready
   function attachBtn() {
     var btn = document.getElementById('themeToggle');
-    if (btn && !btn._themeAttached) {
-      btn._themeAttached = true;
+    if (btn && !btn.dataset.themeWired) {
+      btn.dataset.themeWired = '1';
       btn.addEventListener('click', function() {
         applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
       });

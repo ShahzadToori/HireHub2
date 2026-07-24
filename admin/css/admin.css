@@ -22,8 +22,8 @@
   --shadow:     0 1px 4px rgba(0,0,0,.08);
   --shadow-md:  0 4px 16px rgba(0,0,0,.10);
 
-  --font: 'DM Sans', sans-serif;
-  --font-display: 'Syne', sans-serif;
+  --font: 'Source Sans 3', sans-serif;
+  --font-display: 'Lexend', sans-serif;
 }
 
 [data-theme="dark"] {
@@ -35,6 +35,15 @@
   --text-muted: #8b949e;
   --shadow:     0 1px 4px rgba(0,0,0,.4);
   --shadow-md:  0 4px 16px rgba(0,0,0,.5);
+}
+
+/* Bootstrap's own .text-muted / .text-secondary utility classes ship a
+   fixed gray (~#6c757d) with no dark-mode awareness — wherever admin pages
+   reach for these instead of var(--text-muted), the text goes near-invisible
+   against the dark background. */
+[data-theme="dark"] .text-muted,
+[data-theme="dark"] .text-secondary {
+  color: #8b949e !important;
 }
 
 /* ── Base ──────────────────────────────────────────────────── */

@@ -10,15 +10,15 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700;800&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/employer/employer.css">
   <style>
   .logo-wrap{display:flex;align-items:center;gap:1.25rem;padding:1.1rem;background:var(--surface);border-radius:14px;margin-bottom:1.5rem}
   .logo-img{width:72px;height:72px;border-radius:12px;object-fit:cover;border:2px solid var(--border);flex-shrink:0}
-  .logo-placeholder{width:72px;height:72px;border-radius:12px;background:var(--primary);color:#fff;font-family:'Syne',sans-serif;font-weight:800;font-size:1.8rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .logo-placeholder{width:72px;height:72px;border-radius:12px;background:var(--primary);color:#fff;font-family:'Lexend',sans-serif;font-weight:800;font-size:1.8rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
   .logo-info{flex:1;min-width:0}
-  .logo-info h3{font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;color:var(--text-primary);margin:0 0 .2rem}
+  .logo-info h3{font-family:'Lexend',sans-serif;font-weight:700;font-size:.9rem;color:var(--text-primary);margin:0 0 .2rem}
   .logo-info p{font-size:.75rem;color:var(--text-muted);margin:0 0 .6rem}
   .logo-upload-btn{display:inline-flex;align-items:center;gap:.3rem;padding:.38rem .85rem;border:1.5px solid var(--border);border-radius:8px;background:var(--bg-card);color:var(--text-secondary);font-size:.8rem;font-weight:600;cursor:pointer;transition:all .15s}
   .logo-upload-btn:hover{border-color:var(--primary);color:var(--primary)}
@@ -589,7 +589,7 @@ function previewTemplate(type) {
   hdr.appendChild(closeBtn);
 
   const pre = document.createElement('pre');
-  pre.style.cssText = 'white-space:pre-wrap;font-size:.8rem;background:var(--surface);padding:.85rem;border-radius:10px;color:var(--text-primary);line-height:1.7;margin:0;font-family:"DM Sans",sans-serif';
+  pre.style.cssText = 'white-space:pre-wrap;font-size:.8rem;background:var(--surface);padding:.85rem;border-radius:10px;color:var(--text-primary);line-height:1.7;margin:0;font-family:"Source Sans 3",sans-serif';
   pre.textContent = preview;
 
   const note = document.createElement('p');
@@ -728,7 +728,7 @@ init();
 (function(){
   var WARN=25*60*1000,LOGOUT=30*60*1000,warnT,logoutT,shown=false;
   function reset(){clearTimeout(warnT);clearTimeout(logoutT);if(shown)hide();warnT=setTimeout(warn,WARN);logoutT=setTimeout(auto,LOGOUT);}
-  function warn(){shown=true;var el=document.getElementById('inactWarn');if(!el){el=document.createElement('div');el.id='inactWarn';el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';el.innerHTML='<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:2rem;max-width:380px;width:100%;text-align:center"><div style="font-size:2rem;margin-bottom:.5rem">⏰</div><h3 style="font-family:Syne,sans-serif;font-weight:800;color:var(--text-primary);margin-bottom:.5rem">Still there?</h3><p style="color:var(--text-secondary);font-size:.9rem">You\'ll be logged out in <strong id="inactCD">5:00</strong></p><div style="display:flex;gap:.75rem;justify-content:center;margin-top:1.25rem"><button class="ep-btn-primary" onclick="keepIn()">Keep me logged in</button><button class="ep-btn-outline" onclick="logoutNow()">Logout</button></div></div>';document.body.appendChild(el);var s=300;var ci=setInterval(function(){s--;var e=document.getElementById('inactCD');if(e)e.textContent=Math.floor(s/60)+':'+(s%60<10?'0':'')+s%60;if(s<=0)clearInterval(ci);},1000);}el.style.display='flex';}
+  function warn(){shown=true;var el=document.getElementById('inactWarn');if(!el){el=document.createElement('div');el.id='inactWarn';el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';el.innerHTML='<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:2rem;max-width:380px;width:100%;text-align:center"><div style="font-size:2rem;margin-bottom:.5rem">⏰</div><h3 style="font-family:Lexend,sans-serif;font-weight:800;color:var(--text-primary);margin-bottom:.5rem">Still there?</h3><p style="color:var(--text-secondary);font-size:.9rem">You\'ll be logged out in <strong id="inactCD">5:00</strong></p><div style="display:flex;gap:.75rem;justify-content:center;margin-top:1.25rem"><button class="ep-btn-primary" onclick="keepIn()">Keep me logged in</button><button class="ep-btn-outline" onclick="logoutNow()">Logout</button></div></div>';document.body.appendChild(el);var s=300;var ci=setInterval(function(){s--;var e=document.getElementById('inactCD');if(e)e.textContent=Math.floor(s/60)+':'+(s%60<10?'0':'')+s%60;if(s<=0)clearInterval(ci);},1000);}el.style.display='flex';}
   function hide(){shown=false;var el=document.getElementById('inactWarn');if(el)el.style.display='none';}
   function auto(){fetch('/api/employer/logout',{method:'POST',credentials:'include'});window.location.href='/employer/?reason=timeout';}
   window.keepIn=function(){hide();reset();fetch('/api/employer/me',{credentials:'include'});};

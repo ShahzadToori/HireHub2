@@ -16,12 +16,12 @@
   <meta name="theme-color" content="#0f62fe">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700;800&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
   <style>
     /* ═══════════════════════════════════════════════════════
        FEEDBACK PAGE — refined editorial aesthetic
-       Syne display + DM Sans body, primary blue accents,
+       Lexend display + Source Sans 3 body, primary blue accents,
        floating label fields, animated progress indicators
     ═══════════════════════════════════════════════════════ */
 
@@ -48,7 +48,7 @@
       margin-bottom: 1.1rem;
     }
     .fb-hero-title {
-      font-family: 'Syne', sans-serif; font-weight: 800;
+      font-family: 'Lexend', sans-serif; font-weight: 800;
       font-size: clamp(2rem, 5vw, 3.2rem);
       color: #fff; line-height: 1.1; margin-bottom: .75rem;
     }
@@ -116,7 +116,7 @@
       border-radius: 11px;
       background: var(--bg-card);
       color: var(--text-primary);
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Source Sans 3', sans-serif;
       font-size: .93rem;
       outline: none;
       transition: border-color .18s, box-shadow .18s;
@@ -142,7 +142,7 @@
       font-size: .82rem; color: var(--text-muted);
       pointer-events: none;
       transition: all .16s;
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Source Sans 3', sans-serif;
       white-space: nowrap;
     }
     .fl-group .fl-input:focus ~ .fl-label,
@@ -189,7 +189,7 @@
       width: 100%; padding: .85rem;
       background: var(--primary); color: #fff;
       border: none; border-radius: 11px;
-      font-family: 'Syne', sans-serif; font-weight: 700;
+      font-family: 'Lexend', sans-serif; font-weight: 700;
       font-size: .97rem; cursor: pointer;
       display: flex; align-items: center; justify-content: center; gap: .5rem;
       transition: background .18s, transform .15s, box-shadow .18s;
@@ -235,7 +235,7 @@
       display: inline-flex; align-items: center; justify-content: center;
       font-size: 1.75rem; color: #059669; margin-bottom: 1.25rem;
     }
-    .fb-success h3 { font-family: 'Syne',sans-serif; font-weight: 800; font-size: 1.45rem; margin-bottom: .5rem; color: var(--text-primary); }
+    .fb-success h3 { font-family: 'Lexend',sans-serif; font-weight: 800; font-size: 1.45rem; margin-bottom: .5rem; color: var(--text-primary); }
     .fb-success p  { color: var(--text-secondary); font-size: .92rem; max-width: 360px; margin: 0 auto 1.5rem; }
 
     /* ── Sidebar info cards ───────────────────────────────── */
@@ -249,7 +249,7 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 1.05rem; margin-bottom: .75rem;
     }
-    .info-card-title { font-family: 'Syne',sans-serif; font-weight: 700; font-size: .88rem; color: var(--text-primary); margin-bottom: .3rem; }
+    .info-card-title { font-family: 'Lexend',sans-serif; font-weight: 700; font-size: .88rem; color: var(--text-primary); margin-bottom: .3rem; }
     .info-card p, .info-card a { font-size: .82rem; color: var(--text-secondary); line-height: 1.6; }
     .info-card a { color: var(--primary); text-decoration: none; }
     .info-card a:hover { text-decoration: underline; }
@@ -516,9 +516,12 @@
   applyTheme(localStorage.getItem('theme')||'light',false);
   document.addEventListener('DOMContentLoaded',function(){
     var btn=document.getElementById('themeToggle');
-    if(btn)btn.addEventListener('click',function(){
-      applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');
-    });
+    if(btn&&!btn.dataset.themeWired){
+      btn.dataset.themeWired='1';
+      btn.addEventListener('click',function(){
+        applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');
+      });
+    }
   });
   window.toggleTheme=function(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');};
 })();

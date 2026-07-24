@@ -356,11 +356,16 @@ async function loadSettings() {
   }
 }
 
-// Homepage ad zones (top/sidebar/between-jobs). The footer zone is handled
-// independently in footer.html since that partial is shared on every page,
-// not just this one. A zone only shows if the admin has both enabled it in
-// Monetization AND (for top/sidebar, which predate the ads feed) left the
-// matching Section Visibility toggle on.
+// Homepage ad zones (top/sidebar/between_jobs section banner). The footer
+// zone is handled independently in footer.html since that partial is shared
+// on every page, not just this one. The between_jobs *zone* actually backs
+// two placements on this page: this static banner (#ad-between-jobs, sitting
+// once between the "Job of the Day" section and the grid) and a second,
+// dynamically-recreated inline slot inside the grid itself — see
+// injectInlineBetweenJobsAd() below, which reuses the same ad_code. A zone
+// only shows if the admin has both enabled it in Monetization AND (for
+// top/sidebar, which predate the ads feed) left the matching Section
+// Visibility toggle on.
 async function loadAds(settings) {
   try {
     const data = await cachedGet('/api/ads', 300000); // cache 5 min
@@ -377,6 +382,27 @@ async function loadAds(settings) {
       const slot = document.getElementById(codeId);
       if (wrap && slot) { slot.innerHTML = code; wrap.classList.remove('d-none'); }
     });
+  } catch (e) { /* ads are non-critical — fail silently */ }
+}
+
+// The inline between-jobs ad sits inside #jobsList, which loadJobs() replaces
+// wholesale on every search/filter/sort/page change — so unlike the static
+// banner above (which loadAds() only ever needs to touch once), this one has
+// to be (re-)injected after every render. It intentionally uses its own
+// #ad-inline-between-jobs id (distinct from the static banner's
+// #ad-between-jobs) — the two used to share an id, which meant
+// getElementById() always resolved to whichever came first in the DOM and
+// the in-grid slot could never actually be populated. cachedGet reuses the
+// 5-minute in-memory cache from loadAds(), so this doesn't cost an extra
+// request per render.
+async function injectInlineBetweenJobsAd() {
+  try {
+    const data = await cachedGet('/api/ads', 300000);
+    const code = data.ads && data.ads.between_jobs;
+    if (!code) return;
+    const wrap = document.getElementById('ad-inline-between-jobs');
+    const slot = document.getElementById('ad-inline-between-jobs-code');
+    if (wrap && slot) { slot.innerHTML = code; wrap.classList.remove('d-none'); }
   } catch (e) { /* ads are non-critical — fail silently */ }
 }
 
@@ -534,7 +560,7 @@ async function loadJobs() {
     list.className = state.viewMode === 'list' ? 'row g-3 list-view' : 'row g-3';
     list.innerHTML = data.jobs.map((job, idx) => {
       const adInsert = (idx === 5 && state.page === 1)
-        ? '<div class="col-12" id="ad-between"><span class="ad-label text-muted small d-block text-center">Advertisement</span></div>'
+        ? '<div class="col-12"><div id="ad-inline-between-jobs" class="ad-zone ad-between-jobs d-none text-center"><span class="ad-label">Advertisement</span><div id="ad-inline-between-jobs-code"></div></div></div>'
         : '';
       return `${adInsert}<div class="col-md-6 col-lg-${state.viewMode === 'list' ? '12' : '6'}">${renderJobCard(job)}</div>`;
     }).join('');
@@ -544,6 +570,8 @@ async function loadJobs() {
         if (!e.target.closest('a')) openJobModal(card.dataset.id);
       });
     });
+
+    injectInlineBetweenJobsAd(); // #ad-inline-between-jobs was just recreated above — fill it in
 
     updateSchema(data.jobs); // updates schema + meta + URL bar
 
@@ -577,36 +605,46 @@ function renderJobCard(job, isFeaturedSection = false) {
   if (isSponsored)    cardClass += ' sponsored-card';
   if (isMaybeExpired) cardClass += ' card-expired';
 
-  // ── Urgency badge ─────────────────────────────────────────
-  const urgencyBadge = isUrgent       ? '<span class="badge-urgency badge-urgent">🔥 Urgent</span>'
-                     : isNew          ? '<span class="badge-urgency badge-new">⚡ New Today</span>'
-                     : isExpiring     ? '<span class="badge-urgency badge-expiring">⏰ Closing Soon</span>'
-                     : isMaybeExpired ? '<span class="badge-urgency badge-expired">⚠ May Be Expired</span>'
+  // ── Urgency badge (quiet, tinted — not competing with paid badges) ──
+  const urgencyBadge = isUrgent       ? '<span class="badge-urgency badge-urgent"><i class="bi bi-exclamation-triangle-fill me-1"></i>Urgent</span>'
+                     : isNew          ? '<span class="badge-urgency badge-new"><i class="bi bi-lightning-charge-fill me-1"></i>New Today</span>'
+                     : isExpiring     ? '<span class="badge-urgency badge-expiring"><i class="bi bi-hourglass-split me-1"></i>Closing Soon</span>'
+                     : isMaybeExpired ? '<span class="badge-urgency badge-expired"><i class="bi bi-exclamation-circle me-1"></i>May Be Expired</span>'
                      : '';
   const iqamaBadge = /transferable/i.test((job.title||"")+(job.description||"")) ? '<span class="card-visa-badge" style="background:rgba(16,185,129,.1);color:#059669;border-color:rgba(16,185,129,.3)"><i class="bi bi-file-earmark-check me-1"></i>Transferable Iqama</span>' : "";
   const immediateBadge = /immediate/i.test((job.title||"")+(job.description||"")) ? '<span class="card-visa-badge" style="background:rgba(245,158,11,.1);color:#d97706;border-color:rgba(245,158,11,.3)"><i class="bi bi-lightning-fill me-1"></i>Immediate Joining</span>' : "";
 
-  const badges = [
-    isSponsored  ? '<span class="badge-sponsored">📌 Sponsored</span>' : '',
-    isFeatured   ? '<span class="badge-featured">⭐ Featured</span>'   : '',
+  // Tier 1 — paid/trust status badges (top row, solid, highest emphasis)
+  const statusBadges = [
+    isSponsored  ? '<span class="badge-sponsored"><i class="bi bi-megaphone-fill me-1"></i>Sponsored</span>' : '',
+    isFeatured   ? '<span class="badge-featured"><i class="bi bi-star-fill me-1"></i>Featured</span>'   : '',
     job.verified == 1 ? '<span class="badge-verified"><i class="bi bi-patch-check-fill me-1"></i>Verified</span>' : '',
-    urgencyBadge,
-    `<span class="badge-category">${escHtml(job.category || '')}</span>`,
-    `<span class="badge-type">${escHtml(job.job_type || 'Full-time')}</span>`,
-    iqamaBadge,
-    immediateBadge
+    urgencyBadge
   ].filter(Boolean).join('');
 
+  // Tier 2 — quiet meta badges (second row, under the title/company)
+  const metaBadges = [
+    job.category ? `<span class="badge-category">${escHtml(job.category)}</span>` : '',
+    `<span class="badge-type">${escHtml(job.job_type || 'Full-time')}</span>`
+  ].filter(Boolean).join('');
 
   // ── Visa sponsored badge ──────────────────────────────────
   const visaHtml = job.visa_sponsored
     ? `<span class="card-visa-badge"><i class="bi bi-passport me-1"></i>Visa Sponsored</span>`
     : '';
+  const highlightsHtml = [visaHtml, iqamaBadge, immediateBadge].filter(Boolean).join('');
 
   // ── City flag ─────────────────────────────────────────────
   const cityFlag   = getCityFlag(job.location);
-  const salaryMeta = job.salary ? `<span class="meta-item"><i class="bi bi-cash-stack"></i>${escHtml(job.salary)}</span>` : "";
+  const salaryMeta = job.salary ? `<span class="meta-item meta-item-salary"><i class="bi bi-cash-stack"></i>${escHtml(job.salary)}</span>` : "";
   const locationHtml = `<span class="meta-item"><i class="bi bi-geo-alt"></i>${cityFlag}${escHtml(job.location)}</span>`;
+
+  // ── Company logo / initial avatar (falls back to initial if the
+  // logo file is missing, e.g. deleted upload) ──────────────────
+  const companyInitial = escHtml((job.company || '?').trim().charAt(0).toUpperCase() || '?');
+  const logoHtml = job.employer_logo
+    ? `<img src="${escHtml(job.employer_logo)}" alt="" onerror="this.replaceWith(document.createTextNode('${companyInitial}'))">`
+    : companyInitial;
 
   // ── Contact icons ─────────────────────────────────────────
   const isSaved = isJobSaved(job.id);
@@ -618,14 +656,17 @@ function renderJobCard(job, isFeaturedSection = false) {
     job.whatsapp  ? `<a href="${waLink(job)}" class="btn-contact-icon whatsapp" title="WhatsApp" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i class="bi bi-whatsapp"></i></a>` : '',
     job.map_link  ? `<a href="${escHtml(job.map_link)}" class="btn-contact-icon map" title="View on Map" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i class="bi bi-geo-alt-fill"></i></a>` : '',
     job.email     ? `<a href="mailto:${job.email}" class="btn-contact-icon email" title="Email" onclick="event.stopPropagation()"><i class="bi bi-envelope-fill"></i></a>` : '',
-    job.apply_link ? `<a href="${escHtml(job.apply_link)}" class="btn-contact-icon applylink" title="Apply Link" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i class="bi bi-box-arrow-up-right"></i></a>` : '',
-    job.slug      ? `<a href="/job/${job.slug}" class="btn-contact-icon details" title="View Full Details" onclick="event.stopPropagation()"><i class="bi bi-arrows-angle-expand"></i></a>` : ''
+    job.apply_link ? `<a href="${escHtml(job.apply_link)}" class="btn-contact-icon applylink" title="Apply Link" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i class="bi bi-box-arrow-up-right"></i></a>` : ''
   ].filter(Boolean).join('');
 
-  // ── WhatsApp Quick Apply ──────────────────────────────────
-  
+  // ── Primary action — explicit "View" button (still a real link to the
+  // SSR job page for crawlability/share-ability, just no longer a tiny
+  // icon buried among the other contact icons) ──────────────────────
+  const viewBtnHtml = job.slug
+    ? `<a href="/job/${job.slug}" class="btn-view-details" title="View Full Details" onclick="event.stopPropagation()">View<i class="bi bi-arrow-right ms-1"></i></a>`
+    : '';
 
-  // ── Trust Score badge ─────────────────────────────────────
+  // ── Trust Score badge — lives in the footer, not the top badge row ──
   const trustScore = calcTrustScore(job);
   const trustHtml  = trustScore
     ? `<span class="trust-score trust-${trustScore.level}" title="Employer transparency score">
@@ -635,21 +676,31 @@ function renderJobCard(job, isFeaturedSection = false) {
   return `
     <div class="${cardClass}" data-id="${job.id}" data-slug="${job.slug || ''}" role="button" tabindex="0"
          aria-label="View ${escHtml(job.title)} at ${escHtml(job.company)}">
-      <div class="card-badges">${badges}${trustHtml ? ' ' + trustHtml : ''}</div>
+      <div class="card-badges">${statusBadges}</div>
       <button type="button" class="btn-report-job" title="Report this listing" aria-label="Report this listing"
         data-slug="${job.slug || ''}" data-title="${escHtml(job.title)}"
         onclick="event.stopPropagation();reportJobCard(this)">
         <i class="bi bi-flag"></i>
       </button>
-      <div class="card-title">${escHtml(job.title)}</div>
-      <div class="card-company"><i class="bi bi-building me-1"></i>${escHtml(job.company)}</div>
-      ${visaHtml ? `<div class="card-highlights">${visaHtml}</div>` : ""}
+      <div class="card-identity">
+        <div class="card-logo">${logoHtml}</div>
+        <div class="card-identity-text">
+          <div class="card-title">${escHtml(job.title)}</div>
+          <div class="card-company">${escHtml(job.company)}</div>
+        </div>
+      </div>
+      <div class="card-badges card-badges-meta">${metaBadges}</div>
+      ${highlightsHtml ? `<div class="card-highlights">${highlightsHtml}</div>` : ""}
       <div class="card-meta">${locationHtml}${salaryMeta}</div>
       <p class="card-desc">${escHtml(job.description)}</p>
       <div class="card-footer-row">
-        <span class="card-date"><i class="bi bi-clock me-1"></i>${timeAgo(job.created_at)}</span>
-        <div class="d-flex align-items-center gap-1">
+        <div class="footer-meta-left">
+          ${trustHtml}
+          <span class="card-date"><i class="bi bi-clock me-1"></i>${timeAgo(job.created_at)}</span>
+        </div>
+        <div class="card-actions d-flex align-items-center gap-1">
           <div class="card-contacts">${contacts}</div>
+          ${viewBtnHtml}
         </div>
       </div>
     </div>`;
@@ -754,8 +805,9 @@ function populateModal(job) {
     if (label) label.textContent = saved ? 'Saved' : 'Save';
   }
   const badges = [
-    job.sponsored == 1 && state.settings.show_sponsored !== '0' ? '<span class="badge-sponsored">Sponsored</span>' : '',
-    job.featured  == 1 && state.settings.show_featured  !== '0' ? '<span class="badge-featured">⭐ Featured</span>' : ''
+    job.sponsored == 1 && state.settings.show_sponsored !== '0' ? '<span class="badge-sponsored"><i class="bi bi-megaphone-fill me-1"></i>Sponsored</span>' : '',
+    job.featured  == 1 && state.settings.show_featured  !== '0' ? '<span class="badge-featured"><i class="bi bi-star-fill me-1"></i>Featured</span>' : '',
+    job.verified == 1 ? '<span class="badge-verified"><i class="bi bi-patch-check-fill me-1"></i>Verified</span>' : ''
   ].filter(Boolean).join('');
 
   $('#modalBadges').innerHTML     = badges;
@@ -765,6 +817,24 @@ function populateModal(job) {
   $('#modalType').textContent     = job.job_type || 'Full-time';
   $('#modalCategory').textContent = job.category;
   $('#modalPosted').textContent   = `Posted ${timeAgo(job.created_at)}`;
+
+  const logoEl = $('#modalLogoAvatar');
+  if (logoEl) {
+    const companyInitial = escHtml((job.company || '?').trim().charAt(0).toUpperCase() || '?');
+    logoEl.innerHTML = job.employer_logo
+      ? `<img src="${escHtml(job.employer_logo)}" alt="" onerror="this.replaceWith(document.createTextNode('${companyInitial}'))">`
+      : companyInitial;
+  }
+
+  const salaryWrap = $('#modalSalaryWrap');
+  if (salaryWrap) {
+    if (job.salary) {
+      $('#modalSalary').textContent = job.salary;
+      salaryWrap.classList.remove('d-none');
+    } else {
+      salaryWrap.classList.add('d-none');
+    }
+  }
 
   const descEl = $('#modalDescription');
   descEl.innerHTML = escHtml(job.description)
@@ -1523,10 +1593,19 @@ function debounce(fn, ms = 350) {
    EVENT LISTENERS
 ══════════════════════════════════════════════════════════════ */
 function bindEvents() {
-  // Safe null check — navbar may not be in DOM yet on some pages
+  // Safe null check — navbar may not be in DOM yet on some pages.
+  // Shared "themeWired" guard with navbar.html/footer.html — those partials
+  // wire this same button too, and without one shared flag the listeners
+  // stack up and cancel each other out on an even click count.
   const themeBtn = document.getElementById('themeToggle');
-  if (themeBtn) themeBtn.addEventListener('click', toggleTheme);
-  else document.querySelectorAll('.theme-toggle').forEach(btn => btn.addEventListener('click', toggleTheme));
+  if (themeBtn && !themeBtn.dataset.themeWired) {
+    themeBtn.dataset.themeWired = '1';
+    themeBtn.addEventListener('click', toggleTheme);
+  } else if (!themeBtn) {
+    document.querySelectorAll('.theme-toggle').forEach(btn => {
+      if (!btn.dataset.themeWired) { btn.dataset.themeWired = '1'; btn.addEventListener('click', toggleTheme); }
+    });
+  }
 
   // Search history item / clear — event delegation (avoids inline onclick injection)
   document.addEventListener('click', (e) => {

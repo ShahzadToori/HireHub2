@@ -13,14 +13,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700;800&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
   <style>
     .page-hero{background:linear-gradient(135deg,#0d1117 0%,#161b22 55%,#0f2744 100%);padding:3.5rem 0 2.75rem;text-align:center;position:relative;overflow:hidden}
     .page-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(15,98,254,.2),transparent 70%)}
     .page-hero-inner{position:relative}
     .page-badge{display:inline-flex;align-items:center;gap:.4rem;background:rgba(245,158,11,.18);border:1px solid rgba(245,158,11,.3);border-radius:100px;padding:.28rem .85rem;font-size:.72rem;font-weight:700;color:#fbbf24;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.9rem}
-    .page-hero h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.7rem,4vw,2.6rem);color:#fff;margin-bottom:.6rem}
+    .page-hero h1{font-family:'Lexend',sans-serif;font-weight:800;font-size:clamp(1.7rem,4vw,2.6rem);color:#fff;margin-bottom:.6rem}
     .page-hero p{color:rgba(255,255,255,.6);font-size:.95rem;max-width:520px;margin:0 auto}
     .form-card{background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:2rem;box-shadow:var(--shadow)}
     @media(max-width:576px){.form-card{padding:1.25rem;border-radius:14px}}
@@ -29,7 +29,7 @@
     .star-inp.lit{color:#f59e0b}
     .review-card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:1.25rem;margin-bottom:.85rem}
     .review-stars{color:#f59e0b;font-size:.9rem;letter-spacing:1px}
-    .review-company{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;color:var(--text-primary)}
+    .review-company{font-family:'Lexend',sans-serif;font-weight:700;font-size:1rem;color:var(--text-primary)}
     .review-meta{font-size:.78rem;color:var(--text-muted);margin:.25rem 0 .75rem}
     .review-text{font-size:.875rem;color:var(--text-secondary);line-height:1.7}
     .rating-pill{display:inline-flex;align-items:center;gap:.3rem;font-size:.72rem;padding:.2rem .6rem;border-radius:100px;font-weight:600}
@@ -64,7 +64,7 @@
     <div class="col-lg-7">
       <!-- Search -->
       <div class="form-card mb-4">
-        <h2 style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;color:var(--text-primary);margin-bottom:1rem">Search for a Company</h2>
+        <h2 style="font-family:'Lexend',sans-serif;font-weight:700;font-size:1.05rem;color:var(--text-primary);margin-bottom:1rem">Search for a Company</h2>
         <div class="search-box">
           <i class="bi bi-search"></i>
           <input type="text" id="searchCompany" placeholder="Type company name…" autocomplete="off">
@@ -73,7 +73,7 @@
       </div>
 
       <!-- Recent reviews -->
-      <h2 style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;color:var(--text-primary);margin-bottom:1rem">Recent Reviews</h2>
+      <h2 style="font-family:'Lexend',sans-serif;font-weight:700;font-size:1.05rem;color:var(--text-primary);margin-bottom:1rem">Recent Reviews</h2>
       <div id="recentReviews">
         <div class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm me-2"></div>Loading reviews…</div>
       </div>
@@ -82,7 +82,7 @@
     <!-- Right: Submit Form -->
     <div class="col-lg-5">
       <div class="form-card" style="position:sticky;top:80px">
-        <h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.15rem;color:var(--text-primary);margin-bottom:.35rem">Write a Review</h2>
+        <h2 style="font-family:'Lexend',sans-serif;font-weight:800;font-size:1.15rem;color:var(--text-primary);margin-bottom:.35rem">Write a Review</h2>
         <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:1.25rem">100% anonymous. No account required.</p>
 
         <div class="mb-3">
@@ -146,7 +146,7 @@
 
         <div id="rvMsg" class="msg-box"></div>
 
-        <button class="btn btn-primary w-100 mt-2" style="font-family:'Syne',sans-serif;font-weight:700" onclick="submitReview()">
+        <button class="btn btn-primary w-100 mt-2" style="font-family:'Lexend',sans-serif;font-weight:700" onclick="submitReview()">
           <i class="bi bi-send-fill me-1"></i>Submit Review
         </button>
         <p style="font-size:.72rem;color:var(--text-muted);text-align:center;margin-top:.75rem">
@@ -163,7 +163,7 @@
 (function(){
   async function ls(){try{const d=await fetch('/api/settings').then(r=>r.json());const s=d.settings;if(s.primary_color)document.documentElement.style.setProperty('--primary',s.primary_color);if(s.site_name){document.querySelectorAll('.brand-name').forEach(e=>e.textContent=s.site_name);const fc=document.getElementById('footer-copy-name');if(fc)fc.textContent=s.site_name;}if(s.logo_url){const l=document.getElementById('site-logo');if(l){l.src=s.logo_url;l.classList.remove('d-none');}}at(localStorage.getItem('theme')||s.default_theme||'light',false);}catch(e){}}
   function at(t,save=true){document.documentElement.setAttribute('data-theme',t);document.documentElement.style.colorScheme=t;const i=document.getElementById('themeIcon');if(i)i.className=t==='dark'?'bi bi-sun-fill':'bi bi-moon-fill';if(save)localStorage.setItem('theme',t);}
-  const tb=document.getElementById('themeToggle');if(tb)tb.addEventListener('click',()=>at(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+  const tb=document.getElementById('themeToggle');if(tb&&!tb.dataset.themeWired){tb.dataset.themeWired='1';tb.addEventListener('click',()=>at(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));}
   const fy=document.getElementById('footerYear');if(fy)fy.textContent=new Date().getFullYear();
   ls();
 })();

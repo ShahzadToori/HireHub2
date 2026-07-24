@@ -26,7 +26,7 @@
   gap: .6rem;
   text-decoration: none;
   color: #fff;
-  font-family: 'Syne', sans-serif;
+  font-family: 'Lexend', sans-serif;
   font-weight: 700;
   font-size: .85rem;
   white-space: nowrap;
@@ -70,7 +70,7 @@
   color: #fff;
   cursor: pointer;
   font-size: .82rem;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Source Sans 3', sans-serif;
   transition: background .15s;
 }
 .ep-user-btn:hover { background: rgba(255,255,255,.12); }
@@ -166,19 +166,37 @@
 }
 @media(max-width:767px) { .ep-auth-page { grid-template-columns: 1fr; } }
 .ep-auth-left {
-  background: linear-gradient(135deg, #0d1117 0%, #0f2744 100%);
+  background:
+    radial-gradient(560px 420px at 12% 8%, rgba(15,98,254,.32), transparent 60%),
+    radial-gradient(480px 380px at 92% 88%, rgba(255,107,53,.16), transparent 60%),
+    linear-gradient(160deg, #0d1117 0%, #0f2744 100%);
   padding: 3rem 2.5rem;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
   position: sticky;
   top: 0;
   height: 100vh;
+  position: relative;
+  overflow: hidden;
 }
 @media(max-width:767px) { .ep-auth-left { display: none; } }
+.ep-auth-left::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+  background-size: 44px 44px;
+  -webkit-mask-image: radial-gradient(circle at 25% 15%, #000, transparent 65%);
+  mask-image: radial-gradient(circle at 25% 15%, #000, transparent 65%);
+  pointer-events: none;
+}
+.ep-auth-left > * { position: relative; z-index: 1; }
 .ep-auth-logo { display: inline-block; margin-bottom: 2.5rem; }
 .ep-auth-left h1 {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Lexend', sans-serif;
   font-weight: 800;
   font-size: 2.2rem;
   color: #fff;
@@ -186,9 +204,26 @@
   margin-bottom: 1rem;
 }
 .ep-auth-left p { color: rgba(255,255,255,.6); font-size: 1rem; margin-bottom: 2rem; }
-.ep-auth-features { display: flex; flex-direction: column; gap: .6rem; }
-.ep-auth-feat { display: flex; align-items: center; gap: .65rem; color: rgba(255,255,255,.75); font-size: .9rem; }
-.ep-auth-feat i { color: #34d399; font-size: .9rem; }
+.ep-auth-features { display: flex; flex-wrap: wrap; gap: .55rem; }
+.ep-auth-feat {
+  display: flex; align-items: center; gap: .45rem;
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.12);
+  color: rgba(255,255,255,.85);
+  padding: .4rem .75rem;
+  border-radius: 999px;
+  font-size: .78rem;
+  font-weight: 500;
+}
+.ep-auth-feat i { color: #34d399; font-size: .85rem; }
+.ep-auth-region { border-top: 1px solid rgba(255,255,255,.12); padding-top: 1.25rem; }
+.ep-auth-region-label {
+  font-size: .7rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+  color: rgba(255,255,255,.4); margin-bottom: .6rem;
+}
+.ep-auth-region-list { display: flex; flex-wrap: wrap; gap: 0 1rem; }
+.ep-auth-region-list span { color: rgba(255,255,255,.78); font-size: .84rem; font-weight: 600; position: relative; }
+.ep-auth-region-list span:not(:last-child)::after { content: "\00b7"; position: absolute; right: -.62rem; color: rgba(255,255,255,.3); }
 .ep-auth-right {
   background: var(--bg);
   padding: 3rem 2rem;
@@ -221,7 +256,7 @@
   border-radius: 8px;
   background: none;
   color: var(--text-muted);
-  font-family: 'Syne', sans-serif;
+  font-family: 'Lexend', sans-serif;
   font-weight: 700;
   font-size: .85rem;
   cursor: pointer;
@@ -264,6 +299,60 @@
   .ep-auth-tab { font-size: .78rem; padding: .6rem .3rem; white-space: nowrap; }
 }
 
+/* ── Signup wizard (stepper + steps) ──────────────────────────── */
+.ep-stepper { margin-bottom: 1.5rem; }
+.ep-stepper-track { display: flex; align-items: center; gap: .4rem; margin-bottom: .65rem; }
+.ep-stepper-seg { flex: 1; height: 4px; border-radius: 99px; background: var(--border); overflow: hidden; }
+.ep-stepper-seg i { display: block; height: 100%; width: 0%; background: var(--primary); transition: width .3s ease; font-style: normal; }
+.ep-stepper-seg.done i, .ep-stepper-seg.current i { width: 100%; }
+.ep-stepper-labels { display: flex; justify-content: space-between; font-size: .72rem; font-weight: 700; color: var(--text-muted); letter-spacing: .02em; }
+.ep-stepper-labels span.active { color: var(--primary); }
+.ep-step-panel { display: none; }
+.ep-step-panel.active { display: block; animation: epStepIn .25s ease; }
+@keyframes epStepIn { from { opacity: 0; transform: translateX(8px); } to { opacity: 1; transform: translateX(0); } }
+.ep-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 .75rem; }
+@media(max-width:420px) { .ep-grid-2 { grid-template-columns: 1fr; } }
+.ep-btn-row { display: flex; gap: .6rem; }
+.ep-btn-row .ep-btn-outline, .ep-btn-row .ep-btn-primary { flex: 1; }
+
+/* ── Password strength meter ───────────────────────────────────── */
+.ep-pw-meter { display: flex; gap: .3rem; margin: .5rem 0 0; }
+.ep-pw-meter span { flex: 1; height: 4px; border-radius: 99px; background: var(--border); }
+.ep-pw-meter span.on-weak { background: #dc2626; }
+.ep-pw-meter span.on-fair { background: #d97706; }
+.ep-pw-meter span.on-strong { background: var(--success); }
+.ep-pw-hint { font-size: .72rem; color: var(--text-muted); margin: .35rem 0 0; }
+
+/* ── Reviewed-within-24h note + trust row ──────────────────────── */
+.ep-reviewed-note {
+  display: flex; gap: .55rem; align-items: flex-start;
+  background: var(--primary-light); border-radius: 10px; padding: .7rem .85rem;
+  font-size: .78rem; color: var(--text-secondary); margin-top: 1.1rem; line-height: 1.55;
+}
+.ep-reviewed-note i { color: var(--primary); flex-shrink: 0; margin-top: 1px; }
+.ep-trust-row { display: flex; align-items: center; gap: 1.1rem; justify-content: center; margin-top: 1.25rem; flex-wrap: wrap; }
+.ep-trust-item { display: flex; align-items: center; gap: .35rem; font-size: .75rem; color: var(--text-muted); }
+.ep-trust-item i { color: var(--success); }
+
+/* ── Remember-me row ────────────────────────────────────────────── */
+.ep-remember-row {
+  display: flex; align-items: center; justify-content: space-between;
+  margin: -.2rem 0 1rem; font-size: .82rem; color: var(--text-secondary); flex-wrap: wrap; gap: .4rem;
+}
+.ep-remember-label { display: flex; align-items: center; gap: .5rem; cursor: pointer; margin: 0; }
+.ep-remember-label input[type="checkbox"] {
+  width: 16px; height: 16px; margin: 0; accent-color: var(--primary); cursor: pointer;
+}
+.ep-forgot-link { font-size: .82rem; font-weight: 600; color: var(--primary); text-decoration: none; white-space: nowrap; }
+.ep-forgot-link:hover { text-decoration: underline; }
+
+/* ── Leading icon inside inputs (email/password) ───────────────── */
+.ep-input-wrap .ep-input-icon-left {
+  position: absolute; left: .85rem; top: 50%; transform: translateY(-50%);
+  color: var(--text-muted); font-size: .95rem; pointer-events: none;
+}
+.ep-input-wrap .ep-input.has-icon { padding-left: 2.5rem; }
+
 /* ── Page layout ─────────────────────────────────────────────── */
 .ep-page {
   max-width: 1280px;
@@ -279,7 +368,7 @@
   flex-wrap: wrap;
 }
 .ep-page-title {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Lexend', sans-serif;
   font-weight: 800;
   font-size: 1.5rem;
   color: var(--text-primary);
@@ -302,14 +391,14 @@
   margin-bottom: 1rem;
 }
 .ep-card-title {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Lexend', sans-serif;
   font-weight: 700;
   font-size: 1rem;
   color: var(--text-primary);
   margin: 0;
 }
 .ep-section-sub {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Lexend', sans-serif;
   font-weight: 700;
   font-size: .88rem;
   color: var(--text-secondary);
@@ -345,7 +434,7 @@
   flex-shrink: 0;
 }
 .ep-stat-num {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Lexend', sans-serif;
   font-weight: 800;
   font-size: 1.5rem;
   color: var(--text-primary);
@@ -370,7 +459,7 @@
   border-radius: 10px;
   background: var(--bg-card);
   color: var(--text-primary);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Source Sans 3', sans-serif;
   font-size: .9rem;
   outline: none;
   transition: border-color .15s, box-shadow .15s;
@@ -402,7 +491,7 @@
   color: #fff;
   border: none;
   border-radius: 10px;
-  font-family: 'Syne', sans-serif;
+  font-family: 'Lexend', sans-serif;
   font-weight: 700;
   font-size: .88rem;
   cursor: pointer;
@@ -420,7 +509,7 @@
   color: var(--text-secondary);
   border: 1.5px solid var(--border);
   border-radius: 9px;
-  font-family: 'Syne', sans-serif;
+  font-family: 'Lexend', sans-serif;
   font-weight: 600;
   font-size: .83rem;
   cursor: pointer;
@@ -500,7 +589,7 @@
   align-items: center;
   justify-content: space-between;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Source Sans 3', sans-serif;
   font-size: .85rem;
   font-weight: 700;
   color: var(--text-primary);
@@ -668,7 +757,7 @@
 }
 .ep-job-card:hover { border-color: var(--primary); }
 .ep-job-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: .85rem; }
-.ep-job-card-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; color: var(--text-primary); margin-bottom: .3rem; }
+.ep-job-card-title { font-family: 'Lexend', sans-serif; font-weight: 700; font-size: 1rem; color: var(--text-primary); margin-bottom: .3rem; }
 .ep-job-card-meta  { display: flex; flex-wrap: wrap; gap: .35rem .85rem; font-size: .78rem; color: var(--text-muted); }
 .ep-job-card-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .5rem; }
 .ep-job-apps { font-size: .82rem; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; gap: .35rem; }
@@ -752,7 +841,7 @@
   padding: 1.25rem 1.5rem;
   border-bottom: 1px solid var(--border);
 }
-.ep-modal-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.05rem; color: var(--text-primary); margin: 0; }
+.ep-modal-title { font-family: 'Lexend', sans-serif; font-weight: 700; font-size: 1.05rem; color: var(--text-primary); margin: 0; }
 .ep-modal-close { background: none; border: none; color: var(--text-muted); font-size: 1rem; cursor: pointer; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
 .ep-modal-close:hover { background: var(--surface); color: var(--text-primary); }
 .ep-modal-body  { padding: 1.25rem 1.5rem; overflow-y: auto; flex: 1; }
@@ -893,7 +982,7 @@
 .ep-action-menu-item.danger{color:#dc2626}
 /* Pagination */
 .ep-pagination{display:flex;align-items:center;justify-content:center;gap:.3rem;margin-top:1rem;flex-wrap:wrap}
-.ep-page-btn{min-width:34px;height:34px;padding:0 .4rem;border-radius:8px;border:1.5px solid var(--border);background:var(--bg-card);color:var(--text-secondary);cursor:pointer;font-size:.82rem;display:flex;align-items:center;justify-content:center;font-family:"DM Sans",sans-serif}
+.ep-page-btn{min-width:34px;height:34px;padding:0 .4rem;border-radius:8px;border:1.5px solid var(--border);background:var(--bg-card);color:var(--text-secondary);cursor:pointer;font-size:.82rem;display:flex;align-items:center;justify-content:center;font-family:"Source Sans 3",sans-serif}
 .ep-page-btn.active{background:var(--primary);color:#fff;border-color:var(--primary);font-weight:700}
 .ep-page-btn:disabled{opacity:.4;cursor:not-allowed}
 .ep-page-info{font-size:.75rem;color:var(--text-muted);text-align:center;margin-top:.4rem}

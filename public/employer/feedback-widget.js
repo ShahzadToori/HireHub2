@@ -66,7 +66,7 @@
 }
 
 .fb-title {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Lexend', sans-serif;
   font-weight: 800;
   font-size: 1.1rem;
   color: var(--text-primary, #161616);
@@ -117,7 +117,7 @@
   border-radius: 20px;
   background: transparent;
   color: var(--text-secondary, #6b7280);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Source Sans 3', sans-serif;
   font-size: .8rem; font-weight: 500;
   cursor: pointer;
   transition: all .15s;
@@ -139,7 +139,7 @@
   border-radius: 12px;
   background: var(--bg-card, #fff);
   color: var(--text-primary, #161616);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Source Sans 3', sans-serif;
   font-size: .85rem;
   resize: vertical;
   box-sizing: border-box;
@@ -166,7 +166,7 @@
   border-radius: 12px;
   background: var(--primary, #0f62fe);
   color: #fff;
-  font-family: 'Syne', sans-serif;
+  font-family: 'Lexend', sans-serif;
   font-weight: 700;
   font-size: .95rem;
   cursor: pointer;
@@ -181,7 +181,7 @@
 }
 .fb-success-icon { font-size: 3rem; margin-bottom: .5rem; }
 .fb-success-title {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Lexend', sans-serif;
   font-weight: 800;
   font-size: 1.1rem;
   color: var(--text-primary, #161616);

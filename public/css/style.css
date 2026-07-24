@@ -1,7 +1,7 @@
 /* ═══════════════════════════════════════════════════════════
    HIREHUB – MAIN STYLESHEET
    Aesthetic: Refined editorial / clean & professional
-   Fonts: Syne (display) + DM Sans (body)
+   Fonts: Lexend (display) + Source Sans 3 (body)
 ═══════════════════════════════════════════════════════════ */
 
 /* ── CSS Variables ─────────────────────────────────────────── */
@@ -36,8 +36,8 @@
   --radius-lg:      20px;
   --radius-xl:      28px;
 
-  --font-display:   'Syne', sans-serif;
-  --font-body:      'DM Sans', sans-serif;
+  --font-display:   'Lexend', sans-serif;
+  --font-body:      'Source Sans 3', sans-serif;
 
   --nav-height:     64px;
   --transition:     all .22s cubic-bezier(.4,0,.2,1);
@@ -417,14 +417,20 @@ img { max-width: 100%; }
   gap:       .4rem;
   flex-wrap: wrap;
   margin-bottom: .75rem;
+  min-height: 22px;
 }
+.card-badges-meta { margin-bottom: .6rem; min-height: 0; }
 
+.badge-featured, .badge-sponsored, .badge-verified {
+  display: inline-flex;
+  align-items: center;
+}
 .badge-featured {
   background: var(--primary);
   color:      white;
   font-size:  .7rem;
   padding:    .2rem .6rem;
-  border-radius: 4px;
+  border-radius: 6px;
   font-weight: 600;
   letter-spacing: .3px;
 }
@@ -433,7 +439,7 @@ img { max-width: 100%; }
   color:      white;
   font-size:  .7rem;
   padding:    .2rem .6rem;
-  border-radius: 4px;
+  border-radius: 6px;
   font-weight: 600;
 }
 .badge-verified {
@@ -441,7 +447,7 @@ img { max-width: 100%; }
   color: white;
   font-size: .7rem;
   padding: .2rem .6rem;
-  border-radius: 4px;
+  border-radius: 6px;
   font-weight: 600;
   letter-spacing: .3px;
 }
@@ -482,6 +488,32 @@ img { max-width: 100%; }
   border:      1px solid rgba(16,185,129,.3);
 }
 
+.card-identity {
+  display: flex;
+  gap: .7rem;
+  margin-bottom: .1rem;
+}
+
+.card-logo {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  overflow: hidden;
+}
+.card-logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.card-identity-text { min-width: 0; }
+
 .card-title {
   font-family:   var(--font-display);
   font-size:     1.05rem;
@@ -513,6 +545,15 @@ img { max-width: 100%; }
   color:       var(--text-muted);
 }
 
+.meta-item-salary {
+  background: rgba(5,150,105,.1);
+  color: #059669;
+  font-weight: 700;
+  padding: .22rem .55rem;
+  border-radius: 6px;
+}
+[data-theme="dark"] .meta-item-salary { background: rgba(52,211,153,.14); color: #34d399; }
+
 .card-desc {
   font-size:   .85rem;
   color:       var(--text-secondary);
@@ -525,19 +566,58 @@ img { max-width: 100%; }
   overflow:    hidden;
 }
 
+/* Two fixed lines (meta, then actions) rather than one line that wraps
+   only when a job happens to have several contact methods — that made
+   cards in the same grid row stretch to different heights depending on
+   content. Stacking always gives every card the same footer shape. */
 .card-footer-row {
-  display:         flex;
+  display:        flex;
+  flex-direction: column;
+  align-items:    stretch;
+  gap:            .5rem;
+  margin-top:     auto;
+  padding-top:    .75rem;
+  border-top:     1px solid var(--border);
+}
+
+.footer-meta-left {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.card-actions {
+  display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items:     center;
-  margin-top:      auto;
-  padding-top:     .75rem;
-  border-top:      1px solid var(--border);
+  gap: .4rem;
+  width: 100%;
 }
 
 .card-date {
   font-size: .78rem;
   color:     var(--text-muted);
 }
+
+.btn-view-details {
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  padding: .4rem .7rem;
+  border-radius: 8px;
+  font-size: .78rem;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: var(--transition);
+}
+.btn-view-details:hover { background: var(--primary-hover); color: #fff; text-decoration: none; }
+.btn-view-details i { font-size: .72rem; }
 
 .card-contacts {
   display:    flex;
@@ -580,7 +660,23 @@ img { max-width: 100%; }
   gap:            1rem;
 }
 .list-view .card-badges { margin-bottom: 0; flex-direction: row; }
-.list-view .card-footer-row { border-top: none; padding-top: 0; margin-left: auto; flex-shrink: 0; }
+.list-view .card-badges-meta,
+.list-view .card-highlights { display: none; }
+.list-view .card-identity { margin-bottom: 0; }
+.list-view .card-footer-row {
+  flex-direction: row;
+  align-items: center;
+  border-top: none;
+  padding-top: 0;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.list-view .card-footer-row .card-actions {
+  margin-left: auto;
+  flex-shrink: 0;
+  width: auto;
+  justify-content: flex-end;
+}
 .list-view .card-desc { display: none; }
 
 /* ── Loading Spinner ────────────────────────────────────────── */
@@ -786,6 +882,32 @@ img { max-width: 100%; }
   color:         var(--text-secondary);
   white-space:   nowrap;
 }
+.meta-chip-salary {
+  background: rgba(5,150,105,.1);
+  border-color: rgba(5,150,105,.25);
+  color: #059669;
+  font-weight: 700;
+}
+[data-theme="dark"] .meta-chip-salary { background: rgba(52,211,153,.14); border-color: rgba(52,211,153,.28); color: #34d399; }
+
+.modal-logo-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  overflow: hidden;
+}
+.modal-logo-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+@media (max-width: 576px) { .modal-logo-avatar { width: 40px; height: 40px; font-size: 1rem; } }
 
 /* Close button */
 .btn-modal-close {
@@ -969,6 +1091,12 @@ img { max-width: 100%; }
 /* ── Ad Zones ───────────────────────────────────────────────── */
 .ad-zone { position: relative; }
 .ad-top { background: var(--surface); border-bottom: 1px solid var(--border); }
+.ad-between-jobs {
+  background:    var(--surface);
+  border:        1px solid var(--border);
+  border-radius: var(--radius);
+  padding:       1rem;
+}
 .ad-label {
   display:       block;
   font-size:     .65rem;
@@ -1042,10 +1170,16 @@ img { max-width: 100%; }
     flex-direction: column;
   }
   .list-view .card-footer-row {
-    margin-left: 0;
+    flex-direction: column;
+    align-items: stretch;
     border-top:  1px solid var(--border);
     padding-top: .75rem;
     width:       100%;
+  }
+  .list-view .card-footer-row .card-actions {
+    margin-left: 0;
+    justify-content: space-between;
+    width: 100%;
   }
 }
 
@@ -1182,6 +1316,19 @@ img { max-width: 100%; }
 /* ═══════════════════════════════════════════════════════════════
    DARK THEME — Fix invisible text
    ═══════════════════════════════════════════════════════════════ */
+
+/* Bootstrap's own .text-muted / .text-secondary utility classes are a fixed
+   gray (~#6c757d) that Bootstrap ships with no dark-mode awareness at all —
+   wherever a page reaches for these instead of var(--text-muted), the text
+   goes near-invisible against our dark backgrounds (e.g. "No approved
+   reviews yet" on public/employers/reviews.html). Overriding them here fixes
+   every page/component that uses these classes, present and future. */
+[data-theme="dark"] .text-muted {
+  color: #8b949e !important;
+}
+[data-theme="dark"] .text-secondary {
+  color: #8b949e !important;
+}
 
 /* Blog card excerpt was using --text-muted (#6e7681) which is
    too dark against --bg-card (#161b22) in dark mode */

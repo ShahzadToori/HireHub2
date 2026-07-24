@@ -449,12 +449,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   const simCss = document.createElement('style');
   simCss.textContent = `
     .similar-jobs-section{margin-top:2.5rem}
-    .sim-heading{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;color:var(--text-primary);margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid var(--border)}
+    .sim-heading{font-family:'Lexend',sans-serif;font-weight:700;font-size:1rem;color:var(--text-primary);margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid var(--border)}
     .sim-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:.85rem}
     @media(max-width:480px){.sim-grid{grid-template-columns:1fr}}
     .sim-card{display:block;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:1rem;text-decoration:none;transition:transform .18s,border-color .18s,box-shadow .18s}
     .sim-card:hover{transform:translateY(-2px);border-color:var(--primary);box-shadow:0 6px 20px rgba(0,0,0,.08);text-decoration:none}
-    .sim-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;color:var(--text-primary);margin-bottom:.25rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .sim-title{font-family:'Lexend',sans-serif;font-weight:700;font-size:.88rem;color:var(--text-primary);margin-bottom:.25rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
     .sim-company{font-size:.78rem;color:var(--text-muted);margin-bottom:.35rem}
     .sim-meta{display:flex;justify-content:space-between;align-items:center;font-size:.73rem;color:var(--text-muted);margin-bottom:.5rem}
     .sim-time{font-size:.7rem}

@@ -169,7 +169,8 @@ router.get('/', validate(searchSchema, 'query'), async (req, res) => {
               j.phone, j.whatsapp, j.email, j.map_link, j.apply_link,
               j.featured, j.sponsored, j.slug, j.created_at, j.views,
               j.salary, j.visa_sponsored, j.verified,
-              c.name AS category, c.slug AS category_slug
+              c.name AS category, c.slug AS category_slug,
+              e.logo_url AS employer_logo
          FROM jobs j
          JOIN categories c ON j.category_id = c.id
          LEFT JOIN employers e ON e.id = j.employer_id
@@ -406,7 +407,8 @@ router.get('/batch/:batchId', async (req, res) => {
 router.get('/:slug', async (req, res) => {
   try {
     const [rows] = await db.query(
-      `SELECT j.*, c.name AS category, c.slug AS category_slug
+      `SELECT j.*, c.name AS category, c.slug AS category_slug,
+              e.logo_url AS employer_logo
          FROM jobs j
          JOIN categories c ON j.category_id = c.id
          LEFT JOIN employers e ON e.id = j.employer_id

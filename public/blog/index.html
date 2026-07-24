@@ -10,12 +10,12 @@
   <link rel="icon" type="image/png" href="/JobOrbitFavicon.png">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700;800&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
   <style>
     .blog-hero{background:linear-gradient(135deg,#0d1117 0%,#161b22 60%,#0f2744 100%);padding:4rem 0 3rem;text-align:center;position:relative;overflow:hidden;background-size:cover;background-position:center;background-blend-mode:overlay}
     .blog-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(15,98,254,.18) 0%,transparent 70%)}
-    .blog-hero-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.75rem,4vw,2.75rem);color:#fff;margin-bottom:.6rem;position:relative}
+    .blog-hero-title{font-family:'Lexend',sans-serif;font-weight:800;font-size:clamp(1.75rem,4vw,2.75rem);color:#fff;margin-bottom:.6rem;position:relative}
     .blog-hero-sub{color:rgba(255,255,255,.6);font-size:.95rem;max-width:540px;margin:0 auto;position:relative}
     .cat-pill{display:inline-flex;align-items:center;padding:.35rem .9rem;border-radius:100px;border:1.5px solid var(--border);background:var(--bg-card);color:var(--text-secondary);font-size:.8rem;font-weight:600;cursor:pointer;transition:all .15s;text-decoration:none;border:none}
     .cat-pill:hover,.cat-pill.active{background:var(--primary);color:#fff;text-decoration:none}
@@ -25,7 +25,7 @@
     .blog-card-img-placeholder{width:100%;height:180px;background:linear-gradient(135deg,var(--surface),var(--border));display:flex;align-items:center;justify-content:center;font-size:2.5rem;color:var(--text-muted)}
     .blog-card-body{padding:1.25rem;flex:1;display:flex;flex-direction:column}
     .blog-card-cat{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--primary);margin-bottom:.4rem}
-    .blog-card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;color:var(--text-primary);line-height:1.4;margin-bottom:.5rem;flex:1}
+    .blog-card-title{font-family:'Lexend',sans-serif;font-weight:700;font-size:1rem;color:var(--text-primary);line-height:1.4;margin-bottom:.5rem;flex:1}
     .blog-card-excerpt{font-size:.83rem;color:var(--text-muted);line-height:1.6;margin-bottom:.75rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
     .blog-card-meta{display:flex;align-items:center;justify-content:space-between;font-size:.73rem;color:var(--text-muted);border-top:1px solid var(--border);padding-top:.75rem;margin-top:auto}
     .blog-card-link{display:block;text-decoration:none;height:100%}
@@ -34,7 +34,7 @@
     .featured-card img{width:100%;height:320px;object-fit:cover}
     @media(max-width:768px){.featured-card img{height:220px}}
     .featured-card-body{padding:1.75rem}
-    .featured-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.25rem,3vw,1.75rem);color:var(--text-primary);line-height:1.3;margin-bottom:.65rem}
+    .featured-title{font-family:'Lexend',sans-serif;font-weight:800;font-size:clamp(1.25rem,3vw,1.75rem);color:var(--text-primary);line-height:1.3;margin-bottom:.65rem}
     .search-bar{display:flex;gap:.5rem;margin-bottom:1.5rem}
     .search-bar input{flex:1;padding:.6rem 1rem;border:1.5px solid var(--border);border-radius:10px;background:var(--bg-card);color:var(--text-primary);font-size:.9rem}
     .search-bar input:focus{outline:none;border-color:var(--primary)}
@@ -226,7 +226,7 @@ function toggleTheme() {
   const saved = localStorage.getItem('theme') || 'light';
   applyTheme(saved, false);
   const btn = document.getElementById('themeToggle');
-  if (btn) btn.addEventListener('click', toggleTheme);
+  if (btn && !btn.dataset.themeWired) { btn.dataset.themeWired = '1'; btn.addEventListener('click', toggleTheme); }
 })();
 </script>
 </body>

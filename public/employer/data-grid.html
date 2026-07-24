@@ -10,14 +10,14 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700;800&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/employer/employer.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tabulator-tables@6.2.5/dist/css/tabulator.min.css">
   <style>
 /* ── Type tabs ── */
 .dg-type-tabs{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.75rem}
-.dg-type-btn{display:flex;align-items:center;gap:.35rem;padding:.45rem .9rem;border:1px solid var(--border);border-radius:8px;background:var(--bg-card);color:var(--text-secondary);font-family:'DM Sans',sans-serif;font-size:.83rem;font-weight:500;cursor:pointer;transition:all .15s;min-height:40px;white-space:nowrap}
+.dg-type-btn{display:flex;align-items:center;gap:.35rem;padding:.45rem .9rem;border:1px solid var(--border);border-radius:8px;background:var(--bg-card);color:var(--text-secondary);font-family:'Source Sans 3',sans-serif;font-size:.83rem;font-weight:500;cursor:pointer;transition:all .15s;min-height:40px;white-space:nowrap}
 .dg-type-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
 .dg-type-btn:hover:not(.active){background:var(--surface);color:var(--text-primary)}
 /* ── Toolbar ── */
@@ -44,7 +44,7 @@
 /* ── Grid wrapper ── */
 #dataGrid{border-radius:12px;overflow:hidden;border:1px solid var(--border);margin-bottom:1.5rem}
 /* ── Tabulator overrides ── */
-.tabulator{font-family:'DM Sans',sans-serif;font-size:.82rem;border:none;background:var(--bg-card)}
+.tabulator{font-family:'Source Sans 3',sans-serif;font-size:.82rem;border:none;background:var(--bg-card)}
 .tabulator-header{background:var(--surface);border-bottom:2px solid var(--border)}
 .tabulator-header .tabulator-col{background:var(--surface);border-right:1px solid var(--border);color:var(--text-secondary);font-weight:600;font-size:.73rem;text-transform:uppercase;letter-spacing:.05em}
 .tabulator-header .tabulator-col:hover{background:var(--border)}
@@ -57,7 +57,7 @@
 .tabulator-cell.tabulator-editing{border:2px solid var(--primary)!important;padding:0!important;background:var(--bg-card)!important}
 .tabulator-cell.tabulator-editing input,
 .tabulator-cell.tabulator-editing select,
-.tabulator-cell.tabulator-editing textarea{width:100%;height:100%;min-height:32px;border:none;background:var(--bg-card);color:var(--text-primary);font-family:'DM Sans',sans-serif;font-size:.82rem;padding:.4rem .65rem;outline:none;box-sizing:border-box}
+.tabulator-cell.tabulator-editing textarea{width:100%;height:100%;min-height:32px;border:none;background:var(--bg-card);color:var(--text-primary);font-family:'Source Sans 3',sans-serif;font-size:.82rem;padding:.4rem .65rem;outline:none;box-sizing:border-box}
 .tabulator-footer{background:var(--surface);border-top:1px solid var(--border)}
 .tabulator-footer .tabulator-page{background:var(--bg-card);border:1px solid var(--border);color:var(--text-primary);border-radius:5px;padding:.18rem .5rem;margin:0 .12rem;cursor:pointer}
 .tabulator-footer .tabulator-page.active{background:var(--primary);color:#fff;border-color:var(--primary)}
@@ -86,7 +86,7 @@
 .sh-f{margin-bottom:.9rem}
 .sh-f label{display:block;font-size:.82rem;font-weight:600;color:var(--text-secondary);margin-bottom:.3rem}
 .sh-priv{display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden}
-.sh-priv-btn{flex:1;padding:.5rem .4rem;background:transparent;border:none;color:var(--text-secondary);font-family:'DM Sans',sans-serif;font-size:.8rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.35rem;transition:all .15s;text-align:center}
+.sh-priv-btn{flex:1;padding:.5rem .4rem;background:transparent;border:none;color:var(--text-secondary);font-family:'Source Sans 3',sans-serif;font-size:.8rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.35rem;transition:all .15s;text-align:center}
 .sh-priv-btn.active{background:var(--primary);color:#fff}
 .sh-link{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.6rem .85rem;font-size:.77rem;word-break:break-all;color:var(--primary);margin-top:.75rem;display:none}
 .sh-link-inner{display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem}
@@ -110,12 +110,12 @@
 .dg-flt select{height:32px;font-size:.79rem;padding:.2rem .45rem;border-radius:8px;border:1.5px solid var(--border);background:var(--bg-card);color:var(--text-primary);cursor:pointer;width:100%}
 .dg-flt select.active{border-color:var(--primary);color:var(--primary);background:rgba(15,98,254,.07);font-weight:600}
 .dg-dd-wrap{position:relative}
-.dg-dd-btn{display:flex;align-items:center;justify-content:space-between;gap:.3rem;width:100%;height:32px;padding:.2rem .55rem;border-radius:8px;border:1.5px solid var(--border);background:var(--bg-card);color:var(--text-primary);font-size:.79rem;cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif}
+.dg-dd-btn{display:flex;align-items:center;justify-content:space-between;gap:.3rem;width:100%;height:32px;padding:.2rem .55rem;border-radius:8px;border:1.5px solid var(--border);background:var(--bg-card);color:var(--text-primary);font-size:.79rem;cursor:pointer;text-align:left;font-family:'Source Sans 3',sans-serif}
 .dg-dd-btn.active{border-color:var(--primary);color:var(--primary);background:rgba(15,98,254,.07);font-weight:600}
 .dg-dd-btn span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
 .dg-dd-panel{position:absolute;top:calc(100% + 4px);left:0;z-index:3000;background:var(--bg-card);border:1.5px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.15);display:none;min-width:190px;max-width:280px}
 .dg-dd-panel.show{display:block}
-.dg-dd-search{width:100%;padding:.4rem .65rem;border:none;border-bottom:1px solid var(--border);font-size:.8rem;background:var(--bg-card);color:var(--text-primary);outline:none;border-radius:10px 10px 0 0;font-family:'DM Sans',sans-serif}
+.dg-dd-search{width:100%;padding:.4rem .65rem;border:none;border-bottom:1px solid var(--border);font-size:.8rem;background:var(--bg-card);color:var(--text-primary);outline:none;border-radius:10px 10px 0 0;font-family:'Source Sans 3',sans-serif}
 .dg-dd-opts{max-height:200px;overflow-y:auto;padding:.25rem}
 .dg-dd-opt{display:flex;align-items:center;gap:.5rem;padding:.38rem .55rem;border-radius:6px;cursor:pointer;font-size:.8rem;color:var(--text-primary);user-select:none}
 .dg-dd-opt:hover{background:var(--surface)}
@@ -424,7 +424,7 @@ function nativeSelectEditor(cell,onRendered,success,cancel,editorParams){
     if(v===cell.getValue())o.selected=true;
     sel.appendChild(o);
   });
-  sel.style.cssText='width:100%;height:100%;border:none;background:var(--bg-card);color:var(--text-primary);font-family:DM Sans,sans-serif;font-size:.82rem;cursor:pointer;outline:none;';
+  sel.style.cssText='width:100%;height:100%;border:none;background:var(--bg-card);color:var(--text-primary);font-family:Source Sans 3,sans-serif;font-size:.82rem;cursor:pointer;outline:none;';
   let _done=false;
   sel.addEventListener('change',()=>{_done=true;success(sel.value);});
   sel.addEventListener('blur',()=>{if(!_done)cancel();});
@@ -1037,7 +1037,7 @@ function openPicker(cell, values){
   values.forEach(v=>{
     const active=v===String(current||'');
     const btn=document.createElement('button');
-    btn.style.cssText='display:flex;align-items:center;gap:.6rem;width:100%;padding:.75rem 1rem;border:1px solid '+(active?'var(--primary)':'var(--border)')+';border-radius:10px;background:'+(active?'rgba(15,98,254,.08)':'transparent')+';color:'+(active?'var(--primary)':'var(--text-primary)')+';font-family:DM Sans,sans-serif;font-size:.88rem;font-weight:'+(active?'600':'400')+';text-align:left;cursor:pointer;margin-bottom:.45rem;text-transform:capitalize';
+    btn.style.cssText='display:flex;align-items:center;gap:.6rem;width:100%;padding:.75rem 1rem;border:1px solid '+(active?'var(--primary)':'var(--border)')+';border-radius:10px;background:'+(active?'rgba(15,98,254,.08)':'transparent')+';color:'+(active?'var(--primary)':'var(--text-primary)')+';font-family:Source Sans 3,sans-serif;font-size:.88rem;font-weight:'+(active?'600':'400')+';text-align:left;cursor:pointer;margin-bottom:.45rem;text-transform:capitalize';
     btn.innerHTML='<i class="bi '+(active?'bi-check-circle-fill':'bi-circle')+'" style="color:'+(active?'var(--primary)':'var(--text-muted)')+'"></i>'+v.charAt(0).toUpperCase()+v.slice(1);
     btn.addEventListener('click',()=>{
       overlay.remove();
@@ -1051,7 +1051,7 @@ function openPicker(cell, values){
     sheet.appendChild(btn);
   });
   const cancel=document.createElement('button');
-  cancel.style.cssText='display:block;width:100%;padding:.65rem;border:none;background:transparent;color:var(--text-muted);font-family:DM Sans,sans-serif;font-size:.85rem;cursor:pointer;margin-top:.25rem';
+  cancel.style.cssText='display:block;width:100%;padding:.65rem;border:none;background:transparent;color:var(--text-muted);font-family:Source Sans 3,sans-serif;font-size:.85rem;cursor:pointer;margin-top:.25rem';
   cancel.textContent='Cancel';
   cancel.addEventListener('click',()=>overlay.remove());
   sheet.appendChild(cancel);
@@ -1073,7 +1073,7 @@ init();
   var WARN=25*60*1000,LOGOUT=30*60*1000;
   var warnT,logoutT,shown=false;
   function reset(){clearTimeout(warnT);clearTimeout(logoutT);if(shown)hide();warnT=setTimeout(warn,WARN);logoutT=setTimeout(auto,LOGOUT)}
-  function warn(){shown=true;var el=document.getElementById('inactWarn');if(!el){el=document.createElement('div');el.id='inactWarn';el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';el.innerHTML='<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:2rem;max-width:380px;width:100%;text-align:center"><div style="font-size:2rem;margin-bottom:.5rem">⏰</div><h3 style="font-family:Syne,sans-serif;font-weight:800;color:var(--text-primary);margin-bottom:.5rem">Still there?</h3><p style="color:var(--text-secondary);font-size:.9rem">You\'ll be logged out in <strong id="inactCD">5:00</strong></p><div style="display:flex;gap:.75rem;justify-content:center;margin-top:1.25rem"><button class="ep-btn-primary" onclick="keepIn()">Keep me logged in</button><button class="ep-btn-outline" onclick="logoutNow()">Logout</button></div></div>';document.body.appendChild(el);var s=300;var ci=setInterval(function(){s--;var e=document.getElementById('inactCD');if(e)e.textContent=Math.floor(s/60)+':'+(s%60<10?'0':'')+s%60;if(s<=0)clearInterval(ci)},1000)}el.style.display='flex'}
+  function warn(){shown=true;var el=document.getElementById('inactWarn');if(!el){el=document.createElement('div');el.id='inactWarn';el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';el.innerHTML='<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:2rem;max-width:380px;width:100%;text-align:center"><div style="font-size:2rem;margin-bottom:.5rem">⏰</div><h3 style="font-family:Lexend,sans-serif;font-weight:800;color:var(--text-primary);margin-bottom:.5rem">Still there?</h3><p style="color:var(--text-secondary);font-size:.9rem">You\'ll be logged out in <strong id="inactCD">5:00</strong></p><div style="display:flex;gap:.75rem;justify-content:center;margin-top:1.25rem"><button class="ep-btn-primary" onclick="keepIn()">Keep me logged in</button><button class="ep-btn-outline" onclick="logoutNow()">Logout</button></div></div>';document.body.appendChild(el);var s=300;var ci=setInterval(function(){s--;var e=document.getElementById('inactCD');if(e)e.textContent=Math.floor(s/60)+':'+(s%60<10?'0':'')+s%60;if(s<=0)clearInterval(ci)},1000)}el.style.display='flex'}
   function hide(){shown=false;var el=document.getElementById('inactWarn');if(el)el.style.display='none'}
   function auto(){fetch('/api/employer/logout',{method:'POST',credentials:'include'});window.location.href='/employer/?reason=timeout'}
   window.keepIn=function(){hide();reset();fetch('/api/employer/me',{credentials:'include'})};

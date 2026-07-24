@@ -1027,7 +1027,7 @@ router.post('/apply/:jobId', publicFormLimiter, cvUpload.single('cv'),
           to: email.trim(),
           subject: `Application Received — ${job.title} at ${job.company}`,
           html: `
-            <div style="font-family:'DM Sans',Arial,sans-serif;max-width:560px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;border:1px solid #e5e7eb">
+            <div style="font-family:'Source Sans 3',Arial,sans-serif;max-width:560px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;border:1px solid #e5e7eb">
               <div style="background:#0f62fe;padding:2rem 1.5rem">
                 <h1 style="color:#fff;font-size:1.4rem;margin:0;font-weight:800">Application Received ✅</h1>
               </div>
@@ -1058,7 +1058,7 @@ router.post('/apply/:jobId', publicFormLimiter, cvUpload.single('cv'),
         await sendMailEmp({
           to: emp.email,
           subject: `📥 New Application — ${job.title}`,
-          html: `<div style="font-family:'DM Sans',Arial,sans-serif;max-width:560px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;border:1px solid #e5e7eb">
+          html: `<div style="font-family:'Source Sans 3',Arial,sans-serif;max-width:560px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;border:1px solid #e5e7eb">
             <div style="background:#0f62fe;padding:2rem 1.5rem">
               <h1 style="color:#fff;font-size:1.4rem;margin:0;font-weight:800">New Application 📥</h1>
             </div>

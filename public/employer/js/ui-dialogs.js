@@ -24,9 +24,9 @@
     style.textContent = `
       #uiDialogOverlay{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;background:rgba(15,23,42,.55);backdrop-filter:blur(2px);padding:1rem}
       #uiDialogOverlay.show{display:flex}
-      .ui-dialog-box{background:var(--bg-card,#fff);border:1px solid var(--border,#e5e7eb);border-radius:16px;box-shadow:0 20px 50px rgba(0,0,0,.25);max-width:400px;width:100%;padding:1.5rem;font-family:'DM Sans',sans-serif;animation:uiDialogPop .16s ease}
+      .ui-dialog-box{background:var(--bg-card,#fff);border:1px solid var(--border,#e5e7eb);border-radius:16px;box-shadow:0 20px 50px rgba(0,0,0,.25);max-width:400px;width:100%;padding:1.5rem;font-family:'Source Sans 3',sans-serif;animation:uiDialogPop .16s ease}
       @keyframes uiDialogPop{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
-      .ui-dialog-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;color:var(--text-primary,#111827);margin:0 0 .5rem}
+      .ui-dialog-title{font-family:'Lexend',sans-serif;font-weight:700;font-size:1.05rem;color:var(--text-primary,#111827);margin:0 0 .5rem}
       .ui-dialog-msg{font-size:.88rem;color:var(--text-secondary,#6b7280);margin:0 0 1.25rem;line-height:1.5;white-space:pre-line}
       .ui-dialog-actions{display:flex;gap:.6rem;justify-content:flex-end}
       .ui-dialog-btn{border:none;border-radius:10px;padding:.55rem 1.1rem;font-size:.85rem;font-weight:600;cursor:pointer;transition:opacity .15s,transform .1s}

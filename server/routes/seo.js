@@ -9,11 +9,12 @@
 
 'use strict';
 
-const express = require('express');
-const fs      = require('fs');
-const path    = require('path');
-const db      = require('../db/connection');
-const router  = express.Router();
+const express    = require('express');
+const fs         = require('fs');
+const path       = require('path');
+const db         = require('../db/connection');
+const htmlLayout = require('../middleware/htmlLayout');
+const router     = express.Router();
 
 // Shared apply-form partial — single source of truth, also used by the
 // homepage job-detail modal (see public/js/apply-form.js + htmlLayout.js)
@@ -366,10 +367,8 @@ router.get('/job/:slug', async (req, res, next) => {
     );
     const siteUrl  = await getSiteUrl();
     const siteName = await getSiteName();
-    const logoUrl  = await getLogoUrl();
     const titleFmt = await getSetting('meta_title_format', '');
     const ga4Id    = await getSetting('ga4_id', '');
-    const logoSrc  = logoUrl.startsWith('http') ? logoUrl : `${siteUrl}${logoUrl}`;
     const pageTitle = titleFmt
       ? titleFmt.replace('{title}', job.title||'').replace('{company}', job.company||'').replace('{site}', siteName||'')
       : `${job.title} at ${job.company} – ${siteName}`;
@@ -488,12 +487,12 @@ if (job.whatsapp) {
     `Hello, I am very interested in this position. Please find my details attached. Thank you.`;
   whatsappUrl = `https://wa.me/${clean}?text=${encodeURIComponent(msg)}`;
 }
-const applyLinkBtn = job.apply_link ? `<a href="${he(job.apply_link)}" class="cbtn" target="_blank"><i>🔗</i> Apply Link</a>` : '';
+const applyLinkBtn = job.apply_link ? `<a href="${he(job.apply_link)}" class="cbtn" target="_blank"><i class="bi bi-box-arrow-up-right"></i>Apply Link</a>` : '';
 const contactBtns = [
-  job.phone    ? `<a href="tel:${he(job.phone)}"    class="cbtn"><i>📞</i> ${he(job.phone)}</a>` : '',
-  job.whatsapp ? `<a href="${whatsappUrl}" class="cbtn" target="_blank"><i>💬</i> WhatsApp</a>` : '',
-  job.email    ? `<a href="mailto:${he(job.email)}" class="cbtn"><i>✉️</i> ${he(job.email)}</a>` : '',
-  job.map_link ? `<a href="${he(job.map_link)}"     class="cbtn" target="_blank"><i>📍</i> View Location</a>` : '',
+  job.phone    ? `<a href="tel:${he(job.phone)}"    class="cbtn cbtn-phone"><i class="bi bi-telephone-fill"></i>${he(job.phone)}</a>` : '',
+  job.whatsapp ? `<a href="${whatsappUrl}" class="cbtn cbtn-wa" target="_blank"><i class="bi bi-whatsapp"></i>WhatsApp</a>` : '',
+  job.email    ? `<a href="mailto:${he(job.email)}" class="cbtn"><i class="bi bi-envelope-fill"></i>${he(job.email)}</a>` : '',
+  job.map_link ? `<a href="${he(job.map_link)}"     class="cbtn" target="_blank"><i class="bi bi-geo-alt-fill"></i>View Location</a>` : '',
   applyLinkBtn
 ].filter(Boolean).join('\n          ');
 
@@ -508,6 +507,11 @@ const contactBtns = [
   <meta name="description" content="${he(metaDesc)}">
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
   <link rel="canonical" href="${he(canonical)}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700;800&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/apply-form.css">
 
   <!-- Open Graph -->
@@ -528,90 +532,128 @@ const contactBtns = [
   <script type="application/ld+json">${JSON.stringify(breadcrumb)}</script>
 
   <style>
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f8f9fa;color:#161616;line-height:1.65}
-    a{color:#0f62fe;text-decoration:none}
-    a:hover{text-decoration:underline}
-    .wrap{max-width:780px;margin:0 auto;padding:2rem 1.25rem}
+    *{box-sizing:border-box;}
+    body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary);line-height:1.65;}
+    a{color:var(--primary);text-decoration:none;}
+    a:hover{text-decoration:underline;}
+    .wrap{max-width:1180px;margin:0 auto;padding:2rem 1.25rem 3rem;}
 
-    .seo-header{height:64px;display:flex;align-items:center;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid #e5e7eb;position:sticky;top:0;z-index:100}
-    .seo-header-inner{max-width:780px;margin:0 auto;padding:0 1.25rem;width:100%;display:flex;align-items:center}
-    .seo-logo{height:36px;display:block}
+    .top-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:.6rem;}
+    .back{display:inline-flex;align-items:center;gap:.4rem;font-size:.85rem;font-weight:600;color:var(--text-secondary);}
+    .back:hover{color:var(--primary);text-decoration:none;}
+    .bc{font-size:.79rem;color:var(--text-muted);display:flex;flex-wrap:wrap;gap:.3rem;align-items:center;}
+    .bc a{color:var(--text-muted);font-weight:500;}
+    .bc a:hover{color:var(--primary);}
+    .bc span{color:#c3c9d1;}
 
-    .bc{font-size:.82rem;color:#6b7280;margin-bottom:1.5rem;display:flex;flex-wrap:wrap;gap:.3rem;align-items:center}
-    .bc a{color:#0f62fe}
-    .bc span{color:#9ca3af}
+    /* ===== two-column layout: main content + recommended-jobs sidebar ===== */
+    .page-grid{display:grid;grid-template-columns:1fr 300px;gap:2rem;align-items:start;}
+    @media(max-width:920px){.page-grid{grid-template-columns:1fr;}}
+    .aside-sticky{position:sticky;top:80px;}
+    @media(max-width:920px){.aside-sticky{position:static;}}
 
-    .back{display:inline-flex;align-items:center;gap:.3rem;color:#0f62fe;font-size:.88rem;margin-bottom:1.5rem}
-    .back:hover{text-decoration:underline}
+    .card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-lg);}
+    .accent-bar{height:4px;background:transparent;}
+    .card.is-featured .accent-bar{background:linear-gradient(90deg,var(--primary),#5aa2ff);}
+    .card.is-sponsored .accent-bar{background:linear-gradient(90deg,var(--accent),#ffab7d);}
 
-    .card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;overflow:hidden;margin-bottom:1.5rem;box-shadow:0 2px 12px rgba(0,0,0,.06)}
-    .card-head{padding:1.75rem 2rem 1.5rem;border-bottom:1px solid #f1f3f4}
-    .card-body{padding:1.75rem 2rem}
-    .apply-section{background:#f8fafc;border-top:1px solid #f1f3f4}
+    .card-head{padding:2.25rem 2.25rem 1.75rem;background:linear-gradient(180deg,var(--surface) 0%,var(--bg-card) 100%);border-bottom:1px solid var(--border);}
+    .card-body{padding:2.25rem;}
+    .apply-section{padding:2.25rem;background:var(--surface);border-top:1px solid var(--border);}
 
-    .job-head{display:flex;gap:1rem;align-items:flex-start;margin-bottom:.85rem}
-    .company-avatar{width:54px;height:54px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.4rem;color:#fff;background:linear-gradient(135deg,#0f62fe,#1a56db);overflow:hidden}
-    .company-avatar img{width:100%;height:100%;object-fit:cover;display:block}
-    .job-head-info{flex:1;min-width:0;padding-top:.1rem}
-    .company-name{font-size:.92rem;color:#475569;font-weight:600;margin-top:.25rem}
+    .ribbon-row{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1rem;min-height:22px;}
+    .ribbon{display:inline-flex;align-items:center;gap:.3rem;font-size:.68rem;font-weight:700;padding:.24rem .6rem;border-radius:6px;color:#fff;}
+    .ribbon i{font-size:.65rem;}
+    .ribbon-featured{background:var(--primary);}
+    .ribbon-sponsored{background:var(--accent);}
+    .ribbon-verified{background:#059669;}
 
-    .badges{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.75rem}
-    .badge{display:inline-block;padding:.22rem .7rem;border-radius:100px;font-size:.72rem;font-weight:600;letter-spacing:.3px}
-    .b-cat{background:#e8f0fe;color:#1a56db}
-    .b-type{background:transparent;color:#0f62fe;border:1px solid #0f62fe}
-    .b-feat{background:#0f62fe;color:#fff}
-    .b-spon{background:#ff6b35;color:#fff}
-    .b-visa{background:#dcfce7;color:#166534}
-    .b-cv{background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0}
+    .eyebrow{font-size:.78rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.6rem;}
+    .eyebrow a{color:var(--text-muted);}
+    .eyebrow a:hover{color:var(--primary);}
 
-    h1{font-size:clamp(1.4rem,3vw,1.9rem);font-weight:800;color:#0f172a;margin-bottom:0;line-height:1.2}
+    h1{font-size:clamp(1.5rem,2.6vw,2.05rem);font-family:var(--font-display);font-weight:800;line-height:1.18;margin:0 0 .9rem;color:var(--text-primary);}
 
-    .meta-grid{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1rem}
-    .chip{display:inline-flex;align-items:center;gap:.3rem;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:100px;padding:.28rem .8rem;font-size:.8rem;color:#475569}
-    .chip-salary{background:#dcfce7;border-color:#bbf7d0;color:#166534;font-weight:700}
+    .job-head{display:flex;align-items:center;gap:.85rem;margin-bottom:1.4rem;}
+    .company-avatar{width:52px;height:52px;border-radius:13px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:800;font-size:1.3rem;color:var(--text-secondary);background:var(--surface);border:1px solid var(--border);overflow:hidden;}
+    .company-avatar img{width:100%;height:100%;object-fit:cover;display:block;}
+    .job-head-info{flex:1;min-width:0;}
+    .company-name{font-weight:700;font-size:1rem;color:var(--text-primary);}
+    .company-sub{font-size:.8rem;color:var(--text-muted);margin-top:.1rem;}
 
-    .section-label{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#9ca3af;margin-bottom:.85rem;padding-bottom:.5rem;border-bottom:1px solid #f1f3f4}
-    .desc{font-size:.95rem;line-height:1.85;color:#334155;white-space:pre-line}
+    .meta-grid{display:flex;flex-wrap:wrap;align-items:center;gap:.15rem 0;font-size:.87rem;color:var(--text-secondary);margin-bottom:.9rem;}
+    .chip{display:inline-flex;align-items:center;gap:.4rem;padding:.2rem .9rem .2rem 0;}
+    .chip i{color:var(--text-muted);font-size:.95rem;}
+    .chip-salary{font-weight:700;color:#059669;}
+    .chip-salary i{color:#059669;}
+    [data-theme="dark"] .chip-salary,[data-theme="dark"] .chip-salary i{color:#34d399;}
 
-    .apply-head{font-size:1.05rem;font-weight:700;color:#0f172a;margin-bottom:.6rem}
-    .apply-sub{font-size:.875rem;color:#64748b;margin-top:.6rem;margin-bottom:0}
-    .apply-cta{display:flex;align-items:center;justify-content:center;gap:.5rem;width:100%;background:#0f62fe;color:#fff;border:none;border-radius:10px;padding:.85rem 1.5rem;font-weight:700;font-size:.95rem;cursor:pointer;text-decoration:none;font-family:inherit;transition:background .15s}
-    .apply-cta:hover{background:#0353e9;text-decoration:none}
-    .apply-divider{display:flex;align-items:center;gap:.75rem;margin:1.25rem 0;font-size:.72rem;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em}
-    .apply-divider::before,.apply-divider::after{content:'';flex:1;height:1px;background:#e5e7eb}
+    .badges{display:flex;flex-wrap:wrap;gap:.5rem;}
+    .badge{display:inline-flex;align-items:center;gap:.35rem;font-size:.78rem;font-weight:600;padding:.3rem .7rem;border-radius:100px;background:none;border:1px solid var(--border);color:var(--text-secondary);}
+    .badge i{color:#059669;}
+    .badge.warn i{color:#d97706;}
+    [data-theme="dark"] .badge i{color:#34d399;}
+    [data-theme="dark"] .badge.warn i{color:#fbbf24;}
 
-    .contact-row{display:flex;flex-wrap:wrap;gap:.65rem}
-    .cbtn{display:inline-flex;align-items:center;gap:.4rem;padding:.6rem 1.25rem;border-radius:9px;font-weight:600;font-size:.875rem;text-decoration:none;background:#fff;color:#334155;border:1.5px solid #e2e8f0;transition:border-color .15s,background .15s}
-    .cbtn:hover{border-color:#0f62fe;background:#f8faff;text-decoration:none}
+    .section-label{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;}
+    .desc{font-size:.98rem;line-height:1.85;color:var(--text-secondary);white-space:pre-line;max-width:66ch;}
+    .section-gap{margin-top:1.9rem;padding-top:1.9rem;border-top:1px solid var(--border);}
 
-    .cnt-picker{position:relative}
-    .cnt-dropdown{position:absolute;top:calc(100% + 3px);left:0;right:0;background:#fff;border:1px solid #e5e7eb;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:2000;max-height:210px;overflow-y:auto;display:none}
-    .cnt-dropdown.show{display:block}
-    .cnt-option{padding:.48rem .75rem;cursor:pointer;font-size:.83rem;color:#161616}
-    .cnt-option:hover{background:#f9fafb}
-    .cnt-option strong{color:#0f62fe;font-weight:700}
+    .apply-head{font-size:1.15rem;font-weight:800;font-family:var(--font-display);color:var(--text-primary);margin-bottom:.3rem;}
+    .apply-sub{font-size:.85rem;color:var(--text-secondary);margin-top:.6rem;margin-bottom:0;}
+    .apply-cta{display:inline-flex;align-items:center;justify-content:center;gap:.6rem;width:100%;background:var(--primary);color:#fff;border:none;border-radius:12px;padding:1rem 1.5rem;font-weight:700;font-size:1rem;cursor:pointer;text-decoration:none;font-family:var(--font-display);transition:background .15s,transform .1s;box-shadow:0 10px 24px -8px rgba(15,98,254,.45);}
+    .apply-cta:hover{background:var(--primary-hover);text-decoration:none;transform:translateY(-1px);}
+    .apply-divider{display:flex;align-items:center;gap:.85rem;margin:1.5rem 0;font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em;}
+    .apply-divider::before,.apply-divider::after{content:'';flex:1;height:1px;background:var(--border);}
 
-    /* Similar Jobs */
-    .sim-section{margin-top:2rem}
-    .sim-heading{font-size:1.05rem;font-weight:700;color:#0f172a;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid #e5e7eb}
-    .sim-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.85rem}
-    .sim-card{display:block;background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:1rem;text-decoration:none;transition:border-color .15s,box-shadow .15s}
-    .sim-card:hover{border-color:#0f62fe;box-shadow:0 4px 16px rgba(15,98,254,.08);text-decoration:none}
-    .sim-title{font-weight:700;font-size:.9rem;color:#0f172a;margin-bottom:.3rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-    .sim-company{font-size:.78rem;color:#64748b;margin-bottom:.3rem}
-    .sim-meta{display:flex;flex-wrap:wrap;gap:.4rem;font-size:.75rem;color:#94a3b8;margin-bottom:.3rem}
-    .sim-salary{font-size:.78rem;font-weight:700;color:#166534}
+    .contact-row{display:flex;flex-wrap:wrap;gap:.6rem;}
+    .cbtn{display:inline-flex;align-items:center;gap:.5rem;padding:.65rem 1.15rem;border-radius:10px;font-weight:600;font-size:.86rem;text-decoration:none;background:var(--bg-card);color:var(--text-primary);border:1.5px solid var(--border);transition:border-color .15s,background .15s;}
+    .cbtn:hover{border-color:var(--primary);background:var(--primary-light);text-decoration:none;}
+    .cbtn i{color:var(--text-secondary);}
+    .cbtn-phone i{color:#059669;}
+    .cbtn-wa i{color:#25d366;}
+    [data-theme="dark"] .cbtn-phone i{color:#34d399;}
 
-    footer{margin-top:3rem;padding:1.5rem 1.25rem;text-align:center;font-size:.8rem;color:#9ca3af;border-top:1px solid #e5e7eb}
+    .trust-note{display:flex;gap:.6rem;align-items:flex-start;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:.75rem .95rem;font-size:.79rem;color:var(--text-secondary);margin-top:1.4rem;}
+    .trust-note i{color:#059669;flex-shrink:0;margin-top:1px;}
+    [data-theme="dark"] .trust-note i{color:#34d399;}
+    .trust-note b{color:var(--text-primary);}
 
-    /* Mobile sticky apply bar */
-    .mobile-apply-bar{display:none}
+    .report-line{margin-top:1.75rem;text-align:center;font-size:.78rem;color:var(--text-muted);}
+    .report-line a{color:var(--text-muted);}
+    .report-line a:hover{color:var(--text-secondary);}
+
+    .cnt-picker{position:relative;}
+    .cnt-dropdown{position:absolute;top:calc(100% + 3px);left:0;right:0;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow-lg);z-index:2000;max-height:210px;overflow-y:auto;display:none;}
+    .cnt-dropdown.show{display:block;}
+    .cnt-option{padding:.48rem .75rem;cursor:pointer;font-size:.83rem;color:var(--text-primary);}
+    .cnt-option:hover{background:var(--surface);}
+    .cnt-option strong{color:var(--primary);font-weight:700;}
+
+    /* Sidebar — Recommended Jobs only */
+    .side-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.4rem;box-shadow:var(--shadow-sm);}
+    .side-card-title{display:flex;align-items:center;gap:.5rem;font-family:var(--font-display);font-weight:800;font-size:.98rem;color:var(--text-primary);margin-bottom:1.1rem;}
+    .side-card-title i{color:var(--primary);}
+    .rec-row{display:flex;gap:.7rem;padding:.85rem 0;border-bottom:1px solid var(--border);text-decoration:none;transition:opacity .15s;}
+    .rec-row:first-child{padding-top:0;}
+    .rec-row:last-child{border-bottom:none;padding-bottom:0;}
+    .rec-row:hover{opacity:.7;text-decoration:none;}
+    .rec-avatar{width:36px;height:36px;border-radius:9px;flex-shrink:0;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:800;font-size:.85rem;color:var(--text-secondary);overflow:hidden;}
+    .rec-text{min-width:0;}
+    .rec-title{font-weight:700;font-size:.85rem;color:var(--text-primary);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:.2rem;}
+    .rec-meta{font-size:.74rem;color:var(--text-muted);}
+    .rec-salary{font-size:.75rem;font-weight:700;color:#059669;margin-top:.15rem;}
+    [data-theme="dark"] .rec-salary{color:#34d399;}
+    .browse-all-link{display:flex;align-items:center;justify-content:center;gap:.35rem;margin-top:1.1rem;padding-top:1rem;border-top:1px solid var(--border);font-size:.82rem;font-weight:600;}
+
+    /* Mobile sticky apply bar — sits just above the shared mobile bottom nav
+       (64px) rather than at the very bottom, so the two don't overlap. */
+    .mobile-apply-bar{display:none;}
     @media(max-width:600px){
-      .card-head,.card-body{padding:1.25rem}
-      .wrap{padding-bottom:5.5rem}
-      .mobile-apply-bar{display:flex;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e5e7eb;padding:.65rem 1rem;box-shadow:0 -4px 16px rgba(0,0,0,.08);z-index:500}
-      .mobile-apply-bar .apply-cta{margin:0}
+      .card-head,.card-body,.apply-section{padding:1.4rem;}
+      .wrap{padding-bottom:9.5rem;}
+      .mobile-apply-bar{display:flex;position:fixed;bottom:64px;left:0;right:0;background:var(--bg-card);border-top:1px solid var(--border);padding:.65rem 1rem;box-shadow:0 -4px 16px rgba(0,0,0,.08);z-index:500;}
+      .mobile-apply-bar .apply-cta{margin:0;}
     }
   </style>
 ${ga4Script}
@@ -620,110 +662,123 @@ ${verifyTags}
 </head>
 <body>
 
-<header class="seo-header">
-  <div class="seo-header-inner">
-    <a href="${siteUrl}/"><img src="${he(logoSrc)}" alt="${he(siteName)}" class="seo-logo"></a>
-  </div>
-</header>
+<!-- NAVBAR -->
 
 <div class="wrap">
-  <a class="back" href="/">← All Jobs</a>
-
-  <nav class="bc" aria-label="Breadcrumb">
-    <a href="/">Jobs</a>
-    <span>›</span>
-    <a href="/?category=${he(job.cat_slug)}">${he(job.category)}</a>
-    <span>›</span>
-    <span>${he(job.title)}</span>
-  </nav>
-
-  <div class="card">
-    <div class="card-head">
-      <div class="job-head">
-        <div class="company-avatar">
-          ${employerLogo ? `<img src="${he(employerLogoSrc)}" alt="${he(job.company)}" onerror="this.parentElement.textContent='${he(companyInitial)}';this.remove();">` : he(companyInitial)}
-        </div>
-        <div class="job-head-info">
-          <h1>${he(job.title)}</h1>
-          <div class="company-name">${he(job.company) || 'Company name not provided'}</div>
-        </div>
-      </div>
-      <div class="badges">
-        ${job.featured  == 1 ? '<span class="badge b-feat">⭐ Featured</span>' : ''}
-        ${job.sponsored == 1 ? '<span class="badge b-spon">Sponsored</span>' : ''}
-        <span class="badge b-cat">${he(job.category)}</span>
-        <span class="badge b-type">${he(job.job_type || 'Full-time')}</span>
-        ${job.visa_sponsored == 1 ? '<span class="badge b-visa">✈️ Visa Sponsored</span>' : ''}
-        ${job.require_cv == 1 ? '<span class="badge b-cv">📄 CV Required</span>' : ''}
-      </div>
-      <div class="meta-grid">
-        <span class="chip">📍 ${he(job.location)}</span>
-        ${salaryDisplay ? `<span class="chip chip-salary">💰 ${he(salaryDisplay)}</span>` : ''}
-        ${job.positions > 1 ? `<span class="chip">👥 ${job.positions} positions</span>` : ''}
-        <span class="chip">🗓 ${postedAgo}</span>
-      </div>
-    </div>
-    <div class="card-body">
-      <div class="section-label">Job Description</div>
-      <div class="desc">${he(job.description)}</div>
-      ${job.requirements ? `<div class="section-label" style="margin-top:1.25rem">Requirements</div>
-      <div class="desc">${he(job.requirements)}</div>` : ''}
-    </div>
-    <div class="card-body apply-section">
-      <div class="apply-head">${job.employer_id ? 'Apply for this Job' : 'Apply Now'}</div>
-      ${job.employer_id ? `
-      <button class="apply-cta" onclick="openApplyForm(${job.id}, ${he(JSON.stringify(job.title))})">📩 Apply Now</button>
-      <p class="apply-sub">${he(job.company) || 'The employer'} will review your application directly on ${he(siteName)}.</p>
-      ` : ''}
-      ${contactBtns ? `
-      ${job.employer_id
-        ? '<div class="apply-divider">Or contact directly</div>'
-        : `<p class="apply-sub" style="margin-top:0;margin-bottom:1.1rem">Contact ${he(job.company) || 'the employer'} directly — no middlemen.</p>`}
-      <div class="contact-row">${contactBtns}</div>
-      ` : ''}
-      ${(!job.employer_id && !contactBtns) ? '<p style="color:#9ca3af;font-size:.88rem">No contact info provided.</p>' : ''}
-      <p style="margin-top:1.1rem;font-size:.78rem;color:#9ca3af">
-        Or <a href="/">browse more jobs</a> on ${he(siteName)}
-      </p>
-    </div>
+  <div class="top-row">
+    <a class="back" href="/"><i class="bi bi-arrow-left"></i>All Jobs</a>
+    <nav class="bc" aria-label="Breadcrumb">
+      <a href="/">Jobs</a>
+      <span>/</span>
+      <a href="/?category=${he(job.cat_slug)}">${he(job.category)}</a>
+      <span>/</span>
+      <span>${he(job.title)}</span>
+    </nav>
   </div>
 
-  <!-- Phase 2: Similar Jobs -->
-  ${simRows.length > 0 ? `
-  <div class="sim-section">
-    <h2 class="sim-heading">Similar Jobs in ${he(job.category)}</h2>
-    <div class="sim-grid">
-      ${simRows.map(j => `
-      <a href="${siteUrl}/job/${xe(j.slug)}" class="sim-card">
-        <div class="sim-title">${he(j.title)}</div>
-        <div class="sim-company">🏢 ${he(j.company) || he(siteName)}</div>
-        <div class="sim-meta">
-          <span>📍 ${he(j.location)}</span>
-          <span>${he(j.job_type || 'Full-time')}</span>
+  <div class="page-grid">
+    <div>
+      <div class="card${job.featured == 1 ? ' is-featured' : job.sponsored == 1 ? ' is-sponsored' : ''}">
+        <div class="accent-bar"></div>
+        <div class="card-head">
+          <div class="ribbon-row">
+            ${job.featured  == 1 ? '<span class="ribbon ribbon-featured"><i class="bi bi-star-fill"></i>Featured</span>' : ''}
+            ${job.sponsored == 1 ? '<span class="ribbon ribbon-sponsored"><i class="bi bi-megaphone-fill"></i>Sponsored</span>' : ''}
+            ${job.verified  == 1 ? '<span class="ribbon ribbon-verified"><i class="bi bi-patch-check-fill"></i>Verified Employer</span>' : ''}
+          </div>
+          <div class="eyebrow"><a href="/?category=${he(job.cat_slug)}">${he(job.category)}</a> · ${he(job.job_type || 'Full-time')} · Posted ${postedAgo}</div>
+          <h1>${he(job.title)}</h1>
+          <div class="job-head">
+            <div class="company-avatar">
+              ${employerLogo ? `<img src="${he(employerLogoSrc)}" alt="${he(job.company)}" onerror="this.parentElement.textContent='${he(companyInitial)}';this.remove();">` : he(companyInitial)}
+            </div>
+            <div class="job-head-info">
+              <div class="company-name">${he(job.company) || 'Company name not provided'}</div>
+              <div class="company-sub">${he(job.location)}</div>
+            </div>
+          </div>
+          <div class="meta-grid">
+            <span class="chip"><i class="bi bi-geo-alt"></i>${he(job.location)}</span>
+            ${job.positions > 1 ? `<span class="chip"><i class="bi bi-people"></i>${job.positions} positions</span>` : ''}
+            ${job.views ? `<span class="chip"><i class="bi bi-eye"></i>${job.views} views</span>` : ''}
+            ${salaryDisplay ? `<span class="chip chip-salary"><i class="bi bi-cash-stack"></i>${he(salaryDisplay)}</span>` : ''}
+          </div>
+          ${(job.visa_sponsored == 1 || job.require_cv == 1) ? `
+          <div class="badges">
+            ${job.visa_sponsored == 1 ? '<span class="badge"><i class="bi bi-check-circle-fill"></i>Visa Sponsored</span>' : ''}
+            ${job.require_cv == 1 ? '<span class="badge warn"><i class="bi bi-file-earmark-text-fill"></i>CV Required</span>' : ''}
+          </div>` : ''}
         </div>
-        ${j.salary ? `<div class="sim-salary">💰 ${he(j.salary)}</div>` : ''}
-      </a>`).join('')}
-    </div>
-  </div>` : ''}
+        <div class="card-body">
+          <div class="section-label"><i class="bi bi-file-earmark-text"></i>Job Description</div>
+          <div class="desc">${he(job.description)}</div>
+          ${job.requirements ? `<div class="section-gap">
+          <div class="section-label"><i class="bi bi-list-check"></i>Requirements</div>
+          <div class="desc">${he(job.requirements)}</div>
+          </div>` : ''}
+        </div>
+        <div class="apply-section">
+          <div class="apply-head">${job.employer_id ? 'Apply for this Job' : 'Apply Now'}</div>
+          ${job.employer_id ? `
+          <p class="apply-sub" style="margin-top:0;margin-bottom:1.25rem">${he(job.company) || 'The employer'} will review your application directly on ${he(siteName)}.</p>
+          <button class="apply-cta" onclick="openApplyForm(${job.id}, ${he(JSON.stringify(job.title))})"><i class="bi bi-send-fill"></i>Apply Now</button>
+          ` : ''}
+          ${contactBtns ? `
+          ${job.employer_id
+            ? '<div class="apply-divider">Or contact directly</div>'
+            : `<p class="apply-sub" style="margin-top:0;margin-bottom:1.1rem">Contact ${he(job.company) || 'the employer'} directly — no middlemen.</p>`}
+          <div class="contact-row">${contactBtns}</div>
+          ` : ''}
+          ${(!job.employer_id && !contactBtns) ? '<p style="color:var(--text-muted);font-size:.88rem">No contact info provided.</p>' : ''}
+          <div class="trust-note">
+            <i class="bi bi-shield-check"></i>
+            <div><b>${salaryDisplay && job.visa_sponsored ? 'Transparent listing' : 'About this listing'}</b> — this employer disclosed ${[salaryDisplay ? 'salary' : '', job.visa_sponsored ? 'visa status' : '', contactBtns ? 'direct contact details' : ''].filter(Boolean).join(', ') || 'basic job details'}.</div>
+          </div>
+          <p style="margin-top:1.1rem;font-size:.78rem;color:var(--text-muted)">
+            Or <a href="/">browse more jobs</a> on ${he(siteName)}
+          </p>
+        </div>
+      </div>
 
-  <!-- Phase 2: Report a Job link -->
-  <p style="margin-top:2rem;text-align:center;font-size:.78rem;color:#9ca3af">
-    ⚑ <a href="/feedback.html?type=report_job&subject=${encodeURIComponent('Job Report: ' + job.title)}&msg=${encodeURIComponent('Listing URL: ' + (process.env.SITE_URL || 'https://joborbit.org') + '/job/' + job.slug + '\n\nReason: ')}" style="color:#9ca3af">Report this listing</a> if it appears fake, expired, or inappropriate.
-  </p>
+      <p class="report-line">
+        <i class="bi bi-flag"></i>
+        <a href="/feedback.html?type=report_job&subject=${encodeURIComponent('Job Report: ' + job.title)}&msg=${encodeURIComponent('Listing URL: ' + (process.env.SITE_URL || 'https://joborbit.org') + '/job/' + job.slug + '\n\nReason: ')}">Report this listing</a> if it appears fake, expired, or inappropriate.
+      </p>
+    </div>
+
+    ${simRows.length > 0 ? `
+    <div>
+      <div class="aside-sticky">
+        <div class="side-card">
+          <div class="side-card-title"><i class="bi bi-briefcase-fill"></i>Recommended Jobs</div>
+          ${simRows.map(j => `
+          <a href="${siteUrl}/job/${xe(j.slug)}" class="rec-row">
+            <div class="rec-avatar">${he((j.company || '?').trim().charAt(0).toUpperCase() || '?')}</div>
+            <div class="rec-text">
+              <div class="rec-title">${he(j.title)}</div>
+              <div class="rec-meta">${he(j.company) || he(siteName)} · ${he(j.location)}</div>
+              ${j.salary ? `<div class="rec-salary">${he(j.salary)}</div>` : ''}
+            </div>
+          </a>`).join('')}
+          <a href="/" class="browse-all-link">Browse all jobs<i class="bi bi-arrow-right"></i></a>
+        </div>
+      </div>
+    </div>` : ''}
+  </div>
 </div>
 
 ${(job.employer_id || job.whatsapp || job.phone || job.email) ? `
 <div class="mobile-apply-bar">
   ${job.employer_id
-    ? `<button class="apply-cta" onclick="openApplyForm(${job.id}, ${he(JSON.stringify(job.title))})">📩 Apply Now</button>`
+    ? `<button class="apply-cta" onclick="openApplyForm(${job.id}, ${he(JSON.stringify(job.title))})"><i class="bi bi-send-fill"></i>Apply Now</button>`
     : job.whatsapp
-      ? `<a href="${whatsappUrl}" target="_blank" class="apply-cta">💬 WhatsApp</a>`
+      ? `<a href="${whatsappUrl}" target="_blank" class="apply-cta"><i class="bi bi-whatsapp"></i>WhatsApp</a>`
       : job.phone
-        ? `<a href="tel:${he(job.phone)}" class="apply-cta">📞 Call Now</a>`
-        : `<a href="mailto:${he(job.email)}" class="apply-cta">✉️ Email</a>`}
+        ? `<a href="tel:${he(job.phone)}" class="apply-cta"><i class="bi bi-telephone-fill"></i>Call Now</a>`
+        : `<a href="mailto:${he(job.email)}" class="apply-cta"><i class="bi bi-envelope-fill"></i>Email</a>`}
 </div>` : ''}
 
-<footer>© ${new Date().getFullYear()} ${he(siteName)}. All rights reserved.</footer>
+<!-- FOOTER -->
 
 <script>
   (function() {
@@ -745,7 +800,10 @@ ${readApplyFormPartial()}
 
     res.set('Content-Type', 'text/html; charset=utf-8');
     res.set('Cache-Control', 'public, max-age=3600');
-    res.send(html);
+    // Only swap in the shared NAVBAR/FOOTER partials here — this page already
+    // builds its own GA4/verification tags inline above, so running the full
+    // htmlLayout.injectAnalytics() too would duplicate those scripts.
+    res.send(htmlLayout.inject(html));
   } catch (err) {
     console.error('SSR job page error:', err);
     next(); // fallback to SPA

@@ -7,15 +7,15 @@
   <link rel="icon" href="/JobOrbitFavicon.png">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700;800&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
   <style>
-  body{font-family:'DM Sans',sans-serif;background:var(--bg)}
+  body{font-family:'Source Sans 3',sans-serif;background:var(--bg)}
   .req-wrap{max-width:640px;margin:0 auto;padding:1rem 1rem 5rem}
   .req-card{background:var(--bg-card);border:1.5px solid var(--border);border-radius:16px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 2px 8px rgba(0,0,0,.05)}
   .req-hero-card{text-align:left}
-  .req-hero-avatar{width:64px;height:64px;border-radius:14px;background:var(--primary);color:#fff;font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0}
-  .req-company-name{font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;color:var(--text-primary);margin:.1rem 0 .4rem}
+  .req-hero-avatar{width:64px;height:64px;border-radius:14px;background:var(--primary);color:#fff;font-family:'Lexend',sans-serif;font-weight:800;font-size:1.6rem;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0}
+  .req-company-name{font-family:'Lexend',sans-serif;font-weight:800;font-size:1.3rem;color:var(--text-primary);margin:.1rem 0 .4rem}
   .req-badge{display:inline-flex;align-items:center;gap:.25rem;font-size:.72rem;font-weight:600;padding:.2rem .55rem;border-radius:20px;background:rgba(15,98,254,.1);color:var(--primary)}
   .req-hero-stats{display:flex;justify-content:flex-start;flex-wrap:wrap;gap:.4rem 1rem;margin:1rem 0;padding:.85rem 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
   .req-stat-item{font-size:.8rem;color:var(--text-secondary);display:flex;align-items:center;gap:.25rem}
@@ -24,7 +24,7 @@
   .req-btn-phone:hover{border-color:var(--primary);color:var(--primary)}
   .req-btn-wa{background:#25d366;color:#fff;border-color:#25d366}
   .req-btn-wa:hover{background:#1fba59;color:#fff;border-color:#1fba59}
-  .req-section-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.8rem;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:.85rem}
+  .req-section-title{font-family:'Lexend',sans-serif;font-weight:700;font-size:.8rem;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:.85rem}
   .pos-row{display:flex;align-items:flex-start;gap:.65rem;padding:.8rem 0;border-bottom:1px solid var(--border)}
   .pos-row:last-child{border-bottom:none}
   .pos-num{width:24px;height:24px;border-radius:6px;background:var(--surface);color:var(--text-muted);font-size:.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
@@ -53,13 +53,13 @@
   .apply-sheet-handle{width:40px;height:4px;border-radius:2px;background:var(--border);margin:0 auto .75rem}
   .apply-field{margin-bottom:.85rem}
   .apply-label{font-size:.78rem;font-weight:600;color:var(--text-secondary);margin-bottom:.3rem;display:block}
-  .apply-input{width:100%;padding:.6rem .85rem;border:1.5px solid var(--border);border-radius:10px;background:var(--bg-card);color:var(--text-primary);font-family:'DM Sans',sans-serif;font-size:.88rem;outline:none;transition:border-color .15s}
+  .apply-input{width:100%;padding:.6rem .85rem;border:1.5px solid var(--border);border-radius:10px;background:var(--bg-card);color:var(--text-primary);font-family:'Source Sans 3',sans-serif;font-size:.88rem;outline:none;transition:border-color .15s}
   .apply-input:focus{border-color:var(--primary)}
   .apply-row{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
-  .apply-submit{width:100%;padding:.7rem;border-radius:10px;background:var(--primary);color:#fff;border:none;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;margin-top:.5rem;transition:background .15s}
+  .apply-submit{width:100%;padding:.7rem;border-radius:10px;background:var(--primary);color:#fff;border:none;font-family:'Source Sans 3',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;margin-top:.5rem;transition:background .15s}
   .apply-submit:hover{background:#0050e6}
   .apply-submit:disabled{background:var(--text-muted);cursor:not-allowed}
-  .apply-job-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;color:var(--text-primary);margin-bottom:.2rem}
+  .apply-job-title{font-family:'Lexend',sans-serif;font-weight:700;font-size:1.05rem;color:var(--text-primary);margin-bottom:.2rem}
   .apply-job-meta{font-size:.78rem;color:var(--text-muted);margin-bottom:1.1rem}
   </style>
 </head>
@@ -76,9 +76,12 @@
   applyTheme(localStorage.getItem('theme')||'light',false);
   document.addEventListener('DOMContentLoaded',function(){
     var btn=document.getElementById('themeToggle');
-    if(btn)btn.addEventListener('click',function(){
-      applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');
-    });
+    if(btn&&!btn.dataset.themeWired){
+      btn.dataset.themeWired='1';
+      btn.addEventListener('click',function(){
+        applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');
+      });
+    }
   });
   window.toggleTheme=function(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');};
 })();
@@ -108,7 +111,7 @@
   <!-- Error state -->
   <div id="reqError" style="display:none;text-align:center;padding:3rem 1rem">
     <div style="font-size:2.5rem;margin-bottom:.75rem">🔍</div>
-    <h2 style="font-family:'Syne',sans-serif;font-weight:800;color:var(--text-primary)">Requirement Not Found</h2>
+    <h2 style="font-family:'Lexend',sans-serif;font-weight:800;color:var(--text-primary)">Requirement Not Found</h2>
     <p style="color:var(--text-secondary)">This requirement may have expired or been removed.</p>
     <a href="/" class="req-btn-phone" style="display:inline-flex;margin-top:1rem">Browse all jobs</a>
   </div>

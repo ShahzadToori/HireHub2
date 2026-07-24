@@ -72,7 +72,7 @@
   <!-- ══ Styles ════════════════════════════════════════════════ -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700;800&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/apply-form.css">
   <style>
@@ -108,7 +108,7 @@
     .city-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.1);border-color:var(--primary)}
     [data-theme="dark"] .city-card:hover{box-shadow:0 8px 24px rgba(0,0,0,.35)}
     .city-flag{font-size:1.8rem;display:block;margin-bottom:.35rem;line-height:1}
-    .city-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;color:var(--text-primary)}
+    .city-name{font-family:'Lexend',sans-serif;font-weight:700;font-size:.88rem;color:var(--text-primary)}
     .city-count{font-size:.7rem;color:var(--text-muted);margin-top:.2rem}
     #filterCount{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;border-radius:9px;background:var(--primary);color:#fff;font-size:.62rem;font-weight:700;padding:0 .3rem;margin-left:.2rem;vertical-align:middle}
     /* ═══════════════════════════════════════════
@@ -155,7 +155,7 @@
     /* ═══════════════════════════════════════════
        PHASE 2 — WHATSAPP ALERTS BUTTON
     ═══════════════════════════════════════════ */
-    .btn-wa-alerts{display:flex;align-items:center;justify-content:center;gap:.5rem;width:100%;padding:.75rem;border-radius:11px;background:var(--primary);color:#fff;border:none;font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;transition:background .15s,transform .12s}
+    .btn-wa-alerts{display:flex;align-items:center;justify-content:center;gap:.5rem;width:100%;padding:.75rem;border-radius:11px;background:var(--primary);color:#fff;border:none;font-family:'Lexend',sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;transition:background .15s,transform .12s}
     .btn-wa-alerts:hover{background:#0353e9;transform:translateY(-1px)}
     .btn-wa-channel{display:inline-flex;align-items:center;background:#25D366;color:#fff;padding:.65rem 1.5rem;border-radius:50px;font-weight:700;font-size:.88rem;text-decoration:none;transition:all .2s;box-shadow:0 4px 15px rgba(37,211,102,.3)}
     .btn-wa-channel:hover{background:#1ebe5d;color:#fff;transform:translateY(-2px);box-shadow:0 6px 20px rgba(37,211,102,.4)}
@@ -187,10 +187,10 @@
     .jotd-card:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(15,98,254,.18)}
     @media(max-width:576px){.jotd-card{flex-direction:column;align-items:flex-start;padding:1.25rem}}
     .jotd-badge{display:inline-flex;align-items:center;gap:.3rem;background:var(--primary);color:#fff;font-size:.65rem;font-weight:700;padding:.2rem .65rem;border-radius:100px;letter-spacing:.05em;text-transform:uppercase;margin-bottom:.5rem}
-    .jotd-title{font-family:"Syne",sans-serif;font-weight:800;font-size:1.2rem;color:var(--text-primary);margin-bottom:.35rem}
+    .jotd-title{font-family:"Lexend",sans-serif;font-weight:800;font-size:1.2rem;color:var(--text-primary);margin-bottom:.35rem}
     .jotd-meta{display:flex;flex-wrap:wrap;gap:.6rem;font-size:.82rem;color:var(--text-muted)}
     .jotd-meta span{display:flex;align-items:center;gap:.25rem}
-    .jotd-cta{margin-left:auto;flex-shrink:0;background:var(--primary);color:#fff;padding:.6rem 1.5rem;border-radius:10px;font-family:"Syne",sans-serif;font-weight:700;font-size:.88rem;border:none;cursor:pointer;white-space:nowrap;transition:background .15s}
+    .jotd-cta{margin-left:auto;flex-shrink:0;background:var(--primary);color:#fff;padding:.6rem 1.5rem;border-radius:10px;font-family:"Lexend",sans-serif;font-weight:700;font-size:.88rem;border:none;cursor:pointer;white-space:nowrap;transition:background .15s}
     .jotd-cta:hover{background:#0353e9}
     @media(max-width:576px){.jotd-cta{width:100%;margin-left:0}}
     /* ═══════════════════════════════════════════
@@ -499,14 +499,18 @@
       <!-- Sticky Header -->
       <div class="job-modal-header">
         <div class="d-flex justify-content-between align-items-start gap-3">
-          <div class="flex-grow-1">
-            <div id="modalBadges" class="d-flex flex-wrap gap-1 mb-2"></div>
-            <h3 class="modal-job-title" id="modalTitle">Loading…</h3>
-            <div class="modal-job-meta d-flex flex-wrap gap-2 mt-2">
-              <span class="meta-chip"><i class="bi bi-building me-1"></i><span id="modalCompany"></span></span>
-              <span class="meta-chip"><i class="bi bi-geo-alt me-1"></i><span id="modalLocation"></span></span>
-              <span class="meta-chip"><i class="bi bi-briefcase me-1"></i><span id="modalType"></span></span>
-              <span class="meta-chip"><i class="bi bi-tag me-1"></i><span id="modalCategory"></span></span>
+          <div class="d-flex gap-3 flex-grow-1" style="min-width:0">
+            <div class="modal-logo-avatar" id="modalLogoAvatar"></div>
+            <div class="flex-grow-1" style="min-width:0">
+              <div id="modalBadges" class="d-flex flex-wrap gap-1 mb-2"></div>
+              <h3 class="modal-job-title" id="modalTitle">Loading…</h3>
+              <div class="modal-job-meta d-flex flex-wrap gap-2 mt-2">
+                <span class="meta-chip"><i class="bi bi-building me-1"></i><span id="modalCompany"></span></span>
+                <span class="meta-chip"><i class="bi bi-geo-alt me-1"></i><span id="modalLocation"></span></span>
+                <span class="meta-chip meta-chip-salary d-none" id="modalSalaryWrap"><i class="bi bi-cash-stack me-1"></i><span id="modalSalary"></span></span>
+                <span class="meta-chip"><i class="bi bi-briefcase me-1"></i><span id="modalType"></span></span>
+                <span class="meta-chip"><i class="bi bi-tag me-1"></i><span id="modalCategory"></span></span>
+              </div>
             </div>
           </div>
           <button type="button" class="btn-modal-close flex-shrink-0" data-bs-dismiss="modal" aria-label="Close">

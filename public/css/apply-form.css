@@ -36,7 +36,7 @@
   align-items: center;
   justify-content: space-between;
 }
-.af-title { margin: 0; font-size: 1.05rem; font-weight: 800; color: var(--text-primary, #161616); font-family: 'Syne', sans-serif; }
+.af-title { margin: 0; font-size: 1.05rem; font-weight: 800; color: var(--text-primary, #161616); font-family: 'Lexend', sans-serif; }
 .af-subtitle { margin: .2rem 0 0; font-size: .78rem; color: var(--text-muted, #6b7280); }
 .af-close-btn { background: none; border: none; font-size: 1.3rem; line-height: 1; cursor: pointer; color: var(--text-muted, #6b7280); padding: 0; }
 
@@ -87,7 +87,7 @@
   font-weight: 700;
   cursor: pointer;
   font-size: .88rem;
-  font-family: 'Syne', sans-serif;
+  font-family: 'Lexend', sans-serif;
 }
 .af-btn-primary:disabled { opacity: .7; cursor: not-allowed; }
 .af-btn-secondary {

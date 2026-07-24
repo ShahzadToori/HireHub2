@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Login — JobOrbit Employer</title>
+  <title>Sign In / Create Account — JobOrbit Employer</title>
   <meta name="robots" content="noindex,nofollow">
   <link rel="icon" href="/JobOrbitFavicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700;800&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/employer/employer.css">
 </head>
@@ -41,72 +41,239 @@
 </div>
 <div class="ep-auth-page">
   <div class="ep-auth-left">
-    <a href="/" class="ep-auth-logo">
-      <img src="/uploads/logo-1772305890056.svg" alt="JobOrbit" style="height:40px;filter:brightness(10)">
-    </a>
-    <h1>Find the Right Workers.<br>Faster.</h1>
-    <p>Post jobs, manage applications, and build your talent pool — all in one place. Free forever.</p>
-    <div class="ep-auth-features">
-      <div class="ep-auth-feat"><i class="bi bi-check-circle-fill"></i>Free job posting</div>
-      <div class="ep-auth-feat"><i class="bi bi-check-circle-fill"></i>Pre-screened candidates</div>
-      <div class="ep-auth-feat"><i class="bi bi-check-circle-fill"></i>Gulf-specific filters</div>
-      <div class="ep-auth-feat"><i class="bi bi-check-circle-fill"></i>Application inbox</div>
-      <div class="ep-auth-feat"><i class="bi bi-check-circle-fill"></i>Job templates</div>
+    <div>
+      <a href="/" class="ep-auth-logo">
+        <img src="/uploads/logo-1772305890056.svg" alt="JobOrbit" style="height:40px;filter:brightness(10)">
+      </a>
+      <h1>Hire the Right Workers.<br>Faster.</h1>
+      <p>Post jobs, manage applications, and build your talent pool — all in one place. Free forever.</p>
+      <div class="ep-auth-features">
+        <div class="ep-auth-feat"><i class="bi bi-check-circle-fill"></i>Free job posting</div>
+        <div class="ep-auth-feat"><i class="bi bi-check-circle-fill"></i>Gulf-specific filters</div>
+        <div class="ep-auth-feat"><i class="bi bi-check-circle-fill"></i>Application inbox</div>
+        <div class="ep-auth-feat"><i class="bi bi-check-circle-fill"></i>Job templates</div>
+      </div>
+    </div>
+    <div class="ep-auth-region">
+      <div class="ep-auth-region-label">WHERE EMPLOYERS ARE HIRING</div>
+      <div class="ep-auth-region-list">
+        <span>Saudi Arabia</span><span>UAE</span><span>Qatar</span><span>Kuwait</span>
+      </div>
     </div>
   </div>
   <div class="ep-auth-right">
     <div class="ep-auth-card">
-      <h2 style="font-size:1.3rem;font-weight:800;margin-bottom:1.25rem;color:var(--text)">Sign In</h2>
 
-      <!-- LOGIN -->
-      <div id="loginForm">
-        <div class="ep-field">
-          <label class="ep-label">Email Address</label>
-          <input type="email" class="ep-input" id="loginEmail" placeholder="company@email.com" autocomplete="email">
+      <div class="ep-auth-tabs">
+        <button type="button" class="ep-auth-tab active" id="tabLogin" onclick="showAuthTab('login')">Sign In</button>
+        <button type="button" class="ep-auth-tab" id="tabSignup" onclick="showAuthTab('signup')">Create Account</button>
+      </div>
+
+      <!-- LOGIN PANEL -->
+      <div id="loginPanel">
+        <div id="loginForm">
+          <div class="ep-field">
+            <label class="ep-label">Email Address</label>
+            <div class="ep-input-wrap">
+              <i class="bi bi-envelope ep-input-icon-left"></i>
+              <input type="email" class="ep-input has-icon" id="loginEmail" placeholder="company@email.com" autocomplete="email">
+            </div>
+          </div>
+          <div class="ep-field">
+            <label class="ep-label">Password</label>
+            <div class="ep-input-wrap">
+              <i class="bi bi-lock ep-input-icon-left"></i>
+              <input type="password" class="ep-input has-icon" id="loginPass" placeholder="Your password" autocomplete="current-password">
+              <button class="ep-input-eye" onclick="togglePass('loginPass',this)" type="button"><i class="bi bi-eye"></i></button>
+            </div>
+          </div>
+          <div class="ep-remember-row">
+            <label class="ep-remember-label">
+              <input type="checkbox" id="rememberMe">
+              Remember me <span style="color:var(--text-muted)">· 30 days</span>
+            </label>
+            <a href="#" class="ep-forgot-link" onclick="showForgot();return false">Forgot password?</a>
+          </div>
+          <div id="loginMsg" class="ep-msg d-none"></div>
+          <button class="ep-btn-primary w-100 mt-2" onclick="doLogin()">
+            <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+          </button>
+          <div class="ep-trust-row">
+            <span class="ep-trust-item"><i class="bi bi-shield-check"></i>Encrypted &amp; private</span>
+            <span class="ep-trust-item"><i class="bi bi-check-circle"></i>No card required</span>
+          </div>
+          <p style="text-align:center;margin-top:1rem;font-size:.85rem;color:var(--text-muted)">
+            New to JobOrbit? <a href="#" onclick="showAuthTab('signup');return false" style="color:var(--primary);font-weight:600;text-decoration:none">Create a free account</a>
+          </p>
         </div>
-        <div class="ep-field">
-          <label class="ep-label">Password</label>
-          <div class="ep-input-wrap">
-            <input type="password" class="ep-input" id="loginPass" placeholder="Your password" autocomplete="current-password">
-            <button class="ep-input-eye" onclick="togglePass('loginPass',this)"><i class="bi bi-eye"></i></button>
+
+        <!-- FORGOT PASSWORD -->
+        <div id="forgotForm" class="d-none">
+          <p style="font-size:.85rem;color:var(--text-secondary);margin-bottom:1rem">
+            Enter the email address associated with your account, and we'll send you a link to reset your password.
+          </p>
+          <div class="ep-field">
+            <label class="ep-label">Email Address</label>
+            <input type="email" class="ep-input" id="forgotEmail" placeholder="company@email.com" autocomplete="email">
+          </div>
+          <div id="forgotMsg" class="ep-msg d-none"></div>
+          <button class="ep-btn-primary w-100 mt-2" onclick="doForgotPassword()">
+            <i class="bi bi-envelope-fill me-2"></i>Send Reset Link
+          </button>
+          <button class="ep-btn-outline w-100 mt-2" onclick="backToLogin()">
+            <i class="bi bi-arrow-left me-2"></i>Back to Sign In
+          </button>
+        </div>
+      </div>
+
+      <!-- SIGNUP PANEL (3-step wizard) -->
+      <div id="signupPanel" class="d-none">
+        <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:1.25rem">
+          Your account will be reviewed before you can post jobs — usually within 24 hours.
+        </p>
+
+        <div class="ep-stepper">
+          <div class="ep-stepper-track">
+            <div class="ep-stepper-seg current" id="regSeg1"><i></i></div>
+            <div class="ep-stepper-seg" id="regSeg2"><i></i></div>
+            <div class="ep-stepper-seg" id="regSeg3"><i></i></div>
+          </div>
+          <div class="ep-stepper-labels">
+            <span class="active" id="regLab1">Company</span>
+            <span id="regLab2">Location</span>
+            <span id="regLab3">Account</span>
           </div>
         </div>
-        <div class="ep-remember-row">
-          <label class="ep-remember-label">
-            <input type="checkbox" id="rememberMe" style="margin-right:.5rem">
-            Remember me on this device
-          </label>
-          <span style="font-size:.75rem;color:var(--text-muted)">30 days</span>
+
+        <!-- STEP 1: Company -->
+        <div class="ep-step-panel active" id="regStep1">
+          <div class="ep-field">
+            <label class="ep-label">Company Name <span class="text-danger">*</span></label>
+            <input type="text" class="ep-input" id="regCompany" maxlength="200" placeholder="e.g. Al-Rajhi Contracting">
+          </div>
+          <div class="row g-2">
+            <div class="col-sm-6">
+              <div class="ep-field">
+                <label class="ep-label">Your Name <span class="text-danger">*</span></label>
+                <input type="text" class="ep-input" id="regName" maxlength="100" placeholder="Contact person">
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="ep-field">
+                <label class="ep-label">Phone / WhatsApp</label>
+                <input type="tel" class="ep-input" id="regPhone" maxlength="30" placeholder="+966 5XX XXX XXXX">
+              </div>
+            </div>
+          </div>
+          <div class="ep-field">
+            <label class="ep-label">Sector</label>
+            <select class="ep-input" id="regSector">
+              <option value="">Select sector</option>
+              <option>Construction</option>
+              <option>Oil & Gas</option>
+              <option>Healthcare</option>
+              <option>Technology</option>
+              <option>Manufacturing</option>
+              <option>Hospitality</option>
+              <option>Finance</option>
+              <option>Education</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div id="regStep1Msg" class="ep-msg d-none"></div>
+          <button class="ep-btn-primary w-100 mt-2" type="button" onclick="goRegStep(2)">
+            Continue<i class="bi bi-arrow-right ms-2"></i>
+          </button>
         </div>
-        <div style="text-align:right;margin-top:-.4rem;margin-bottom:.6rem">
-          <a href="#" onclick="showForgot();return false" style="font-size:.78rem;color:var(--primary);text-decoration:none">Forgot password?</a>
+
+        <!-- STEP 2: Location & business -->
+        <div class="ep-step-panel" id="regStep2">
+          <div class="row g-2">
+            <div class="col-sm-6">
+              <div class="ep-field">
+                <label class="ep-label">City</label>
+                <input type="text" class="ep-input" id="regCity" maxlength="100" placeholder="e.g. Riyadh">
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="ep-field">
+                <label class="ep-label">CR Number <span style="color:var(--text-muted);font-weight:400">(optional)</span></label>
+                <input type="text" class="ep-input" id="regCR" maxlength="100" placeholder="Commercial Registration No.">
+              </div>
+            </div>
+          </div>
+          <div class="ep-field">
+            <label class="ep-label">Address <span class="text-danger">*</span></label>
+            <input type="text" class="ep-input" id="regAddress" maxlength="255" placeholder="e.g. Jubail Industrial Area 2, near Tasnee">
+          </div>
+          <div class="ep-field">
+            <label class="ep-label">Google Maps Link <span style="color:var(--text-muted);font-weight:400">(optional)</span></label>
+            <input type="text" class="ep-input" id="regMapLink" maxlength="500" placeholder="Paste your location link here">
+            <p style="font-size:.72rem;color:var(--text-muted);margin:.3rem 0 0">
+              In Google Maps: long-press your location → Share → Copy Link, then paste here
+            </p>
+          </div>
+          <div class="ep-field">
+            <label class="ep-label">Website <span style="color:var(--text-muted);font-weight:400">(optional)</span></label>
+            <input type="text" class="ep-input" id="regWebsite" maxlength="300" placeholder="www.example.com">
+          </div>
+          <div class="ep-field">
+            <label class="ep-label">About Your Business <span style="color:var(--text-muted);font-weight:400">(optional)</span></label>
+            <textarea class="ep-input" id="regAbout" maxlength="2000" rows="3" placeholder="A short description of what your company does"></textarea>
+          </div>
+          <div id="regStep2Msg" class="ep-msg d-none"></div>
+          <div class="ep-btn-row mt-2">
+            <button class="ep-btn-outline" type="button" onclick="goRegStep(1)"><i class="bi bi-arrow-left me-2"></i>Back</button>
+            <button class="ep-btn-primary" type="button" onclick="goRegStep(3)">Continue<i class="bi bi-arrow-right ms-2"></i></button>
+          </div>
         </div>
-        <div id="loginMsg" class="ep-msg d-none"></div>
-        <button class="ep-btn-primary w-100 mt-2" onclick="doLogin()">
-          <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
-        </button>
-        <p style="text-align:center;margin-top:1rem;font-size:.85rem;color:var(--text-muted)">
-          Don't have an account? <a href="register.html" style="color:var(--primary);font-weight:600;text-decoration:none">Sign Up</a>
+
+        <!-- STEP 3: Account -->
+        <div class="ep-step-panel" id="regStep3">
+          <div class="ep-field">
+            <label class="ep-label">Email Address <span class="text-danger">*</span></label>
+            <div class="ep-input-wrap">
+              <i class="bi bi-envelope ep-input-icon-left"></i>
+              <input type="email" class="ep-input has-icon" id="regEmail" maxlength="160" placeholder="company@email.com">
+            </div>
+          </div>
+          <div class="ep-field">
+            <label class="ep-label">Password <span class="text-danger">*</span></label>
+            <div class="ep-input-wrap">
+              <i class="bi bi-lock ep-input-icon-left"></i>
+              <input type="password" class="ep-input has-icon" id="regPass" maxlength="72" placeholder="Min 8 characters" oninput="pwStrength(this.value)">
+              <button class="ep-input-eye" onclick="togglePass('regPass',this)" type="button"><i class="bi bi-eye"></i></button>
+            </div>
+            <div class="ep-pw-meter"><span id="pwSeg1"></span><span id="pwSeg2"></span><span id="pwSeg3"></span></div>
+            <p class="ep-pw-hint" id="pwHint">Use 8+ characters with a number or symbol.</p>
+          </div>
+          <div class="ep-field">
+            <label class="ep-label">Confirm Password <span class="text-danger">*</span></label>
+            <div class="ep-input-wrap">
+              <i class="bi bi-lock ep-input-icon-left"></i>
+              <input type="password" class="ep-input has-icon" id="regPassConfirm" maxlength="72" placeholder="Re-enter password">
+              <button class="ep-input-eye" onclick="togglePass('regPassConfirm',this)" type="button"><i class="bi bi-eye"></i></button>
+            </div>
+          </div>
+          <div id="registerMsg" class="ep-msg d-none"></div>
+          <div class="ep-btn-row mt-2">
+            <button class="ep-btn-outline" type="button" onclick="goRegStep(2)"><i class="bi bi-arrow-left me-2"></i>Back</button>
+            <button class="ep-btn-primary" type="button" onclick="doRegister()"><i class="bi bi-person-plus-fill me-2"></i>Create Free Account</button>
+          </div>
+          <div class="ep-reviewed-note">
+            <i class="bi bi-clock-history"></i>
+            <div>Your account is reviewed before you can post jobs — usually approved within 24 hours. We'll email you either way.</div>
+          </div>
+        </div>
+
+        <p style="font-size:.75rem;color:var(--text-muted);text-align:center;margin-top:1rem">
+          By creating an account you agree to our <a href="/terms.html" style="color:var(--primary)">Terms</a> and <a href="/privacy-policy.html" style="color:var(--primary)">Privacy Policy</a>.
+        </p>
+        <p style="text-align:center;margin-top:.75rem;font-size:.85rem;color:var(--text-muted)">
+          Already have an account? <a href="#" onclick="showAuthTab('login');return false" style="color:var(--primary);font-weight:600;text-decoration:none">Sign In</a>
         </p>
       </div>
 
-      <!-- FORGOT PASSWORD -->
-      <div id="forgotForm" class="d-none">
-        <p style="font-size:.85rem;color:var(--text-secondary);margin-bottom:1rem">
-          Enter the email address associated with your account, and we'll send you a link to reset your password.
-        </p>
-        <div class="ep-field">
-          <label class="ep-label">Email Address</label>
-          <input type="email" class="ep-input" id="forgotEmail" placeholder="company@email.com" autocomplete="email">
-        </div>
-        <div id="forgotMsg" class="ep-msg d-none"></div>
-        <button class="ep-btn-primary w-100 mt-2" onclick="doForgotPassword()">
-          <i class="bi bi-envelope-fill me-2"></i>Send Reset Link
-        </button>
-        <button class="ep-btn-outline w-100 mt-2" onclick="backToLogin()">
-          <i class="bi bi-arrow-left me-2"></i>Back to Sign In
-        </button>
-      </div>
     </div>
   </div>
 </div>
@@ -128,97 +295,30 @@ const API = {
   async post(url, data) {
     const r = await fetch(url, { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
     return r.json();
-  },
-  async put(url, data) {
-    const r = await fetch(url, { method: 'PUT', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-    return r.json();
-  },
-  async del(url) {
-    const r = await fetch(url, { method: 'DELETE', credentials: 'include' });
-    return r.json();
   }
 };
 
-async function checkAuth() {
-  try {
-    const d = await API.get('/api/employer/me');
-    if (!d.success) { window.location.href = '/employer/'; return null; }
-    const n = document.getElementById('epCompanyName');
-    const a = document.getElementById('epAvatar');
-    if (n) n.textContent = d.employer.company_name;
-    if (a) {
-      if (d.employer.logo_url) {
-        a.innerHTML = `<img src="${d.employer.logo_url}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block;">`;
-        a.style.padding = '0';
-        a.style.overflow = 'hidden';
-        a.style.background = 'transparent';
-      } else {
-        a.textContent = d.employer.company_name.charAt(0).toUpperCase();
-      }
-    }
-    return d;
-  } catch(e) { window.location.href = '/employer/'; return null; }
-}
-
-async function logout() {
-  if (!(await showConfirm('Are you sure you want to log out?', { title: 'Log out' }))) return;
-  await API.post('/api/employer/logout', {});
-  window.location.href = '/employer/';
-}
-
-function toggleUserMenu() {
-  document.getElementById('epUserDropdown')?.classList.toggle('show');
-}
-document.addEventListener('click', e => {
-  const menu = document.getElementById('epUserMenu');
-  if (menu && !menu.contains(e.target)) {
-    document.getElementById('epUserDropdown')?.classList.remove('show');
-  }
-});
-
-function showToast(msg, type='success') {
-  const t = document.createElement('div');
-  t.className = 'ep-toast ep-toast-' + type;
-  t.innerHTML = '<i class="bi bi-' + (type==='success'?'check-circle-fill':'exclamation-circle-fill') + ' me-2"></i>' + msg;
-  document.body.appendChild(t);
-  setTimeout(() => t.classList.add('show'), 10);
-  setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3500);
-}
-
-function timeAgo(date) {
-  const d = new Date(date), now = new Date();
-  const diff = Math.floor((now - d) / 1000);
-  if (diff < 60) return 'just now';
-  if (diff < 3600) return Math.floor(diff/60) + 'm ago';
-  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
-  return Math.floor(diff/86400) + 'd ago';
-}
-
-// Show timeout message if redirected
-if (window.location.search.includes('reason=timeout')) {
-  setTimeout(() => {
-    const msg = document.getElementById('loginMsg');
-    if (msg) { msg.className = 'ep-msg ep-msg-error'; msg.textContent = 'Your session expired due to inactivity. Please log in again.'; msg.classList.remove('d-none'); }
-  }, 300);
-}
-// Show email verification result if redirected from the verification link
-if (window.location.search.includes('verified=1')) {
-  setTimeout(() => {
-    const msg = document.getElementById('loginMsg');
-    if (msg) { msg.className = 'ep-msg ep-msg-success'; msg.textContent = 'Email verified! You can sign in once your account is approved.'; msg.classList.remove('d-none'); }
-  }, 300);
-}
-if (window.location.search.includes('verify_error=1')) {
-  setTimeout(() => {
-    const msg = document.getElementById('loginMsg');
-    if (msg) { msg.className = 'ep-msg ep-msg-error'; msg.textContent = 'Invalid or already-used verification link.'; msg.classList.remove('d-none'); }
-  }, 300);
-}
-// Check if already logged in
+// If already logged in, skip straight to dashboard
 API.get('/api/employer/me').then(d => {
   if (d.success) window.location.href = '/employer/dashboard.html';
 }).catch(() => {});
 
+/* ── Tab switching (Sign In / Create Account) ─────────────────── */
+function showAuthTab(tab) {
+  const isLogin = tab === 'login';
+  document.getElementById('loginPanel').classList.toggle('d-none', !isLogin);
+  document.getElementById('signupPanel').classList.toggle('d-none', isLogin);
+  document.getElementById('tabLogin').classList.toggle('active', isLogin);
+  document.getElementById('tabSignup').classList.toggle('active', !isLogin);
+  const params = new URLSearchParams(window.location.search);
+  params.set('tab', tab);
+  history.replaceState(null, '', '?' + params.toString());
+}
+
+const initialParams = new URLSearchParams(window.location.search);
+if (initialParams.get('tab') === 'signup') showAuthTab('signup');
+
+/* ── Login ──────────────────────────────────────────────────────── */
 function showForgot() {
   document.getElementById('loginForm').classList.add('d-none');
   document.getElementById('forgotForm').classList.remove('d-none');
@@ -228,7 +328,7 @@ function backToLogin() {
   document.getElementById('forgotForm').classList.add('d-none');
   document.getElementById('forgotMsg').classList.add('d-none');
   document.getElementById('forgotEmail').value = '';
-  showTab('login');
+  document.getElementById('loginForm').classList.remove('d-none');
 }
 
 async function doForgotPassword() {
@@ -250,11 +350,6 @@ async function doForgotPassword() {
     btn.disabled = false;
     btn.innerHTML = '<i class="bi bi-envelope-fill me-2"></i>Send Reset Link';
   }
-}
-
-function showTab(tab) {
-  document.getElementById('loginForm').classList.remove('d-none');
-  document.getElementById('forgotForm').classList.add('d-none');
 }
 
 function togglePass(id, btn) {
@@ -298,12 +393,135 @@ function showMsg(el, text, type) {
   el.classList.remove('d-none');
 }
 
-document.addEventListener('keypress', e => {
-  if (e.key === 'Enter') {
-    const loginVisible = !document.getElementById('loginForm').classList.contains('d-none');
-    if (loginVisible) doLogin();
-    else doForgotPassword();
+// Show timeout message if redirected
+if (window.location.search.includes('reason=timeout')) {
+  setTimeout(() => {
+    const msg = document.getElementById('loginMsg');
+    if (msg) { msg.className = 'ep-msg ep-msg-error'; msg.textContent = 'Your session expired due to inactivity. Please log in again.'; msg.classList.remove('d-none'); }
+  }, 300);
+}
+// Show email verification result if redirected from the verification link
+if (window.location.search.includes('verified=1')) {
+  setTimeout(() => {
+    const msg = document.getElementById('loginMsg');
+    if (msg) { msg.className = 'ep-msg ep-msg-success'; msg.textContent = 'Email verified! You can sign in once your account is approved.'; msg.classList.remove('d-none'); }
+  }, 300);
+}
+if (window.location.search.includes('verify_error=1')) {
+  setTimeout(() => {
+    const msg = document.getElementById('loginMsg');
+    if (msg) { msg.className = 'ep-msg ep-msg-error'; msg.textContent = 'Invalid or already-used verification link.'; msg.classList.remove('d-none'); }
+  }, 300);
+}
+
+/* ── Signup wizard ──────────────────────────────────────────────── */
+let regCurrentStep = 1;
+
+function validateRegStep(step) {
+  if (step === 1) {
+    const msg = document.getElementById('regStep1Msg');
+    if (!document.getElementById('regCompany').value.trim()) { showMsg(msg, 'Company name is required', 'error'); return false; }
+    if (!document.getElementById('regName').value.trim()) { showMsg(msg, 'Your name is required', 'error'); return false; }
+    msg.classList.add('d-none');
+    return true;
   }
+  if (step === 2) {
+    const msg = document.getElementById('regStep2Msg');
+    if (!document.getElementById('regAddress').value.trim()) { showMsg(msg, 'Address is required', 'error'); return false; }
+    msg.classList.add('d-none');
+    return true;
+  }
+  return true;
+}
+
+function goRegStep(step) {
+  if (step > regCurrentStep && !validateRegStep(regCurrentStep)) return;
+  regCurrentStep = step;
+  for (let i = 1; i <= 3; i++) {
+    document.getElementById('regStep' + i).classList.toggle('active', i === step);
+    document.getElementById('regLab' + i).classList.toggle('active', i <= step);
+    const seg = document.getElementById('regSeg' + i);
+    seg.classList.toggle('done', i < step);
+    seg.classList.toggle('current', i === step);
+  }
+}
+
+function pwStrength(val) {
+  let score = 0;
+  if (val.length >= 8) score++;
+  if (/[A-Z]/.test(val) && /[a-z]/.test(val)) score++;
+  if (/[0-9]/.test(val) && /[^A-Za-z0-9]/.test(val)) score++;
+  const segs = [document.getElementById('pwSeg1'), document.getElementById('pwSeg2'), document.getElementById('pwSeg3')];
+  const cls = score <= 1 ? 'on-weak' : score === 2 ? 'on-fair' : 'on-strong';
+  segs.forEach((s, i) => { s.className = i < score ? cls : ''; });
+  const hint = document.getElementById('pwHint');
+  if (val.length === 0) hint.textContent = 'Use 8+ characters with a number or symbol.';
+  else hint.textContent = score <= 1 ? 'Weak — try adding a number and a capital letter.' : score === 2 ? 'Fair — add a symbol to make it strong.' : 'Strong password.';
+}
+
+async function doRegister() {
+  const password = document.getElementById('regPass').value;
+  const confirm_password = document.getElementById('regPassConfirm').value;
+
+  const data = {
+    company_name:     document.getElementById('regCompany').value.trim(),
+    contact_name:     document.getElementById('regName').value.trim(),
+    email:            document.getElementById('regEmail').value.trim(),
+    password,
+    confirm_password,
+    phone:            document.getElementById('regPhone').value.trim(),
+    sector:           document.getElementById('regSector').value,
+    city:             document.getElementById('regCity').value.trim(),
+    address:          document.getElementById('regAddress').value.trim(),
+    map_link:         document.getElementById('regMapLink').value.trim(),
+    cr_number:        document.getElementById('regCR').value.trim(),
+    website:          document.getElementById('regWebsite').value.trim(),
+    about:            document.getElementById('regAbout').value.trim()
+  };
+  const msg = document.getElementById('registerMsg');
+  const btn = event.target.closest('button');
+
+  if (!data.company_name || !data.contact_name) { goRegStep(1); return; }
+  if (!data.address) { goRegStep(2); return; }
+  if (!data.email)        { showMsg(msg, 'Email is required', 'error'); return; }
+  if (password.length < 8) { showMsg(msg, 'Password must be at least 8 characters', 'error'); return; }
+  if (password !== confirm_password) { showMsg(msg, 'Passwords do not match', 'error'); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Creating account...';
+
+  try {
+    const d = await API.post('/api/employer/register', data);
+    if (d.success && window.jbTrack) window.jbTrack('employer_registered', {});
+    if (d.success && d.pending) {
+      showMsg(msg, d.message, 'success');
+      btn.innerHTML = '<i class="bi bi-clock me-2"></i>Application Submitted';
+      // Don't re-enable button — prevent duplicate submissions
+    } else if (d.success) {
+      window.location.href = '/employer/dashboard.html';
+    } else {
+      showMsg(msg, d.message || 'Registration failed', 'error');
+      btn.disabled = false;
+      btn.innerHTML = '<i class="bi bi-person-plus-fill me-2"></i>Create Free Account';
+    }
+  } catch(e) {
+    showMsg(msg, 'Network error. Please try again.', 'error');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="bi bi-person-plus-fill me-2"></i>Create Free Account';
+  }
+}
+
+document.addEventListener('keypress', e => {
+  if (e.key !== 'Enter') return;
+  const signupVisible = !document.getElementById('signupPanel').classList.contains('d-none');
+  if (signupVisible) {
+    if (regCurrentStep < 3) goRegStep(regCurrentStep + 1);
+    else doRegister();
+    return;
+  }
+  const loginVisible = !document.getElementById('loginForm').classList.contains('d-none');
+  if (loginVisible) doLogin();
+  else doForgotPassword();
 });
 </script>
 <script src="/employer/js/ui-dialogs.js"></script>

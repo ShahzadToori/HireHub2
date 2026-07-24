@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700;800&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/employer/employer.css">
 </head>
@@ -168,7 +168,7 @@
         <div id="dashReqPending"></div>
         <!-- Toggle for approved/denied -->
         <div id="dashReqHistoryWrap" style="display:none;margin-top:.5rem">
-          <button onclick="toggleReqHistory()" id="dashReqHistoryBtn" style="width:100%;padding:.45rem;border:none;background:var(--surface);border-radius:8px;font-size:.77rem;color:var(--text-muted);cursor:pointer;font-family:'DM Sans',sans-serif">
+          <button onclick="toggleReqHistory()" id="dashReqHistoryBtn" style="width:100%;padding:.45rem;border:none;background:var(--surface);border-radius:8px;font-size:.77rem;color:var(--text-muted);cursor:pointer;font-family:'Source Sans 3',sans-serif">
             <i class="bi bi-chevron-down me-1"></i>Show approved/denied
           </button>
           <div id="dashReqHistory" style="display:none;margin-top:.35rem"></div>
@@ -402,7 +402,7 @@ init();
       el = document.createElement('div');
       el.id = 'inactWarn';
       el.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';
-      el.innerHTML = '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:2rem;max-width:380px;width:100%;text-align:center"><div style=\"font-size:2rem;margin-bottom:.5rem\">⏰</div><h3 style=\"font-family:Syne,sans-serif;font-weight:800;color:var(--text-primary);margin-bottom:.5rem\">Still there?</h3><p style=\"color:var(--text-secondary);font-size:.9rem\">You\'ll be logged out in <strong id=\"inactCD\">5:00</strong></p><div style=\"display:flex;gap:.75rem;justify-content:center;margin-top:1.25rem\"><button class=\"ep-btn-primary\" onclick=\"keepIn()\">Keep me logged in</button><button class=\"ep-btn-outline\" onclick=\"logoutNow()\">Logout</button></div></div>';
+      el.innerHTML = '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:2rem;max-width:380px;width:100%;text-align:center"><div style=\"font-size:2rem;margin-bottom:.5rem\">⏰</div><h3 style=\"font-family:Lexend,sans-serif;font-weight:800;color:var(--text-primary);margin-bottom:.5rem\">Still there?</h3><p style=\"color:var(--text-secondary);font-size:.9rem\">You\'ll be logged out in <strong id=\"inactCD\">5:00</strong></p><div style=\"display:flex;gap:.75rem;justify-content:center;margin-top:1.25rem\"><button class=\"ep-btn-primary\" onclick=\"keepIn()\">Keep me logged in</button><button class=\"ep-btn-outline\" onclick=\"logoutNow()\">Logout</button></div></div>';
       document.body.appendChild(el);
       var s = 300;
       var ci = setInterval(function(){ s--; var e=document.getElementById('inactCD'); if(e) e.textContent=Math.floor(s/60)+':'+(s%60<10?'0':'')+s%60; if(s<=0) clearInterval(ci); }, 1000);

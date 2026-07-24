@@ -26,11 +26,27 @@ async function requireAuth() {
 }
 
 // ── API helper ──────────────────────────────────────────────────
+// Every write method used to resolve on ANY response — a 401 (session
+// expired), 403 (missing permission), 429 (rate limited), or 500 all parsed
+// fine as JSON and returned normally, so callers' `await adminApi.put(...)`
+// never threw and the success toast fired regardless of whether the write
+// actually happened. (This is exactly how the Monetization page could show
+// "Ad placement updated!" while the ad stayed enabled — the save silently
+// 401'd and nobody could tell.) parseOrThrow() makes failure visible: any
+// non-2xx, or a 2xx body with `success: false`, throws with the server's
+// own message so the caller's catch block reports it instead of lying.
+async function parseOrThrow(res) {
+  let data;
+  try { data = await res.json(); } catch { data = null; }
+  if (!res.ok || (data && data.success === false)) {
+    throw new Error((data && data.message) || `HTTP ${res.status}`);
+  }
+  return data;
+}
 const adminApi = {
   get: async (url) => {
     const res = await fetch(url);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return res.json();
+    return parseOrThrow(res);
   },
   post: async (url, body) => {
     const res = await fetch(url, {
@@ -38,7 +54,7 @@ const adminApi = {
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify(body)
     });
-    return res.json();
+    return parseOrThrow(res);
   },
   put: async (url, body) => {
     const res = await fetch(url, {
@@ -46,7 +62,7 @@ const adminApi = {
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify(body)
     });
-    return res.json();
+    return parseOrThrow(res);
   },
   del: async (url, body = null) => {
     const opts = { method: 'DELETE' };
@@ -55,13 +71,13 @@ const adminApi = {
       opts.body    = JSON.stringify(body);
     }
     const res = await fetch(url, opts);
-    return res.json();
+    return parseOrThrow(res);
   },
   patch: async (url, body = null) => {
     const opts = { method: "PATCH" };
     if (body) { opts.headers = { "Content-Type": "application/json" }; opts.body = JSON.stringify(body); }
     const res = await fetch(url, opts);
-    return res.json();
+    return parseOrThrow(res);
   },
 };
 

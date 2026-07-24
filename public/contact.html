@@ -17,7 +17,7 @@
   <link rel="icon" type="image/svg+xml" href="/JobOrbitFavicon.svg">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700;800&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/contact.css">
   <style>
@@ -60,7 +60,7 @@
     .pkg-card.selected-sponsored .pkg-check { background: #10b981; }
 
     .pkg-emoji { font-size: 1.75rem; margin-bottom: .35rem; }
-    .pkg-label { font-family: 'Syne',sans-serif; font-weight: 700; font-size: .95rem; color: var(--text,#1a1a2e); }
+    .pkg-label { font-family: 'Lexend',sans-serif; font-weight: 700; font-size: .95rem; color: var(--text,#1a1a2e); }
     .pkg-price-tag { font-size: .78rem; font-weight: 700; margin-top: .2rem; }
     .pkg-price-free { color: #10b981; }
     .pkg-price-paid { color: var(--primary,#0f62fe); }
@@ -465,9 +465,13 @@ function applyTheme(theme, save = true) {
   document.getElementById('themeIcon').className = theme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
   if (save) localStorage.setItem('theme', theme);
 }
-document.getElementById('themeToggle').addEventListener('click', () => {
-  applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-});
+const themeToggleBtn = document.getElementById('themeToggle');
+if (themeToggleBtn && !themeToggleBtn.dataset.themeWired) {
+  themeToggleBtn.dataset.themeWired = '1';
+  themeToggleBtn.addEventListener('click', () => {
+    applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  });
+}
 
 /* ── Load categories into job form ─────────────────────────── */
 async function loadCategories() {

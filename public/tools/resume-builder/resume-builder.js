@@ -1180,7 +1180,7 @@ async function downloadPDF() {
       '<meta charset="UTF-8">',
       '<meta name="viewport" content="width=794">',
       // Google Fonts — server waits for networkidle0 so fonts load fully
-      '<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">',
+      '<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;700;800&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">',
       // Bootstrap Icons embedded inline via iconsCSS — no CDN dependency
       '<style>' + iconsCSS + cssText + extraCSS + '</style>',
       '</head>',
@@ -1240,7 +1240,7 @@ async function printFallback() {
   win.document.write(
     '<!DOCTYPE html><html lang="en" data-theme="light"><head>' +
     '<meta charset="UTF-8"><meta name="color-scheme" content="light">' +
-    '<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">' +
+    '<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;700;800&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">' +
     '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">' +
     '<style>' + cssText + '@media print{@page{margin:0;size:A4}body{margin:0}*{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}}</style>' +
     '</head><body style="margin:0;background:#fff">' + resumeHTML + '</body></html>'

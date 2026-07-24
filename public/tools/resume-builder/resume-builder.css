@@ -33,7 +33,7 @@
   margin-bottom: .75rem;
 }
 .rb-hero h1 {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Lexend', sans-serif;
   font-weight: 800;
   font-size: clamp(1.6rem,4vw,2.5rem);
   color: #fff;
@@ -153,7 +153,7 @@
 .rb-section.active { display: block; }
 
 .rb-section-title {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Lexend', sans-serif;
   font-weight: 800;
   font-size: 1.15rem;
   color: var(--text-primary);
@@ -188,7 +188,7 @@
   border-radius: 10px;
   background: var(--bg-card);
   color: var(--text-primary);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Source Sans 3', sans-serif;
   font-size: .9rem;
   outline: none;
   transition: border-color .15s, box-shadow .15s;
@@ -275,7 +275,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-family: 'Syne', sans-serif;
+  font-family: 'Lexend', sans-serif;
   font-weight: 800;
   font-size: 1.1rem;
   color: var(--text-primary);
@@ -427,7 +427,7 @@
   overflow: hidden;
 }
 .rb-template-info { padding: .7rem; background: var(--bg-card); }
-.rb-template-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .85rem; color: var(--text-primary); }
+.rb-template-name { font-family: 'Lexend', sans-serif; font-weight: 700; font-size: .85rem; color: var(--text-primary); }
 .rb-template-role { font-size: .72rem; color: var(--text-muted); }
 .rb-template-check {
   position: absolute;
@@ -480,7 +480,7 @@
   border-radius: 10px;
   background: var(--surface);
   color: var(--text-primary);
-  font-family: 'Syne', sans-serif;
+  font-family: 'Lexend', sans-serif;
   font-weight: 700;
   font-size: .88rem;
   cursor: pointer;
@@ -494,7 +494,7 @@
   color: #fff;
   border: none;
   border-radius: 10px;
-  font-family: 'Syne', sans-serif;
+  font-family: 'Lexend', sans-serif;
   font-weight: 700;
   font-size: .92rem;
   cursor: pointer;
@@ -508,7 +508,7 @@
   color: #fff;
   border: none;
   border-radius: 10px;
-  font-family: 'Syne', sans-serif;
+  font-family: 'Lexend', sans-serif;
   font-weight: 700;
   font-size: .92rem;
   cursor: pointer;
@@ -571,7 +571,7 @@
   box-shadow: 0 4px 32px rgba(0,0,0,.15);
   min-height: 600px;
   transform-origin: top center;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Source Sans 3', sans-serif;
 }
 .rb-preview-label {
   font-size: .7rem;
@@ -626,7 +626,7 @@
   width: 90%;
 }
 .rb-generating-card .spinner-border { width: 3rem; height: 3rem; color: #059669; margin-bottom: 1rem; }
-.rb-generating-card h5 { font-family: 'Syne', sans-serif; font-weight: 700; margin-bottom: .25rem; color: #0f172a; }
+.rb-generating-card h5 { font-family: 'Lexend', sans-serif; font-weight: 700; margin-bottom: .25rem; color: #0f172a; }
 .rb-generating-card p { font-size: .85rem; color: #64748b; margin: 0; }
 
 /* ── Restore banner ─────────────────────────────────────────── */
@@ -661,7 +661,7 @@
   color: #fff;
   margin-top: 1.5rem;
 }
-.rb-cta h3 { font-family: 'Syne',sans-serif; font-weight: 800; margin-bottom: .5rem; }
+.rb-cta h3 { font-family: 'Lexend',sans-serif; font-weight: 800; margin-bottom: .5rem; }
 .rb-cta p { font-size: .88rem; opacity: .85; margin-bottom: 1.25rem; }
 .rb-cta .cta-btn { background: #fff; color: #0f62fe; border-radius: 9px; padding: .6rem 1.25rem; font-weight: 700; font-size: .85rem; text-decoration: none; display: inline-block; transition: opacity .15s; }
 .rb-cta .cta-btn:hover { opacity: .9; }
@@ -676,7 +676,7 @@
   line-height: 1.4;
   color: #1a1a1a;
   background: #fff;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Source Sans 3', sans-serif;
 }
 .rb-resume * { box-sizing: border-box; }
 
@@ -704,7 +704,7 @@
   font-size: 1.5rem;
 }
 .tpl-classic .tpl-photo img { width: 100%; height: 100%; object-fit: cover; border-radius: 2px; display: block; }
-.tpl-classic .tpl-name { font-size: 20pt; font-weight: 800; font-family: 'Syne', sans-serif; margin-bottom: .25rem; }
+.tpl-classic .tpl-name { font-size: 20pt; font-weight: 800; font-family: 'Lexend', sans-serif; margin-bottom: .25rem; }
 .tpl-classic .tpl-title { font-size: 10.5pt; color: rgba(255,255,255,.75); margin-bottom: .6rem; }
 .tpl-classic .tpl-contact-row { display: flex; flex-wrap: wrap; gap: .4rem .85rem; font-size: 8.5pt; color: rgba(255,255,255,.7); }
 .tpl-classic .tpl-contact-row span { display: flex; align-items: center; gap: .3rem; }
@@ -712,7 +712,7 @@
 .tpl-classic .tpl-sidebar { background: #f8fafc; padding: 1.25rem 1.1rem; border-right: 1px solid #e2e8f0; }
 .tpl-classic .tpl-content { padding: 1.25rem 1.5rem; }
 .tpl-classic .tpl-section-title {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Lexend', sans-serif;
   font-weight: 700;
   font-size: 9pt;
   text-transform: uppercase;
@@ -770,7 +770,7 @@
   overflow: hidden;
 }
 .tpl-modern .tpl-photo img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-.tpl-modern .tpl-name { font-family: 'Syne',sans-serif; font-weight: 800; font-size: 13pt; color: #fff; text-align: center; margin-bottom: .2rem; }
+.tpl-modern .tpl-name { font-family: 'Lexend',sans-serif; font-weight: 800; font-size: 13pt; color: #fff; text-align: center; margin-bottom: .2rem; }
 .tpl-modern .tpl-title { font-size: 8.5pt; color: #0ea5e9; text-align: center; margin-bottom: 1.25rem; font-weight: 600; }
 .tpl-modern .tpl-section-title { font-size: 7.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: #0ea5e9; margin: 1rem 0 .5rem; }
 .tpl-modern .tpl-contact-item { font-size: 8pt; color: rgba(255,255,255,.75); padding: .2rem 0; display: flex; align-items: center; gap: .4rem; word-break: break-all; }
@@ -779,7 +779,7 @@
 .tpl-modern .tpl-skill-name { font-size: 8pt; color: rgba(255,255,255,.85); }
 .tpl-modern .tpl-lang-row { display: flex; justify-content: space-between; font-size: 8pt; color: rgba(255,255,255,.75); padding: .15rem 0; }
 .tpl-modern .tpl-main { padding: 1.5rem 1.5rem 1.5rem 1.25rem; }
-.tpl-modern .tpl-main-title { font-family: 'Syne',sans-serif; font-weight: 800; font-size: 8.5pt; text-transform: uppercase; letter-spacing: .08em; color: #1e293b; border-bottom: 2px solid #0ea5e9; padding-bottom: .3rem; margin: 1rem 0 .75rem; }
+.tpl-modern .tpl-main-title { font-family: 'Lexend',sans-serif; font-weight: 800; font-size: 8.5pt; text-transform: uppercase; letter-spacing: .08em; color: #1e293b; border-bottom: 2px solid #0ea5e9; padding-bottom: .3rem; margin: 1rem 0 .75rem; }
 .tpl-modern .tpl-main-title:first-child { margin-top: 0; }
 .tpl-modern .tpl-exp-title { font-weight: 700; font-size: 10pt; color: #0f172a; }
 .tpl-modern .tpl-exp-company { font-size: 9pt; color: #64748b; }
@@ -806,12 +806,12 @@
   color: rgba(255,255,255,.6); font-size: 1.5rem;
 }
 .tpl-health .tpl-photo img { width: 100%; height: 100%; object-fit: cover; }
-.tpl-health .tpl-name { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 18pt; color: #fff; }
+.tpl-health .tpl-name { font-family: 'Lexend', sans-serif; font-weight: 800; font-size: 18pt; color: #fff; }
 .tpl-health .tpl-title { font-size: 10pt; color: rgba(255,255,255,.8); margin-bottom: .4rem; }
 .tpl-health .tpl-contact-row { display: flex; flex-wrap: wrap; gap: .3rem .75rem; font-size: 8pt; color: rgba(255,255,255,.75); }
 .tpl-health .tpl-contact-row span { display: flex; align-items: center; gap: .25rem; }
 .tpl-health .tpl-body { padding: 1.25rem 1.75rem; }
-.tpl-health .tpl-section-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 9pt; color: #0891b2; border-bottom: 2px solid #0891b2; padding-bottom: .25rem; margin: 1rem 0 .6rem; text-transform: uppercase; letter-spacing: .06em; }
+.tpl-health .tpl-section-title { font-family: 'Lexend', sans-serif; font-weight: 700; font-size: 9pt; color: #0891b2; border-bottom: 2px solid #0891b2; padding-bottom: .25rem; margin: 1rem 0 .6rem; text-transform: uppercase; letter-spacing: .06em; }
 .tpl-health .tpl-credentials { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: .75rem; }
 .tpl-health .tpl-cred-badge { background: #e0f2fe; color: #0369a1; padding: .2rem .65rem; border-radius: 100px; font-size: 8pt; font-weight: 600; }
 .tpl-health .tpl-exp-item { margin-bottom: .85rem; display: grid; grid-template-columns: 120px 1fr; gap: .75rem; }
@@ -830,13 +830,13 @@
   color: rgba(255,255,255,.4); font-size: 1.3rem; border: 2px solid rgba(255,255,255,.2);
 }
 .tpl-trades .tpl-photo img { width: 100%; height: 100%; object-fit: cover; }
-.tpl-trades .tpl-name { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 18pt; color: #fff; margin-bottom: .15rem; }
+.tpl-trades .tpl-name { font-family: 'Lexend', sans-serif; font-weight: 800; font-size: 18pt; color: #fff; margin-bottom: .15rem; }
 .tpl-trades .tpl-title { font-size: 10pt; color: #f97316; margin-bottom: .35rem; font-weight: 600; }
 .tpl-trades .tpl-contact-row { display: flex; flex-wrap: wrap; gap: .25rem .65rem; font-size: 8pt; color: rgba(255,255,255,.65); }
 .tpl-trades .tpl-skills-bar { background: #f97316; height: 4px; margin: 0; }
 .tpl-trades .tpl-body { padding: 1.25rem 1.75rem; }
 .tpl-trades .tpl-skills-section { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 8px; padding: .85rem; margin-bottom: 1rem; }
-.tpl-trades .tpl-section-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 9pt; color: #1c1917; border-left: 3px solid #f97316; padding-left: .5rem; margin: .85rem 0 .6rem; text-transform: uppercase; letter-spacing: .05em; }
+.tpl-trades .tpl-section-title { font-family: 'Lexend', sans-serif; font-weight: 700; font-size: 9pt; color: #1c1917; border-left: 3px solid #f97316; padding-left: .5rem; margin: .85rem 0 .6rem; text-transform: uppercase; letter-spacing: .05em; }
 .tpl-trades .tpl-skill-grid { display: flex; flex-wrap: wrap; gap: .3rem; }
 .tpl-trades .tpl-skill-tag { background: #1c1917; color: #fff; padding: .2rem .6rem; border-radius: 4px; font-size: 8pt; font-weight: 600; }
 .tpl-trades .tpl-exp-item { margin-bottom: .85rem; border-left: 3px solid #f97316; padding-left: .75rem; }
@@ -847,10 +847,10 @@
 .tpl-trades .tpl-summary { font-size: 10pt; color: #374151; line-height: 1.6; margin-bottom: .75rem; border-left: 3px solid #f97316; padding-left: .75rem; }
 
 /* ── Template 5: Saudi Government / Vision 2030 ─────────────── */
-.tpl-gov { font-family: 'DM Sans', sans-serif; }
+.tpl-gov { font-family: 'Source Sans 3', sans-serif; }
 .tpl-gov .tpl-header { background: #006c35; padding: 1.5rem 2rem; position: relative; overflow: hidden; }
 .tpl-gov .tpl-header::after { content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 120px; background: linear-gradient(to right, transparent, rgba(255,255,255,.08)); }
-.tpl-gov .tpl-name { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 19pt; color: #fff; }
+.tpl-gov .tpl-name { font-family: 'Lexend', sans-serif; font-weight: 800; font-size: 19pt; color: #fff; }
 .tpl-gov .tpl-title { font-size: 10pt; color: rgba(255,255,255,.8); margin: .2rem 0 .75rem; }
 .tpl-gov .tpl-nationality-badge { display: inline-flex; align-items: center; gap: .35rem; background: rgba(255,255,255,.15); border-radius: 4px; padding: .2rem .75rem; font-size: 8.5pt; color: rgba(255,255,255,.9); margin-bottom: .5rem; }
 .tpl-gov .tpl-contact-row { display: flex; flex-wrap: wrap; gap: .3rem .85rem; font-size: 8.5pt; color: rgba(255,255,255,.75); }
@@ -862,7 +862,7 @@
 .tpl-gov .tpl-info-item-label { color: #166534; font-weight: 700; font-size: 7pt; text-transform: uppercase; letter-spacing: .05em; }
 .tpl-gov .tpl-info-item-val { color: #374151; }
 .tpl-gov .tpl-body { padding: 1.25rem 2rem; }
-.tpl-gov .tpl-section-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 9pt; color: #006c35; border-bottom: 2px solid #006c35; padding-bottom: .3rem; margin: 1rem 0 .7rem; text-transform: uppercase; letter-spacing: .07em; }
+.tpl-gov .tpl-section-title { font-family: 'Lexend', sans-serif; font-weight: 700; font-size: 9pt; color: #006c35; border-bottom: 2px solid #006c35; padding-bottom: .3rem; margin: 1rem 0 .7rem; text-transform: uppercase; letter-spacing: .07em; }
 .tpl-gov .tpl-section-title:first-child { margin-top: 0; }
 .tpl-gov .tpl-exp-item { margin-bottom: .85rem; }
 .tpl-gov .tpl-exp-title { font-weight: 700; font-size: 10pt; color: #0f172a; }
@@ -881,7 +881,7 @@
 .cs-tb-btn:hover{background:var(--bg-card);color:var(--primary)}
 .cs-tb-btn b,.cs-tb-btn i,.cs-tb-btn u{pointer-events:none}
 .cs-tb-sep{width:1px;background:var(--border);margin:.15rem .1rem;align-self:stretch}
-.cs-editor{min-height:110px;padding:.7rem .85rem;border:1.5px solid var(--border);border-radius:0 0 9px 9px;background:var(--bg-card);color:var(--text-primary);font-family:'DM Sans',sans-serif;font-size:.88rem;line-height:1.65;outline:none;transition:border-color .15s;overflow-y:auto;max-height:280px}
+.cs-editor{min-height:110px;padding:.7rem .85rem;border:1.5px solid var(--border);border-radius:0 0 9px 9px;background:var(--bg-card);color:var(--text-primary);font-family:'Source Sans 3',sans-serif;font-size:.88rem;line-height:1.65;outline:none;transition:border-color .15s;overflow-y:auto;max-height:280px}
 .cs-editor:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(15,98,254,.1)}
 .cs-editor:empty::before{content:attr(placeholder);color:var(--text-muted);font-style:italic;pointer-events:none;white-space:pre-line}
 .cs-editor ul{padding-left:1.25rem;margin:.3rem 0}
