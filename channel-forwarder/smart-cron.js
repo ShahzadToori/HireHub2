@@ -3,11 +3,11 @@ require('dotenv').config({ path: '/var/www/HireHub2/.env' });
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const mysql = require('mysql2/promise');
+const { renderTemplate, DEFAULT_TEMPLATE, DEFAULT_NOTICE, DEFAULT_DESC_LENGTH } = require('./message-template');
 
 // ----- Configuration -----
 const GROUP_ID = process.env.WHATSAPP_GROUP_ID;       // For pending jobs
 const CHANNEL_ID = process.env.WHATSAPP_CHANNEL_ID;   // For active jobs
-const SITE_URL = 'https://joborbit.org';
 
 if (!GROUP_ID || !CHANNEL_ID) {
     console.error('Missing WHATSAPP_GROUP_ID or WHATSAPP_CHANNEL_ID in .env');
@@ -24,49 +24,21 @@ const pool = mysql.createPool({
     connectionLimit: 5,
 });
 
-function formatWhatsAppMessage(job) {
-    const jobUrl = `${SITE_URL}/job/${job.slug}`;
-    const siteName = 'JobOrbit';
-
-    function stripPhoneNumbers(text) {
-        let cleaned = text.replace(/(\+?9665|05)\d{8}/g, '')
-            .replace(/(\+\d{1,3}[-.\s]?\d{6,})/g, '')
-            .replace(/\d{4,}[-.\s]?\d{4,}/g, '');
-        if (cleaned !== text && !cleaned.includes('📞 Contact details on website')) {
-            cleaned += ' 📞 Contact details on website.';
-        }
-        return cleaned;
-    }
-
-    function stripEmails(text) {
-        let cleaned = text.replace(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g, '');
-        if (cleaned !== text && !cleaned.includes('✉️ Email on website')) {
-            cleaned += ' ✉️ Email on website.';
-        }
-        return cleaned;
-    }
-
-    let desc = (job.description || '').replace(/\n/g, ' ');
-    desc = stripPhoneNumbers(desc);
-    desc = stripEmails(desc);
-    desc = desc.replace(/Contact:\s*/gi, '')
-               .replace(/Phone:\s*/gi, '')
-               .replace(/WhatsApp:\s*/gi, '');
-    
-    const truncatedDesc = desc.substring(0, 200) + (desc.length >= 200 ? '…' : '');
-    const notice = `⚠️ *Important Notice:* 
-▪ Verify job details before joining
-▪ Do NOT pay anyone for job placement
-▪ Only deal with verified sources`;
-
-    return `🔥 *Job Opportunity on ${siteName}*\n\n` +
-        `📋 *${job.title}*\n` +
-        `🏢 ${job.company || 'Not specified'}\n` +
-        `📍 ${job.location}\n` +
-        `💼 ${job.job_type || 'Full-time'}\n\n` +
-        `${truncatedDesc}\n\n` +
-        `🔗 View & apply: ${jobUrl}\n\n` +
-        `${notice}`;
+// Message format is editable from admin → WhatsApp Bot (server/routes/admin-whatsapp.js
+// writes these into the settings table); fall back to the built-in default
+// so nothing breaks if the settings have never been touched.
+async function loadMessageFormat() {
+    const [rows] = await pool.execute(
+        "SELECT `key`, `value` FROM settings WHERE `key` IN ('whatsapp_msg_template','whatsapp_desc_length','whatsapp_notice_text')"
+    );
+    const map = {};
+    rows.forEach(r => { map[r.key] = r.value; });
+    const descLength = parseInt(map.whatsapp_desc_length, 10);
+    return {
+        template: map.whatsapp_msg_template || DEFAULT_TEMPLATE,
+        descLength: Number.isFinite(descLength) ? descLength : DEFAULT_DESC_LENGTH,
+        notice: map.whatsapp_notice_text != null ? map.whatsapp_notice_text : DEFAULT_NOTICE,
+    };
 }
 
 let client = null;
@@ -104,13 +76,17 @@ const sendMessage = async (to, text) => {
 
 const main = async () => {
     try {
+        const format = await loadMessageFormat();
+
         // Fetch unsent jobs (whatsapp_sent = 0 or NULL) with status active or pending
         const [rows] = await pool.execute(
-            `SELECT id, title, company, location, job_type, description, slug, status
-             FROM jobs
-             WHERE (whatsapp_sent IS NULL OR whatsapp_sent = 0)
-               AND status IN ('active', 'pending')
-             ORDER BY status DESC, id ASC`  // active first (optional)
+            `SELECT j.id, j.title, j.company, j.location, j.job_type, j.description, j.slug, j.status,
+                    j.salary, j.salary_min, j.salary_max, j.positions, c.name AS category
+             FROM jobs j
+             LEFT JOIN categories c ON c.id = j.category_id
+             WHERE (j.whatsapp_sent IS NULL OR j.whatsapp_sent = 0)
+               AND j.status IN ('active', 'pending')
+             ORDER BY j.status DESC, j.id ASC`  // active first (optional)
         );
         if (rows.length === 0) {
             console.log('No pending jobs to send.');
@@ -121,7 +97,7 @@ const main = async () => {
         for (const job of rows) {
             const target = (job.status === 'active') ? CHANNEL_ID : GROUP_ID;
             const targetType = (job.status === 'active') ? 'channel' : 'group';
-            const text = formatWhatsAppMessage(job);
+            const text = renderTemplate(format.template, job, { descLength: format.descLength, notice: format.notice });
             try {
                 await sendMessage(target, text);
                 await pool.execute('UPDATE jobs SET whatsapp_sent = 1 WHERE id = ?', [job.id]);

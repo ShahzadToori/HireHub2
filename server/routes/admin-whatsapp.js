@@ -11,6 +11,13 @@ const fs = require('fs');
 const path = require('path');
 const { spawn } = require('child_process');
 const { requireAdmin } = require('../middleware/auth');
+const db = require('../db/connection');
+const {
+  renderTemplate,
+  DEFAULT_TEMPLATE,
+  DEFAULT_NOTICE,
+  DEFAULT_DESC_LENGTH,
+} = require('../../channel-forwarder/message-template');
 const router = express.Router();
 
 const CF_DIR = path.join(__dirname, '..', '..', 'channel-forwarder');
@@ -18,6 +25,12 @@ const SESSION_DIR = path.join(CF_DIR, 'cron-session');
 const LOCK_FILE = path.join(CF_DIR, '.reconnect.lock');
 const STATE_FILE = path.join(CF_DIR, '.reconnect-state.json');
 const LOG_FILE = '/var/log/smart-cron.log';
+
+const MSG_SETTINGS_KEYS = {
+  template: 'whatsapp_msg_template',
+  descLength: 'whatsapp_desc_length',
+  notice: 'whatsapp_notice_text',
+};
 
 const ACTIVE_STATES = new Set(['starting', 'awaiting-code', 'code-ready']);
 const STALE_LOCK_MS = 6 * 60 * 1000; // pair-link.js self-exits after 5 min
@@ -218,6 +231,97 @@ router.post('/reconnect/cancel', (req, res) => {
   clearLock();
   writeState({ state: 'cancelled', cancelledAt: new Date().toISOString() });
   res.json({ success: true });
+});
+
+// GET /api/admin/whatsapp/message-settings
+router.get('/message-settings', async (req, res) => {
+  try {
+    const [rows] = await db.query(
+      'SELECT `key`, `value` FROM settings WHERE `key` IN (?,?,?)',
+      [MSG_SETTINGS_KEYS.template, MSG_SETTINGS_KEYS.descLength, MSG_SETTINGS_KEYS.notice]
+    );
+    const map = {};
+    rows.forEach(r => { map[r.key] = r.value; });
+    const descLength = parseInt(map[MSG_SETTINGS_KEYS.descLength], 10);
+    res.json({
+      success: true,
+      template: map[MSG_SETTINGS_KEYS.template] || DEFAULT_TEMPLATE,
+      descLength: Number.isFinite(descLength) ? descLength : DEFAULT_DESC_LENGTH,
+      notice: map[MSG_SETTINGS_KEYS.notice] != null ? map[MSG_SETTINGS_KEYS.notice] : DEFAULT_NOTICE,
+      defaults: { template: DEFAULT_TEMPLATE, descLength: DEFAULT_DESC_LENGTH, notice: DEFAULT_NOTICE },
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// PUT /api/admin/whatsapp/message-settings  { template, descLength, notice }
+router.put('/message-settings', async (req, res) => {
+  const template = req.body.template;
+  const notice = req.body.notice != null ? String(req.body.notice) : '';
+  const descLength = parseInt(req.body.descLength, 10);
+
+  if (typeof template !== 'string' || !template.trim()) {
+    return res.status(400).json({ success: false, message: 'Template cannot be empty.' });
+  }
+  if (!template.includes('{{link}}')) {
+    return res.status(400).json({ success: false, message: 'Template must include {{link}} so applicants can reach the job.' });
+  }
+  if (!Number.isFinite(descLength) || descLength < 0 || descLength > 2000) {
+    return res.status(400).json({ success: false, message: 'Description length must be between 0 and 2000.' });
+  }
+
+  try {
+    const pairs = [
+      [MSG_SETTINGS_KEYS.template, template],
+      [MSG_SETTINGS_KEYS.descLength, String(descLength)],
+      [MSG_SETTINGS_KEYS.notice, notice],
+    ];
+    for (const [key, value] of pairs) {
+      await db.query('INSERT INTO settings (`key`,`value`) VALUES (?,?) ON DUPLICATE KEY UPDATE `value`=?', [key, value, value]);
+    }
+    res.json({ success: true, message: 'Message format saved.' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// POST /api/admin/whatsapp/message-preview  { template, descLength, notice }
+// Renders against the most recently posted job so admins see real output,
+// not lorem-ipsum — falls back to a sample job if the table is empty.
+router.post('/message-preview', async (req, res) => {
+  try {
+    const [rows] = await db.query(
+      `SELECT j.title, j.company, j.location, j.job_type, j.description, j.slug,
+              j.salary, j.salary_min, j.salary_max, j.positions, c.name AS category
+       FROM jobs j LEFT JOIN categories c ON c.id = j.category_id
+       ORDER BY j.id DESC LIMIT 1`
+    );
+    const sample = rows[0] || {
+      title: 'Sample Job Title',
+      company: 'Sample Company',
+      location: 'Riyadh, Saudi Arabia',
+      job_type: 'Full-time',
+      description: 'This is a sample description used because no jobs exist yet. Contact: 0501234567 for details.',
+      slug: 'sample-job',
+      salary: '5000-8000 SAR',
+      positions: 2,
+      category: 'IT & Software',
+    };
+
+    const descLength = parseInt(req.body.descLength, 10);
+    const text = renderTemplate(
+      typeof req.body.template === 'string' ? req.body.template : DEFAULT_TEMPLATE,
+      sample,
+      {
+        descLength: Number.isFinite(descLength) ? descLength : DEFAULT_DESC_LENGTH,
+        notice: req.body.notice != null ? req.body.notice : DEFAULT_NOTICE,
+      }
+    );
+    res.json({ success: true, text, sampleJobTitle: sample.title, isSample: !rows[0] });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
 });
 
 module.exports = router;

@@ -38,6 +38,16 @@
     .wa-instructions { text-align: left; max-width: 380px; margin: 0 auto; font-size: .88rem; color: var(--text-secondary); }
     .wa-instructions li { margin-bottom: .35rem; }
     #confirmPhraseInput { font-family: 'SFMono-Regular', Consolas, monospace; text-align: center; letter-spacing: .1em; text-transform: uppercase; }
+
+    .wa-token-palette { display: flex; flex-wrap: wrap; gap: .4rem; }
+    .wa-token-btn { font-family: 'SFMono-Regular', Consolas, monospace; font-size: .72rem; background: var(--surface); border: 1px solid var(--border); color: var(--primary); border-radius: 20px; padding: .25rem .65rem; cursor: pointer; transition: background .15s; }
+    .wa-token-btn:hover { background: rgba(15,98,254,.1); }
+    .wa-preview-wrap { background: #e5ddd5; border-radius: 12px; padding: 1.25rem .9rem; min-height: 320px; }
+    [data-theme="dark"] .wa-preview-wrap { background: #0b141a; }
+    .wa-preview-bubble { background: #fff; border-radius: 8px; padding: .65rem .8rem; font-size: .86rem; line-height: 1.45; white-space: pre-wrap; word-break: break-word; box-shadow: 0 1px 1px rgba(0,0,0,.1); position: relative; color: #111; }
+    [data-theme="dark"] .wa-preview-bubble { background: #202c33; color: #e9edef; }
+    .wa-preview-bubble::before { content: ''; position: absolute; top: 0; left: -8px; border-width: 0 8px 8px 0; border-style: solid; border-color: transparent #fff transparent transparent; }
+    [data-theme="dark"] .wa-preview-bubble::before { border-color: transparent #202c33 transparent transparent; }
   </style>
 </head>
 <body class="admin-body">
@@ -131,6 +141,45 @@
         </div>
       </div>
     </div>
+
+    <!-- Message Format -->
+    <div class="admin-card mt-4">
+      <div class="admin-card-header d-flex justify-content-between align-items-center">
+        <h5 class="admin-card-title mb-0"><i class="bi bi-chat-square-text me-2"></i>Message Format</h5>
+        <button class="btn btn-sm btn-admin-outline" onclick="resetMsgFormat()"><i class="bi bi-arrow-counterclockwise me-1"></i>Reset to Default</button>
+      </div>
+      <div class="p-3">
+        <div class="row g-4">
+          <div class="col-lg-7">
+            <label class="form-label-custom">Message Template</label>
+            <p class="text-muted small mb-2">Click a token to insert it. Remove tokens you don't want, reorder freely, or add your own text/emoji.</p>
+            <div class="wa-token-palette mb-2" id="tokenPalette"></div>
+            <textarea class="form-control-custom" id="templateInput" rows="12" spellcheck="false" style="font-family:'SFMono-Regular',Consolas,monospace; font-size:.82rem;"></textarea>
+
+            <div class="row g-3 mt-1">
+              <div class="col-sm-6">
+                <label class="form-label-custom">Description length (characters)</label>
+                <input type="number" class="form-control-custom" id="descLengthInput" min="0" max="2000">
+              </div>
+            </div>
+
+            <label class="form-label-custom mt-3">Safety Notice text <span class="text-muted fw-normal">— insert with <code>{{notice}}</code></span></label>
+            <textarea class="form-control-custom" id="noticeInput" rows="4" spellcheck="false"></textarea>
+
+            <div id="msgFormatError" class="alert alert-danger d-none mt-3 mb-0 py-2 small"></div>
+
+            <button class="btn btn-admin-primary mt-3" onclick="saveMsgFormat()"><i class="bi bi-save me-1"></i>Save Format</button>
+          </div>
+
+          <div class="col-lg-5">
+            <label class="form-label-custom">Live Preview <span class="text-muted fw-normal" id="previewSourceLabel"></span></label>
+            <div class="wa-preview-wrap">
+              <div class="wa-preview-bubble" id="previewBubble">Loading preview…</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
 </div>
 
@@ -177,6 +226,8 @@
 
     loadStatus();
     statusPollTimer = setInterval(loadStatus, 10000);
+
+    loadMsgFormat();
   });
 
   function escHtml(s) {
@@ -346,6 +397,105 @@
     el.textContent = msg;
     el.classList.remove('d-none');
     setTimeout(() => el.classList.add('d-none'), 3500);
+  }
+
+  /* ── Message Format ─────────────────────────────────────── */
+
+  const MSG_TOKENS = [
+    { t: '{{title}}', label: 'Title' },
+    { t: '{{company}}', label: 'Company' },
+    { t: '{{location}}', label: 'Location' },
+    { t: '{{job_type}}', label: 'Job Type' },
+    { t: '{{salary}}', label: 'Salary' },
+    { t: '{{salary_line}}', label: 'Salary Line' },
+    { t: '{{category}}', label: 'Category' },
+    { t: '{{category_line}}', label: 'Category Line' },
+    { t: '{{positions}}', label: 'Positions' },
+    { t: '{{description}}', label: 'Description' },
+    { t: '{{link}}', label: 'Apply Link' },
+    { t: '{{notice}}', label: 'Safety Notice' },
+    { t: '{{site_name}}', label: 'Site Name' },
+  ];
+
+  let msgDefaults = null;
+  let previewDebounce = null;
+
+  async function loadMsgFormat() {
+    const palette = document.getElementById('tokenPalette');
+    palette.innerHTML = MSG_TOKENS.map(tok =>
+      `<button type="button" class="wa-token-btn" onclick="insertToken('${tok.t}')">${escHtml(tok.label)}</button>`
+    ).join('');
+
+    try {
+      const data = await adminApi.get('/api/admin/whatsapp/message-settings');
+      msgDefaults = data.defaults;
+      document.getElementById('templateInput').value = data.template;
+      document.getElementById('descLengthInput').value = data.descLength;
+      document.getElementById('noticeInput').value = data.notice;
+      updatePreview();
+
+      ['templateInput', 'descLengthInput', 'noticeInput'].forEach(id => {
+        document.getElementById(id).addEventListener('input', () => {
+          clearTimeout(previewDebounce);
+          previewDebounce = setTimeout(updatePreview, 400);
+        });
+      });
+    } catch (e) {
+      showWaAlert(e.message || 'Failed to load message format', 'danger');
+    }
+  }
+
+  function insertToken(token) {
+    const el = document.getElementById('templateInput');
+    const start = el.selectionStart ?? el.value.length;
+    const end = el.selectionEnd ?? el.value.length;
+    el.value = el.value.slice(0, start) + token + el.value.slice(end);
+    el.focus();
+    el.selectionStart = el.selectionEnd = start + token.length;
+    clearTimeout(previewDebounce);
+    previewDebounce = setTimeout(updatePreview, 400);
+  }
+
+  function renderPreviewBubble(text) {
+    const escaped = escHtml(text);
+    return escaped.replace(/\*([^\n*]+)\*/g, '<strong>$1</strong>');
+  }
+
+  async function updatePreview() {
+    const template = document.getElementById('templateInput').value;
+    const descLength = document.getElementById('descLengthInput').value;
+    const notice = document.getElementById('noticeInput').value;
+    try {
+      const data = await adminApi.post('/api/admin/whatsapp/message-preview', { template, descLength, notice });
+      document.getElementById('previewBubble').innerHTML = renderPreviewBubble(data.text);
+      document.getElementById('previewSourceLabel').textContent = data.isSample ? '(sample job — no jobs posted yet)' : `(latest job: ${data.sampleJobTitle})`;
+    } catch (e) {
+      document.getElementById('previewBubble').textContent = 'Preview unavailable: ' + (e.message || 'error');
+    }
+  }
+
+  async function saveMsgFormat() {
+    const errEl = document.getElementById('msgFormatError');
+    errEl.classList.add('d-none');
+    const template = document.getElementById('templateInput').value;
+    const descLength = document.getElementById('descLengthInput').value;
+    const notice = document.getElementById('noticeInput').value;
+
+    try {
+      await adminApi.put('/api/admin/whatsapp/message-settings', { template, descLength, notice });
+      showWaAlert('Message format saved — new jobs will use it starting with the next cron run.', 'success');
+    } catch (e) {
+      errEl.textContent = e.message || 'Failed to save message format';
+      errEl.classList.remove('d-none');
+    }
+  }
+
+  function resetMsgFormat() {
+    if (!msgDefaults) return;
+    document.getElementById('templateInput').value = msgDefaults.template;
+    document.getElementById('descLengthInput').value = msgDefaults.descLength;
+    document.getElementById('noticeInput').value = msgDefaults.notice;
+    updatePreview();
   }
 </script>
 </body>
