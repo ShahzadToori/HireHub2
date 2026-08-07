@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WhatsApp Bot – JobOrbit Admin</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/svg+xml" href="/JobOrbitFavicon.svg">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@600;700;800&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/admin/css/admin.css">
+  <style>
+    .wa-status-row { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; }
+    .wa-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
+    .wa-dot.ok { background: var(--success); box-shadow: 0 0 0 4px rgba(25,135,84,.15); }
+    .wa-dot.bad { background: var(--danger); box-shadow: 0 0 0 4px rgba(220,53,69,.15); }
+    .wa-dot.unknown { background: var(--text-muted); box-shadow: 0 0 0 4px rgba(107,114,128,.12); }
+    .wa-dot.pending { background: var(--warning); box-shadow: 0 0 0 4px rgba(255,193,7,.18); animation: wa-pulse 1.4s ease-in-out infinite; }
+    @keyframes wa-pulse { 0%,100% { opacity: 1; } 50% { opacity: .45; } }
+    .wa-status-text { font-weight: 600; font-size: 1.05rem; }
+    .wa-meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-top: 1.25rem; }
+    .wa-meta-item { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: .85rem 1rem; }
+    .wa-meta-label { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); font-weight: 600; margin-bottom: .3rem; }
+    .wa-meta-value { font-family: 'SFMono-Regular', Consolas, monospace; font-size: .85rem; word-break: break-all; display: flex; align-items: center; gap: .5rem; }
+    .wa-copy-btn { border: none; background: none; color: var(--text-muted); cursor: pointer; padding: 0; line-height: 1; flex-shrink: 0; }
+    .wa-copy-btn:hover { color: var(--primary); }
+    .wa-activity-list { list-style: none; margin: 0; padding: 0; max-height: 260px; overflow-y: auto; }
+    .wa-activity-list li { font-family: 'SFMono-Regular', Consolas, monospace; font-size: .78rem; padding: .45rem .6rem; border-bottom: 1px solid var(--border); color: var(--text-muted); white-space: pre-wrap; word-break: break-word; }
+    .wa-activity-list li:last-child { border-bottom: none; }
+    .wa-activity-list li.sent { color: var(--success); }
+    .wa-activity-list li.failed { color: var(--danger); }
+    .wa-reconnect-panel { text-align: center; padding: 1rem .5rem; }
+    .wa-pairing-code { font-family: 'SFMono-Regular', Consolas, monospace; font-size: 2.4rem; font-weight: 700; letter-spacing: .18em; color: var(--primary); background: var(--surface); border: 1px dashed var(--primary); border-radius: 12px; padding: 1rem 1.25rem; display: inline-block; margin: 1rem 0; }
+    .wa-step-icon { font-size: 2rem; color: var(--primary); margin-bottom: .5rem; }
+    .wa-spin { animation: wa-spin 1s linear infinite; }
+    @keyframes wa-spin { to { transform: rotate(360deg); } }
+    .wa-instructions { text-align: left; max-width: 380px; margin: 0 auto; font-size: .88rem; color: var(--text-secondary); }
+    .wa-instructions li { margin-bottom: .35rem; }
+    #confirmPhraseInput { font-family: 'SFMono-Regular', Consolas, monospace; text-align: center; letter-spacing: .1em; text-transform: uppercase; }
+  </style>
+</head>
+<body class="admin-body">
+
+<aside class="admin-sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <img src="/JobOrbitFavicon.svg" alt="JobOrbit" class="sidebar-brand" style="height:40px">
+    <span class="sidebar-brand">JobOrbit</span>
+    <button class="btn-sidebar-close d-lg-none" id="sidebarClose"><i class="bi bi-x-lg"></i></button>
+  </div>
+  <nav class="sidebar-nav">
+    <!-- links injected by admin.js -->
+    <hr class="sidebar-divider">
+    <a href="/" class="sidebar-link" target="_blank"><i class="bi bi-box-arrow-up-right"></i><span>View Site</span></a>
+    <button class="sidebar-link sidebar-btn" id="logoutBtn"><i class="bi bi-box-arrow-right"></i><span>Logout</span></button>
+  </nav>
+</aside>
+<div class="sidebar-overlay d-lg-none d-none" id="sidebarOverlay"></div>
+
+<div class="admin-main">
+  <header class="admin-topbar">
+    <button class="btn-hamburger d-lg-none" id="sidebarToggle"><i class="bi bi-list fs-4"></i></button>
+    <h1 class="topbar-title"><i class="bi bi-whatsapp me-2"></i>WhatsApp Bot</h1>
+    <div class="topbar-right">
+      <button class="btn-icon-admin" id="themeToggleAdmin"><i class="bi bi-moon-fill" id="adminThemeIcon"></i></button>
+    </div>
+  </header>
+
+  <main class="admin-content">
+    <div id="waAlert" class="alert d-none mb-3"></div>
+
+    <!-- Connection status -->
+    <div class="admin-card mb-4">
+      <div class="admin-card-header"><h5 class="admin-card-title"><i class="bi bi-broadcast me-2"></i>Connection Status</h5></div>
+      <div class="p-3">
+        <div class="wa-status-row">
+          <span class="wa-dot unknown" id="statusDot"></span>
+          <span class="wa-status-text" id="statusText">Checking…</span>
+          <span class="text-muted small ms-auto" id="lastCheckedText"></span>
+        </div>
+
+        <div class="wa-meta-grid">
+          <div class="wa-meta-item">
+            <div class="wa-meta-label">Delivery schedule</div>
+            <div class="wa-meta-value">Every 5 minutes (cron)</div>
+          </div>
+          <div class="wa-meta-item">
+            <div class="wa-meta-label">Session on disk</div>
+            <div class="wa-meta-value" id="sessionExistsText">–</div>
+          </div>
+          <div class="wa-meta-item">
+            <div class="wa-meta-label">Channel ID (active jobs)</div>
+            <div class="wa-meta-value">
+              <span id="channelIdText">–</span>
+              <button class="wa-copy-btn" onclick="copyText('channelIdText')" title="Copy"><i class="bi bi-clipboard"></i></button>
+            </div>
+          </div>
+          <div class="wa-meta-item">
+            <div class="wa-meta-label">Group ID (pending jobs)</div>
+            <div class="wa-meta-value">
+              <span id="groupIdText">–</span>
+              <button class="wa-copy-btn" onclick="copyText('groupIdText')" title="Copy"><i class="bi bi-clipboard"></i></button>
+            </div>
+          </div>
+        </div>
+        <p class="text-muted small mt-3 mb-0"><i class="bi bi-info-circle me-1"></i>Group/Channel IDs are set via <code>WHATSAPP_GROUP_ID</code> / <code>WHATSAPP_CHANNEL_ID</code> in <code>.env</code> on the server — edit them there if the destinations change.</p>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <!-- Reconnect -->
+      <div class="col-lg-6">
+        <div class="admin-card h-100">
+          <div class="admin-card-header"><h5 class="admin-card-title"><i class="bi bi-arrow-repeat me-2"></i>Reconnect</h5></div>
+          <div class="p-3" id="reconnectPanel">
+            <!-- state rendered by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Activity -->
+      <div class="col-lg-6">
+        <div class="admin-card h-100">
+          <div class="admin-card-header d-flex justify-content-between align-items-center">
+            <h5 class="admin-card-title mb-0"><i class="bi bi-list-check me-2"></i>Recent Activity</h5>
+            <button class="btn btn-sm btn-admin-outline" onclick="loadStatus()"><i class="bi bi-arrow-clockwise"></i></button>
+          </div>
+          <div class="p-2">
+            <ul class="wa-activity-list" id="activityList"><li>Loading…</li></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Confirm modal -->
+<div class="modal fade" id="confirmModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>Start reconnect?</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>This deletes the bot's saved WhatsApp session and takes it <strong>offline</strong> until you finish re-pairing with a code on your phone. The scheduled job delivery will pause automatically until then.</p>
+        <label class="form-label-custom">Bot's WhatsApp number</label>
+        <input type="text" class="form-control-custom mb-3" id="phoneNumberInput" placeholder="9665XXXXXXXX" inputmode="numeric">
+        <label class="form-label-custom">Type <strong>RECONNECT</strong> to confirm</label>
+        <input type="text" class="form-control-custom" id="confirmPhraseInput" placeholder="RECONNECT" autocomplete="off">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-admin-outline" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-admin-primary" id="confirmStartBtn" disabled onclick="startReconnect()">
+          <i class="bi bi-arrow-repeat me-1"></i>Start Reconnect
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/admin/js/admin.js"></script>
+<script>
+  let statusPollTimer = null;
+  let reconnectPollTimer = null;
+  let confirmModal = null;
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    await requireAuth();
+    confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+    document.getElementById('phoneNumberInput').value = '966535707283';
+
+    document.getElementById('confirmPhraseInput').addEventListener('input', (e) => {
+      document.getElementById('confirmStartBtn').disabled = e.target.value.trim().toUpperCase() !== 'RECONNECT';
+    });
+
+    loadStatus();
+    statusPollTimer = setInterval(loadStatus, 10000);
+  });
+
+  function escHtml(s) {
+    return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function relTime(iso) {
+    if (!iso) return 'never';
+    const diffMs = Date.now() - new Date(iso).getTime();
+    const mins = Math.round(diffMs / 60000);
+    if (mins < 1) return 'just now';
+    if (mins < 60) return `${mins}m ago`;
+    const hrs = Math.round(mins / 60);
+    if (hrs < 24) return `${hrs}h ago`;
+    return `${Math.round(hrs / 24)}d ago`;
+  }
+
+  async function copyText(elId) {
+    const text = document.getElementById(elId).textContent;
+    if (!text || text === '–') return;
+    try { await navigator.clipboard.writeText(text); showWaAlert('Copied!', 'success'); } catch {}
+  }
+
+  async function loadStatus() {
+    try {
+      const data = await adminApi.get('/api/admin/whatsapp/status');
+
+      const dot = document.getElementById('statusDot');
+      const text = document.getElementById('statusText');
+      if (data.reconnect && ['starting', 'awaiting-code', 'code-ready'].includes(data.reconnect.state)) {
+        dot.className = 'wa-dot pending';
+        text.textContent = 'Reconnecting…';
+      } else if (data.connected === true) {
+        dot.className = 'wa-dot ok';
+        text.textContent = 'Connected';
+      } else if (data.connected === false) {
+        dot.className = 'wa-dot bad';
+        text.textContent = 'Disconnected — needs reconnect';
+      } else {
+        dot.className = 'wa-dot unknown';
+        text.textContent = 'Status unknown (no log data yet)';
+      }
+      document.getElementById('lastCheckedText').textContent = data.lastLogWriteAt ? `Last cron activity: ${relTime(data.lastLogWriteAt)}` : '';
+      document.getElementById('sessionExistsText').textContent = data.sessionExists ? 'Present' : 'Missing';
+      document.getElementById('channelIdText').textContent = data.channelId || 'Not set';
+      document.getElementById('groupIdText').textContent = data.groupId || 'Not set';
+
+      const list = document.getElementById('activityList');
+      if (!data.activity || !data.activity.length) {
+        list.innerHTML = '<li>No recent activity logged.</li>';
+      } else {
+        list.innerHTML = data.activity.map(line => {
+          const cls = line.includes('✅ Sent') ? 'sent' : line.includes('❌ Failed') ? 'failed' : '';
+          return `<li class="${cls}">${escHtml(line)}</li>`;
+        }).join('');
+      }
+
+      renderReconnectPanel(data.reconnect || { state: 'idle' });
+    } catch (e) {
+      showWaAlert(e.message || 'Failed to load status', 'danger');
+    }
+  }
+
+  function renderReconnectPanel(state) {
+    const panel = document.getElementById('reconnectPanel');
+    const s = state.state || 'idle';
+
+    if (['starting', 'awaiting-code'].includes(s)) {
+      if (!reconnectPollTimer) reconnectPollTimer = setInterval(pollReconnect, 1500);
+      panel.innerHTML = `
+        <div class="wa-reconnect-panel">
+          <i class="bi bi-arrow-repeat wa-spin wa-step-icon"></i>
+          <p class="mb-0">${s === 'starting' ? 'Clearing old session…' : 'Requesting a pairing code from WhatsApp…'}</p>
+          <button class="btn btn-sm btn-admin-outline mt-3" onclick="cancelReconnect()">Cancel</button>
+        </div>`;
+      return;
+    }
+
+    if (s === 'code-ready') {
+      if (!reconnectPollTimer) reconnectPollTimer = setInterval(pollReconnect, 1500);
+      panel.innerHTML = `
+        <div class="wa-reconnect-panel">
+          <div class="wa-pairing-code">${escHtml(state.pairingCode || '')}</div>
+          <ol class="wa-instructions">
+            <li>On the bot's phone, open <strong>WhatsApp</strong></li>
+            <li>Tap <strong>⋮ → Linked Devices → Link a Device</strong></li>
+            <li>Tap <strong>"Link with phone number instead"</strong></li>
+            <li>Enter the code above — <strong>be quick, it expires in ~1 minute</strong></li>
+          </ol>
+          <p class="text-muted small mb-2">This page updates automatically once linked.</p>
+          <button class="btn btn-sm btn-admin-outline" onclick="cancelReconnect()">Cancel</button>
+        </div>`;
+      return;
+    }
+
+    if (reconnectPollTimer) { clearInterval(reconnectPollTimer); reconnectPollTimer = null; }
+
+    if (s === 'linked') {
+      panel.innerHTML = `
+        <div class="wa-reconnect-panel">
+          <i class="bi bi-check-circle-fill wa-step-icon" style="color:var(--success)"></i>
+          <p class="mb-3"><strong>Linked!</strong> The bot is back online and job delivery has resumed.</p>
+          <button class="btn btn-sm btn-admin-primary" onclick="openConfirmModal()">Reconnect Again</button>
+        </div>`;
+      return;
+    }
+
+    if (s === 'failed' || s === 'timeout') {
+      panel.innerHTML = `
+        <div class="wa-reconnect-panel">
+          <i class="bi bi-x-circle-fill wa-step-icon" style="color:var(--danger)"></i>
+          <p class="mb-1"><strong>${s === 'timeout' ? 'Pairing code expired' : 'Reconnect failed'}</strong></p>
+          <p class="text-muted small mb-3">${escHtml(state.error || 'The code wasn\'t entered in time. Try again.')}</p>
+          <button class="btn btn-sm btn-admin-primary" onclick="openConfirmModal()">Try Again</button>
+        </div>`;
+      return;
+    }
+
+    // idle / cancelled
+    panel.innerHTML = `
+      <div class="wa-reconnect-panel">
+        <i class="bi bi-qr-code wa-step-icon"></i>
+        <p class="text-muted small mb-3">If the bot has gone offline, reconnect it here instead of SSHing into the server.</p>
+        <button class="btn btn-admin-primary" onclick="openConfirmModal()"><i class="bi bi-arrow-repeat me-1"></i>Reconnect</button>
+      </div>`;
+  }
+
+  function openConfirmModal() {
+    document.getElementById('confirmPhraseInput').value = '';
+    document.getElementById('confirmStartBtn').disabled = true;
+    confirmModal.show();
+  }
+
+  async function startReconnect() {
+    const phoneNumber = document.getElementById('phoneNumberInput').value.replace(/[^0-9]/g, '');
+    try {
+      await adminApi.post('/api/admin/whatsapp/reconnect/start', { phoneNumber });
+      confirmModal.hide();
+      loadStatus();
+    } catch (e) {
+      showWaAlert(e.message || 'Failed to start reconnect', 'danger');
+    }
+  }
+
+  async function pollReconnect() {
+    try {
+      const state = await adminApi.get('/api/admin/whatsapp/reconnect/status');
+      renderReconnectPanel(state);
+      if (['linked', 'failed', 'timeout', 'cancelled'].includes(state.state)) {
+        loadStatus();
+      }
+    } catch (e) { /* keep polling silently */ }
+  }
+
+  async function cancelReconnect() {
+    try {
+      await adminApi.post('/api/admin/whatsapp/reconnect/cancel', {});
+      loadStatus();
+    } catch (e) {
+      showWaAlert(e.message || 'Failed to cancel', 'danger');
+    }
+  }
+
+  function showWaAlert(msg, type) {
+    const el = document.getElementById('waAlert');
+    el.className = `alert alert-${type}`;
+    el.textContent = msg;
+    el.classList.remove('d-none');
+    setTimeout(() => el.classList.add('d-none'), 3500);
+  }
+</script>
+</body>
+</html>

@@ -25,6 +25,7 @@ const adminEmployersRoutes  = require('./routes/admin-employers');
 const analyticsRoutes       = require('./routes/analytics');
 const adminAnalyticsRoutes  = require('./routes/admin-analytics');
 const adsRoutes             = require('./routes/ads');
+const adminWhatsappRoutes   = require('./routes/admin-whatsapp');
 
 
 // Fail fast rather than silently signing sessions with a well-known fallback
@@ -159,6 +160,7 @@ app.use('/api/jobs',      jobsRoutes);
 app.use('/api/admin/redirects',  redirectsRoutes);
 app.use('/api/admin/employers',  adminEmployersRoutes);
 app.use('/api/admin/analytics',  adminAnalyticsRoutes);
+app.use('/api/admin/whatsapp',   adminWhatsappRoutes);
 app.use('/api/analytics',        analyticsRoutes);
 app.use('/api/ads',              adsRoutes);
 app.use('/api/admin',            adminRoutes);

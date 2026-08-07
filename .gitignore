@@ -12,6 +12,8 @@ qr.png
 *.tmp
 .DS_Store
 channel-forwarder/.wwebjs_cache/
+channel-forwarder/.reconnect.lock
+channel-forwarder/.reconnect-state.json
 public/uploads/blog/
 patch*.py
 public/uploads/cvs/
