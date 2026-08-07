@@ -59,6 +59,16 @@
       <a href="/employer/applications.html" class="ep-nav-link"><i class="bi bi-inbox-fill"></i><span>Applications</span></a>
     </div>
     <div class="ep-nav-right">
+      <div class="ep-notif-wrap" id="epNotifWrap">
+        <button class="ep-icon-btn" id="epNotifBtn" title="Notifications">
+          <i class="bi bi-bell-fill"></i>
+          <span class="ep-notif-dot" id="epNotifDot"></span>
+        </button>
+        <div class="ep-notif-dropdown" id="epNotifDropdown">
+          <div class="ep-notif-header"><span>Notifications</span></div>
+          <div id="epNotifList"><div class="ep-notif-empty"><i class="bi bi-hourglass-split"></i>Loading…</div></div>
+        </div>
+      </div>
       <button class="ep-icon-btn" id="themeToggle"><i class="bi bi-moon-fill" id="themeIcon"></i></button>
       <div class="ep-user-menu" id="epUserMenu">
         <button class="ep-user-btn" onclick="toggleUserMenu()">
@@ -738,5 +748,6 @@ init();
 })();
 </script>
 <script src="/employer/js/ui-dialogs.js"></script>
+<script src="/employer/js/notifications.js"></script>
 <script src="/employer/feedback-widget.js"></script>
 </body></html>

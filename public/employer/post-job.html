@@ -92,6 +92,16 @@
       <a href="/employer/applications.html" class="ep-nav-link "><i class="bi bi-inbox-fill"></i><span>Applications</span></a>
     </div>
     <div class="ep-nav-right">
+      <div class="ep-notif-wrap" id="epNotifWrap">
+        <button class="ep-icon-btn" id="epNotifBtn" title="Notifications">
+          <i class="bi bi-bell-fill"></i>
+          <span class="ep-notif-dot" id="epNotifDot"></span>
+        </button>
+        <div class="ep-notif-dropdown" id="epNotifDropdown">
+          <div class="ep-notif-header"><span>Notifications</span></div>
+          <div id="epNotifList"><div class="ep-notif-empty"><i class="bi bi-hourglass-split"></i>Loading…</div></div>
+        </div>
+      </div>
       <button class="ep-icon-btn" id="themeToggle"><i class="bi bi-moon-fill" id="themeIcon"></i></button>
       <div class="ep-user-menu" id="epUserMenu">
         <button class="ep-user-btn" onclick="toggleUserMenu()">
@@ -150,7 +160,13 @@
 
       <!-- Job form -->
       <div class="ep-card">
-        <h2 class="ep-card-title mb-3">Job Details</h2>
+        <div class="ep-form-section-head mb-3">
+          <div class="ep-form-section-icon"><i class="bi bi-briefcase-fill"></i></div>
+          <div>
+            <h2 class="ep-card-title" style="margin:0">Job Basics</h2>
+            <p class="ep-form-section-desc">Title, category, location and type</p>
+          </div>
+        </div>
         <div class="row g-3">
           <div class="col-12">
             <div class="ep-field">
@@ -223,7 +239,13 @@
         </div>
 
         <hr style="border-color:var(--border);margin:1.5rem 0">
-        <h3 class="ep-section-sub">Contact Information</h3>
+        <div class="ep-form-section-head mb-3">
+          <div class="ep-form-section-icon"><i class="bi bi-telephone-fill"></i></div>
+          <div>
+            <h3 class="ep-card-title" style="margin:0;font-size:.98rem">Contact Information</h3>
+            <p class="ep-form-section-desc">How applicants reach you — shown on the public listing</p>
+          </div>
+        </div>
         <div class="row g-3">
           <div class="col-sm-4">
             <div class="ep-field">
@@ -298,11 +320,12 @@
             <input class="form-check-input" type="checkbox" role="switch" id="jRequireCv" onchange="updateSharePreview()">
             <label class="form-check-label" style="font-size:.82rem;color:var(--text-primary)" for="jRequireCv">
               Require CV upload <span style="font-size:.72rem;color:var(--text-muted)">(PDF, max 5MB)</span>
+              <span class="ep-help-tip"><span class="ep-help-icon">?</span><span class="ep-help-popover">When on, applicants must attach a CV — they can't apply with just contact details.</span></span>
             </label>
           </div>
           <div class="row g-3">
             <div class="col-sm-6 sc-field" id="fNat" style="display:none">
-              <div class="ep-field"><label class="ep-label">Accepted Nationalities</label>
+              <div class="ep-field"><label class="ep-label">Accepted Nationalities <span class="ep-help-tip"><span class="ep-help-icon">?</span><span class="ep-help-popover">Applicants outside these nationalities won't be able to submit an application for this job.</span></span></label>
                 <div class="cnt-picker" id="scNatWrapper">
                   <input type="text" class="ep-input" id="scNatSearch" placeholder="Search nationalities..." oninput="filterCnt('scNat',this.value)" onfocus="showCntDd('scNat')" autocomplete="off">
                   <div class="cnt-dropdown" id="scNatDd"></div>
@@ -311,15 +334,15 @@
                 </div></div>
             </div>
             <div class="col-sm-6 sc-field" id="fIqama" style="display:none">
-              <div class="ep-field"><label class="ep-label">Iqama Type Required</label>
+              <div class="ep-field"><label class="ep-label">Iqama Type Required <span class="ep-help-tip"><span class="ep-help-icon">?</span><span class="ep-help-popover">Restricts applicants by iqama transfer status — pick the option that matches who you can legally hire.</span></span></label>
                 <select class="ep-input" id="scIqama"><option value="">Any status welcome</option><option value="transferable">Transferable iqama only</option><option value="local">Local transfer or visit visa</option></select></div>
             </div>
             <div class="col-sm-6 sc-field" id="fExp" style="display:none">
-              <div class="ep-field"><label class="ep-label">Minimum Experience (years)</label>
+              <div class="ep-field"><label class="ep-label">Minimum Experience (years) <span class="ep-help-tip"><span class="ep-help-icon">?</span><span class="ep-help-popover">Candidates with fewer years of experience than this will be blocked from applying.</span></span></label>
                 <input type="number" class="ep-input" id="scExp" value="0" min="0" max="30"></div>
             </div>
             <div class="col-sm-6 sc-field" id="fCerts" style="display:none">
-              <div class="ep-field"><label class="ep-label">Required Certifications</label>
+              <div class="ep-field"><label class="ep-label">Required Certifications <span class="ep-help-tip"><span class="ep-help-icon">?</span><span class="ep-help-popover">Applicants must confirm they hold at least one of these — free text, shown exactly as typed.</span></span></label>
                 <input type="text" class="ep-input" id="scCerts" placeholder="e.g. Aramco Approval, CSWIP, PMP"></div>
             </div>
           </div>
@@ -1761,6 +1784,15 @@ init();
 </script>
 <script src="/js/countries.js"></script>
 <script>document.addEventListener("DOMContentLoaded",()=>{ initCntPicker("scNat",""); initCntPicker("bscNat",""); });</script>
+<script>
+// Tap-to-toggle help tooltips on touch devices (there's no :hover there)
+document.addEventListener('click', (e) => {
+  const tip = e.target.closest('.ep-help-tip');
+  document.querySelectorAll('.ep-help-tip.open').forEach(t => { if (t !== tip) t.classList.remove('open'); });
+  if (tip) { e.stopPropagation(); tip.classList.toggle('open'); }
+});
+</script>
 <script src="/employer/js/ui-dialogs.js"></script>
+<script src="/employer/js/notifications.js"></script>
 <script src="/employer/feedback-widget.js"></script>
 </body></html>

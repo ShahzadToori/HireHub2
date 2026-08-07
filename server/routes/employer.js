@@ -364,7 +364,7 @@ router.post('/logout-all', requireEmployer, async (req, res) => {
 router.get('/me', requireEmployer, async (req, res) => {
   try {
     const [[emp]] = await db.query(
-      'SELECT id, company_name, contact_name, email, phone, whatsapp, sector, city, logo_url, about, website, status, created_at, address, map_link, company_size, cr_number, linkedin_url, founded_year, wa_template_single, wa_template_bulk FROM employers WHERE id = ?',
+      'SELECT id, company_name, contact_name, email, phone, whatsapp, sector, city, logo_url, about, website, status, created_at, address, map_link, company_size, cr_number, linkedin_url, founded_year, wa_template_single, wa_template_bulk, email_verified FROM employers WHERE id = ?',
       [req.employer.id]
     );
     const [[{ total_jobs }]] = await db.query(
@@ -381,6 +381,65 @@ router.get('/me', requireEmployer, async (req, res) => {
     );
     res.json({ success: true, employer: emp, stats: { total_jobs, total_applications, new_applications } });
   } catch (err) {
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+// GET /api/employer/notifications — powers the navbar bell across the portal.
+// Grouped by urgency (expiring jobs first, since inaction there loses the
+// listing) rather than a single chronological merge — mixing "3 days from
+// now" with "2 hours ago" into one time-sorted list reads confusingly.
+router.get('/notifications', requireEmployer, async (req, res) => {
+  try {
+    const [expiring] = await db.query(
+      `SELECT id, title, expires_at
+         FROM jobs
+        WHERE employer_id = ? AND status = 'active' AND expires_at IS NOT NULL
+          AND expires_at BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 3 DAY)
+        ORDER BY expires_at ASC LIMIT 8`,
+      [req.employer.id]
+    );
+    const [newApps] = await db.query(
+      `SELECT a.id, a.full_name, a.created_at, j.title AS job_title, j.id AS job_id
+         FROM job_applications a
+         JOIN jobs j ON j.id = a.job_id
+        WHERE j.employer_id = ? AND a.status = 'new'
+        ORDER BY a.created_at DESC LIMIT 8`,
+      [req.employer.id]
+    );
+    const [pendingRequests] = await db.query(
+      `SELECT sr.id, sr.requester_name, sr.created_at, sv.title AS share_title
+         FROM share_requests sr
+         JOIN shared_views sv ON sv.token = sr.share_token
+        WHERE sv.employer_id = ? AND sr.status = 'pending'
+        ORDER BY sr.created_at DESC LIMIT 8`,
+      [req.employer.id]
+    );
+
+    const notifications = [
+      ...expiring.map(j => ({
+        type: 'expiring',
+        text: `"${j.title}" expires soon`,
+        time: j.expires_at,
+        link: '/employer/jobs.html',
+      })),
+      ...newApps.map(a => ({
+        type: 'application',
+        text: `${a.full_name} applied for ${a.job_title}`,
+        time: a.created_at,
+        link: `/employer/applications.html?job_id=${a.job_id}`,
+      })),
+      ...pendingRequests.map(r => ({
+        type: 'access_request',
+        text: `${r.requester_name || 'Someone'} requested access to "${r.share_title}"`,
+        time: r.created_at,
+        link: '/employer/dashboard.html',
+      })),
+    ].slice(0, 15);
+
+    res.json({ success: true, notifications });
+  } catch (err) {
+    console.error('[employer/notifications]', err);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });
@@ -661,6 +720,86 @@ router.post('/jobs/:id/repost', requireEmployer, async (req, res) => {
     );
     res.json({ success: true, message: 'Job reposted successfully' });
   } catch (err) {
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+// GET /api/employer/jobs/:id/view-trend — daily view counts for a job's
+// public detail page over the last 14 days. Reuses the existing first-party
+// analytics tables (analytics_pageviews already logs every /job/:slug hit)
+// rather than adding new per-job view tracking.
+router.get('/jobs/:id/view-trend', requireEmployer, async (req, res) => {
+  try {
+    const [[job]] = await db.query('SELECT slug FROM jobs WHERE id = ? AND employer_id = ?', [req.params.id, req.employer.id]);
+    if (!job) return res.status(404).json({ success: false, message: 'Job not found' });
+
+    // DATE_FORMAT returns a plain string from MySQL — DATE()/JS Date would
+    // get re-serialized through toISOString() on the way to JSON, which
+    // shifts the day backward for any timezone ahead of UTC.
+    const [rows] = await db.query(
+      `SELECT DATE_FORMAT(created_at, '%Y-%m-%d') AS day, COUNT(*) AS views
+         FROM analytics_pageviews
+        WHERE path = ? AND created_at >= NOW() - INTERVAL 14 DAY
+        GROUP BY day
+        ORDER BY day ASC`,
+      ['/job/' + job.slug]
+    );
+    res.json({ success: true, trend: rows });
+  } catch (err) {
+    console.error('[employer/jobs/:id/view-trend]', err);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+// POST /api/employer/jobs/:id/duplicate — creates a brand-new job row
+// pre-filled from an existing one. Distinct from /repost, which reactivates
+// the SAME row (same id/slug/application history) — this is for employers
+// who hire the same role repeatedly and want a fresh listing.
+router.post('/jobs/:id/duplicate', requireEmployer, async (req, res) => {
+  try {
+    const [[job]] = await db.query('SELECT * FROM jobs WHERE id = ? AND employer_id = ?', [req.params.id, req.employer.id]);
+    if (!job) return res.status(404).json({ success: false, message: 'Job not found' });
+
+    let baseSlug = slugify(job.title + '-' + job.location);
+    let slug = baseSlug;
+    let counter = 1;
+    while (true) {
+      const [[existing]] = await db.query('SELECT id FROM jobs WHERE slug = ?', [slug]);
+      if (!existing) break;
+      slug = `${baseSlug}-${counter++}`;
+    }
+
+    let expiresAt = null;
+    if (job.expires_at && job.created_at) {
+      const durationMs = new Date(job.expires_at).getTime() - new Date(job.created_at).getTime();
+      expiresAt = new Date(Date.now() + (durationMs > 0 ? durationMs : 30 * 86400000));
+    }
+
+    const [result] = await db.query(
+      `INSERT INTO jobs
+         (employer_id, title, company, category_id, location, job_type, description,
+          requirements, salary, positions, phone, whatsapp, email, map_link, slug, status,
+          require_cv, expires_at, posted_by, created_at)
+       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,'active',?,?,'employer',NOW())`,
+      [
+        req.employer.id, job.title, job.company, job.category_id, job.location, job.job_type,
+        job.description, job.requirements, job.salary, job.positions, job.phone, job.whatsapp,
+        job.email, job.map_link, slug, job.require_cv, expiresAt
+      ]
+    );
+
+    const [[screening]] = await db.query('SELECT * FROM job_screening WHERE job_id = ?', [job.id]);
+    if (screening) {
+      await db.query(
+        `INSERT INTO job_screening (job_id, nationalities, iqama_types, min_experience, required_certs, custom_questions, require_iqama_number)
+         VALUES (?,?,?,?,?,?,?)`,
+        [result.insertId, screening.nationalities, screening.iqama_types, screening.min_experience, screening.required_certs, screening.custom_questions, screening.require_iqama_number]
+      );
+    }
+
+    res.json({ success: true, message: 'Job duplicated', job: { id: result.insertId, slug } });
+  } catch (err) {
+    console.error('[employer/jobs/:id/duplicate]', err);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });

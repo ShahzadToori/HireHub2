@@ -46,6 +46,16 @@
       <a href="/employer/applications.html" class="ep-nav-link "><i class="bi bi-inbox-fill"></i><span>Applications</span></a>
     </div>
     <div class="ep-nav-right">
+      <div class="ep-notif-wrap" id="epNotifWrap">
+        <button class="ep-icon-btn" id="epNotifBtn" title="Notifications">
+          <i class="bi bi-bell-fill"></i>
+          <span class="ep-notif-dot" id="epNotifDot"></span>
+        </button>
+        <div class="ep-notif-dropdown" id="epNotifDropdown">
+          <div class="ep-notif-header"><span>Notifications</span></div>
+          <div id="epNotifList"><div class="ep-notif-empty"><i class="bi bi-hourglass-split"></i>Loading…</div></div>
+        </div>
+      </div>
       <button class="ep-icon-btn" id="themeToggle"><i class="bi bi-moon-fill" id="themeIcon"></i></button>
       <div class="ep-user-menu" id="epUserMenu">
         <button class="ep-user-btn" onclick="toggleUserMenu()">
@@ -259,6 +269,7 @@ function renderPage() {
       <!-- Stats -->
       <div style="display:flex;align-items:center;gap:.85rem;padding:.5rem 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin:.6rem 0;flex-wrap:wrap">
         <span style="font-size:.76rem;color:var(--text-muted)"><i class="bi bi-eye me-1"></i>${j.views||0} views</span>
+        <span class="ep-sparkline" id="spark-${j.id}"></span>
         <span style="font-size:.76rem;cursor:pointer" onclick="window.location.href='/employer/applications.html?job_id=${j.id}'">
           <i class="bi bi-people-fill me-1" style="color:var(--primary)"></i>
           <strong>${j.application_count||0}</strong> applications
@@ -281,16 +292,19 @@ function renderPage() {
           <div class="ep-action-menu-panel" id="menu-${j.id}">
             ${j.status==='active'?`
             <div class="ep-action-menu-item" onclick="editJob(${j.id});closeMenus()"><i class="bi bi-pencil" style="color:var(--primary)"></i>Edit Job</div>
+            <div class="ep-action-menu-item" onclick="duplicateJob(${j.id});closeMenus()"><i class="bi bi-files"></i>Duplicate as New</div>
             <div class="ep-action-menu-item" onclick="copyShareMsg(${j.id});closeMenus()"><i class="bi bi-clipboard"></i>Copy Message</div>
             <div class="ep-action-menu-item danger" onclick="closeJob(${j.id});closeMenus()"><i class="bi bi-x-circle"></i>Close Job</div>
             <div class="ep-action-menu-item danger" onclick="deleteJob(${j.id});closeMenus()"><i class="bi bi-trash3"></i>Delete Job</div>`:`
             <div class="ep-action-menu-item" onclick="repostJob(${j.id});closeMenus()"><i class="bi bi-arrow-repeat" style="color:var(--primary)"></i>Repost</div>
+            <div class="ep-action-menu-item" onclick="duplicateJob(${j.id});closeMenus()"><i class="bi bi-files"></i>Duplicate as New</div>
             <div class="ep-action-menu-item" onclick="copyShareMsg(${j.id});closeMenus()"><i class="bi bi-clipboard"></i>Copy Message</div>
             <div class="ep-action-menu-item danger" onclick="deleteJob(${j.id});closeMenus()"><i class="bi bi-trash3"></i>Delete Job</div>`}
           </div>
         </div>
       </div>
     </div>`).join('');
+  loadSparklines(slice);
   // Pagination
   if(pag){
     if(total<=1){pag.innerHTML='';if(info)info.textContent='';return;}
@@ -452,8 +466,46 @@ async function repostJob(id) {
   else showToast(d.message, 'error');
 }
 
+async function duplicateJob(id) {
+  const d = await API.post('/api/employer/jobs/' + id + '/duplicate', {});
+  if (d.success) { showToast('Job duplicated — edit the copy to make changes'); init(); }
+  else showToast(d.message || 'Failed to duplicate job', 'error');
+}
+
 function editJob(id) {
   window.location.href = '/employer/post-job.html?edit=' + id;
+}
+
+/* ── Per-job view-trend sparklines ── */
+function localDateStr(d) {
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function renderSparklineSvg(values) {
+  const total = values.reduce((a,b) => a+b, 0);
+  if (!total) return '';
+  const max = Math.max(...values, 1);
+  const w = 56, h = 20;
+  const step = w / (values.length - 1);
+  const points = values.map((v,i) => `${(i*step).toFixed(1)},${(h - (v/max)*h*0.85 - 1).toFixed(1)}`).join(' ');
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><polyline points="${points}" fill="none" stroke="var(--primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="ep-sparkline-label">${total} views/14d</span>`;
+}
+
+async function loadSparklines(jobs) {
+  await Promise.all(jobs.map(async j => {
+    const el = document.getElementById('spark-' + j.id);
+    if (!el) return;
+    try {
+      const d = await API.get('/api/employer/jobs/' + j.id + '/view-trend');
+      const map = {};
+      (d.trend || []).forEach(t => { map[t.day] = t.views; });
+      const days = [];
+      for (let i = 13; i >= 0; i--) {
+        days.push(map[localDateStr(new Date(Date.now() - i*86400000))] || 0);
+      }
+      el.innerHTML = renderSparklineSvg(days);
+    } catch (e) { /* leave blank — not critical */ }
+  }));
 }
 
 function buildShareMsg(id) {
@@ -522,5 +574,6 @@ init();
 })();
 </script>
 <script src="/employer/js/ui-dialogs.js"></script>
+<script src="/employer/js/notifications.js"></script>
 <script src="/employer/feedback-widget.js"></script>
 </body></html>

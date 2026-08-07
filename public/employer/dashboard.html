@@ -46,6 +46,16 @@
       <a href="/employer/applications.html" class="ep-nav-link "><i class="bi bi-inbox-fill"></i><span>Applications</span></a>
     </div>
     <div class="ep-nav-right">
+      <div class="ep-notif-wrap" id="epNotifWrap">
+        <button class="ep-icon-btn" id="epNotifBtn" title="Notifications">
+          <i class="bi bi-bell-fill"></i>
+          <span class="ep-notif-dot" id="epNotifDot"></span>
+        </button>
+        <div class="ep-notif-dropdown" id="epNotifDropdown">
+          <div class="ep-notif-header"><span>Notifications</span></div>
+          <div id="epNotifList"><div class="ep-notif-empty"><i class="bi bi-hourglass-split"></i>Loading…</div></div>
+        </div>
+      </div>
       <button class="ep-icon-btn" id="themeToggle"><i class="bi bi-moon-fill" id="themeIcon"></i></button>
       <div class="ep-user-menu" id="epUserMenu">
         <button class="ep-user-btn" onclick="toggleUserMenu()">
@@ -78,35 +88,49 @@
     <a href="/employer/post-job.html" class="ep-btn-primary"><i class="bi bi-plus-lg me-2"></i>Post a Job</a>
   </div>
 
+  <!-- Onboarding checklist (first-time employers only) -->
+  <div class="ep-onboard-card d-none" id="onboardCard">
+    <div class="ep-onboard-top">
+      <div class="ep-onboard-title"><i class="bi bi-stars" style="color:var(--primary)"></i>Get the most out of JobOrbit</div>
+      <div style="display:flex;align-items:center;gap:.6rem">
+        <span class="ep-onboard-progress-text" id="onboardProgressText"></span>
+        <button class="ep-onboard-close" onclick="dismissOnboarding()" title="Dismiss"><i class="bi bi-x-lg"></i></button>
+      </div>
+    </div>
+    <div class="ep-onboard-bar"><div class="ep-onboard-bar-fill" id="onboardBarFill" style="width:0%"></div></div>
+    <div class="ep-onboard-steps" id="onboardSteps"></div>
+  </div>
+
   <!-- Stats -->
   <div class="ep-stats-grid">
     <div class="ep-stat-card">
-      <div class="ep-stat-icon" style="background:rgba(15,98,254,.1);color:var(--primary)"><i class="bi bi-briefcase-fill"></i></div>
-      <div>
-        <div class="ep-stat-num" id="statJobs">—</div>
-        <div class="ep-stat-label">Active Jobs</div>
+      <div class="ep-stat-top">
+        <div class="ep-stat-icon" style="background:rgba(15,98,254,.1);color:var(--primary)"><i class="bi bi-briefcase-fill"></i></div>
+        <span class="ep-stat-trend" id="statJobsTrend" style="display:none;background:rgba(5,150,105,.1);color:#059669"></span>
       </div>
+      <div class="ep-stat-num" id="statJobs">—</div>
+      <div class="ep-stat-label">Active Jobs</div>
     </div>
     <div class="ep-stat-card">
-      <div class="ep-stat-icon" style="background:rgba(16,185,129,.1);color:#059669"><i class="bi bi-people-fill"></i></div>
-      <div>
-        <div class="ep-stat-num" id="statApps">—</div>
-        <div class="ep-stat-label">Total Applications</div>
+      <div class="ep-stat-top">
+        <div class="ep-stat-icon" style="background:rgba(16,185,129,.1);color:#059669"><i class="bi bi-people-fill"></i></div>
       </div>
+      <div class="ep-stat-num" id="statApps">—</div>
+      <div class="ep-stat-label">Total Applications</div>
     </div>
     <div class="ep-stat-card" style="cursor:pointer" onclick="window.location.href='/employer/applications.html?status=new'">
-      <div class="ep-stat-icon" style="background:rgba(245,158,11,.1);color:#d97706"><i class="bi bi-bell-fill"></i></div>
-      <div>
-        <div class="ep-stat-num" id="statNew">—</div>
-        <div class="ep-stat-label">New Applications</div>
+      <div class="ep-stat-top">
+        <div class="ep-stat-icon" style="background:rgba(245,158,11,.1);color:#d97706"><i class="bi bi-bell-fill"></i></div>
       </div>
+      <div class="ep-stat-num" id="statNew">—</div>
+      <div class="ep-stat-label">New Applications</div>
     </div>
     <div class="ep-stat-card">
-      <div class="ep-stat-icon" style="background:rgba(99,102,241,.1);color:#6366f1"><i class="bi bi-eye-fill"></i></div>
-      <div>
-        <div class="ep-stat-num" id="statViews">—</div>
-        <div class="ep-stat-label">Total Views</div>
+      <div class="ep-stat-top">
+        <div class="ep-stat-icon" style="background:rgba(99,102,241,.1);color:#6366f1"><i class="bi bi-eye-fill"></i></div>
       </div>
+      <div class="ep-stat-num" id="statViews">—</div>
+      <div class="ep-stat-label">Total Views</div>
     </div>
   </div>
 
@@ -324,6 +348,46 @@ async function dashApproveReq(id, action) {
   } catch(e) {}
 }
 
+/* ── Onboarding checklist ── */
+function computeOnboardingSteps(employer, jobsCount) {
+  return [
+    { label: 'Complete profile', done: !!(employer.sector && employer.city && employer.phone), href: '/employer/profile.html' },
+    { label: 'Verify email', done: !!employer.email_verified, href: '/employer/profile.html' },
+    { label: 'Post your first job', done: jobsCount > 0, href: '/employer/post-job.html' },
+    { label: 'Set WhatsApp template', done: !!employer.wa_template_single, href: '/employer/profile.html' },
+  ];
+}
+
+function renderOnboarding(employer, jobsCount) {
+  const card = document.getElementById('onboardCard');
+  if (!card) return;
+  window._epId = employer.id;
+  const dismissKey = 'ep_onboard_dismissed_' + employer.id;
+  const steps = computeOnboardingSteps(employer, jobsCount);
+  const doneCount = steps.filter(s => s.done).length;
+
+  if (doneCount === steps.length || localStorage.getItem(dismissKey)) {
+    card.classList.add('d-none');
+    return;
+  }
+  card.classList.remove('d-none');
+  document.getElementById('onboardProgressText').textContent = `${doneCount} of ${steps.length} done`;
+  document.getElementById('onboardBarFill').style.width = Math.round(doneCount / steps.length * 100) + '%';
+  document.getElementById('onboardSteps').innerHTML = steps.map(s => `
+    <a class="ep-onboard-step ${s.done ? 'done' : ''}" href="${s.href}">
+      <span class="ep-onboard-step-check">${s.done ? '<i class="bi bi-check-lg"></i>' : ''}</span>
+      <span>${s.label}</span>
+    </a>`).join('');
+}
+
+function dismissOnboarding() {
+  if (window._epId) localStorage.setItem('ep_onboard_dismissed_' + window._epId, '1');
+  document.getElementById('onboardCard')?.classList.add('d-none');
+}
+
+const JOB_ICONS = ['bi-briefcase-fill','bi-building','bi-tools','bi-truck','bi-hammer','bi-clipboard-data-fill'];
+function jobIcon(id) { return JOB_ICONS[id % JOB_ICONS.length]; }
+
 async function init() {
   const d = await checkAuth();
   if (!d) return;
@@ -335,9 +399,19 @@ async function init() {
 
   // Load jobs
   const jd = await API.get('/api/employer/jobs');
-  const jobs = (jd.jobs || []).slice(0, 5);
-  const totalViews = (jd.jobs || []).reduce((a, j) => a + (j.views || 0), 0);
+  const allJobs = jd.jobs || [];
+  const jobs = allJobs.slice(0, 5);
+  const totalViews = allJobs.reduce((a, j) => a + (j.views || 0), 0);
   document.getElementById('statViews').textContent = totalViews.toLocaleString();
+
+  renderOnboarding(d.employer, allJobs.length);
+
+  const recentJobs = allJobs.filter(j => Date.now() - new Date(j.created_at).getTime() < 7 * 86400000).length;
+  const jobsTrend = document.getElementById('statJobsTrend');
+  if (jobsTrend && recentJobs > 0) {
+    jobsTrend.textContent = `+${recentJobs} this week`;
+    jobsTrend.style.display = '';
+  }
 
   const dashJobs = document.getElementById('dashJobs');
   if (!jobs.length) {
@@ -345,6 +419,7 @@ async function init() {
   } else {
     dashJobs.innerHTML = jobs.map(j => `
       <div class="ep-job-row">
+        <div class="ep-row-icon"><i class="bi ${jobIcon(j.id)}"></i></div>
         <div class="ep-job-row-info">
           <div class="ep-job-row-title">${j.title}</div>
           <div class="ep-job-row-meta">${j.location} · ${timeAgo(j.created_at)}</div>
@@ -418,5 +493,6 @@ init();
 })();
 </script>
 <script src="/employer/js/ui-dialogs.js"></script>
+<script src="/employer/js/notifications.js"></script>
 <script src="/employer/feedback-widget.js"></script>
 </body></html>
