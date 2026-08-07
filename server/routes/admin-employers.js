@@ -1,6 +1,7 @@
 'use strict';
 
 const express    = require('express');
+const crypto     = require('crypto');
 const router     = express.Router();
 const db         = require('../db/connection');
 const { requireAdmin } = require('../middleware/auth');
@@ -162,6 +163,48 @@ router.patch('/:id/notes', async (req, res) => {
     res.json({ success: true, message: 'Notes saved' });
   } catch (err) {
     console.error('[admin/employers/:id/notes]', err);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+// ── POST /api/admin/employers/:id/impersonate ─────────────────────
+// Logs the admin's browser into the employer portal as this employer, so
+// they can check the portal is working from the employer's own view.
+// Adds a new, short-lived session row alongside any the employer already
+// has — it doesn't touch or revoke those, so the employer stays logged in
+// on their own device.
+router.post('/:id/impersonate', async (req, res) => {
+  try {
+    const [[emp]] = await db.query(
+      'SELECT id, company_name, status FROM employers WHERE id = ?',
+      [req.params.id]
+    );
+    if (!emp) return res.status(404).json({ success: false, message: 'Employer not found' });
+    if (emp.status !== 'active') {
+      return res.status(400).json({ success: false, message: `Only active employers can be logged in as — this one is ${emp.status}.` });
+    }
+
+    const token = crypto.randomBytes(32).toString('hex');
+    const maxAgeMs = 2 * 60 * 60 * 1000; // 2 hours — short-lived, admin QA use only
+    const expires = new Date(Date.now() + maxAgeMs);
+
+    await db.query(
+      'INSERT INTO employer_sessions (employer_id, token, expires_at, remember_me) VALUES (?,?,?,0)',
+      [emp.id, token, expires]
+    );
+
+    res.cookie('emp_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: maxAgeMs,
+      sameSite: 'lax'
+    });
+
+    console.log(`[admin-impersonate] admin="${req.session.username}" (#${req.session.adminId}) logged in as employer #${emp.id} "${emp.company_name}"`);
+
+    res.json({ success: true, message: `Logged in as ${emp.company_name}` });
+  } catch (err) {
+    console.error('[admin/employers/:id/impersonate]', err);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });

@@ -68,6 +68,11 @@
     .btn-suspend:hover{background:#fde68a}
     .btn-unsuspend{background:#dbeafe;color:#1e40af;border:none;border-radius:6px;padding:.25rem .6rem;font-size:.75rem;font-weight:600;cursor:pointer;transition:background .15s}
     .btn-unsuspend:hover{background:#bfdbfe}
+    .btn-login-as{background:#e0e7ff;color:#4338ca;border:none;border-radius:6px;padding:.25rem .6rem;font-size:.75rem;font-weight:600;cursor:pointer;transition:background .15s}
+    .btn-login-as:hover{background:#c7d2fe}
+    .btn-login-as:disabled{opacity:.6;cursor:not-allowed}
+    [data-theme="dark"] .btn-login-as{background:rgba(99,102,241,.18);color:#a5b4fc}
+    [data-theme="dark"] .btn-login-as:hover{background:rgba(99,102,241,.28)}
 
     /* ── Error toast ────────────────────────────────────────────── */
     #errToast{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;max-width:380px;background:#dc3545;color:#fff;border-radius:10px;padding:.75rem 1rem;font-size:.82rem;display:none;box-shadow:0 4px 20px rgba(0,0,0,.25)}
@@ -382,6 +387,7 @@ async function loadEmployers(page = 1) {
         <td>
           <div class="d-flex gap-1 flex-wrap">
             <button class="btn-action btn-action-edit" onclick="openDetail(${emp.id})" title="View details"><i class="bi bi-eye"></i></button>
+            ${emp.status === 'active'     ? `<button class="btn-login-as" onclick="loginAsEmployer(${emp.id},this)" title="Log in as this employer to check their portal"><i class="bi bi-box-arrow-in-right me-1"></i>Login</button>` : ''}
             ${emp.status === 'pending'    ? `<button class="btn-approve" onclick="quickAction(${emp.id},'active',this)">Approve</button>` : ''}
             ${emp.status === 'active'     ? `<button class="btn-suspend" onclick="quickAction(${emp.id},'suspended',this)">Suspend</button>` : ''}
             ${emp.status === 'suspended'  ? `<button class="btn-unsuspend" onclick="quickAction(${emp.id},'active',this)">Unsuspend</button>` : ''}
@@ -406,6 +412,7 @@ async function loadEmployers(page = 1) {
         </div>
         <div class="d-flex gap-1 mt-2 flex-wrap">
           <button class="btn-action btn-action-edit" onclick="openDetail(${emp.id})" title="View"><i class="bi bi-eye"></i></button>
+          ${emp.status === 'active'     ? `<button class="btn-login-as" onclick="loginAsEmployer(${emp.id},this)"><i class="bi bi-box-arrow-in-right me-1"></i>Login</button>` : ''}
           ${emp.status === 'pending'    ? `<button class="btn-approve" onclick="quickAction(${emp.id},'active',this)">Approve</button>` : ''}
           ${emp.status === 'active'     ? `<button class="btn-suspend" onclick="quickAction(${emp.id},'suspended',this)">Suspend</button>` : ''}
           ${emp.status === 'suspended'  ? `<button class="btn-unsuspend" onclick="quickAction(${emp.id},'active',this)">Unsuspend</button>` : ''}
@@ -440,6 +447,26 @@ function empAvatar(emp, size) {
             <div style="width:${s}px;height:${s}px;border-radius:8px;background:var(--primary);display:none;align-items:center;justify-content:center;font-weight:700;font-size:${Math.round(s*0.38)}px;color:#fff;flex-shrink:0">${escHtml(emp.company_name.charAt(0).toUpperCase())}</div>`;
   }
   return `<div style="width:${s}px;height:${s}px;border-radius:8px;background:var(--primary);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:${Math.round(s*0.38)}px;color:#fff;flex-shrink:0">${escHtml(emp.company_name.charAt(0).toUpperCase())}</div>`;
+}
+
+async function loginAsEmployer(id, btn) {
+  // Open the tab synchronously, inside the click handler — awaiting the API
+  // call first would lose the "user gesture" browsers require to allow
+  // window.open, and the tab would get silently popup-blocked.
+  const win = window.open('', '_blank');
+  const original = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+  try {
+    await adminApi.post(`/api/admin/employers/${id}/impersonate`, {});
+    if (win) win.location.href = '/employer/dashboard.html';
+  } catch (e) {
+    if (win) win.close();
+    showErrToast('Could not log in as employer: ' + (e.message || 'Server error'));
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = original;
+  }
 }
 
 async function quickAction(id, status, btn) {
